@@ -81,13 +81,14 @@ function ChatInterfaceWithAgent({
     console.log("    ");
 
     // Generate logo with margin to match Ink paddingX={2}
-    const logoOutput = cfonts.render("GROK", {
+    const logoOutput = cfonts.render("GROK
+HURRY MODE", {
       font: "3d",
       align: "left",
-      colors: ["magenta", "gray"],
+      colors: ["yellow", "red"],
       space: true,
       maxLength: "0",
-      gradient: ["magenta", "cyan"],
+      gradient: ["yellow", "red", "cyan"],
       independentGradient: false,
       transitionGradient: true,
       env: "node",
