@@ -430,3 +430,23 @@ bun run typecheck
 ## License
 
 MIT
+
+## Troubleshooting
+
+### Tool Execution Errors
+
+If you encounter errors like `fs.readFile is not a function` or `fs.stat is not a function` when using file operations:
+
+1. **This is a known issue** with the tool infrastructure
+2. **Automatic fallback**: The CLI will automatically fall back to bash commands for file operations
+3. **Warning messages**: You may see console warnings like "str_replace_editor tool failed, falling back to bash"
+4. **Functionality**: Despite the warnings, operations should still work via bash fallbacks
+
+This issue is being tracked and the fallbacks ensure the CLI remains functional.
+
+### Common Issues
+
+- **File operations fail**: Check that the file path exists and is accessible
+- **Bash commands fail**: Ensure you have the necessary permissions
+- **Tool timeouts**: Complex operations may take time; the spinner indicates progress
+

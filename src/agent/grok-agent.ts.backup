@@ -639,51 +639,22 @@ Current working directory: ${process.cwd()}`,
 
       switch (toolCall.function.name) {
         case "view_file":
-          try {
-            const range: [number, number] | undefined =
-              args.start_line && args.end_line
-                ? [args.start_line, args.end_line]
-                : undefined;
-            return await this.textEditor.view(args.path, range);
-          } catch (error: any) {
-            console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            // Fallback to bash cat/head/tail
-            const path = args.path;
-            let command = `cat "${path}"`;
-            if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path}"`;
-            }
-            return await this.bash.execute(command);
-          }
+          const range: [number, number] | undefined =
+            args.start_line && args.end_line
+              ? [args.start_line, args.end_line]
+              : undefined;
+          return await this.textEditor.view(args.path, range);
 
         case "create_file":
-          try {
-            return await this.textEditor.create(args.path, args.content);
-          } catch (error: any) {
-            console.warn(`create_file tool failed, falling back to bash: ${error.message}`);
-            // Fallback to bash echo/redirect
-            const command = `cat > "${args.path}" << 'EOF'\n${args.content}\nEOF`;
-            return await this.bash.execute(command);
-          }
+          return await this.textEditor.create(args.path, args.content);
 
         case "str_replace_editor":
-          try {
-            return await this.textEditor.strReplace(
-              args.path,
-              args.old_str,
-              args.new_str,
-              args.replace_all
-            );
-          } catch (error: any) {
-            console.warn(`str_replace_editor tool failed, falling back to bash: ${error.message}`);
-            // Fallback to bash sed for replacement
-            const escapedOld = args.old_str.replace(/[\/&]/g, '\\$&');
-            const escapedNew = args.new_str.replace(/[\/&]/g, '\\$&');
-            const sedCommand = args.replace_all
-              ? `sed -i 's/${escapedOld}/${escapedNew}/g' "${args.path}"`
-              : `sed -i '0,/${escapedOld}/s/${escapedOld}/${escapedNew}/' "${args.path}"`;
-            return await this.bash.execute(sedCommand);
-          }
+          return await this.textEditor.strReplace(
+            args.path,
+            args.old_str,
+            args.new_str,
+            args.replace_all
+          );
 
         case "edit_file":
           if (!this.morphEditor) {
@@ -709,30 +680,17 @@ Current working directory: ${process.cwd()}`,
           return await this.todoTool.updateTodoList(args.updates);
 
         case "search":
-          try {
-            return await this.search.search(args.query, {
-              searchType: args.search_type,
-              includePattern: args.include_pattern,
-              excludePattern: args.exclude_pattern,
-              caseSensitive: args.case_sensitive,
-              wholeWord: args.whole_word,
-              regex: args.regex,
-              maxResults: args.max_results,
-              fileTypes: args.file_types,
-              includeHidden: args.include_hidden,
-            });
-          } catch (error: any) {
-            console.warn(`search tool failed, falling back to bash: ${error.message}`);
-            // Fallback to bash grep/find
-            let command = `grep -r "${args.query}" .`;
-            if (args.include_pattern) {
-              command += ` --include="${args.include_pattern}"`;
-            }
-            if (args.exclude_pattern) {
-              command += ` --exclude="${args.exclude_pattern}"`;
-            }
-            return await this.bash.execute(command);
-          }
+          return await this.search.search(args.query, {
+            searchType: args.search_type,
+            includePattern: args.include_pattern,
+            excludePattern: args.exclude_pattern,
+            caseSensitive: args.case_sensitive,
+            wholeWord: args.whole_word,
+            regex: args.regex,
+            maxResults: args.max_results,
+            fileTypes: args.file_types,
+            includeHidden: args.include_hidden,
+          });
 
         default:
           // Check if this is an MCP tool
