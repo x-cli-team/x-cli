@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import pkg from '../../../package.json' assert { type: 'json' };
+
 import { Box, Text } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
 import { useInputHandler } from "../../hooks/use-input-handler.js";
@@ -81,8 +83,7 @@ function ChatInterfaceWithAgent({
     console.log("    ");
 
     // Generate logo with margin to match Ink paddingX={2}
-    const logoOutput = cfonts.render("GROK
-HURRY MODE", {
+    const grokLogo = cfonts.render("GROK", {
       font: "3d",
       align: "left",
       colors: ["yellow", "red"],
@@ -95,7 +96,10 @@ HURRY MODE", {
     });
 
     // Add horizontal margin (2 spaces) to match Ink paddingX={2}
-    const logoLines = (logoOutput as any).string.split("\n");
+
+    const logoOutput = grokLogo.string + "\nHURRY MODE" + "\n" + pkg.version;
+
+    const logoLines = logoOutput.split("\n");
     logoLines.forEach((line: string) => {
       if (line.trim()) {
         console.log(" " + line); // Add 2 spaces for horizontal margin

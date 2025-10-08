@@ -18,7 +18,7 @@ A conversational AI CLI tool powered by Grok with intelligent text editor capabi
 ## Installation
 
 ### Prerequisites
-- Bun 1.0+ (or Node.js 18+ as fallback)
+- Node.js 20+ (Bun 1.0+ recommended for development)
 - Grok API key from X.AI
 - (Optional, Recommended) Morph API key for Fast Apply editing
 
@@ -36,9 +36,9 @@ npm install -g @vibe-kit/grok-cli
 ```bash
 git clone <repository>
 cd grok-cli
-bun install
-bun run build
-bun link
+npm install
+npm run build
+npm link
 ```
 
 ## Setup
@@ -405,13 +405,13 @@ grok mcp remove server-name
 
 ```bash
 # Install dependencies
-bun install
+npm install
 
 # Development mode
 bun run dev
 
 # Build project
-bun run build
+npm run build
 
 # Run linter
 bun run lint

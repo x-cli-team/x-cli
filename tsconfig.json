@@ -1,21 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "lib": ["ES2022"],
+    "target": "ES2020",
+    "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": false,
+    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "sourceMap": true,
     "resolveJsonModule": true,
-    "jsx": "react",
-    "moduleResolution": "Bundler",
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": false
+    "moduleResolution": "Bundler"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
