@@ -13,7 +13,7 @@ A conversational AI CLI tool powered by Grok with intelligent text editor capabi
 - **🚀 Morph Fast Apply**: Optional high-speed code editing at 4,500+ tokens/sec with 98% accuracy
 - **🔌 MCP Tools**: Extend capabilities with Model Context Protocol servers (Linear, GitHub, etc.)
 - **💬 Interactive UI**: Beautiful terminal interface built with Ink
-- **🌍 Global Installation**: Install and use anywhere with `bun add -g @hinetapora/grok-cli-hurry-mode`
+- **🌍 Global Installation**: Install and use anywhere with `bun add -g grok-cli-hurry-mode`
 
 ## Installation
 
@@ -24,12 +24,12 @@ A conversational AI CLI tool powered by Grok with intelligent text editor capabi
 
 ### Global Installation (Recommended)
 ```bash
-bun add -g @hinetapora/grok-cli-hurry-mode
+bun add -g grok-cli-hurry-mode
 ```
 
 Or with npm (fallback):
 ```bash
-npm install -g @hinetapora/grok-cli-hurry-mode
+npm install -g grok-cli-hurry-mode
 ```
 
 ### Local Development

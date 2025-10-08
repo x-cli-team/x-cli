@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "@hinetapora/grok-cli-hurry-mode",
+  "name": "grok-cli-hurry-mode",
   "version": "1.0.0",
   "description": "An open-source AI agent that brings the power of Grok directly into your terminal.",
   "main": "dist/index.js",
@@ -31,7 +31,7 @@
     "grok",
     "ai"
   ],
-  "author": "hinetapora",
+  "author": "grok_cli",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",
