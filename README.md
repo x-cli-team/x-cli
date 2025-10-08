@@ -2,7 +2,7 @@
 
 A conversational AI CLI tool powered by Grok with intelligent text editor capabilities and tool usage.
 
-<img width="980" height="435" alt="Screenshot 2025-07-21 at 13 35 41" src="https://github.com/user-attachments/assets/192402e3-30a8-47df-9fc8-a084c5696e78" />
+<img width="980" height="435" alt="Grok CLI Logo with HURRY MODE and Version" src="https://github.com/hinetapora/grok-cli-hurry-mode/releases/download/v0.0.33/grok-logo-screenshot.png" />
 
 ## Features
 
