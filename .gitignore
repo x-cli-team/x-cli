@@ -5,9 +5,9 @@ yarn-debug.log*
 yarn-error.log*
 # Ignore yarn lockfiles as we support both npm and Bun
 yarn.lock
-# Keep Bun lockfiles (both binary and text format)
-# bun.lockb
-# bun.lock
+# Ignore Bun lockfiles (allowing fresh dependency resolution)
+bun.lockb
+bun.lock
 
 # Build outputs
 dist/
