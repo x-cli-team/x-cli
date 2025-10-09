@@ -13,3 +13,12 @@ export {
   CodeAwareEditorTool,
   OperationHistoryTool
 } from "./advanced/index.js";
+
+// Intelligence tools
+export {
+  ASTParserTool,
+  SymbolSearchTool,
+  DependencyAnalyzerTool,
+  CodeContextTool,
+  RefactoringAssistantTool
+} from "./intelligence/index.js";

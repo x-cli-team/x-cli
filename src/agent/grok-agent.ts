@@ -19,6 +19,11 @@ import {
   FileTreeOperationsTool,
   CodeAwareEditorTool,
   OperationHistoryTool,
+  ASTParserTool,
+  SymbolSearchTool,
+  DependencyAnalyzerTool,
+  CodeContextTool,
+  RefactoringAssistantTool,
 } from "../tools/index.js";
 import { ToolResult } from "../types/index.js";
 import { EventEmitter } from "events";
@@ -59,6 +64,12 @@ export class GrokAgent extends EventEmitter {
   private fileTreeOps: FileTreeOperationsTool;
   private codeAwareEditor: CodeAwareEditorTool;
   private operationHistory: OperationHistoryTool;
+  // Intelligence tools
+  private astParser: ASTParserTool;
+  private symbolSearch: SymbolSearchTool;
+  private dependencyAnalyzer: DependencyAnalyzerTool;
+  private codeContext: CodeContextTool;
+  private refactoringAssistant: RefactoringAssistantTool;
   private chatHistory: ChatEntry[] = [];
   private messages: GrokMessage[] = [];
   private tokenCounter: TokenCounter;
@@ -90,6 +101,12 @@ export class GrokAgent extends EventEmitter {
     this.fileTreeOps = new FileTreeOperationsTool();
     this.codeAwareEditor = new CodeAwareEditorTool();
     this.operationHistory = new OperationHistoryTool();
+    // Initialize intelligence tools
+    this.astParser = new ASTParserTool();
+    this.symbolSearch = new SymbolSearchTool();
+    this.dependencyAnalyzer = new DependencyAnalyzerTool();
+    this.codeContext = new CodeContextTool();
+    this.refactoringAssistant = new RefactoringAssistantTool();
     this.tokenCounter = createTokenCounter(modelToUse);
 
     // Initialize MCP servers if configured
@@ -838,6 +855,21 @@ Current working directory: ${process.cwd()}`,
             default:
               return { success: false, error: `Unknown operation_history operation: ${args.operation}` };
           }
+
+        case "ast_parser":
+          return await this.astParser.execute(args);
+
+        case "symbol_search":
+          return await this.symbolSearch.execute(args);
+
+        case "dependency_analyzer":
+          return await this.dependencyAnalyzer.execute(args);
+
+        case "code_context":
+          return await this.codeContext.execute(args);
+
+        case "refactoring_assistant":
+          return await this.refactoringAssistant.execute(args);
 
         default:
           // Check if this is an MCP tool

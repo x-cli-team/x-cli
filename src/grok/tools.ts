@@ -241,6 +241,263 @@ const BASE_GROK_TOOLS: GrokTool[] = [
       },
     },
   },
+  // Intelligence tools
+  {
+    type: "function",
+    function: {
+      name: "ast_parser",
+      description: "Parse source code files to extract AST, symbols, imports, exports, and structural information",
+      parameters: {
+        type: "object",
+        properties: {
+          filePath: {
+            type: "string",
+            description: "Path to the source code file to parse"
+          },
+          includeSymbols: {
+            type: "boolean",
+            description: "Whether to extract symbols (functions, classes, variables, etc.)",
+            default: true
+          },
+          includeImports: {
+            type: "boolean", 
+            description: "Whether to extract import/export information",
+            default: true
+          },
+          includeTree: {
+            type: "boolean",
+            description: "Whether to include the full AST tree in response",
+            default: false
+          },
+          symbolTypes: {
+            type: "array",
+            items: {
+              type: "string",
+              enum: ["function", "class", "variable", "interface", "enum", "type", "method", "property"]
+            },
+            description: "Types of symbols to extract",
+            default: ["function", "class", "variable", "interface", "enum", "type"]
+          },
+          scope: {
+            type: "string",
+            enum: ["all", "global", "local"],
+            description: "Scope of symbols to extract",
+            default: "all"
+          }
+        },
+        required: ["filePath"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "symbol_search",
+      description: "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Search query for symbol names"
+          },
+          searchPath: {
+            type: "string",
+            description: "Root path to search in",
+            default: "current working directory"
+          },
+          symbolTypes: {
+            type: "array",
+            items: {
+              type: "string",
+              enum: ["function", "class", "variable", "interface", "enum", "type", "method", "property"]
+            },
+            description: "Types of symbols to search for",
+            default: ["function", "class", "variable", "interface", "enum", "type"]
+          },
+          includeUsages: {
+            type: "boolean",
+            description: "Whether to find usages of matched symbols",
+            default: false
+          },
+          fuzzyMatch: {
+            type: "boolean",
+            description: "Use fuzzy matching for symbol names",
+            default: true
+          },
+          caseSensitive: {
+            type: "boolean", 
+            description: "Case sensitive search",
+            default: false
+          },
+          maxResults: {
+            type: "integer",
+            description: "Maximum number of results to return",
+            default: 50,
+            minimum: 1,
+            maximum: 1000
+          }
+        },
+        required: ["query"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "dependency_analyzer",
+      description: "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs",
+      parameters: {
+        type: "object",
+        properties: {
+          rootPath: {
+            type: "string",
+            description: "Root path to analyze dependencies from",
+            default: "current working directory"
+          },
+          filePatterns: {
+            type: "array",
+            items: { type: "string" },
+            description: "Glob patterns for files to include",
+            default: ["**/*.{ts,tsx,js,jsx}"]
+          },
+          excludePatterns: {
+            type: "array",
+            items: { type: "string" },
+            description: "Glob patterns for files to exclude",
+            default: ["**/node_modules/**", "**/dist/**", "**/.git/**"]
+          },
+          includeExternals: {
+            type: "boolean",
+            description: "Include external module dependencies",
+            default: false
+          },
+          detectCircular: {
+            type: "boolean",
+            description: "Detect circular dependencies",
+            default: true
+          },
+          findUnreachable: {
+            type: "boolean",
+            description: "Find unreachable files from entry points",
+            default: true
+          },
+          generateGraph: {
+            type: "boolean",
+            description: "Generate serialized dependency graph",
+            default: false
+          }
+        },
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "code_context",
+      description: "Build intelligent code context, analyze relationships, and provide semantic understanding",
+      parameters: {
+        type: "object",
+        properties: {
+          filePath: {
+            type: "string",
+            description: "Path to the file to analyze for context"
+          },
+          rootPath: {
+            type: "string",
+            description: "Root path of the project",
+            default: "current working directory"
+          },
+          includeRelationships: {
+            type: "boolean",
+            description: "Include code relationships analysis",
+            default: true
+          },
+          includeMetrics: {
+            type: "boolean",
+            description: "Include code quality metrics",
+            default: true
+          },
+          includeSemantics: {
+            type: "boolean",
+            description: "Include semantic analysis and patterns",
+            default: true
+          },
+          maxRelatedFiles: {
+            type: "integer",
+            description: "Maximum number of related files to analyze",
+            default: 10,
+            minimum: 1,
+            maximum: 50
+          }
+        },
+        required: ["filePath"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "refactoring_assistant",
+      description: "Perform safe code refactoring operations including rename, extract, inline, and move operations",
+      parameters: {
+        type: "object",
+        properties: {
+          operation: {
+            type: "string",
+            enum: ["rename", "extract_function", "extract_variable", "inline_function", "inline_variable", "move_function", "move_class"],
+            description: "Type of refactoring operation to perform"
+          },
+          symbolName: {
+            type: "string",
+            description: "Name of symbol to refactor (for rename, inline, move operations)"
+          },
+          newName: {
+            type: "string",
+            description: "New name for symbol (for rename operation)"
+          },
+          filePath: {
+            type: "string",
+            description: "Path to file containing the symbol"
+          },
+          scope: {
+            type: "string",
+            enum: ["file", "project", "global"],
+            description: "Scope of refactoring operation",
+            default: "project"
+          },
+          includeComments: {
+            type: "boolean",
+            description: "Include comments in rename operation",
+            default: false
+          },
+          includeStrings: {
+            type: "boolean",
+            description: "Include string literals in rename operation",
+            default: false
+          },
+          startLine: {
+            type: "integer",
+            description: "Start line for extract operations"
+          },
+          endLine: {
+            type: "integer",
+            description: "End line for extract operations"
+          },
+          functionName: {
+            type: "string",
+            description: "Name for extracted function"
+          },
+          variableName: {
+            type: "string",
+            description: "Name for extracted variable"
+          }
+        },
+        required: ["operation"]
+      }
+    }
+  }
 ];
 
 // Morph Fast Apply tool (conditional)
