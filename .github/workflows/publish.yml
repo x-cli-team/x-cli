@@ -3,7 +3,6 @@ name: Publish to NPM
 on:
   push:
     branches: [main]
-    tags: ['v*']
   workflow_dispatch:
 
 jobs:
@@ -15,91 +14,70 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Setup Bun
       uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        registry-url: 'https://registry.npmjs.org'
-
     - name: Install dependencies
       run: bun install
-
-    - name: Run type check
-      run: bun run typecheck
-      continue-on-error: true  # Continue even if existing TS errors
 
     - name: Build
       run: bun run build
       continue-on-error: true  # Continue even if existing TS errors
 
-    - name: Determine version bump
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Determine and bump version
       id: version
       run: |
         # Get last commit message
         COMMIT_MSG=$(git log -1 --pretty=%B)
         
-        if [[ $COMMIT_MSG =~ \[major\] ]]; then
-          echo "bump=major" >> $GITHUB_OUTPUT
-        elif [[ $COMMIT_MSG =~ \[minor\] ]]; then
-          echo "bump=minor" >> $GITHUB_OUTPUT
-        else
-          echo "bump=patch" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Bump version
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        # Extract current version
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        echo "Current version: $CURRENT_VERSION"
         
-        if [ "${{ steps.version.outputs.bump }}" = "major" ]; then
-          npm version major
-        elif [ "${{ steps.version.outputs.bump }}" = "minor" ]; then
-          npm version minor
+        # Determine bump type
+        if [[ $COMMIT_MSG =~ \[major\] ]]; then
+          BUMP_TYPE="major"
+        elif [[ $COMMIT_MSG =~ \[minor\] ]]; then
+          BUMP_TYPE="minor"
         else
-          npm version patch
+          BUMP_TYPE="patch"
         fi
+        
+        echo "Bump type: $BUMP_TYPE"
+        
+        # Bump version and capture new version
+        NEW_VERSION=$(npm version $BUMP_TYPE --no-git-tag-version)
+        echo "New version: $NEW_VERSION"
+        
+        # Set output for later steps
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
 
-    - name: Publish to NPM
-      run: npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-    - name: Push version tag
+    - name: Commit version bump
       run: |
-        git push origin --tags
+        git add package.json
+        git commit -m "Bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+
+    - name: Create and push tag
+      run: |
+        git tag ${{ steps.version.outputs.new_version }}
         git push origin main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-on-tag:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        registry-url: 'https://registry.npmjs.org'
-
-    - name: Install dependencies
-      run: bun install
-
-    - name: Build
-      run: bun run build
-      continue-on-error: true
+        git push origin ${{ steps.version.outputs.new_version }}
 
     - name: Publish to NPM
       run: npm publish --access public
