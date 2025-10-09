@@ -97,7 +97,7 @@ function ChatInterfaceWithAgent({
 
     // Add horizontal margin (2 spaces) to match Ink paddingX={2}
 
-    const logoOutput = grokLogo.string + "\nHURRY MODE" + "\n" + pkg.version;
+    const logoOutput = (typeof grokLogo === 'object' && 'string' in grokLogo ? grokLogo.string : String(grokLogo)) + "\nHURRY MODE" + "\n" + pkg.version;
 
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line: string) => {
@@ -200,9 +200,9 @@ function ChatInterfaceWithAgent({
                         return {
                           ...entry,
                           type: "tool_result",
-                          content: chunk.toolResult.success
+                          content: chunk.toolResult?.success
                             ? chunk.toolResult.output || "Success"
-                            : chunk.toolResult.error || "Error occurred",
+                            : chunk.toolResult?.error || "Error occurred",
                           toolResult: chunk.toolResult,
                         };
                       }

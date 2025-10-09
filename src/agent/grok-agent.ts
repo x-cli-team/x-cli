@@ -1,7 +1,5 @@
 import { GrokClient, GrokMessage, GrokToolCall } from "../grok/client.js";
 import {
-  GROK_TOOLS,
-  addMCPToolsToGrokTools,
   getAllGrokTools,
   getMCPManager,
   initializeMCPServers,

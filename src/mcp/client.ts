@@ -124,10 +124,16 @@ export class MCPManager extends EventEmitter {
     // Extract the original tool name (remove mcp__servername__ prefix)
     const originalToolName = toolName.replace(`mcp__${tool.serverName}__`, '');
 
-    return await client.callTool({
+    const result = await client.callTool({
       name: originalToolName,
       arguments: arguments_
     });
+    
+    // Ensure the result has the expected content structure
+    return {
+      ...result,
+      content: result.content || []
+    } as CallToolResult;
   }
 
   getTools(): MCPTool[] {
