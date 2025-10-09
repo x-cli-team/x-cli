@@ -1,19 +1,67 @@
 # Grok CLI
 
-A conversational AI CLI tool powered by Grok with intelligent text editor capabilities and tool usage.
+[![NPM Version](https://img.shields.io/npm/v/grok-cli-hurry-mode?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/grok-cli-hurry-mode)
+[![GitHub Release](https://img.shields.io/github/v/release/hinetapora/grok-cli-hurry-mode?style=for-the-badge&logo=github&color=181717)](https://github.com/hinetapora/grok-cli-hurry-mode/releases)
+[![Downloads](https://img.shields.io/npm/dm/grok-cli-hurry-mode?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/grok-cli-hurry-mode)
+[![License](https://img.shields.io/github/license/hinetapora/grok-cli-hurry-mode?style=for-the-badge&color=green)](https://github.com/hinetapora/grok-cli-hurry-mode/blob/main/LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-xAI_Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/channels/1315720379607679066/1315822328139223064)
 
-<img width="980" height="435" alt="Grok CLI Logo with HURRY MODE and Version" src="https://github.com/hinetapora/grok-cli-hurry-mode/releases/download/v0.0.33/grok-logo-screenshot.png" />
+A conversational AI CLI tool powered by Grok with **Claude Code-level intelligence** and advanced tool capabilities.
 
-## Features
+<img width="1310" height="966" alt="Grok CLI Logo with HURRY MODE and Version" src="https://github.com/hinetapora/grok-cli-hurry-mode/releases/download/v0.0.33/grok-logo-screenshot.png" />
 
-- **🤖 Conversational AI**: Natural language interface powered by Grok-3
-- **📝 Smart File Operations**: AI automatically uses tools to view, create, and edit files
-- **⚡ Bash Integration**: Execute shell commands through natural conversation
-- **🔧 Automatic Tool Selection**: AI intelligently chooses the right tools for your requests
+## 🔗 Quick Links
+
+- **📦 [NPM Package](https://www.npmjs.com/package/grok-cli-hurry-mode)** - Install globally with `npm install -g grok-cli-hurry-mode`
+- **🐙 [GitHub Repository](https://github.com/hinetapora/grok-cli-hurry-mode)** - Source code, issues, and contributions
+- **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
+- **📚 [Releases](https://github.com/hinetapora/grok-cli-hurry-mode/releases)** - Version history and changelogs
+
+## 🆕 What's New in v1.0+
+
+### 🧠 **P2: Code Intelligence Tools** (Latest)
+- **🔍 AST Parser**: Language-specific syntax tree analysis for TypeScript, JavaScript, Python
+- **🔎 Symbol Search**: Fuzzy search across codebases with cross-references and usage analysis
+- **📊 Dependency Analyzer**: Circular dependency detection and dependency graph generation
+- **🎯 Code Context**: Semantic analysis with quality metrics and design pattern detection
+- **🔧 Refactoring Assistant**: Safe rename, extract, inline operations with preview and rollback
+
+### 🚀 **P1: Enhanced File Operations** 
+- **⚡ Multi-File Editor**: Atomic operations with transaction support and rollback
+- **🔍 Advanced Search Tool**: Regex patterns with bulk replace and context-aware results
+- **🌳 File Tree Operations**: Visual trees, bulk operations, and intelligent file organization
+- **🧠 Code-Aware Editor**: Syntax-aware editing with smart refactoring capabilities
+- **📚 Operation History**: Comprehensive undo/redo system with persistent history
+
+**🎯 Result**: **Claude Code-level capabilities** in your terminal!
+
+## ✨ Features
+
+### 🧠 **Claude Code-Level Intelligence**
+- **🔍 AST Code Analysis**: Parse TypeScript, JavaScript, Python files to extract symbols, imports, and structure
+- **🔎 Symbol Search**: Fuzzy search for functions, classes, variables across entire codebases
+- **📊 Dependency Analysis**: Detect circular dependencies and generate dependency graphs
+- **🎯 Code Context**: Intelligent relationship mapping with semantic analysis and quality metrics
+- **🔧 Safe Refactoring**: Rename, extract, inline operations with preview and rollback support
+
+### 🚀 **Advanced File Operations** 
+- **⚡ Multi-File Editing**: Atomic operations across multiple files with transaction support
+- **🔍 Advanced Search**: Regex patterns with bulk replace and context-aware results
+- **🌳 File Tree Operations**: Visual directory trees, bulk operations, and file organization
+- **📚 Operation History**: Comprehensive undo/redo with persistent history and snapshots
 - **🚀 Morph Fast Apply**: Optional high-speed code editing at 4,500+ tokens/sec with 98% accuracy
-- **🔌 MCP Tools**: Extend capabilities with Model Context Protocol servers (Linear, GitHub, etc.)
-- **💬 Interactive UI**: Beautiful terminal interface built with Ink
-- **🌍 Global Installation**: Install and use anywhere with `bun add -g grok-cli-hurry-mode`
+
+### 🤖 **Core AI Capabilities**
+- **💬 Conversational Interface**: Natural language powered by Grok models
+- **🔧 Intelligent Tool Selection**: AI automatically chooses the right tools for your requests
+- **⚡ Bash Integration**: Execute shell commands through natural conversation
+- **🔌 MCP Extension**: Extend capabilities with Model Context Protocol servers (Linear, GitHub, etc.)
+- **💻 Beautiful Terminal UI**: Interactive interface built with Ink and Claude Code-style animations
+
+### 🌍 **Installation & Setup**
+- **📦 Global Installation**: Install anywhere with `npm install -g grok-cli-hurry-mode`
+- **⚙️ Flexible Configuration**: Environment variables, user settings, or project-specific configs
+- **🔄 CI/CD Ready**: Headless mode perfect for automation and scripting
 
 ## Installation
 
