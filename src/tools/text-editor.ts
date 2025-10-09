@@ -75,6 +75,13 @@ export class TextEditorTool {
     replaceAll: boolean = false
   ): Promise<ToolResult> {
     try {
+      if (oldStr === "") {
+        return {
+          success: false,
+          error: "oldStr cannot be an empty string",
+        };
+      }
+
       const resolvedPath = path.resolve(filePath);
 
       if (!(await fs.pathExists(resolvedPath))) {
@@ -166,6 +173,13 @@ export class TextEditorTool {
   async create(filePath: string, content: string): Promise<ToolResult> {
     try {
       const resolvedPath = path.resolve(filePath);
+
+      if (await fs.pathExists(resolvedPath)) {
+        return {
+          success: false,
+          error: `File already exists: ${filePath}`,
+        };
+      }
 
       // Check if user has already accepted file operations for this session
       const sessionFlags = this.confirmationService.getSessionFlags();

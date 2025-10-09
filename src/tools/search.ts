@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { spawn, execSync } from "child_process";
 import { ToolResult } from "../types/index.js";
 import { ConfirmationService } from "../utils/confirmation-service.js";
 import * as fs from "fs-extra";
@@ -123,7 +123,16 @@ export class SearchTool {
     }
   ): Promise<SearchResult[]> {
     return new Promise((resolve, reject) => {
-      const args = [
+      // Check if ripgrep is installed
+      try {
+        execSync('which rg', { stdio: 'ignore' });
+      } catch {
+        reject(new Error('ripgrep is not installed. Please install it to use text search. Visit https://github.com/BurntSushi/ripgrep#installation'));
+        return;
+      }
+
+      // If ripgrep is available, proceed with search
+        const args = [
         "--json",
         "--with-filename",
         "--line-number",

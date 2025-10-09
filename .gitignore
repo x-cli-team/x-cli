@@ -21,6 +21,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.npmrc
 
 # IDE and editor files
 .vscode/
@@ -87,9 +88,18 @@ coverage/
 tmp/
 temp/
 
+# Temporary files
+fix.awk
+sed_cmd.sh
+temp.txt
+*.backup
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+
+# Project-specific ignores
+sprints/
 .idea
 *.suo
 *.ntvs*

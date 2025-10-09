@@ -14,6 +14,11 @@ import {
   TodoTool,
   ConfirmationTool,
   SearchTool,
+  MultiFileEditorTool,
+  AdvancedSearchTool,
+  FileTreeOperationsTool,
+  CodeAwareEditorTool,
+  OperationHistoryTool,
 } from "../tools/index.js";
 import { ToolResult } from "../types/index.js";
 import { EventEmitter } from "events";
@@ -48,6 +53,12 @@ export class GrokAgent extends EventEmitter {
   private todoTool: TodoTool;
   private confirmationTool: ConfirmationTool;
   private search: SearchTool;
+  // Advanced tools
+  private multiFileEditor: MultiFileEditorTool;
+  private advancedSearch: AdvancedSearchTool;
+  private fileTreeOps: FileTreeOperationsTool;
+  private codeAwareEditor: CodeAwareEditorTool;
+  private operationHistory: OperationHistoryTool;
   private chatHistory: ChatEntry[] = [];
   private messages: GrokMessage[] = [];
   private tokenCounter: TokenCounter;
@@ -73,6 +84,12 @@ export class GrokAgent extends EventEmitter {
     this.todoTool = new TodoTool();
     this.confirmationTool = new ConfirmationTool();
     this.search = new SearchTool();
+    // Initialize advanced tools
+    this.multiFileEditor = new MultiFileEditorTool();
+    this.advancedSearch = new AdvancedSearchTool();
+    this.fileTreeOps = new FileTreeOperationsTool();
+    this.codeAwareEditor = new CodeAwareEditorTool();
+    this.operationHistory = new OperationHistoryTool();
     this.tokenCounter = createTokenCounter(modelToUse);
 
     // Initialize MCP servers if configured
@@ -90,6 +107,8 @@ export class GrokAgent extends EventEmitter {
       content: `You are Grok CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}
 
 You have access to these tools:
+
+CORE TOOLS:
 - view_file: View file contents or directory listings
 - create_file: Create new files with content (ONLY use this for files that don't exist yet)
 - str_replace_editor: Replace text in existing files (ALWAYS use this to edit or update existing files)${
@@ -101,6 +120,13 @@ You have access to these tools:
 - search: Unified search tool for finding text content or files (similar to Cursor's search functionality)
 - create_todo_list: Create a visual todo list for planning and tracking tasks
 - update_todo_list: Update existing todos in your todo list
+
+ADVANCED TOOLS:
+- multi_file_edit: Perform atomic operations across multiple files with transaction support
+- advanced_search: Enhanced search with regex patterns, context, and bulk replace capabilities
+- file_tree_ops: Generate directory trees, bulk operations, and file organization
+- code_analysis: Analyze code structure, perform refactoring, and smart code operations
+- operation_history: Track, undo, and redo operations with comprehensive history management
 
 REAL-TIME INFORMATION:
 You have access to real-time web search and X (Twitter) data. When users ask for current information, latest news, or recent events, you automatically have access to up-to-date information from the web and social media.
@@ -732,6 +758,85 @@ Current working directory: ${process.cwd()}`,
               command += ` --exclude="${args.exclude_pattern}"`;
             }
             return await this.bash.execute(command);
+          }
+
+        // Advanced Tools
+        case "multi_file_edit":
+          switch (args.operation) {
+            case "begin_transaction":
+              return await this.multiFileEditor.beginTransaction(args.description);
+            case "add_operations":
+              return await this.multiFileEditor.addOperations(args.operations);
+            case "preview_transaction":
+              return await this.multiFileEditor.previewTransaction();
+            case "commit_transaction":
+              return await this.multiFileEditor.commitTransaction();
+            case "rollback_transaction":
+              return await this.multiFileEditor.rollbackTransaction(args.transaction_id);
+            case "execute_multi_file":
+              return await this.multiFileEditor.executeMultiFileOperation(args.operations, args.description);
+            default:
+              return { success: false, error: `Unknown multi_file_edit operation: ${args.operation}` };
+          }
+
+        case "advanced_search":
+          switch (args.operation) {
+            case "search":
+              return await this.advancedSearch.search(args.path, args.options);
+            case "search_replace":
+              return await this.advancedSearch.searchAndReplace(args.path, args.options);
+            case "find_files":
+              return await this.advancedSearch.findFiles(args.path, args.pattern, args.options);
+            default:
+              return { success: false, error: `Unknown advanced_search operation: ${args.operation}` };
+          }
+
+        case "file_tree_ops":
+          switch (args.operation) {
+            case "generate_tree":
+              return await this.fileTreeOps.generateTree(args.path, args.options);
+            case "bulk_operations":
+              return await this.fileTreeOps.bulkOperations(args.operations);
+            case "copy_structure":
+              return await this.fileTreeOps.copyStructure(args.source, args.destination, args.options);
+            case "organize_files":
+              return await this.fileTreeOps.organizeFiles(args.source, args.organization_type, args.destination);
+            case "cleanup_empty_dirs":
+              return await this.fileTreeOps.cleanupEmptyDirectories(args.path);
+            default:
+              return { success: false, error: `Unknown file_tree_ops operation: ${args.operation}` };
+          }
+
+        case "code_analysis":
+          switch (args.operation) {
+            case "analyze":
+              return await this.codeAwareEditor.analyzeCode(args.file_path);
+            case "refactor":
+              return await this.codeAwareEditor.refactor(args.file_path, args.refactor_operation);
+            case "smart_insert":
+              return await this.codeAwareEditor.smartInsert(args.file_path, args.code, args.location, args.target);
+            case "format_code":
+              return await this.codeAwareEditor.formatCode(args.file_path, args.options);
+            case "add_imports":
+              return await this.codeAwareEditor.addMissingImports(args.file_path, args.symbols);
+            default:
+              return { success: false, error: `Unknown code_analysis operation: ${args.operation}` };
+          }
+
+        case "operation_history":
+          switch (args.operation) {
+            case "show_history":
+              return await this.operationHistory.showHistory(args.limit);
+            case "undo":
+              return await this.operationHistory.undo();
+            case "redo":
+              return await this.operationHistory.redo();
+            case "goto_point":
+              return await this.operationHistory.goToHistoryPoint(args.entry_id);
+            case "clear_history":
+              return await this.operationHistory.clearHistory();
+            default:
+              return { success: false, error: `Unknown operation_history operation: ${args.operation}` };
           }
 
         default:

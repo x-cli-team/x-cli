@@ -10,19 +10,30 @@ interface LoadingSpinnerProps {
 
 const loadingTexts = [
   "Thinking...",
-  "Computing...",
-  "Analyzing...",
   "Processing...",
-  "Calculating...",
-  "Interfacing...",
-  "Optimizing...",
-  "Synthesizing...",
-  "Decrypting...",
-  "Calibrating...",
-  "Bootstrapping...",
-  "Synchronizing...",
-  "Compiling...",
-  "Downloading...",
+  "Analyzing...",
+  "Working...",
+  "Computing...",
+  "Generating...",
+  "Herding electrons...",
+  "Combobulating...",
+  "Discombobulating...",
+  "Recombobulating...",
+  "Calibrating flux capacitors...",
+  "Reticulating splines...",
+  "Adjusting bell curves...",
+  "Optimizing bit patterns...",
+  "Harmonizing frequencies...",
+  "Synchronizing timelines...",
+  "Defragmenting thoughts...",
+  "Compiling wisdom...",
+  "Bootstrapping reality...",
+  "Untangling quantum states...",
+  "Negotiating with servers...",
+  "Convincing pixels to cooperate...",
+  "Summoning digital spirits...",
+  "Caffeinating algorithms...",
+  "Debugging the universe...",
 ];
 
 export function LoadingSpinner({
@@ -36,11 +47,11 @@ export function LoadingSpinner({
   useEffect(() => {
     if (!isActive) return;
 
-    const spinnerFrames = ["/", "-", "\\", "|"];
-    // Reduced frequency: 500ms instead of 250ms to reduce flickering on Windows
+    const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+    // Smooth animation with faster transitions like Claude Code
     const interval = setInterval(() => {
       setSpinnerFrame((prev) => (prev + 1) % spinnerFrames.length);
-    }, 500);
+    }, 80);
 
     return () => clearInterval(interval);
   }, [isActive]);
@@ -60,16 +71,15 @@ export function LoadingSpinner({
 
   if (!isActive) return null;
 
-  const spinnerFrames = ["/", "-", "\\", "|"];
+  const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
   return (
     <Box marginTop={1}>
-      <Text color="cyan">
-        {spinnerFrames[spinnerFrame]} {loadingTexts[loadingTextIndex]}{" "}
+      <Text color="blue">
+        {spinnerFrames[spinnerFrame]} {loadingTexts[loadingTextIndex]}
       </Text>
       <Text color="gray">
-        ({processingTime}s · ↑ {formatTokenCount(tokenCount)} tokens · esc to
-        interrupt)
+        {" "}({processingTime}s · ↑ {formatTokenCount(tokenCount)} tokens · esc to interrupt)
       </Text>
     </Box>
   );
