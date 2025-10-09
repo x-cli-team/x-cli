@@ -99,13 +99,20 @@ temp.txt
 !.vscode/extensions.json
 
 # Project-specific ignores
-sprints/
 .idea
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Development files and documentation
+dev/
+test-*.js
+test-*.ts
+demo-*.ts
+demo-*.js
+*test*.md
 
 # Coding agents
 .claude/
