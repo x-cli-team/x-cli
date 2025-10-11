@@ -24,6 +24,6 @@ export default defineConfig({
   treeshake: true,
   // Preserve shebang
   banner: {
-    js: '',
+    js: '#!/usr/bin/env node',
   }
 });

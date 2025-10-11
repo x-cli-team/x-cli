@@ -16,8 +16,8 @@
     "grok": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "build:tsup": "tsup",
+    "build": "tsup",
+    "build:tsc": "tsc",
     "dev": "npm run build && node dist/index.js",
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
