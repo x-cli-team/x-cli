@@ -187,3 +187,38 @@ The ultimate goal is to match Claude Code's capabilities in:
 - **User Experience**: Intuitive and efficient interaction patterns
 
 This CLI aims to bring the power of Claude Code to terminal-based workflows while maintaining the flexibility and extensibility that makes it unique.
+
+## 📚 Documentation System Workflow
+
+### Before Planning Features:
+1. **Read `.agent/README.md`** for project overview
+2. **Check `.agent/system/`** for architecture context
+3. **Review `.agent/tasks/`** for related work
+4. **Scan `.agent/sop/`** for established patterns
+
+### During Implementation:
+- Store PRDs in `.agent/tasks/` before coding
+- Reference architecture docs for consistency
+- Follow established patterns from SOPs
+- Use cross-references between .agent docs
+
+### After Implementation:
+- Run `/update-agent-docs` to capture changes
+- Update `.agent/system/` if architecture changed
+- Add new SOPs for repeatable processes
+- Link related tasks and documents
+
+### Documentation Rules:
+- Keep system docs as single source of truth
+- Use relative links between .agent documents  
+- Maintain concise, actionable content
+- Update cross-references when adding new docs
+
+### Token Optimization:
+- Read .agent docs hierarchically (README → critical-state → relevant docs)
+- Expect ~600 tokens for full context vs 3000+ without system
+- Use .agent structure to avoid redundant codebase scanning
+- Reference existing documentation rather than recreating context
+
+---
+*This section was added by the Grok CLI documentation system*

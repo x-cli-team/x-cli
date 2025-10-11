@@ -1,9 +1,20 @@
 import { ToolResult } from "../../types/index.js";
-import Parser from "tree-sitter";
-import JavaScript from "tree-sitter-javascript";
-import TypeScript from "tree-sitter-typescript";
-import Python from "tree-sitter-python";
 import { parse as parseTS } from "@typescript-eslint/typescript-estree";
+
+// Conditional tree-sitter imports for development compatibility
+let Parser: any;
+let JavaScript: any;
+let TypeScript: any;
+let Python: any;
+
+try {
+  Parser = require("tree-sitter");
+  JavaScript = require("tree-sitter-javascript");
+  TypeScript = require("tree-sitter-typescript");
+  Python = require("tree-sitter-python");
+} catch (error) {
+  console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
+}
 import fs from "fs-extra";
 import path from "path";
 
@@ -79,13 +90,18 @@ export class ASTParserTool {
   name = "ast_parser";
   description = "Parse source code files to extract AST, symbols, imports, exports, and structural information";
 
-  private parsers: Map<string, Parser> = new Map();
+  private parsers: Map<string, any> = new Map();
 
   constructor() {
     this.initializeParsers();
   }
 
   private initializeParsers() {
+    if (!Parser || !JavaScript || !TypeScript || !Python) {
+      console.log("Tree-sitter parsers not available, using TypeScript-only parsing");
+      return;
+    }
+    
     try {
       // JavaScript/JSX parser
       const jsParser = new Parser();
@@ -256,6 +272,10 @@ export class ASTParserTool {
   private async parseWithTreeSitter(content: string, language: string, filePath: string): Promise<ParseResult> {
     const parser = this.parsers.get(language);
     if (!parser) {
+      // Fall back to TypeScript parsing if tree-sitter parser not available
+      if (language === 'typescript' || language === 'ts' || language === 'javascript' || language === 'js') {
+        return await this.parseWithTypeScript(content, language, filePath);
+      }
       throw new Error(`Unsupported language: ${language}`);
     }
 

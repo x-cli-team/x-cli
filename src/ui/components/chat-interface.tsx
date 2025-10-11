@@ -312,7 +312,13 @@ function ChatInterfaceWithAgent({
             <Text color="gray">
               4. Press Shift+Tab to toggle auto-edit mode.
             </Text>
-            <Text color="gray">5. /help for more information.</Text>
+            <Text color="gray">
+              5. Run "/init-agent" to set up an .agent docs system for this project.
+            </Text>
+            <Text color="gray">
+              6. Run "/heal" after errors to capture a fix and add a guardrail.
+            </Text>
+            <Text color="gray">7. /help for more information.</Text>
           </Box>
         </Box>
       )}

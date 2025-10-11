@@ -113,7 +113,24 @@ test-*.ts
 demo-*.ts
 demo-*.js
 *test*.md
+dev-runner.js
+run-local.sh
+setup-dev-command.sh
+test-changes.sh
+test-core.js
+test-dev.sh
+test-example.js
+test-example.py
+test-local.js
+test-minimal.js
+test-p2-tools.js
+dev.sh
+grok-dev*
+dev-workflow.md
 
 # Coding agents
 .claude/
 .grok/
+
+# Agent documentation system (track this)
+!.agent/
