@@ -518,6 +518,10 @@ bun run typecheck
 
 MIT
 
+## Credits
+
+This project is based on [grok-cli](https://github.com/superagent-ai/grok-cli) by [@pelaseyed](https://x.com/pelaseyed).
+
 ## Troubleshooting
 
 ### Tool Execution Errors
