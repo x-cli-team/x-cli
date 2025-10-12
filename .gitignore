@@ -10,7 +10,7 @@ bun.lockb
 bun.lock
 
 # Build outputs
-dist/
+# dist/  # Temporarily commit dist for version fix
 lib/
 build/
 *.tsbuildinfo
