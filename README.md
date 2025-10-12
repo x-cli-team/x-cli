@@ -74,7 +74,33 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 ## Installation
 
 ### Prerequisites
-- Node.js 20+ (Bun 1.0+ recommended for development)
+- Node.js 18+ (Node.js 20+ recommended)
+
+### Quick Install
+```bash
+npm install -g grok-cli-hurry-mode
+```
+
+### Troubleshooting Installation Issues
+
+If you encounter `ENOTEMPTY` errors during installation:
+
+```bash
+# Method 1: Force reinstall
+npm install -g grok-cli-hurry-mode --force
+
+# Method 2: Clean install (if Method 1 fails)
+npm uninstall -g grok-cli-hurry-mode 2>/dev/null || true
+npm cache clean --force
+npm install -g grok-cli-hurry-mode
+
+# Method 3: Alternative package managers
+# Using Yarn
+yarn global add grok-cli-hurry-mode
+
+# Using pnpm  
+pnpm add -g grok-cli-hurry-mode
+```
 - Grok API key from X.AI
 - (Optional, Recommended) Morph API key for Fast Apply editing
 

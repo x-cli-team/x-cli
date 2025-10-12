@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "grok-cli-hurry-mode",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "An open-source AI agent that brings the power of Grok directly into your terminal.",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -25,7 +25,9 @@
     "start:bun": "bun run dist/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
-    "install:bun": "bun install"
+    "install:bun": "bun install",
+    "preinstall": "echo 'Installing Grok CLI...'",
+    "postinstall": "echo 'Grok CLI installed successfully! Run: grok --help'"
   },
   "keywords": [
     "cli",
@@ -90,7 +92,11 @@
     "LICENSE"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "installConfig": {
+    "hoisting": false
   },
   "optionalDependencies": {
     "tree-sitter": "^0.21.1",
