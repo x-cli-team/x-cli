@@ -83,17 +83,9 @@ function ChatInterfaceWithAgent({
     console.log("    ");
 
     // Generate logo with margin to match Ink paddingX={2}
-    const grokLogo = cfonts.render("GROK", {
-      font: "3d",
-      align: "left",
-      colors: ["yellow", "red"],
-      space: true,
-      maxLength: "0",
-      gradient: ["yellow", "red", "cyan"],
-      independentGradient: false,
-      transitionGradient: true,
-      env: "node",
-    });
+    const grokLogo = {
+      string: "\x1b[33m  #####   #####   #####   #    #\n#        #    #  #     #  #   #\n#  ###   #    #  #     #  #  #\n#    #   #####   #     #  # #\n#  ###   #  #    #     #  #  #\n#        #   #   #     #  #   #\n  #####   #    #   #####   #    #\x1b[0m"
+    };
 
     // Add horizontal margin (2 spaces) to match Ink paddingX={2}
 

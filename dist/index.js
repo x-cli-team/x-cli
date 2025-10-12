@@ -23,7 +23,6 @@ import { encoding_for_model, get_encoding } from 'tiktoken';
 import crypto from 'crypto';
 import { marked } from 'marked';
 import TerminalRenderer from 'marked-terminal';
-import cfonts from 'cfonts';
 import chalk from 'chalk';
 
 var __defProp = Object.defineProperty;
@@ -9242,7 +9241,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.26"};
+  version: "1.0.27"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -14604,6 +14603,8 @@ function ApiKeyInput({ onApiKeySet }) {
   const displayText = input.length > 0 ? isSubmitting ? "*".repeat(input.length) : "*".repeat(input.length) + "\u2588" : isSubmitting ? " " : "\u2588";
   return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", paddingX: 2, paddingY: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "yellow" }, "\u{1F511} Grok API Key Required"), /* @__PURE__ */ React12.createElement(Box, { marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "Please enter your Grok API key to continue:")), /* @__PURE__ */ React12.createElement(Box, { borderStyle: "round", borderColor: "blue", paddingX: 1, marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u276F "), /* @__PURE__ */ React12.createElement(Text, null, displayText)), error ? /* @__PURE__ */ React12.createElement(Box, { marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "red" }, "\u274C ", error)) : null, /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2022 Press Enter to submit"), /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2022 Press Ctrl+C to exit"), /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "Note: API key will be saved to ~/.grok/user-settings.json")), isSubmitting ? /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "yellow" }, "\u{1F504} Validating API key...")) : null);
 }
+
+// src/ui/components/chat-interface.tsx
 function ChatInterfaceWithAgent({
   agent,
   initialMessage
@@ -14647,17 +14648,9 @@ function ChatInterfaceWithAgent({
       console.clear();
     }
     console.log("    ");
-    const grokLogo = cfonts.render("GROK", {
-      font: "3d",
-      align: "left",
-      colors: ["yellow", "red"],
-      space: true,
-      maxLength: "0",
-      gradient: ["yellow", "red", "cyan"],
-      independentGradient: false,
-      transitionGradient: true,
-      env: "node"
-    });
+    const grokLogo = {
+      string: "\x1B[33m  #####   #####   #####   #    #\n#        #    #  #     #  #   #\n#  ###   #    #  #     #  #  #\n#    #   #####   #     #  # #\n#  ###   #  #    #     #  #  #\n#        #   #   #     #  #   #\n  #####   #    #   #####   #    #\x1B[0m"
+    };
     const logoOutput = (typeof grokLogo === "object" && "string" in grokLogo ? grokLogo.string : String(grokLogo)) + "\nHURRY MODE\n" + package_default.version;
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line) => {
@@ -15085,10 +15078,6 @@ function createMCPCommand() {
   return mcpCommand;
 }
 
-// package.json with { type: 'json' }
-var package_default2 = {
-  version: "1.0.26"};
-
 // src/index.ts
 dotenv.config();
 process.on("SIGTERM", () => {
@@ -15288,7 +15277,7 @@ async function processPromptHeadless(prompt, apiKey, baseURL, model, maxToolRoun
 }
 program.name("grok").description(
   "A conversational AI CLI tool powered by Grok with text editor capabilities"
-).version(package_default2.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)").option(
+).version(package_default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)").option(
   "-u, --base-url <url>",
   "Grok API base URL (or set GROK_BASE_URL env var)"
 ).option(
