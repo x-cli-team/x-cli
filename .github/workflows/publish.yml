@@ -69,8 +69,13 @@ jobs:
         git add package.json
         git commit -m "Bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
 
-    - name: Build with correct version
-      run: bun run build
+    - name: Clean and build with correct version
+      run: |
+        echo "🏗️ Building with version: ${{ steps.version.outputs.new_version }}"
+        rm -rf dist/
+        bun run build
+        echo "📦 Checking embedded version in built file:"
+        grep -A2 -B2 "version.*:" dist/index.js | head -5 || echo "Version check failed"
       continue-on-error: true  # Continue even if existing TS errors
 
     - name: Create and push tag
