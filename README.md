@@ -58,6 +58,14 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **🔌 MCP Extension**: Extend capabilities with Model Context Protocol servers (Linear, GitHub, etc.)
 - **💻 Beautiful Terminal UI**: Interactive interface built with Ink and Claude Code-style animations
 
+### 📚 **Documentation System**
+- **🏗️ Agent Documentation**: Complete `.agent/` system for AI context optimization
+- **📖 Interactive Commands**: `/docs` menu, `/readme` generation, `/api-docs`, `/changelog`
+- **🔄 Smart Updates**: `/update-agent-docs` with configurable auto-triggers
+- **🤖 Subagent Framework**: Token-optimized processing with specialized agents
+- **🛡️ Self-Healing**: `/heal` command captures incidents and generates guardrails
+- **📝 Code Comments**: `/comments` command for automatic code documentation
+
 ### 🌍 **Installation & Setup**
 - **📦 Global Installation**: Install anywhere with `npm install -g grok-cli-hurry-mode`
 - **⚙️ Flexible Configuration**: Environment variables, user settings, or project-specific configs
