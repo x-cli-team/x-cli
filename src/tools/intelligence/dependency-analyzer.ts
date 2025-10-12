@@ -1,6 +1,18 @@
 import { ToolResult } from "../../types/index.js";
 import { ASTParserTool, ImportInfo, ExportInfo } from "./ast-parser.js";
-import fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import path from "path";
 import { glob } from "glob";
 
@@ -74,7 +86,7 @@ export class DependencyAnalyzerTool {
         maxDepth = 50
       } = args;
 
-      if (!await fs.pathExists(rootPath)) {
+      if (!await pathExists(rootPath)) {
         throw new Error(`Root path does not exist: ${rootPath}`);
       }
 
@@ -276,7 +288,7 @@ export class DependencyAnalyzerTool {
         continue;
       }
 
-      if (resolvedPath && await fs.pathExists(resolvedPath)) {
+      if (resolvedPath && await pathExists(resolvedPath)) {
         dependencies.push(resolvedPath);
       }
     }
@@ -292,7 +304,7 @@ export class DependencyAnalyzerTool {
     
     for (const ext of extensions) {
       const fullPath = basePath + ext;
-      if (await fs.pathExists(fullPath)) {
+      if (await pathExists(fullPath)) {
         return fullPath;
       }
     }
@@ -300,7 +312,7 @@ export class DependencyAnalyzerTool {
     // Try index files
     for (const ext of extensions) {
       const indexPath = path.join(basePath, `index${ext}`);
-      if (await fs.pathExists(indexPath)) {
+      if (await pathExists(indexPath)) {
         return indexPath;
       }
     }

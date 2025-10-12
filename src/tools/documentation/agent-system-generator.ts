@@ -31,17 +31,17 @@ export class AgentSystemGenerator {
       }
 
       // Create .agent directory structure
-      await fs.mkdir(agentPath, { recursive: true });
-      await fs.mkdir(path.join(agentPath, 'system'), { recursive: true });
-      await fs.mkdir(path.join(agentPath, 'tasks'), { recursive: true });
-      await fs.mkdir(path.join(agentPath, 'sop'), { recursive: true });
-      await fs.mkdir(path.join(agentPath, 'incidents'), { recursive: true });
-      await fs.mkdir(path.join(agentPath, 'guardrails'), { recursive: true });
-      await fs.mkdir(path.join(agentPath, 'commands'), { recursive: true });
+      await ops.mkdir(agentPath, { recursive: true });
+      await ops.mkdir(path.join(agentPath, 'system'), { recursive: true });
+      await ops.mkdir(path.join(agentPath, 'tasks'), { recursive: true });
+      await ops.mkdir(path.join(agentPath, 'sop'), { recursive: true });
+      await ops.mkdir(path.join(agentPath, 'incidents'), { recursive: true });
+      await ops.mkdir(path.join(agentPath, 'guardrails'), { recursive: true });
+      await ops.mkdir(path.join(agentPath, 'commands'), { recursive: true });
 
       // Generate README.md (index file)
       const readmeContent = this.generateReadmeContent();
-      await fs.writeFile(path.join(agentPath, 'README.md'), readmeContent);
+      await ops.promises.writeFile(path.join(agentPath, 'README.md'), readmeContent);
       filesCreated.push('.agent/README.md');
 
       // Generate system documentation
@@ -166,17 +166,17 @@ Documentation for documentation system commands:
       ? this.generateGrokArchitecture() 
       : this.generateExternalArchitecture();
     
-    await fs.writeFile(path.join(systemPath, 'architecture.md'), archContent);
+    await ops.promises.writeFile(path.join(systemPath, 'architecture.md'), archContent);
     files.push('.agent/system/architecture.md');
 
     // Critical state snapshot
     const criticalStateContent = this.generateCriticalState();
-    await fs.writeFile(path.join(systemPath, 'critical-state.md'), criticalStateContent);
+    await ops.promises.writeFile(path.join(systemPath, 'critical-state.md'), criticalStateContent);
     files.push('.agent/system/critical-state.md');
 
     // API schema (if applicable)
     const apiContent = this.generateApiSchema();
-    await fs.writeFile(path.join(systemPath, 'api-schema.md'), apiContent);
+    await ops.promises.writeFile(path.join(systemPath, 'api-schema.md'), apiContent);
     files.push('.agent/system/api-schema.md');
 
     return files;
@@ -543,7 +543,7 @@ interface Tool {
 *Updated: ${new Date().toISOString().split('T')[0]}*
 `;
 
-    await fs.writeFile(path.join(sopPath, 'documentation-workflow.md'), docWorkflowContent);
+    await ops.promises.writeFile(path.join(sopPath, 'documentation-workflow.md'), docWorkflowContent);
     files.push('.agent/sop/documentation-workflow.md');
 
     // Adding new command SOP (Grok CLI specific)
@@ -621,7 +621,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
 *Updated: ${new Date().toISOString().split('T')[0]}*
 `;
 
-      await fs.writeFile(path.join(sopPath, 'adding-new-command.md'), newCommandContent);
+      await ops.promises.writeFile(path.join(sopPath, 'adding-new-command.md'), newCommandContent);
       files.push('.agent/sop/adding-new-command.md');
     }
 
@@ -636,7 +636,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
       ? this.generateGrokExampleTask()
       : this.generateExternalExampleTask();
 
-    await fs.writeFile(path.join(tasksPath, 'example-prd.md'), exampleContent);
+    await ops.promises.writeFile(path.join(tasksPath, 'example-prd.md'), exampleContent);
     files.push('.agent/tasks/example-prd.md');
 
     return files;
@@ -835,7 +835,7 @@ After initialization:
 *Updated: ${new Date().toISOString().split('T')[0]}*
 `;
 
-    await fs.writeFile(path.join(commandsPath, 'init-agent.md'), initAgentContent);
+    await ops.promises.writeFile(path.join(commandsPath, 'init-agent.md'), initAgentContent);
     files.push('.agent/commands/init-agent.md');
 
     return files;
@@ -847,7 +847,7 @@ After initialization:
     try {
       // Remove existing .agent directory if it exists
       if (existsSync(agentPath)) {
-        await fs.rm(agentPath, { recursive: true, force: true });
+        await ops.rm(agentPath, { recursive: true, force: true });
       }
 
       // Generate new system

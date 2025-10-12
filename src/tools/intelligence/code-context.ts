@@ -2,7 +2,19 @@ import { ToolResult } from "../../types/index.js";
 import { ASTParserTool, SymbolInfo } from "./ast-parser.js";
 import { SymbolSearchTool, SymbolReference } from "./symbol-search.js";
 import { DependencyAnalyzerTool } from "./dependency-analyzer.js";
-import fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import path from "path";
 
 export interface CodeContext {
@@ -152,7 +164,7 @@ export class CodeContextTool {
         throw new Error("File path is required");
       }
 
-      if (!await fs.pathExists(filePath)) {
+      if (!await pathExists(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
 
@@ -329,7 +341,7 @@ export class CodeContextTool {
     const patterns: UsagePattern[] = [];
 
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await ops.promises.readFile(filePath, 'utf-8');
       const lines = content.split('\n');
 
       // Simple pattern analysis
@@ -540,7 +552,7 @@ export class CodeContextTool {
     dependencies: ContextualDependency[]
   ): Promise<SemanticContext> {
     const fileName = path.basename(filePath);
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await ops.promises.readFile(filePath, 'utf-8');
 
     // Determine purpose
     const purpose = this.inferPurpose(fileName, symbols, content);
@@ -718,7 +730,7 @@ export class CodeContextTool {
   }
 
   private async calculateCodeMetrics(filePath: string, symbols: ContextualSymbol[]): Promise<CodeMetrics> {
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await ops.promises.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
     const codeLines = lines.filter(line => line.trim().length > 0 && !line.trim().startsWith('//'));
 

@@ -1,7 +1,19 @@
 import { spawn, execSync } from "child_process";
 import { ToolResult } from "../types/index.js";
 import { ConfirmationService } from "../utils/confirmation-service.js";
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 
 export interface SearchResult {
@@ -281,7 +293,7 @@ export class SearchTool {
       if (depth > 10 || files.length >= maxResults) return; // Prevent infinite recursion and limit results
 
       try {
-        const entries = await fs.readdir(dir, { withFileTypes: true });
+        const entries = await ops.promises.readdir(dir, { withFileTypes: true });
 
         for (const entry of entries) {
           if (files.length >= maxResults) break;

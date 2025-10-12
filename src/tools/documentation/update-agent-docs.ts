@@ -151,7 +151,7 @@ export class UpdateAgentDocs {
 
     const scanDir = async (dirPath: string): Promise<void> => {
       try {
-        const entries = await fs.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
         
         for (const entry of entries) {
           const fullPath = path.join(dirPath, entry.name);
@@ -159,7 +159,7 @@ export class UpdateAgentDocs {
           if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
             await scanDir(fullPath);
           } else if (entry.isFile()) {
-            const stats = await fs.stat(fullPath);
+            const stats = await ops.promises.stat(fullPath);
             if (stats.mtime.getTime() > oneDayAgo) {
               recentFiles.push(path.relative(this.config.rootPath, fullPath));
             }
@@ -216,9 +216,9 @@ export class UpdateAgentDocs {
       try {
         const archPath = path.join(systemPath, 'architecture.md');
         if (existsSync(archPath)) {
-          const content = await fs.readFile(archPath, 'utf-8');
+          const content = await ops.promises.readFile(archPath, 'utf-8');
           const updatedContent = await this.updateArchitectureDoc(content, analysis);
-          await fs.writeFile(archPath, updatedContent);
+          await ops.promises.writeFile(archPath, updatedContent);
           updatedFiles.push('.agent/system/architecture.md');
         }
       } catch (error) {
@@ -237,7 +237,7 @@ export class UpdateAgentDocs {
         return false;
       }
 
-      const content = await fs.readFile(criticalStatePath, 'utf-8');
+      const content = await ops.promises.readFile(criticalStatePath, 'utf-8');
       
       // Update timestamp and recent changes
       const timestamp = new Date().toISOString();
@@ -268,7 +268,7 @@ ${changesSummary}`;
         }
       }
 
-      await fs.writeFile(criticalStatePath, updatedContent);
+      await ops.promises.writeFile(criticalStatePath, updatedContent);
       return true;
     } catch (error) {
       return false;

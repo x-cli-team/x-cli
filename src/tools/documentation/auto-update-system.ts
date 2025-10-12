@@ -58,7 +58,7 @@ export class AutoUpdateSystem {
     try {
       const settingsPath = path.join(this.rootPath, '.grok', 'settings.json');
       if (existsSync(settingsPath)) {
-        const settings = JSON.parse(await fs.readFile(settingsPath, 'utf-8'));
+        const settings = JSON.parse(await ops.promises.readFile(settingsPath, 'utf-8'));
         if (settings.documentation?.autoUpdate) {
           this.config = { ...this.config, ...settings.documentation.autoUpdate };
         }
@@ -74,7 +74,7 @@ export class AutoUpdateSystem {
       let settings = {};
       
       if (existsSync(settingsPath)) {
-        settings = JSON.parse(await fs.readFile(settingsPath, 'utf-8'));
+        settings = JSON.parse(await ops.promises.readFile(settingsPath, 'utf-8'));
       }
 
       const updatedSettings = {
@@ -88,10 +88,10 @@ export class AutoUpdateSystem {
       // Ensure .grok directory exists
       const grokDir = path.join(this.rootPath, '.grok');
       if (!existsSync(grokDir)) {
-        await fs.mkdir(grokDir, { recursive: true });
+        await ops.mkdir(grokDir, { recursive: true });
       }
 
-      await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
+      await ops.promises.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
     } catch (error) {
       // Fail silently for now
     }
@@ -157,7 +157,7 @@ export class AutoUpdateSystem {
         for (const file of files) {
           const fullPath = path.join(this.rootPath, file);
           if (existsSync(fullPath)) {
-            const stats = await fs.stat(fullPath);
+            const stats = await ops.promises.stat(fullPath);
             if (stats.mtime.getTime() > fiveMinutesAgo && stats.mtime.getTime() > this.lastUpdateTime) {
               return true;
             }
@@ -189,7 +189,7 @@ export class AutoUpdateSystem {
 
     const scanDir = async (dirPath: string): Promise<void> => {
       try {
-        const entries = await fs.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
         
         for (const entry of entries) {
           const fullPath = path.join(dirPath, entry.name);

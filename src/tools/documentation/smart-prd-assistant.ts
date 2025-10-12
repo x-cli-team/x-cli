@@ -39,7 +39,7 @@ export class SmartPRDAssistant {
 
   async analyzePRD(prdPath: string): Promise<PRDAnalysis> {
     const fileName = path.basename(prdPath);
-    const content = await fs.readFile(prdPath, 'utf-8');
+    const content = await ops.promises.readFile(prdPath, 'utf-8');
     const title = this.extractTitle(content);
 
     // Load project context
@@ -74,7 +74,7 @@ export class SmartPRDAssistant {
     }
 
     try {
-      const files = await fs.readdir(tasksPath);
+      const files = await ops.promises.readdir(tasksPath);
       const prdFiles = files.filter(file => file.endsWith('.md') && !file.startsWith('example-'));
       
       const newPRDs: string[] = [];
@@ -82,7 +82,7 @@ export class SmartPRDAssistant {
 
       for (const file of prdFiles) {
         const filePath = path.join(tasksPath, file);
-        const stats = await fs.stat(filePath);
+        const stats = await ops.promises.stat(filePath);
         
         // Check if file was created/modified in the last 10 minutes
         const tenMinutesAgo = Date.now() - (10 * 60 * 1000);
@@ -112,24 +112,24 @@ export class SmartPRDAssistant {
       // Load architecture info
       const archPath = path.join(this.agentPath, 'system', 'architecture.md');
       if (existsSync(archPath)) {
-        const archContent = await fs.readFile(archPath, 'utf-8');
+        const archContent = await ops.promises.readFile(archPath, 'utf-8');
         context.architecture = this.extractKeyPoints(archContent);
       }
 
       // Load critical state
       const statePath = path.join(this.agentPath, 'system', 'critical-state.md');
       if (existsSync(statePath)) {
-        const stateContent = await fs.readFile(statePath, 'utf-8');
+        const stateContent = await ops.promises.readFile(statePath, 'utf-8');
         context.systemConstraints = this.extractKeyPoints(stateContent);
       }
 
       // Load existing SOPs for patterns
       const sopPath = path.join(this.agentPath, 'sop');
       if (existsSync(sopPath)) {
-        const sopFiles = await fs.readdir(sopPath);
+        const sopFiles = await ops.promises.readdir(sopPath);
         for (const file of sopFiles) {
           if (file.endsWith('.md')) {
-            const sopContent = await fs.readFile(path.join(sopPath, file), 'utf-8');
+            const sopContent = await ops.promises.readFile(path.join(sopPath, file), 'utf-8');
             context.patterns.push(...this.extractKeyPoints(sopContent));
           }
         }
@@ -138,7 +138,7 @@ export class SmartPRDAssistant {
       // Load existing tasks
       const tasksPath = path.join(this.agentPath, 'tasks');
       if (existsSync(tasksPath)) {
-        const taskFiles = await fs.readdir(tasksPath);
+        const taskFiles = await ops.promises.readdir(tasksPath);
         for (const file of taskFiles) {
           if (file.endsWith('.md') && !file.startsWith('example-')) {
             context.existingTasks.push(file);
@@ -149,7 +149,7 @@ export class SmartPRDAssistant {
       // Load dependencies from package.json
       const packagePath = path.join(this.rootPath, 'package.json');
       if (existsSync(packagePath)) {
-        const packageContent = await fs.readFile(packagePath, 'utf-8');
+        const packageContent = await ops.promises.readFile(packagePath, 'utf-8');
         const packageData = JSON.parse(packageContent);
         context.dependencies = [
           ...Object.keys(packageData.dependencies || {}),
@@ -270,7 +270,7 @@ export class SmartPRDAssistant {
       for (const taskFile of context.existingTasks) {
         try {
           const taskPath = path.join(tasksPath, taskFile);
-          const taskContent = await fs.readFile(taskPath, 'utf-8');
+          const taskContent = await ops.promises.readFile(taskPath, 'utf-8');
           const taskWords = this.extractKeywords(taskContent);
           
           const similarity = this.calculateSimilarity(contentWords, taskWords);

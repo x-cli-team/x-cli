@@ -57,11 +57,11 @@ export class SelfHealingSystem {
       const incidentPath = path.join(this.agentPath, 'incidents', `${incident.id}.md`);
       
       // Ensure incidents directory exists
-      await fs.mkdir(path.dirname(incidentPath), { recursive: true });
+      await ops.mkdir(path.dirname(incidentPath), { recursive: true });
       
       // Write incident documentation
       const incidentContent = this.generateIncidentContent(incident);
-      await fs.writeFile(incidentPath, incidentContent);
+      await ops.promises.writeFile(incidentPath, incidentContent);
 
       // Try to create a guardrail
       const guardrail = await this.generateGuardrailFromIncident(incident);
@@ -223,13 +223,13 @@ export class SelfHealingSystem {
         return 0;
       }
 
-      const files = await fs.readdir(incidentsPath);
+      const files = await ops.promises.readdir(incidentsPath);
       let count = 0;
 
       for (const file of files) {
         if (file.endsWith('.md')) {
           const filePath = path.join(incidentsPath, file);
-          const content = await fs.readFile(filePath, 'utf-8');
+          const content = await ops.promises.readFile(filePath, 'utf-8');
           if (content.includes(title)) {
             count++;
           }
@@ -335,11 +335,11 @@ ${incident.guardrailCreated ? `Guardrail created: ${incident.guardrailCreated}` 
 
   private async saveGuardrail(guardrail: GuardrailRule): Promise<void> {
     const guardrailsPath = path.join(this.agentPath, 'guardrails');
-    await fs.mkdir(guardrailsPath, { recursive: true });
+    await ops.mkdir(guardrailsPath, { recursive: true });
     
     const filePath = path.join(guardrailsPath, `${guardrail.id}.md`);
     const content = this.generateGuardrailContent(guardrail);
-    await fs.writeFile(filePath, content);
+    await ops.promises.writeFile(filePath, content);
   }
 
   private generateGuardrailContent(guardrail: GuardrailRule): string {
@@ -407,13 +407,13 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
       return [];
     }
 
-    const files = await fs.readdir(guardrailsPath);
+    const files = await ops.promises.readdir(guardrailsPath);
     const guardrails: GuardrailRule[] = [];
 
     for (const file of files) {
       if (file.endsWith('.md')) {
         try {
-          const content = await fs.readFile(path.join(guardrailsPath, file), 'utf-8');
+          const content = await ops.promises.readFile(path.join(guardrailsPath, file), 'utf-8');
           const guardrail = this.parseGuardrailFromContent(content);
           if (guardrail) {
             guardrails.push(guardrail);
@@ -481,13 +481,13 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
       return [];
     }
 
-    const files = await fs.readdir(incidentsPath);
+    const files = await ops.promises.readdir(incidentsPath);
     const incidents: IncidentInfo[] = [];
 
     for (const file of files) {
       if (file.endsWith('.md')) {
         try {
-          const content = await fs.readFile(path.join(incidentsPath, file), 'utf-8');
+          const content = await ops.promises.readFile(path.join(incidentsPath, file), 'utf-8');
           const incident = this.parseIncidentFromContent(content);
           if (incident) {
             incidents.push(incident);

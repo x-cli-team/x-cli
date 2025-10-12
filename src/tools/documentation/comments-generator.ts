@@ -61,7 +61,7 @@ export class CommentsGenerator {
         };
       }
 
-      const content = await fs.readFile(this.config.filePath, 'utf-8');
+      const content = await ops.promises.readFile(this.config.filePath, 'utf-8');
       const analysis = this.analyzeCode(content);
       
       if (analysis.hasExistingComments) {
@@ -75,10 +75,10 @@ export class CommentsGenerator {
       
       // Create backup
       const backupPath = this.config.filePath + '.backup';
-      await fs.writeFile(backupPath, content);
+      await ops.promises.writeFile(backupPath, content);
       
       // Write modified content
-      await fs.writeFile(this.config.filePath, modifiedContent);
+      await ops.promises.writeFile(this.config.filePath, modifiedContent);
 
       const commentCount = this.countAddedComments(analysis);
       

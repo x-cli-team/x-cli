@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import * as fs from 'fs';
+import * as ops7 from 'fs';
 import { existsSync } from 'fs';
 import * as path7 from 'path';
 import path7__default from 'path';
@@ -15,9 +15,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import axios from 'axios';
 import { exec, execSync, spawn } from 'child_process';
 import { promisify } from 'util';
-import * as fs7 from 'fs-extra';
-import fs7__default from 'fs-extra';
-import fs17, { writeFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
 import { glob } from 'glob';
@@ -64,6 +62,9 @@ var init_settings_manager = __esm({
       model: "grok-code-fast-1"
     };
     SettingsManager = class _SettingsManager {
+      static instance;
+      userSettingsPath;
+      projectSettingsPath;
       constructor() {
         this.userSettingsPath = path7.join(
           os.homedir(),
@@ -90,8 +91,8 @@ var init_settings_manager = __esm({
        */
       ensureDirectoryExists(filePath) {
         const dir = path7.dirname(filePath);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true, mode: 448 });
+        if (!ops7.existsSync(dir)) {
+          ops7.mkdirSync(dir, { recursive: true, mode: 448 });
         }
       }
       /**
@@ -99,11 +100,11 @@ var init_settings_manager = __esm({
        */
       loadUserSettings() {
         try {
-          if (!fs.existsSync(this.userSettingsPath)) {
+          if (!ops7.existsSync(this.userSettingsPath)) {
             this.saveUserSettings(DEFAULT_USER_SETTINGS);
             return { ...DEFAULT_USER_SETTINGS };
           }
-          const content = fs.readFileSync(this.userSettingsPath, "utf-8");
+          const content = ops7.readFileSync(this.userSettingsPath, "utf-8");
           const settings = JSON.parse(content);
           return { ...DEFAULT_USER_SETTINGS, ...settings };
         } catch (error) {
@@ -121,9 +122,9 @@ var init_settings_manager = __esm({
         try {
           this.ensureDirectoryExists(this.userSettingsPath);
           let existingSettings = { ...DEFAULT_USER_SETTINGS };
-          if (fs.existsSync(this.userSettingsPath)) {
+          if (ops7.existsSync(this.userSettingsPath)) {
             try {
-              const content = fs.readFileSync(this.userSettingsPath, "utf-8");
+              const content = ops7.readFileSync(this.userSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_USER_SETTINGS, ...parsed };
             } catch (error) {
@@ -131,7 +132,7 @@ var init_settings_manager = __esm({
             }
           }
           const mergedSettings = { ...existingSettings, ...settings };
-          fs.writeFileSync(
+          ops7.writeFileSync(
             this.userSettingsPath,
             JSON.stringify(mergedSettings, null, 2),
             { mode: 384 }
@@ -164,11 +165,11 @@ var init_settings_manager = __esm({
        */
       loadProjectSettings() {
         try {
-          if (!fs.existsSync(this.projectSettingsPath)) {
+          if (!ops7.existsSync(this.projectSettingsPath)) {
             this.saveProjectSettings(DEFAULT_PROJECT_SETTINGS);
             return { ...DEFAULT_PROJECT_SETTINGS };
           }
-          const content = fs.readFileSync(this.projectSettingsPath, "utf-8");
+          const content = ops7.readFileSync(this.projectSettingsPath, "utf-8");
           const settings = JSON.parse(content);
           return { ...DEFAULT_PROJECT_SETTINGS, ...settings };
         } catch (error) {
@@ -186,9 +187,9 @@ var init_settings_manager = __esm({
         try {
           this.ensureDirectoryExists(this.projectSettingsPath);
           let existingSettings = { ...DEFAULT_PROJECT_SETTINGS };
-          if (fs.existsSync(this.projectSettingsPath)) {
+          if (ops7.existsSync(this.projectSettingsPath)) {
             try {
-              const content = fs.readFileSync(this.projectSettingsPath, "utf-8");
+              const content = ops7.readFileSync(this.projectSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_PROJECT_SETTINGS, ...parsed };
             } catch (error) {
@@ -196,7 +197,7 @@ var init_settings_manager = __esm({
             }
           }
           const mergedSettings = { ...existingSettings, ...settings };
-          fs.writeFileSync(
+          ops7.writeFileSync(
             this.projectSettingsPath,
             JSON.stringify(mergedSettings, null, 2)
           );
@@ -330,8 +331,10 @@ var init_config = __esm({
   }
 });
 var GrokClient = class {
+  client;
+  currentModel = "grok-code-fast-1";
+  defaultMaxTokens;
   constructor(apiKey, model, baseURL) {
-    this.currentModel = "grok-code-fast-1";
     this.client = new OpenAI({
       apiKey,
       baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",
@@ -410,6 +413,8 @@ var StdioTransport = class {
       throw new Error("Command is required for stdio transport");
     }
   }
+  transport;
+  process;
   async connect() {
     const env = {
       ...process.env,
@@ -445,11 +450,12 @@ var HttpTransport = class extends EventEmitter {
   constructor(config2) {
     super();
     this.config = config2;
-    this.connected = false;
     if (!config2.url) {
       throw new Error("URL is required for HTTP transport");
     }
   }
+  client;
+  connected = false;
   async connect() {
     this.client = axios.create({
       baseURL: this.config.url,
@@ -478,11 +484,11 @@ var SSETransport = class extends EventEmitter {
   constructor(config2) {
     super();
     this.config = config2;
-    this.connected = false;
     if (!config2.url) {
       throw new Error("URL is required for SSE transport");
     }
   }
+  connected = false;
   async connect() {
     return new Promise((resolve8, reject) => {
       try {
@@ -542,11 +548,11 @@ var StreamableHttpTransport = class extends EventEmitter {
   constructor(config2) {
     super();
     this.config = config2;
-    this.connected = false;
     if (!config2.url) {
       throw new Error("URL is required for streamable_http transport");
     }
   }
+  connected = false;
   async connect() {
     return new Promise((resolve8, reject) => {
       try {
@@ -597,12 +603,9 @@ function createTransport(config2) {
 
 // src/mcp/client.ts
 var MCPManager = class extends EventEmitter {
-  constructor() {
-    super(...arguments);
-    this.clients = /* @__PURE__ */ new Map();
-    this.transports = /* @__PURE__ */ new Map();
-    this.tools = /* @__PURE__ */ new Map();
-  }
+  clients = /* @__PURE__ */ new Map();
+  transports = /* @__PURE__ */ new Map();
+  tools = /* @__PURE__ */ new Map();
   async addServer(config2) {
     try {
       let transportConfig = config2.transport;
@@ -1304,23 +1307,24 @@ async function getAllGrokTools() {
 init_config();
 var execAsync = promisify(exec);
 var ConfirmationService = class _ConfirmationService extends EventEmitter {
-  constructor() {
-    super();
-    this.skipConfirmationThisSession = false;
-    this.pendingConfirmation = null;
-    this.resolveConfirmation = null;
-    // Session flags for different operation types
-    this.sessionFlags = {
-      fileOperations: false,
-      bashCommands: false,
-      allOperations: false
-    };
-  }
+  static instance;
+  skipConfirmationThisSession = false;
+  pendingConfirmation = null;
+  resolveConfirmation = null;
+  // Session flags for different operation types
+  sessionFlags = {
+    fileOperations: false,
+    bashCommands: false,
+    allOperations: false
+  };
   static getInstance() {
     if (!_ConfirmationService.instance) {
       _ConfirmationService.instance = new _ConfirmationService();
     }
     return _ConfirmationService.instance;
+  }
+  constructor() {
+    super();
   }
   async requestConfirmation(options, operationType = "file") {
     if (this.sessionFlags.allOperations || operationType === "file" && this.sessionFlags.fileOperations || operationType === "bash" && this.sessionFlags.bashCommands) {
@@ -1397,10 +1401,8 @@ var ConfirmationService = class _ConfirmationService extends EventEmitter {
 // src/tools/bash.ts
 var execAsync2 = promisify(exec);
 var BashTool = class {
-  constructor() {
-    this.currentDirectory = process.cwd();
-    this.confirmationService = ConfirmationService.getInstance();
-  }
+  currentDirectory = process.cwd();
+  confirmationService = ConfirmationService.getInstance();
   async execute(command, timeout = 6e4) {
     try {
       const sessionFlags = this.confirmationService.getSessionFlags();
@@ -1466,25 +1468,31 @@ STDERR: ${stderr}` : "");
     return this.execute(`grep -r "${pattern}" ${files}`);
   }
 };
-var TextEditorTool = class {
-  constructor() {
-    this.editHistory = [];
-    this.confirmationService = ConfirmationService.getInstance();
+var pathExists = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
   }
+};
+var TextEditorTool = class {
+  editHistory = [];
+  confirmationService = ConfirmationService.getInstance();
   async view(filePath, viewRange) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (await fs7.pathExists(resolvedPath)) {
-        const stats = await fs7.stat(resolvedPath);
+      if (await pathExists(resolvedPath)) {
+        const stats = await ops7.promises.stat(resolvedPath);
         if (stats.isDirectory()) {
-          const files = await fs7.readdir(resolvedPath);
+          const files = await ops7.promises.readdir(resolvedPath);
           return {
             success: true,
             output: `Directory contents of ${filePath}:
 ${files.join("\n")}`
           };
         }
-        const content = await fs7.readFile(resolvedPath, "utf-8");
+        const content = await ops7.promises.readFile(resolvedPath, "utf-8");
         const lines = content.split("\n");
         if (viewRange) {
           const [start, end] = viewRange;
@@ -1528,13 +1536,13 @@ ${numberedLines}${additionalLinesMessage}`
         };
       }
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const content = await fs7.readFile(resolvedPath, "utf-8");
+      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
       if (!content.includes(oldStr)) {
         if (oldStr.includes("\n")) {
           const fuzzyResult = this.findFuzzyMatch(content, oldStr);
@@ -1601,7 +1609,7 @@ ${numberedLines}${additionalLinesMessage}`
   async create(filePath, content) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (await fs7.pathExists(resolvedPath)) {
+      if (await pathExists(resolvedPath)) {
         return {
           success: false,
           error: `File already exists: ${filePath}`
@@ -1634,7 +1642,7 @@ ${numberedLines}${additionalLinesMessage}`
         }
       }
       const dir = path7.dirname(resolvedPath);
-      await fs7.ensureDir(dir);
+      await ops7.promises.mkdir(dir, { recursive: true });
       await writeFile(resolvedPath, content, "utf-8");
       this.editHistory.push({
         command: "create",
@@ -1658,13 +1666,13 @@ ${numberedLines}${additionalLinesMessage}`
   async replaceLines(filePath, startLine, endLine, newContent) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const fileContent = await fs7.readFile(resolvedPath, "utf-8");
+      const fileContent = await ops7.promises.readFile(resolvedPath, "utf-8");
       const lines = fileContent.split("\n");
       if (startLine < 1 || startLine > lines.length) {
         return {
@@ -1726,13 +1734,13 @@ ${numberedLines}${additionalLinesMessage}`
   async insert(filePath, insertLine, content) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const fileContent = await fs7.readFile(resolvedPath, "utf-8");
+      const fileContent = await ops7.promises.readFile(resolvedPath, "utf-8");
       const lines = fileContent.split("\n");
       lines.splice(insertLine - 1, 0, content);
       const newContent = lines.join("\n");
@@ -1766,7 +1774,7 @@ ${numberedLines}${additionalLinesMessage}`
       switch (lastEdit.command) {
         case "str_replace":
           if (lastEdit.path && lastEdit.old_str && lastEdit.new_str) {
-            const content = await fs7.readFile(lastEdit.path, "utf-8");
+            const content = await ops7.promises.readFile(lastEdit.path, "utf-8");
             const revertedContent = content.replace(
               lastEdit.new_str,
               lastEdit.old_str
@@ -1776,12 +1784,12 @@ ${numberedLines}${additionalLinesMessage}`
           break;
         case "create":
           if (lastEdit.path) {
-            await fs7.remove(lastEdit.path);
+            await ops7.promises.rm(lastEdit.path);
           }
           break;
         case "insert":
           if (lastEdit.path && lastEdit.insert_line) {
-            const content = await fs7.readFile(lastEdit.path, "utf-8");
+            const content = await ops7.promises.readFile(lastEdit.path, "utf-8");
             const lines = content.split("\n");
             lines.splice(lastEdit.insert_line - 1, 1);
             await writeFile(lastEdit.path, lines.join("\n"), "utf-8");
@@ -1979,10 +1987,19 @@ ${numberedLines}${additionalLinesMessage}`
     return [...this.editHistory];
   }
 };
+var pathExists2 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 var MorphEditorTool = class {
+  confirmationService = ConfirmationService.getInstance();
+  morphApiKey;
+  morphBaseUrl = "https://api.morphllm.com/v1";
   constructor(apiKey) {
-    this.confirmationService = ConfirmationService.getInstance();
-    this.morphBaseUrl = "https://api.morphllm.com/v1";
     this.morphApiKey = apiKey || process.env.MORPH_API_KEY || "";
     if (!this.morphApiKey) {
       console.warn("MORPH_API_KEY not found. Morph editor functionality will be limited.");
@@ -2014,7 +2031,7 @@ var MorphEditorTool = class {
   async editFile(targetFile, instructions, codeEdit) {
     try {
       const resolvedPath = path7.resolve(targetFile);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists2(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${targetFile}`
@@ -2026,7 +2043,7 @@ var MorphEditorTool = class {
           error: "MORPH_API_KEY not configured. Please set your Morph API key."
         };
       }
-      const initialCode = await fs7.readFile(resolvedPath, "utf-8");
+      const initialCode = await ops7.promises.readFile(resolvedPath, "utf-8");
       const sessionFlags = this.confirmationService.getSessionFlags();
       if (!sessionFlags.fileOperations && !sessionFlags.allOperations) {
         const confirmationResult = await this.confirmationService.requestConfirmation(
@@ -2049,7 +2066,7 @@ ${codeEdit}`
         }
       }
       const mergedCode = await this.callMorphApply(instructions, initialCode, codeEdit);
-      await fs7.writeFile(resolvedPath, mergedCode, "utf-8");
+      await ops7.promises.writeFile(resolvedPath, mergedCode, "utf-8");
       const oldLines = initialCode.split("\n");
       const newLines = mergedCode.split("\n");
       const diff = this.generateDiff(oldLines, newLines, targetFile);
@@ -2222,17 +2239,17 @@ ${codeEdit}`
   async view(filePath, viewRange) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (await fs7.pathExists(resolvedPath)) {
-        const stats = await fs7.stat(resolvedPath);
+      if (await pathExists2(resolvedPath)) {
+        const stats = await ops7.promises.stat(resolvedPath);
         if (stats.isDirectory()) {
-          const files = await fs7.readdir(resolvedPath);
+          const files = await ops7.promises.readdir(resolvedPath);
           return {
             success: true,
             output: `Directory contents of ${filePath}:
 ${files.join("\n")}`
           };
         }
-        const content = await fs7.readFile(resolvedPath, "utf-8");
+        const content = await ops7.promises.readFile(resolvedPath, "utf-8");
         const lines = content.split("\n");
         if (viewRange) {
           const [start, end] = viewRange;
@@ -2277,9 +2294,7 @@ ${numberedLines}${additionalLinesMessage}`
 
 // src/tools/todo-tool.ts
 var TodoTool = class {
-  constructor() {
-    this.todos = [];
-  }
+  todos = [];
   formatTodoList() {
     if (this.todos.length === 0) {
       return "No todos created yet";
@@ -2407,6 +2422,7 @@ var TodoTool = class {
 
 // src/tools/confirmation-tool.ts
 var ConfirmationTool = class {
+  confirmationService;
   constructor() {
     this.confirmationService = ConfirmationService.getInstance();
   }
@@ -2470,10 +2486,8 @@ var ConfirmationTool = class {
   }
 };
 var SearchTool = class {
-  constructor() {
-    this.confirmationService = ConfirmationService.getInstance();
-    this.currentDirectory = process.cwd();
-  }
+  confirmationService = ConfirmationService.getInstance();
+  currentDirectory = process.cwd();
   /**
    * Unified search method that can search for text content or find files
    */
@@ -2643,7 +2657,7 @@ var SearchTool = class {
     const walkDir = async (dir, depth = 0) => {
       if (depth > 10 || files.length >= maxResults) return;
       try {
-        const entries = await fs7.readdir(dir, { withFileTypes: true });
+        const entries = await ops7.promises.readdir(dir, { withFileTypes: true });
         for (const entry of entries) {
           if (files.length >= maxResults) break;
           const fullPath = path7.join(dir, entry.name);
@@ -2755,12 +2769,18 @@ var SearchTool = class {
     return this.currentDirectory;
   }
 };
-var MultiFileEditorTool = class {
-  constructor() {
-    this.confirmationService = ConfirmationService.getInstance();
-    this.transactions = /* @__PURE__ */ new Map();
-    this.currentTransactionId = null;
+var pathExists3 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
   }
+};
+var MultiFileEditorTool = class {
+  confirmationService = ConfirmationService.getInstance();
+  transactions = /* @__PURE__ */ new Map();
+  currentTransactionId = null;
   /**
    * Begin a multi-file transaction
    */
@@ -3055,7 +3075,7 @@ ${results.join("\n")}`
       const resolvedPath = path7.resolve(operation.filePath);
       switch (operation.type) {
         case "create":
-          if (await fs7.pathExists(resolvedPath)) {
+          if (await pathExists3(resolvedPath)) {
             return { valid: false, error: "File already exists" };
           }
           if (!operation.content) {
@@ -3063,7 +3083,7 @@ ${results.join("\n")}`
           }
           break;
         case "edit":
-          if (!await fs7.pathExists(resolvedPath)) {
+          if (!await pathExists3(resolvedPath)) {
             return { valid: false, error: "File does not exist" };
           }
           if (!operation.operations || operation.operations.length === 0) {
@@ -3071,20 +3091,20 @@ ${results.join("\n")}`
           }
           break;
         case "delete":
-          if (!await fs7.pathExists(resolvedPath)) {
+          if (!await pathExists3(resolvedPath)) {
             return { valid: false, error: "File does not exist" };
           }
           break;
         case "rename":
         case "move":
-          if (!await fs7.pathExists(resolvedPath)) {
+          if (!await pathExists3(resolvedPath)) {
             return { valid: false, error: "Source file does not exist" };
           }
           if (!operation.newFilePath) {
             return { valid: false, error: "Destination path required" };
           }
           const newResolvedPath = path7.resolve(operation.newFilePath);
-          if (await fs7.pathExists(newResolvedPath)) {
+          if (await pathExists3(newResolvedPath)) {
             return { valid: false, error: "Destination already exists" };
           }
           break;
@@ -3106,15 +3126,15 @@ ${results.join("\n")}`
           filePath: operation.filePath
         };
       case "edit":
-        const originalContent = await fs7.readFile(resolvedPath, "utf-8");
+        const originalContent = await ops7.promises.readFile(resolvedPath, "utf-8");
         return {
           type: "restore_content",
           filePath: operation.filePath,
           originalContent
         };
       case "delete":
-        const contentToRestore = await fs7.readFile(resolvedPath, "utf-8");
-        const stats = await fs7.stat(resolvedPath);
+        const contentToRestore = await ops7.promises.readFile(resolvedPath, "utf-8");
+        const stats = await ops7.promises.stat(resolvedPath);
         return {
           type: "restore_deleted",
           filePath: operation.filePath,
@@ -3140,25 +3160,25 @@ ${results.join("\n")}`
     switch (operation.type) {
       case "create":
         const dir = path7.dirname(resolvedPath);
-        await fs7.ensureDir(dir);
+        await ops7.promises.mkdir(dir, { recursive: true });
         await writeFile(resolvedPath, operation.content, "utf-8");
         return { success: true, output: `Created ${operation.filePath}` };
       case "edit":
-        let content = await fs7.readFile(resolvedPath, "utf-8");
+        let content = await ops7.promises.readFile(resolvedPath, "utf-8");
         for (const editOp of operation.operations) {
           content = await this.applyEditOperation(content, editOp);
         }
         await writeFile(resolvedPath, content, "utf-8");
         return { success: true, output: `Edited ${operation.filePath}` };
       case "delete":
-        await fs7.remove(resolvedPath);
+        await ops7.promises.rm(resolvedPath);
         return { success: true, output: `Deleted ${operation.filePath}` };
       case "rename":
       case "move":
         const newResolvedPath = path7.resolve(operation.newFilePath);
         const newDir = path7.dirname(newResolvedPath);
-        await fs7.ensureDir(newDir);
-        await fs7.move(resolvedPath, newResolvedPath);
+        await ops7.promises.mkdir(newDir, { recursive: true });
+        await ops7.move(resolvedPath, newResolvedPath);
         return { success: true, output: `${operation.type === "rename" ? "Renamed" : "Moved"} ${operation.filePath} to ${operation.newFilePath}` };
       default:
         throw new Error(`Unknown operation type: ${operation.type}`);
@@ -3201,8 +3221,8 @@ ${results.join("\n")}`
       switch (rollback.type) {
         case "delete_created":
           const createdPath = path7.resolve(rollback.filePath);
-          if (await fs7.pathExists(createdPath)) {
-            await fs7.remove(createdPath);
+          if (await pathExists3(createdPath)) {
+            await ops7.promises.rm(createdPath);
           }
           break;
         case "restore_content":
@@ -3212,16 +3232,16 @@ ${results.join("\n")}`
         case "restore_deleted":
           const deletedPath = path7.resolve(rollback.filePath);
           const deletedDir = path7.dirname(deletedPath);
-          await fs7.ensureDir(deletedDir);
+          await ops7.promises.mkdir(deletedDir, { recursive: true });
           await writeFile(deletedPath, rollback.content, "utf-8");
           break;
         case "restore_move":
           const movedNewPath = path7.resolve(rollback.newPath);
           const movedOldPath = path7.resolve(rollback.oldPath);
-          if (await fs7.pathExists(movedNewPath)) {
+          if (await pathExists3(movedNewPath)) {
             const oldDir = path7.dirname(movedOldPath);
-            await fs7.ensureDir(oldDir);
-            await fs7.move(movedNewPath, movedOldPath);
+            await ops7.promises.mkdir(oldDir, { recursive: true });
+            await ops7.move(movedNewPath, movedOldPath);
           }
           break;
       }
@@ -3261,23 +3281,29 @@ ${results.join("\n")}`
     return this.currentTransactionId;
   }
 };
-var AdvancedSearchTool = class {
-  constructor() {
-    this.confirmationService = ConfirmationService.getInstance();
+var pathExists4 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
   }
+};
+var AdvancedSearchTool = class {
+  confirmationService = ConfirmationService.getInstance();
   /**
    * Search for patterns across files
    */
   async search(searchPath, options) {
     try {
       const resolvedPath = path7.resolve(searchPath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists4(resolvedPath)) {
         return {
           success: false,
           error: `Path not found: ${searchPath}`
         };
       }
-      const stats = await fs7.stat(resolvedPath);
+      const stats = await ops7.promises.stat(resolvedPath);
       const filesToSearch = [];
       if (stats.isFile()) {
         filesToSearch.push(resolvedPath);
@@ -3314,13 +3340,13 @@ var AdvancedSearchTool = class {
   async searchAndReplace(searchPath, options) {
     try {
       const resolvedPath = path7.resolve(searchPath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists4(resolvedPath)) {
         return {
           success: false,
           error: `Path not found: ${searchPath}`
         };
       }
-      const stats = await fs7.stat(resolvedPath);
+      const stats = await ops7.promises.stat(resolvedPath);
       const filesToProcess = [];
       if (stats.isFile()) {
         filesToProcess.push(resolvedPath);
@@ -3365,7 +3391,7 @@ var AdvancedSearchTool = class {
         }
         for (const result of results) {
           if (result.success && result.preview) {
-            await fs7.writeFile(result.filePath, result.preview, "utf-8");
+            await ops7.promises.writeFile(result.filePath, result.preview, "utf-8");
           }
         }
       }
@@ -3386,7 +3412,7 @@ var AdvancedSearchTool = class {
   async findFiles(searchPath, pattern, options = {}) {
     try {
       const resolvedPath = path7.resolve(searchPath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists4(resolvedPath)) {
         return {
           success: false,
           error: `Path not found: ${searchPath}`
@@ -3427,7 +3453,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
    * Search in a single file
    */
   async searchInFile(filePath, options) {
-    const content = await fs7.readFile(filePath, "utf-8");
+    const content = await ops7.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const matches = [];
     let pattern;
@@ -3478,7 +3504,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
    */
   async replaceInFile(filePath, options) {
     try {
-      const content = await fs7.readFile(filePath, "utf-8");
+      const content = await ops7.promises.readFile(filePath, "utf-8");
       let pattern;
       try {
         if (options.isRegex) {
@@ -3529,7 +3555,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
   async getFilesRecursively(dirPath, options) {
     const files = [];
     const walk = async (currentPath) => {
-      const entries = await fs7.readdir(currentPath, { withFileTypes: true });
+      const entries = await ops7.promises.readdir(currentPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7.join(currentPath, entry.name);
         if (entry.isDirectory()) {
@@ -3690,17 +3716,23 @@ ${matchingFiles.join("\n")}` : "No matching files found"
     return output.trim();
   }
 };
-var FileTreeOperationsTool = class {
-  constructor() {
-    this.confirmationService = ConfirmationService.getInstance();
+var pathExists5 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
   }
+};
+var FileTreeOperationsTool = class {
+  confirmationService = ConfirmationService.getInstance();
   /**
    * Generate a visual tree representation of directory structure
    */
   async generateTree(rootPath, options = {}) {
     try {
       const resolvedPath = path7.resolve(rootPath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists5(resolvedPath)) {
         return {
           success: false,
           error: `Path not found: ${rootPath}`
@@ -3781,13 +3813,13 @@ ${results.join("\n")}`
     try {
       const resolvedSource = path7.resolve(sourcePath);
       const resolvedDest = path7.resolve(destinationPath);
-      if (!await fs7.pathExists(resolvedSource)) {
+      if (!await pathExists5(resolvedSource)) {
         return {
           success: false,
           error: `Source path not found: ${sourcePath}`
         };
       }
-      if (await fs7.pathExists(resolvedDest) && !options.overwrite) {
+      if (await pathExists5(resolvedDest) && !options.overwrite) {
         return {
           success: false,
           error: `Destination already exists: ${destinationPath}`
@@ -3830,7 +3862,7 @@ Overwrite: ${options.overwrite ? "Yes" : "No"}`
   async organizeFiles(sourcePath, organizationType, destinationBase) {
     try {
       const resolvedSource = path7.resolve(sourcePath);
-      if (!await fs7.pathExists(resolvedSource)) {
+      if (!await pathExists5(resolvedSource)) {
         return {
           success: false,
           error: `Source path not found: ${sourcePath}`
@@ -3875,11 +3907,11 @@ ${category}/
       let movedFiles = 0;
       for (const [category, fileList] of Object.entries(organization)) {
         const categoryDir = path7.join(destBase, category);
-        await fs7.ensureDir(categoryDir);
+        await ops7.promises.mkdir(categoryDir, { recursive: true });
         for (const filePath of fileList) {
           const fileName = path7.basename(filePath);
           const destPath = path7.join(categoryDir, fileName);
-          await fs7.move(filePath, destPath);
+          await ops7.move(filePath, destPath);
           movedFiles++;
         }
       }
@@ -3900,7 +3932,7 @@ ${category}/
   async cleanupEmptyDirectories(rootPath) {
     try {
       const resolvedPath = path7.resolve(rootPath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists5(resolvedPath)) {
         return {
           success: false,
           error: `Path not found: ${rootPath}`
@@ -3935,7 +3967,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
       }
       emptyDirs.sort((a, b) => b.length - a.length);
       for (const dir of emptyDirs) {
-        await fs7.rmdir(dir);
+        await ops7.rmdir(dir);
       }
       return {
         success: true,
@@ -3952,7 +3984,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
    * Build tree structure recursively
    */
   async buildTreeStructure(dirPath, options, currentDepth) {
-    const stats = await fs7.stat(dirPath);
+    const stats = await ops7.promises.stat(dirPath);
     const name = path7.basename(dirPath);
     const node = {
       name: name || path7.basename(dirPath),
@@ -3964,7 +3996,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     if (stats.isDirectory() && (!options.maxDepth || currentDepth < options.maxDepth)) {
       node.children = [];
       try {
-        const entries = await fs7.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops7.promises.readdir(dirPath, { withFileTypes: true });
         for (const entry of entries) {
           if (!options.includeHidden && entry.name.startsWith(".")) {
             continue;
@@ -4067,7 +4099,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
       switch (operation.type) {
         case "copy":
         case "move":
-          if (!await fs7.pathExists(sourcePath)) {
+          if (!await pathExists5(sourcePath)) {
             return { valid: false, error: "Source path does not exist" };
           }
           if (!operation.destination) {
@@ -4075,17 +4107,17 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
           }
           break;
         case "delete":
-          if (!await fs7.pathExists(sourcePath)) {
+          if (!await pathExists5(sourcePath)) {
             return { valid: false, error: "Path does not exist" };
           }
           break;
         case "create_dir":
-          if (await fs7.pathExists(sourcePath)) {
+          if (await pathExists5(sourcePath)) {
             return { valid: false, error: "Directory already exists" };
           }
           break;
         case "chmod":
-          if (!await fs7.pathExists(sourcePath)) {
+          if (!await pathExists5(sourcePath)) {
             return { valid: false, error: "Path does not exist" };
           }
           if (!operation.mode) {
@@ -4093,7 +4125,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
           }
           break;
         case "rename":
-          if (!await fs7.pathExists(sourcePath)) {
+          if (!await pathExists5(sourcePath)) {
             return { valid: false, error: "Source path does not exist" };
           }
           if (!operation.destination) {
@@ -4114,24 +4146,24 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     switch (operation.type) {
       case "copy":
         const copyDest = path7.resolve(operation.destination);
-        await fs7.copy(sourcePath, copyDest);
+        await ops7.copy(sourcePath, copyDest);
         return `Copied ${operation.source} to ${operation.destination}`;
       case "move":
         const moveDest = path7.resolve(operation.destination);
-        await fs7.move(sourcePath, moveDest);
+        await ops7.move(sourcePath, moveDest);
         return `Moved ${operation.source} to ${operation.destination}`;
       case "delete":
-        await fs7.remove(sourcePath);
+        await ops7.promises.rm(sourcePath);
         return `Deleted ${operation.source}`;
       case "create_dir":
-        await fs7.ensureDir(sourcePath);
+        await ops7.promises.mkdir(sourcePath, { recursive: true });
         return `Created directory ${operation.source}`;
       case "chmod":
-        await fs7.chmod(sourcePath, operation.mode);
+        await ops7.promises.chmod(sourcePath, operation.mode);
         return `Changed permissions of ${operation.source} to ${operation.mode}`;
       case "rename":
         const renameDest = path7.resolve(operation.destination);
-        await fs7.move(sourcePath, renameDest);
+        await ops7.move(sourcePath, renameDest);
         return `Renamed ${operation.source} to ${operation.destination}`;
       default:
         throw new Error(`Unknown operation type: ${operation.type}`);
@@ -4160,17 +4192,17 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
    * Copy structure recursively
    */
   async copyStructureRecursive(source, destination, options) {
-    const stats = await fs7.stat(source);
+    const stats = await ops7.promises.stat(source);
     if (stats.isDirectory()) {
-      await fs7.ensureDir(destination);
-      const entries = await fs7.readdir(source);
+      await ops7.promises.mkdir(destination, { recursive: true });
+      const entries = await ops7.promises.readdir(source);
       for (const entry of entries) {
         const srcPath = path7.join(source, entry);
         const destPath = path7.join(destination, entry);
         await this.copyStructureRecursive(srcPath, destPath, options);
       }
     } else if (options.includeFiles) {
-      await fs7.copy(source, destination, { overwrite: options.overwrite });
+      await ops7.copy(source, destination, { overwrite: options.overwrite });
     }
   }
   /**
@@ -4179,7 +4211,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
   async getFilesRecursively(dirPath) {
     const files = [];
     const walk = async (currentPath) => {
-      const entries = await fs7.readdir(currentPath, { withFileTypes: true });
+      const entries = await ops7.promises.readdir(currentPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7.join(currentPath, entry.name);
         if (entry.isDirectory()) {
@@ -4205,14 +4237,14 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
           category = ext || "no-extension";
           break;
         case "size":
-          const stats = await fs7.stat(filePath);
+          const stats = await ops7.promises.stat(filePath);
           if (stats.size < 1024) category = "small (< 1KB)";
           else if (stats.size < 1024 * 1024) category = "medium (< 1MB)";
           else if (stats.size < 1024 * 1024 * 10) category = "large (< 10MB)";
           else category = "very-large (> 10MB)";
           break;
         case "date":
-          const fileStats = await fs7.stat(filePath);
+          const fileStats = await ops7.promises.stat(filePath);
           const year = fileStats.mtime.getFullYear();
           const month = fileStats.mtime.getMonth() + 1;
           category = `${year}-${month.toString().padStart(2, "0")}`;
@@ -4234,7 +4266,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     const emptyDirs = [];
     const checkDirectory = async (currentPath) => {
       try {
-        const entries = await fs7.readdir(currentPath);
+        const entries = await ops7.promises.readdir(currentPath);
         if (entries.length === 0) {
           emptyDirs.push(currentPath);
           return true;
@@ -4242,7 +4274,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
         let hasNonEmptyChildren = false;
         for (const entry of entries) {
           const fullPath = path7.join(currentPath, entry);
-          const stats = await fs7.stat(fullPath);
+          const stats = await ops7.promises.stat(fullPath);
           if (stats.isDirectory()) {
             const isEmpty = await checkDirectory(fullPath);
             if (!isEmpty) {
@@ -4265,23 +4297,29 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     return emptyDirs;
   }
 };
-var CodeAwareEditorTool = class {
-  constructor() {
-    this.confirmationService = ConfirmationService.getInstance();
+var pathExists6 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
   }
+};
+var CodeAwareEditorTool = class {
+  confirmationService = ConfirmationService.getInstance();
   /**
    * Analyze code structure and context
    */
   async analyzeCode(filePath) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists6(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const content = await fs7.readFile(resolvedPath, "utf-8");
+      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const output = this.formatCodeAnalysis(context, filePath);
@@ -4302,13 +4340,13 @@ var CodeAwareEditorTool = class {
   async refactor(filePath, operation) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists6(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const content = await fs7.readFile(resolvedPath, "utf-8");
+      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const result = await this.performRefactoring(content, context, operation, language);
@@ -4334,7 +4372,7 @@ var CodeAwareEditorTool = class {
           };
         }
       }
-      await fs7.writeFile(resolvedPath, result.newContent, "utf-8");
+      await ops7.promises.writeFile(resolvedPath, result.newContent, "utf-8");
       return {
         success: true,
         output: result.output
@@ -4352,13 +4390,13 @@ var CodeAwareEditorTool = class {
   async smartInsert(filePath, code, location, target) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists6(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const content = await fs7.readFile(resolvedPath, "utf-8");
+      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const insertionPoint = this.findInsertionPoint(content, context, location, target);
@@ -4388,7 +4426,7 @@ var CodeAwareEditorTool = class {
           };
         }
       }
-      await fs7.writeFile(resolvedPath, newContent, "utf-8");
+      await ops7.promises.writeFile(resolvedPath, newContent, "utf-8");
       return {
         success: true,
         output: `Code inserted at line ${insertionPoint.line + 1} in ${filePath}`
@@ -4406,13 +4444,13 @@ var CodeAwareEditorTool = class {
   async formatCode(filePath, options = {}) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists6(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const content = await fs7.readFile(resolvedPath, "utf-8");
+      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const formattedContent = await this.formatCodeContent(content, language, options);
       if (formattedContent === content) {
@@ -4440,7 +4478,7 @@ var CodeAwareEditorTool = class {
           };
         }
       }
-      await fs7.writeFile(resolvedPath, formattedContent, "utf-8");
+      await ops7.promises.writeFile(resolvedPath, formattedContent, "utf-8");
       return {
         success: true,
         output: `Code formatted in ${filePath}`
@@ -4458,13 +4496,13 @@ var CodeAwareEditorTool = class {
   async addMissingImports(filePath, symbols) {
     try {
       const resolvedPath = path7.resolve(filePath);
-      if (!await fs7.pathExists(resolvedPath)) {
+      if (!await pathExists6(resolvedPath)) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
-      const content = await fs7.readFile(resolvedPath, "utf-8");
+      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const missingImports = symbols.filter(
@@ -4505,7 +4543,7 @@ ${importsToAdd.join("\n")}`;
           };
         }
       }
-      await fs7.writeFile(resolvedPath, newContent, "utf-8");
+      await ops7.promises.writeFile(resolvedPath, newContent, "utf-8");
       return {
         success: true,
         output: `Added ${missingImports.length} missing imports to ${filePath}`
@@ -5200,11 +5238,22 @@ ${extractedCode}`;
     return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name);
   }
 };
+var pathExists7 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 var OperationHistoryTool = class {
+  history = [];
+  confirmationService = ConfirmationService.getInstance();
+  currentPosition = -1;
+  // For undo/redo navigation
+  options;
+  historyFile;
   constructor(options = {}) {
-    this.history = [];
-    this.confirmationService = ConfirmationService.getInstance();
-    this.currentPosition = -1;
     this.options = {
       maxEntries: 100,
       maxAge: 7 * 24 * 60 * 60 * 1e3,
@@ -5506,15 +5555,15 @@ This action cannot be undone.`
     for (const filePath of files) {
       try {
         const resolvedPath = path7.resolve(filePath);
-        const exists = await fs7.pathExists(resolvedPath);
+        const exists = await pathExists7(resolvedPath);
         const snapshot = {
           filePath: resolvedPath,
           existed: exists
         };
         if (exists) {
-          const stats = await fs7.stat(resolvedPath);
+          const stats = await ops7.promises.stat(resolvedPath);
           if (stats.isFile() && this.shouldSnapshotFile(resolvedPath)) {
-            snapshot.content = await fs7.readFile(resolvedPath, "utf-8");
+            snapshot.content = await ops7.promises.readFile(resolvedPath, "utf-8");
             snapshot.size = stats.size;
             snapshot.lastModified = stats.mtime;
             snapshot.permissions = stats.mode.toString(8);
@@ -5535,7 +5584,7 @@ This action cannot be undone.`
    */
   shouldSnapshotFile(filePath) {
     try {
-      const stats = fs7.statSync(filePath);
+      const stats = ops7.statSync(filePath);
       if (stats.size > 1024 * 1024) {
         return false;
       }
@@ -5626,16 +5675,16 @@ This action cannot be undone.`
     const errors = [];
     for (const snapshot of fileSnapshots) {
       try {
-        const currentExists = await fs7.pathExists(snapshot.filePath);
+        const currentExists = await pathExists7(snapshot.filePath);
         if (snapshot.existed && snapshot.content !== void 0) {
-          await fs7.ensureDir(path7.dirname(snapshot.filePath));
-          await fs7.writeFile(snapshot.filePath, snapshot.content, "utf-8");
+          await ops7.ensureDir(path7.dirname(snapshot.filePath));
+          await ops7.promises.writeFile(snapshot.filePath, snapshot.content, "utf-8");
           if (snapshot.permissions) {
-            await fs7.chmod(snapshot.filePath, parseInt(snapshot.permissions, 8));
+            await ops7.promises.chmod(snapshot.filePath, parseInt(snapshot.permissions, 8));
           }
           restored.push(`Restored: ${snapshot.filePath}`);
         } else if (!snapshot.existed && currentExists) {
-          await fs7.remove(snapshot.filePath);
+          await ops7.promises.rm(snapshot.filePath);
           restored.push(`Removed: ${snapshot.filePath}`);
         }
       } catch (error) {
@@ -5781,8 +5830,8 @@ ${errors.join("\n")}`;
    */
   async loadHistory() {
     try {
-      if (await fs7.pathExists(this.historyFile)) {
-        const data = await fs7.readFile(this.historyFile, "utf-8");
+      if (await pathExists7(this.historyFile)) {
+        const data = await ops7.promises.readFile(this.historyFile, "utf-8");
         const parsed = JSON.parse(data);
         this.history = parsed.entries.map((entry) => ({
           ...entry,
@@ -5800,13 +5849,13 @@ ${errors.join("\n")}`;
    */
   async saveHistory() {
     try {
-      await fs7.ensureDir(path7.dirname(this.historyFile));
+      await ops7.ensureDir(path7.dirname(this.historyFile));
       const data = {
         entries: this.history,
         currentPosition: this.currentPosition,
         lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
       };
-      await fs7.writeFile(this.historyFile, JSON.stringify(data, null, 2), "utf-8");
+      await ops7.promises.writeFile(this.historyFile, JSON.stringify(data, null, 2), "utf-8");
     } catch (error) {
     }
   }
@@ -5834,11 +5883,19 @@ try {
 } catch (error) {
   console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
 }
+var pathExists8 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 var ASTParserTool = class {
+  name = "ast_parser";
+  description = "Parse source code files to extract AST, symbols, imports, exports, and structural information";
+  parsers = /* @__PURE__ */ new Map();
   constructor() {
-    this.name = "ast_parser";
-    this.description = "Parse source code files to extract AST, symbols, imports, exports, and structural information";
-    this.parsers = /* @__PURE__ */ new Map();
     this.initializeParsers();
   }
   initializeParsers() {
@@ -5901,10 +5958,10 @@ var ASTParserTool = class {
       if (!filePath) {
         throw new Error("File path is required");
       }
-      if (!await fs7__default.pathExists(filePath)) {
+      if (!await pathExists8(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
-      const content = await fs7__default.readFile(filePath, "utf-8");
+      const content = await ops7.promises.readFile(filePath, "utf-8");
       const language = this.detectLanguage(filePath);
       let result;
       if (language === "typescript" || language === "tsx") {
@@ -6440,13 +6497,14 @@ var ASTParserTool = class {
   }
 };
 var SymbolSearchTool = class {
+  name = "symbol_search";
+  description = "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references";
+  astParser;
+  symbolIndex = /* @__PURE__ */ new Map();
+  lastIndexTime = 0;
+  indexCacheDuration = 5 * 60 * 1e3;
   // 5 minutes
   constructor() {
-    this.name = "symbol_search";
-    this.description = "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references";
-    this.symbolIndex = /* @__PURE__ */ new Map();
-    this.lastIndexTime = 0;
-    this.indexCacheDuration = 5 * 60 * 1e3;
     this.astParser = new ASTParserTool();
   }
   async execute(args) {
@@ -6592,7 +6650,7 @@ var SymbolSearchTool = class {
   async findSymbolUsages(symbolRef) {
     const usages = [];
     try {
-      const content = await fs7__default.readFile(symbolRef.filePath, "utf-8");
+      const content = await ops7.promises.readFile(symbolRef.filePath, "utf-8");
       const lines = content.split("\n");
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -6647,7 +6705,7 @@ var SymbolSearchTool = class {
           const usageFiles = symbolRef.usages.filter((usage) => usage.type === "reference" || usage.type === "call").map(() => symbolRef.filePath);
           const importedBy = symbolRef.usages.filter((usage) => usage.type === "import").map(() => symbolRef.filePath);
           const exportedTo = symbolRef.usages.filter((usage) => usage.type === "export").map(() => symbolRef.filePath);
-          crossRefs.push({
+          crossReops.push({
             symbol: symbolName,
             definitionFile,
             usageFiles: [...new Set(usageFiles)],
@@ -6764,10 +6822,19 @@ var SymbolSearchTool = class {
     };
   }
 };
+var pathExists9 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 var DependencyAnalyzerTool = class {
+  name = "dependency_analyzer";
+  description = "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs";
+  astParser;
   constructor() {
-    this.name = "dependency_analyzer";
-    this.description = "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs";
     this.astParser = new ASTParserTool();
   }
   async execute(args) {
@@ -6783,7 +6850,7 @@ var DependencyAnalyzerTool = class {
         entryPoints = [],
         maxDepth = 50
       } = args;
-      if (!await fs7__default.pathExists(rootPath)) {
+      if (!await pathExists9(rootPath)) {
         throw new Error(`Root path does not exist: ${rootPath}`);
       }
       const sourceFiles = await this.findSourceFiles(rootPath, filePatterns, excludePatterns);
@@ -6929,7 +6996,7 @@ var DependencyAnalyzerTool = class {
       } else {
         continue;
       }
-      if (resolvedPath && await fs7__default.pathExists(resolvedPath)) {
+      if (resolvedPath && await pathExists9(resolvedPath)) {
         dependencies.push(resolvedPath);
       }
     }
@@ -6940,13 +7007,13 @@ var DependencyAnalyzerTool = class {
     const extensions = [".ts", ".tsx", ".js", ".jsx", ".json"];
     for (const ext of extensions) {
       const fullPath = basePath + ext;
-      if (await fs7__default.pathExists(fullPath)) {
+      if (await pathExists9(fullPath)) {
         return fullPath;
       }
     }
     for (const ext of extensions) {
       const indexPath = path7__default.join(basePath, `index${ext}`);
-      if (await fs7__default.pathExists(indexPath)) {
+      if (await pathExists9(indexPath)) {
         return indexPath;
       }
     }
@@ -7226,10 +7293,21 @@ var DependencyAnalyzerTool = class {
     };
   }
 };
+var pathExists10 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 var CodeContextTool = class {
+  name = "code_context";
+  description = "Build intelligent code context, analyze relationships, and provide semantic understanding";
+  astParser;
+  symbolSearch;
+  dependencyAnalyzer;
   constructor() {
-    this.name = "code_context";
-    this.description = "Build intelligent code context, analyze relationships, and provide semantic understanding";
     this.astParser = new ASTParserTool();
     this.symbolSearch = new SymbolSearchTool();
     this.dependencyAnalyzer = new DependencyAnalyzerTool();
@@ -7248,7 +7326,7 @@ var CodeContextTool = class {
       if (!filePath) {
         throw new Error("File path is required");
       }
-      if (!await fs7__default.pathExists(filePath)) {
+      if (!await pathExists10(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
       const context = await this.buildCodeContext(
@@ -7365,7 +7443,7 @@ var CodeContextTool = class {
   async analyzeUsagePatterns(symbol, filePath) {
     const patterns = [];
     try {
-      const content = await fs7__default.readFile(filePath, "utf-8");
+      const content = await ops7.promises.readFile(filePath, "utf-8");
       const lines = content.split("\n");
       let callCount = 0;
       let assignmentCount = 0;
@@ -7518,7 +7596,7 @@ var CodeContextTool = class {
   }
   async analyzeSemanticContext(filePath, symbols, dependencies) {
     const fileName = path7__default.basename(filePath);
-    const content = await fs7__default.readFile(filePath, "utf-8");
+    const content = await ops7.promises.readFile(filePath, "utf-8");
     const purpose = this.inferPurpose(fileName, symbols, content);
     const domain = this.extractDomain(filePath, symbols, dependencies);
     const patterns = this.detectDesignPatterns(content, symbols);
@@ -7647,7 +7725,7 @@ var CodeContextTool = class {
     };
   }
   async calculateCodeMetrics(filePath, symbols) {
-    const content = await fs7__default.readFile(filePath, "utf-8");
+    const content = await ops7.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const codeLines = lines.filter((line) => line.trim().length > 0 && !line.trim().startsWith("//"));
     const linesOfCode = codeLines.length;
@@ -7745,10 +7823,22 @@ var CodeContextTool = class {
     };
   }
 };
+var pathExists11 = async (filePath) => {
+  try {
+    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 var RefactoringAssistantTool = class {
+  name = "refactoring_assistant";
+  description = "Perform safe code refactoring operations including rename, extract, inline, and move operations";
+  astParser;
+  symbolSearch;
+  multiFileEditor;
+  operationHistory;
   constructor() {
-    this.name = "refactoring_assistant";
-    this.description = "Perform safe code refactoring operations including rename, extract, inline, and move operations";
     this.astParser = new ASTParserTool();
     this.symbolSearch = new SymbolSearchTool();
     this.multiFileEditor = new MultiFileEditorTool();
@@ -7819,8 +7909,8 @@ var RefactoringAssistantTool = class {
       throw new Error("Failed to find symbol occurrences");
     }
     const symbolRefs = parsed.result.symbols;
-    const relevantRefs = scope === "file" && filePath ? symbolRefs.filter((ref) => ref.filePath === filePath) : symbolRefs;
-    if (relevantRefs.length === 0) {
+    const relevantRefs = scope === "file" && filePath ? symbolReops.filter((ref) => ref.filePath === filePath) : symbolRefs;
+    if (relevantReops.length === 0) {
       throw new Error(`Symbol '${symbolName}' not found in specified scope`);
     }
     const safety = await this.analyzeSafety(relevantRefs, "rename");
@@ -7856,10 +7946,10 @@ var RefactoringAssistantTool = class {
     if (!filePath || startLine === void 0 || endLine === void 0 || !functionName) {
       throw new Error("File path, line range, and function name are required");
     }
-    if (!await fs7__default.pathExists(filePath)) {
+    if (!await pathExists11(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
-    const content = await fs7__default.readFile(filePath, "utf-8");
+    const content = await ops7.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     if (startLine < 0 || endLine >= lines.length || startLine > endLine) {
       throw new Error("Invalid line range");
@@ -7934,7 +8024,7 @@ var RefactoringAssistantTool = class {
     if (!filePath || !variableName) {
       throw new Error("File path and variable name are required");
     }
-    const content = await fs7__default.readFile(filePath, "utf-8");
+    const content = await ops7.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const startLineContent = lines[startLine];
     const endLineContent = lines[endLine];
@@ -8009,7 +8099,7 @@ var RefactoringAssistantTool = class {
     if (!functionSymbol) {
       throw new Error(`Function '${symbolName}' not found`);
     }
-    const content = await fs7__default.readFile(filePath, "utf-8");
+    const content = await ops7.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const functionLines = lines.slice(functionSymbol.startPosition.row, functionSymbol.endPosition.row + 1);
     const functionBody = this.extractFunctionBody(functionLines.join("\n"));
@@ -8093,8 +8183,8 @@ var RefactoringAssistantTool = class {
     return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name);
   }
   async analyzeSafety(refs, operation) {
-    const affectedFiles = new Set(refs.map((ref) => ref.filePath)).size;
-    const affectedSymbols = refs.length;
+    const affectedFiles = new Set(reops.map((ref) => ref.filePath)).size;
+    const affectedSymbols = reops.length;
     let riskLevel = "low";
     const potentialIssues = [];
     if (affectedFiles > 5) {
@@ -8119,7 +8209,7 @@ var RefactoringAssistantTool = class {
   }
   async generateRenameChanges(ref, oldName, newName, includeComments, includeStrings) {
     const changes = [];
-    const content = await fs7__default.readFile(ref.filePath, "utf-8");
+    const content = await ops7.promises.readFile(ref.filePath, "utf-8");
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -8344,6 +8434,7 @@ ${body}
   }
 };
 var TokenCounter = class {
+  encoder;
   constructor(model = "gpt-4") {
     try {
       this.encoder = encoding_for_model(model);
@@ -8409,10 +8500,10 @@ function createTokenCounter(model) {
 function loadCustomInstructions(workingDirectory = process.cwd()) {
   try {
     const instructionsPath = path7.join(workingDirectory, ".grok", "GROK.md");
-    if (!fs.existsSync(instructionsPath)) {
+    if (!ops7.existsSync(instructionsPath)) {
       return null;
     }
-    const customInstructions = fs.readFileSync(instructionsPath, "utf-8");
+    const customInstructions = ops7.readFileSync(instructionsPath, "utf-8");
     return customInstructions.trim();
   } catch (error) {
     console.warn("Failed to load custom instructions:", error);
@@ -8423,12 +8514,33 @@ function loadCustomInstructions(workingDirectory = process.cwd()) {
 // src/agent/grok-agent.ts
 init_settings_manager();
 var GrokAgent = class extends EventEmitter {
+  grokClient;
+  textEditor;
+  morphEditor;
+  bash;
+  todoTool;
+  confirmationTool;
+  search;
+  // Advanced tools
+  multiFileEditor;
+  advancedSearch;
+  fileTreeOps;
+  codeAwareEditor;
+  operationHistory;
+  // Intelligence tools
+  astParser;
+  symbolSearch;
+  dependencyAnalyzer;
+  codeContext;
+  refactoringAssistant;
+  chatHistory = [];
+  messages = [];
+  tokenCounter;
+  abortController = null;
+  mcpInitialized = false;
+  maxToolRounds;
   constructor(apiKey, baseURL, model, maxToolRounds) {
     super();
-    this.chatHistory = [];
-    this.messages = [];
-    this.abortController = null;
-    this.mcpInitialized = false;
     const manager = getSettingsManager();
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
@@ -9525,7 +9637,7 @@ var ClaudeMdParserImpl = class {
       };
     }
     try {
-      const content = await fs17.readFile(claudePath, "utf-8");
+      const content = await ops.promises.readFile(claudePath, "utf-8");
       const hasDocumentationSection = content.includes("Documentation System Workflow") || content.includes(".agent documentation system");
       return {
         exists: true,
@@ -9560,7 +9672,7 @@ This document provides context and instructions for Claude Code when working wit
 
 ${documentationSection}`;
       }
-      await fs17.writeFile(claudePath, newContent);
+      await ops.promises.writeFile(claudePath, newContent);
       return {
         success: true,
         message: exists ? "\u2705 Updated existing CLAUDE.md with documentation system instructions" : "\u2705 Created CLAUDE.md with documentation system instructions"
@@ -9613,6 +9725,7 @@ var claudeMdParser = new ClaudeMdParserImpl();
 
 // src/tools/documentation/agent-system-generator.ts
 var AgentSystemGenerator = class {
+  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -9627,15 +9740,15 @@ var AgentSystemGenerator = class {
           filesCreated: []
         };
       }
-      await fs17.mkdir(agentPath, { recursive: true });
-      await fs17.mkdir(path7__default.join(agentPath, "system"), { recursive: true });
-      await fs17.mkdir(path7__default.join(agentPath, "tasks"), { recursive: true });
-      await fs17.mkdir(path7__default.join(agentPath, "sop"), { recursive: true });
-      await fs17.mkdir(path7__default.join(agentPath, "incidents"), { recursive: true });
-      await fs17.mkdir(path7__default.join(agentPath, "guardrails"), { recursive: true });
-      await fs17.mkdir(path7__default.join(agentPath, "commands"), { recursive: true });
+      await ops.mkdir(agentPath, { recursive: true });
+      await ops.mkdir(path7__default.join(agentPath, "system"), { recursive: true });
+      await ops.mkdir(path7__default.join(agentPath, "tasks"), { recursive: true });
+      await ops.mkdir(path7__default.join(agentPath, "sop"), { recursive: true });
+      await ops.mkdir(path7__default.join(agentPath, "incidents"), { recursive: true });
+      await ops.mkdir(path7__default.join(agentPath, "guardrails"), { recursive: true });
+      await ops.mkdir(path7__default.join(agentPath, "commands"), { recursive: true });
       const readmeContent = this.generateReadmeContent();
-      await fs17.writeFile(path7__default.join(agentPath, "README.md"), readmeContent);
+      await ops.promises.writeFile(path7__default.join(agentPath, "README.md"), readmeContent);
       filesCreated.push(".agent/README.md");
       const systemFiles = await this.generateSystemDocs(agentPath);
       filesCreated.push(...systemFiles);
@@ -9745,13 +9858,13 @@ Documentation for documentation system commands:
     const systemPath = path7__default.join(agentPath, "system");
     const files = [];
     const archContent = this.config.projectType === "grok-cli" ? this.generateGrokArchitecture() : this.generateExternalArchitecture();
-    await fs17.writeFile(path7__default.join(systemPath, "architecture.md"), archContent);
+    await ops.promises.writeFile(path7__default.join(systemPath, "architecture.md"), archContent);
     files.push(".agent/system/architecture.md");
     const criticalStateContent = this.generateCriticalState();
-    await fs17.writeFile(path7__default.join(systemPath, "critical-state.md"), criticalStateContent);
+    await ops.promises.writeFile(path7__default.join(systemPath, "critical-state.md"), criticalStateContent);
     files.push(".agent/system/critical-state.md");
     const apiContent = this.generateApiSchema();
-    await fs17.writeFile(path7__default.join(systemPath, "api-schema.md"), apiContent);
+    await ops.promises.writeFile(path7__default.join(systemPath, "api-schema.md"), apiContent);
     files.push(".agent/system/api-schema.md");
     return files;
   }
@@ -10108,7 +10221,7 @@ interface Tool {
 
 *Updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
-    await fs17.writeFile(path7__default.join(sopPath, "documentation-workflow.md"), docWorkflowContent);
+    await ops.promises.writeFile(path7__default.join(sopPath, "documentation-workflow.md"), docWorkflowContent);
     files.push(".agent/sop/documentation-workflow.md");
     if (this.config.projectType === "grok-cli") {
       const newCommandContent = `# \u2699\uFE0F Adding New Commands SOP
@@ -10183,7 +10296,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
 
 *Updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
-      await fs17.writeFile(path7__default.join(sopPath, "adding-new-command.md"), newCommandContent);
+      await ops.promises.writeFile(path7__default.join(sopPath, "adding-new-command.md"), newCommandContent);
       files.push(".agent/sop/adding-new-command.md");
     }
     return files;
@@ -10192,7 +10305,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
     const tasksPath = path7__default.join(agentPath, "tasks");
     const files = [];
     const exampleContent = this.config.projectType === "grok-cli" ? this.generateGrokExampleTask() : this.generateExternalExampleTask();
-    await fs17.writeFile(path7__default.join(tasksPath, "example-prd.md"), exampleContent);
+    await ops.promises.writeFile(path7__default.join(tasksPath, "example-prd.md"), exampleContent);
     files.push(".agent/tasks/example-prd.md");
     return files;
   }
@@ -10384,7 +10497,7 @@ After initialization:
 
 *Updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
-    await fs17.writeFile(path7__default.join(commandsPath, "init-agent.md"), initAgentContent);
+    await ops.promises.writeFile(path7__default.join(commandsPath, "init-agent.md"), initAgentContent);
     files.push(".agent/commands/init-agent.md");
     return files;
   }
@@ -10392,7 +10505,7 @@ After initialization:
     const agentPath = path7__default.join(this.config.rootPath, ".agent");
     try {
       if (existsSync(agentPath)) {
-        await fs17.rm(agentPath, { recursive: true, force: true });
+        await ops.rm(agentPath, { recursive: true, force: true });
       }
       return await this.generateAgentSystem();
     } catch (error) {
@@ -10463,6 +10576,7 @@ function findDocsMenuOption(input) {
   return DOCS_MENU_OPTIONS.find((option) => option.key === trimmed) || null;
 }
 var ReadmeGenerator = class {
+  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -10478,7 +10592,7 @@ var ReadmeGenerator = class {
         };
       }
       const content = this.generateReadmeContent(analysis);
-      await fs17.writeFile(readmePath, content);
+      await ops.promises.writeFile(readmePath, content);
       return {
         success: true,
         message: readmeExists ? "\u2705 Updated existing README.md with comprehensive documentation" : "\u2705 Created new README.md with project documentation",
@@ -10505,7 +10619,7 @@ var ReadmeGenerator = class {
     try {
       const packagePath = path7__default.join(this.config.rootPath, "package.json");
       if (existsSync(packagePath)) {
-        const packageContent = await fs17.readFile(packagePath, "utf-8");
+        const packageContent = await ops.promises.readFile(packagePath, "utf-8");
         analysis.packageJson = JSON.parse(packageContent);
         analysis.dependencies = Object.keys(analysis.packageJson.dependencies || {});
         analysis.devDependencies = Object.keys(analysis.packageJson.devDependencies || {});
@@ -10784,6 +10898,7 @@ TypeScript is configured via \`tsconfig.json\`.
   }
 };
 var CommentsGenerator = class {
+  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -10795,7 +10910,7 @@ var CommentsGenerator = class {
           message: "File not found"
         };
       }
-      const content = await fs17.readFile(this.config.filePath, "utf-8");
+      const content = await ops.promises.readFile(this.config.filePath, "utf-8");
       const analysis = this.analyzeCode(content);
       if (analysis.hasExistingComments) {
         return {
@@ -10805,8 +10920,8 @@ var CommentsGenerator = class {
       }
       const modifiedContent = this.addComments(content, analysis);
       const backupPath = this.config.filePath + ".backup";
-      await fs17.writeFile(backupPath, content);
-      await fs17.writeFile(this.config.filePath, modifiedContent);
+      await ops.promises.writeFile(backupPath, content);
+      await ops.promises.writeFile(this.config.filePath, modifiedContent);
       const commentCount = this.countAddedComments(analysis);
       return {
         success: true,
@@ -11006,6 +11121,7 @@ var CommentsGenerator = class {
   }
 };
 var ApiDocsGenerator = class {
+  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -11021,7 +11137,7 @@ var ApiDocsGenerator = class {
       const content = this.config.outputFormat === "md" ? this.generateMarkdown(documentation) : this.generateHtml(documentation);
       const outputFileName = `api-docs.${this.config.outputFormat}`;
       const outputPath = path7__default.join(this.config.rootPath, outputFileName);
-      await fs17.writeFile(outputPath, content);
+      await ops.promises.writeFile(outputPath, content);
       const stats = this.getDocumentationStats(documentation);
       return {
         success: true,
@@ -11057,7 +11173,7 @@ ${stats}`,
   }
   async scanDirectory(dirPath, documentation) {
     try {
-      const entries = await fs17.readdir(dirPath, { withFileTypes: true });
+      const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7__default.join(dirPath, entry.name);
         if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
@@ -11076,7 +11192,7 @@ ${stats}`,
   }
   async parseApiFile(filePath, documentation) {
     try {
-      const content = await fs17.readFile(filePath, "utf-8");
+      const content = await ops.promises.readFile(filePath, "utf-8");
       const relativePath = path7__default.relative(this.config.rootPath, filePath);
       const moduleName = this.getModuleName(relativePath);
       const lines = content.split("\n");
@@ -11378,6 +11494,7 @@ type ${type.name} = ${type.definition}
   }
 };
 var ChangelogGenerator = class {
+  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -11402,12 +11519,12 @@ var ChangelogGenerator = class {
       const changelogPath = path7__default.join(this.config.rootPath, "CHANGELOG.md");
       const exists = existsSync(changelogPath);
       if (exists) {
-        const existingContent = await fs17.readFile(changelogPath, "utf-8");
+        const existingContent = await ops.promises.readFile(changelogPath, "utf-8");
         const newContent = content + "\n\n" + existingContent;
-        await fs17.writeFile(changelogPath, newContent);
+        await ops.promises.writeFile(changelogPath, newContent);
       } else {
         const fullContent = this.generateChangelogHeader() + content;
-        await fs17.writeFile(changelogPath, fullContent);
+        await ops.promises.writeFile(changelogPath, fullContent);
       }
       return {
         success: true,
@@ -11606,6 +11723,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
 };
 var UpdateAgentDocs = class {
+  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -11698,13 +11816,13 @@ var UpdateAgentDocs = class {
     const recentFiles = [];
     const scanDir = async (dirPath) => {
       try {
-        const entries = await fs17.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
         for (const entry of entries) {
           const fullPath = path7__default.join(dirPath, entry.name);
           if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
             await scanDir(fullPath);
           } else if (entry.isFile()) {
-            const stats = await fs17.stat(fullPath);
+            const stats = await ops.promises.stat(fullPath);
             if (stats.mtime.getTime() > oneDayAgo) {
               recentFiles.push(path7__default.relative(this.config.rootPath, fullPath));
             }
@@ -11760,9 +11878,9 @@ var UpdateAgentDocs = class {
       try {
         const archPath = path7__default.join(systemPath, "architecture.md");
         if (existsSync(archPath)) {
-          const content = await fs17.readFile(archPath, "utf-8");
+          const content = await ops.promises.readFile(archPath, "utf-8");
           const updatedContent = await this.updateArchitectureDoc(content, analysis);
-          await fs17.writeFile(archPath, updatedContent);
+          await ops.promises.writeFile(archPath, updatedContent);
           updatedFiles.push(".agent/system/architecture.md");
         }
       } catch (error) {
@@ -11776,7 +11894,7 @@ var UpdateAgentDocs = class {
       if (!existsSync(criticalStatePath)) {
         return false;
       }
-      const content = await fs17.readFile(criticalStatePath, "utf-8");
+      const content = await ops.promises.readFile(criticalStatePath, "utf-8");
       const timestamp = (/* @__PURE__ */ new Date()).toISOString();
       const changesSummary = this.generateChangesSummary(analysis);
       let updatedContent = content.replace(
@@ -11801,7 +11919,7 @@ Updated By: /update-agent-docs after detecting changes${recentChangesSection}`
           );
         }
       }
-      await fs17.writeFile(criticalStatePath, updatedContent);
+      await ops.promises.writeFile(criticalStatePath, updatedContent);
       return true;
     } catch (error) {
       return false;
@@ -11891,10 +12009,10 @@ Updated By: /update-agent-docs after detecting changes${recentChangesSection}`
 
 // src/subagents/subagent-framework.ts
 var SubagentFramework = class {
+  activeTasks = /* @__PURE__ */ new Map();
+  results = /* @__PURE__ */ new Map();
+  configs = /* @__PURE__ */ new Map();
   constructor() {
-    this.activeTasks = /* @__PURE__ */ new Map();
-    this.results = /* @__PURE__ */ new Map();
-    this.configs = /* @__PURE__ */ new Map();
     this.initializeConfigs();
   }
   initializeConfigs() {
@@ -12233,6 +12351,9 @@ This is a generated document for ${projectPath}.
   }
 };
 var SelfHealingSystem = class {
+  rootPath;
+  agentPath;
+  config;
   constructor(rootPath, config2) {
     this.rootPath = rootPath;
     this.agentPath = path7__default.join(rootPath, ".agent");
@@ -12248,9 +12369,9 @@ var SelfHealingSystem = class {
     try {
       const incident = await this.analyzeAndCreateIncident(error, context);
       const incidentPath = path7__default.join(this.agentPath, "incidents", `${incident.id}.md`);
-      await fs17.mkdir(path7__default.dirname(incidentPath), { recursive: true });
+      await ops.mkdir(path7__default.dirname(incidentPath), { recursive: true });
       const incidentContent = this.generateIncidentContent(incident);
-      await fs17.writeFile(incidentPath, incidentContent);
+      await ops.promises.writeFile(incidentPath, incidentContent);
       const guardrail = await this.generateGuardrailFromIncident(incident);
       if (guardrail) {
         await this.saveGuardrail(guardrail);
@@ -12380,12 +12501,12 @@ ${guardrail ? `\u{1F6E1}\uFE0F Guardrail created: ${guardrail.name}` : ""}
       if (!existsSync(incidentsPath)) {
         return 0;
       }
-      const files = await fs17.readdir(incidentsPath);
+      const files = await ops.promises.readdir(incidentsPath);
       let count = 0;
       for (const file of files) {
         if (file.endsWith(".md")) {
           const filePath = path7__default.join(incidentsPath, file);
-          const content = await fs17.readFile(filePath, "utf-8");
+          const content = await ops.promises.readFile(filePath, "utf-8");
           if (content.includes(title)) {
             count++;
           }
@@ -12478,10 +12599,10 @@ ${incident.guardrailCreated ? `Guardrail created: ${incident.guardrailCreated}` 
   }
   async saveGuardrail(guardrail) {
     const guardrailsPath = path7__default.join(this.agentPath, "guardrails");
-    await fs17.mkdir(guardrailsPath, { recursive: true });
+    await ops.mkdir(guardrailsPath, { recursive: true });
     const filePath = path7__default.join(guardrailsPath, `${guardrail.id}.md`);
     const content = this.generateGuardrailContent(guardrail);
-    await fs17.writeFile(filePath, content);
+    await ops.promises.writeFile(filePath, content);
   }
   generateGuardrailContent(guardrail) {
     return `# ${guardrail.name}
@@ -12540,12 +12661,12 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
     if (!existsSync(guardrailsPath)) {
       return [];
     }
-    const files = await fs17.readdir(guardrailsPath);
+    const files = await ops.promises.readdir(guardrailsPath);
     const guardrails = [];
     for (const file of files) {
       if (file.endsWith(".md")) {
         try {
-          const content = await fs17.readFile(path7__default.join(guardrailsPath, file), "utf-8");
+          const content = await ops.promises.readFile(path7__default.join(guardrailsPath, file), "utf-8");
           const guardrail = this.parseGuardrailFromContent(content);
           if (guardrail) {
             guardrails.push(guardrail);
@@ -12605,12 +12726,12 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
     if (!existsSync(incidentsPath)) {
       return [];
     }
-    const files = await fs17.readdir(incidentsPath);
+    const files = await ops.promises.readdir(incidentsPath);
     const incidents = [];
     for (const file of files) {
       if (file.endsWith(".md")) {
         try {
-          const content = await fs17.readFile(path7__default.join(incidentsPath, file), "utf-8");
+          const content = await ops.promises.readFile(path7__default.join(incidentsPath, file), "utf-8");
           const incident = this.parseIncidentFromContent(content);
           if (incident) {
             incidents.push(incident);
@@ -14964,6 +15085,10 @@ function createMCPCommand() {
   return mcpCommand;
 }
 
+// package.json with { type: 'json' }
+var package_default2 = {
+  version: "1.0.24"};
+
 // src/index.ts
 dotenv.config();
 process.on("SIGTERM", () => {
@@ -15163,7 +15288,7 @@ async function processPromptHeadless(prompt, apiKey, baseURL, model, maxToolRoun
 }
 program.name("grok").description(
   "A conversational AI CLI tool powered by Grok with text editor capabilities"
-).version(package_default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)").option(
+).version(package_default2.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)").option(
   "-u, --base-url <url>",
   "Grok API base URL (or set GROK_BASE_URL env var)"
 ).option(

@@ -1,4 +1,16 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import axios from "axios";
 import { ToolResult } from "../types/index.js";
@@ -47,7 +59,7 @@ export class MorphEditorTool {
     try {
       const resolvedPath = path.resolve(targetFile);
 
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${targetFile}`,
@@ -62,7 +74,7 @@ export class MorphEditorTool {
       }
 
       // Read the initial code
-      const initialCode = await fs.readFile(resolvedPath, "utf-8");
+      const initialCode = await ops.promises.readFile(resolvedPath, "utf-8");
 
       // Check user confirmation before proceeding
       const sessionFlags = this.confirmationService.getSessionFlags();
@@ -89,7 +101,7 @@ export class MorphEditorTool {
       const mergedCode = await this.callMorphApply(instructions, initialCode, codeEdit);
 
       // Write the merged code back to file
-      await fs.writeFile(resolvedPath, mergedCode, "utf-8");
+      await ops.promises.writeFile(resolvedPath, mergedCode, "utf-8");
 
       // Generate diff for display
       const oldLines = initialCode.split("\n");
@@ -330,18 +342,18 @@ export class MorphEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
 
-      if (await fs.pathExists(resolvedPath)) {
-        const stats = await fs.stat(resolvedPath);
+      if (await pathExists(resolvedPath)) {
+        const stats = await ops.promises.stat(resolvedPath);
 
         if (stats.isDirectory()) {
-          const files = await fs.readdir(resolvedPath);
+          const files = await ops.promises.readdir(resolvedPath);
           return {
             success: true,
             output: `Directory contents of ${filePath}:\n${files.join("\n")}`,
           };
         }
 
-        const content = await fs.readFile(resolvedPath, "utf-8");
+        const content = await ops.promises.readFile(resolvedPath, "utf-8");
         const lines = content.split("\n");
 
         if (viewRange) {

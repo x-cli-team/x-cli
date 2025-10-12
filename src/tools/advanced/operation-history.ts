@@ -1,4 +1,16 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import { ToolResult } from "../../types/index.js";
 import { ConfirmationService } from "../../utils/confirmation-service.js";
@@ -424,7 +436,7 @@ export class OperationHistoryTool {
     for (const filePath of files) {
       try {
         const resolvedPath = path.resolve(filePath);
-        const exists = await fs.pathExists(resolvedPath);
+        const exists = await pathExists(resolvedPath);
 
         const snapshot: FileSnapshot = {
           filePath: resolvedPath,
@@ -432,10 +444,10 @@ export class OperationHistoryTool {
         };
 
         if (exists) {
-          const stats = await fs.stat(resolvedPath);
+          const stats = await ops.promises.stat(resolvedPath);
           
           if (stats.isFile() && this.shouldSnapshotFile(resolvedPath)) {
-            snapshot.content = await fs.readFile(resolvedPath, 'utf-8');
+            snapshot.content = await ops.promises.readFile(resolvedPath, 'utf-8');
             snapshot.size = stats.size;
             snapshot.lastModified = stats.mtime;
             snapshot.permissions = stats.mode.toString(8);
@@ -461,7 +473,7 @@ export class OperationHistoryTool {
   private shouldSnapshotFile(filePath: string): boolean {
     // Skip large files (> 1MB)
     try {
-      const stats = fs.statSync(filePath);
+      const stats = ops.statSync(filePath);
       if (stats.size > 1024 * 1024) {
         return false;
       }
@@ -549,21 +561,21 @@ export class OperationHistoryTool {
 
     for (const snapshot of fileSnapshots) {
       try {
-        const currentExists = await fs.pathExists(snapshot.filePath);
+        const currentExists = await pathExists(snapshot.filePath);
 
         if (snapshot.existed && snapshot.content !== undefined) {
           // Restore file content
-          await fs.ensureDir(path.dirname(snapshot.filePath));
-          await fs.writeFile(snapshot.filePath, snapshot.content, 'utf-8');
+          await ops.ensureDir(path.dirname(snapshot.filePath));
+          await ops.promises.writeFile(snapshot.filePath, snapshot.content, 'utf-8');
           
           if (snapshot.permissions) {
-            await fs.chmod(snapshot.filePath, parseInt(snapshot.permissions, 8));
+            await ops.promises.chmod(snapshot.filePath, parseInt(snapshot.permissions, 8));
           }
           
           restored.push(`Restored: ${snapshot.filePath}`);
         } else if (!snapshot.existed && currentExists) {
           // Remove file that didn't exist before
-          await fs.remove(snapshot.filePath);
+          await ops.promises.rm(snapshot.filePath);
           restored.push(`Removed: ${snapshot.filePath}`);
         }
       } catch (error: any) {
@@ -720,8 +732,8 @@ export class OperationHistoryTool {
    */
   private async loadHistory(): Promise<void> {
     try {
-      if (await fs.pathExists(this.historyFile)) {
-        const data = await fs.readFile(this.historyFile, 'utf-8');
+      if (await pathExists(this.historyFile)) {
+        const data = await ops.promises.readFile(this.historyFile, 'utf-8');
         const parsed = JSON.parse(data);
         
         this.history = parsed.entries.map((entry: any) => ({
@@ -743,7 +755,7 @@ export class OperationHistoryTool {
    */
   private async saveHistory(): Promise<void> {
     try {
-      await fs.ensureDir(path.dirname(this.historyFile));
+      await ops.ensureDir(path.dirname(this.historyFile));
       
       const data = {
         entries: this.history,
@@ -751,7 +763,7 @@ export class OperationHistoryTool {
         lastUpdated: new Date().toISOString()
       };
       
-      await fs.writeFile(this.historyFile, JSON.stringify(data, null, 2), 'utf-8');
+      await ops.promises.writeFile(this.historyFile, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {
       // Silently ignore save errors to avoid disrupting operations
     }

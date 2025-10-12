@@ -1,6 +1,20 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import { writeFile as writeFilePromise } from "fs/promises";
+
+
 import { ToolResult, EditorCommand } from "../types/index.js";
 import { ConfirmationService } from "../utils/confirmation-service.js";
 
@@ -15,18 +29,18 @@ export class TextEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
 
-      if (await fs.pathExists(resolvedPath)) {
-        const stats = await fs.stat(resolvedPath);
+      if (await pathExists(resolvedPath)) {
+        const stats = await ops.promises.stat(resolvedPath);
 
         if (stats.isDirectory()) {
-          const files = await fs.readdir(resolvedPath);
+          const files = await ops.promises.readdir(resolvedPath);
           return {
             success: true,
             output: `Directory contents of ${filePath}:\n${files.join("\n")}`,
           };
         }
 
-        const content = await fs.readFile(resolvedPath, "utf-8");
+        const content = await ops.promises.readFile(resolvedPath, "utf-8");
         const lines = content.split("\n");
 
         if (viewRange) {
@@ -84,14 +98,14 @@ export class TextEditorTool {
 
       const resolvedPath = path.resolve(filePath);
 
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`,
         };
       }
 
-      const content = await fs.readFile(resolvedPath, "utf-8");
+      const content = await ops.promises.readFile(resolvedPath, "utf-8");
 
       if (!content.includes(oldStr)) {
         if (oldStr.includes('\n')) {
@@ -174,7 +188,7 @@ export class TextEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
 
-      if (await fs.pathExists(resolvedPath)) {
+      if (await pathExists(resolvedPath)) {
         return {
           success: false,
           error: `File already exists: ${filePath}`,
@@ -215,7 +229,7 @@ export class TextEditorTool {
       }
 
       const dir = path.dirname(resolvedPath);
-      await fs.ensureDir(dir);
+      await ops.promises.mkdir(dir, { recursive: true });
       await writeFilePromise(resolvedPath, content, "utf-8");
 
       this.editHistory.push({
@@ -250,14 +264,14 @@ export class TextEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
 
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`,
         };
       }
 
-      const fileContent = await fs.readFile(resolvedPath, "utf-8");
+      const fileContent = await ops.promises.readFile(resolvedPath, "utf-8");
       const lines = fileContent.split("\n");
       
       if (startLine < 1 || startLine > lines.length) {
@@ -337,14 +351,14 @@ export class TextEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
 
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`,
         };
       }
 
-      const fileContent = await fs.readFile(resolvedPath, "utf-8");
+      const fileContent = await ops.promises.readFile(resolvedPath, "utf-8");
       const lines = fileContent.split("\n");
 
       lines.splice(insertLine - 1, 0, content);
@@ -385,7 +399,7 @@ export class TextEditorTool {
       switch (lastEdit.command) {
         case "str_replace":
           if (lastEdit.path && lastEdit.old_str && lastEdit.new_str) {
-            const content = await fs.readFile(lastEdit.path, "utf-8");
+            const content = await ops.promises.readFile(lastEdit.path, "utf-8");
             const revertedContent = content.replace(
               lastEdit.new_str,
               lastEdit.old_str
@@ -396,13 +410,13 @@ export class TextEditorTool {
 
         case "create":
           if (lastEdit.path) {
-            await fs.remove(lastEdit.path);
+            await ops.promises.rm(lastEdit.path);
           }
           break;
 
         case "insert":
           if (lastEdit.path && lastEdit.insert_line) {
-            const content = await fs.readFile(lastEdit.path, "utf-8");
+            const content = await ops.promises.readFile(lastEdit.path, "utf-8");
             const lines = content.split("\n");
             lines.splice(lastEdit.insert_line - 1, 1);
             await writeFilePromise(lastEdit.path, lines.join("\n"), "utf-8");

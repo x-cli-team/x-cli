@@ -1,4 +1,16 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import { writeFile as writeFilePromise } from "fs/promises";
 import { ToolResult } from "../../types/index.js";
@@ -365,7 +377,7 @@ export class MultiFileEditorTool {
 
       switch (operation.type) {
         case 'create':
-          if (await fs.pathExists(resolvedPath)) {
+          if (await pathExists(resolvedPath)) {
             return { valid: false, error: "File already exists" };
           }
           if (!operation.content) {
@@ -374,7 +386,7 @@ export class MultiFileEditorTool {
           break;
 
         case 'edit':
-          if (!(await fs.pathExists(resolvedPath))) {
+          if (!(await pathExists(resolvedPath))) {
             return { valid: false, error: "File does not exist" };
           }
           if (!operation.operations || operation.operations.length === 0) {
@@ -383,21 +395,21 @@ export class MultiFileEditorTool {
           break;
 
         case 'delete':
-          if (!(await fs.pathExists(resolvedPath))) {
+          if (!(await pathExists(resolvedPath))) {
             return { valid: false, error: "File does not exist" };
           }
           break;
 
         case 'rename':
         case 'move':
-          if (!(await fs.pathExists(resolvedPath))) {
+          if (!(await pathExists(resolvedPath))) {
             return { valid: false, error: "Source file does not exist" };
           }
           if (!operation.newFilePath) {
             return { valid: false, error: "Destination path required" };
           }
           const newResolvedPath = path.resolve(operation.newFilePath);
-          if (await fs.pathExists(newResolvedPath)) {
+          if (await pathExists(newResolvedPath)) {
             return { valid: false, error: "Destination already exists" };
           }
           break;
@@ -423,7 +435,7 @@ export class MultiFileEditorTool {
         };
 
       case 'edit':
-        const originalContent = await fs.readFile(resolvedPath, 'utf-8');
+        const originalContent = await ops.promises.readFile(resolvedPath, 'utf-8');
         return {
           type: 'restore_content',
           filePath: operation.filePath,
@@ -431,8 +443,8 @@ export class MultiFileEditorTool {
         };
 
       case 'delete':
-        const contentToRestore = await fs.readFile(resolvedPath, 'utf-8');
-        const stats = await fs.stat(resolvedPath);
+        const contentToRestore = await ops.promises.readFile(resolvedPath, 'utf-8');
+        const stats = await ops.promises.stat(resolvedPath);
         return {
           type: 'restore_deleted',
           filePath: operation.filePath,
@@ -462,12 +474,12 @@ export class MultiFileEditorTool {
     switch (operation.type) {
       case 'create':
         const dir = path.dirname(resolvedPath);
-        await fs.ensureDir(dir);
+        await ops.promises.mkdir(dir, { recursive: true });
         await writeFilePromise(resolvedPath, operation.content!, 'utf-8');
         return { success: true, output: `Created ${operation.filePath}` };
 
       case 'edit':
-        let content = await fs.readFile(resolvedPath, 'utf-8');
+        let content = await ops.promises.readFile(resolvedPath, 'utf-8');
         
         for (const editOp of operation.operations!) {
           content = await this.applyEditOperation(content, editOp);
@@ -477,15 +489,15 @@ export class MultiFileEditorTool {
         return { success: true, output: `Edited ${operation.filePath}` };
 
       case 'delete':
-        await fs.remove(resolvedPath);
+        await ops.promises.rm(resolvedPath);
         return { success: true, output: `Deleted ${operation.filePath}` };
 
       case 'rename':
       case 'move':
         const newResolvedPath = path.resolve(operation.newFilePath!);
         const newDir = path.dirname(newResolvedPath);
-        await fs.ensureDir(newDir);
-        await fs.move(resolvedPath, newResolvedPath);
+        await ops.promises.mkdir(newDir, { recursive: true });
+        await ops.move(resolvedPath, newResolvedPath);
         return { success: true, output: `${operation.type === 'rename' ? 'Renamed' : 'Moved'} ${operation.filePath} to ${operation.newFilePath}` };
 
       default:
@@ -536,8 +548,8 @@ export class MultiFileEditorTool {
       switch (rollback.type) {
         case 'delete_created':
           const createdPath = path.resolve(rollback.filePath);
-          if (await fs.pathExists(createdPath)) {
-            await fs.remove(createdPath);
+          if (await pathExists(createdPath)) {
+            await ops.promises.rm(createdPath);
           }
           break;
 
@@ -549,17 +561,17 @@ export class MultiFileEditorTool {
         case 'restore_deleted':
           const deletedPath = path.resolve(rollback.filePath);
           const deletedDir = path.dirname(deletedPath);
-          await fs.ensureDir(deletedDir);
+          await ops.promises.mkdir(deletedDir, { recursive: true });
           await writeFilePromise(deletedPath, rollback.content, 'utf-8');
           break;
 
         case 'restore_move':
           const movedNewPath = path.resolve(rollback.newPath);
           const movedOldPath = path.resolve(rollback.oldPath);
-          if (await fs.pathExists(movedNewPath)) {
+          if (await pathExists(movedNewPath)) {
             const oldDir = path.dirname(movedOldPath);
-            await fs.ensureDir(oldDir);
-            await fs.move(movedNewPath, movedOldPath);
+            await ops.promises.mkdir(oldDir, { recursive: true });
+            await ops.move(movedNewPath, movedOldPath);
           }
           break;
       }

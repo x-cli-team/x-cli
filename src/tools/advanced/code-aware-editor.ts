@@ -1,4 +1,16 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import { ToolResult } from "../../types/index.js";
 import { ConfirmationService } from "../../utils/confirmation-service.js";
@@ -70,14 +82,14 @@ export class CodeAwareEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
 
-      const content = await fs.readFile(resolvedPath, 'utf-8');
+      const content = await ops.promises.readFile(resolvedPath, 'utf-8');
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
 
@@ -102,14 +114,14 @@ export class CodeAwareEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
 
-      const content = await fs.readFile(resolvedPath, 'utf-8');
+      const content = await ops.promises.readFile(resolvedPath, 'utf-8');
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
 
@@ -142,7 +154,7 @@ export class CodeAwareEditorTool {
       }
 
       // Apply changes
-      await fs.writeFile(resolvedPath, result.newContent!, 'utf-8');
+      await ops.promises.writeFile(resolvedPath, result.newContent!, 'utf-8');
 
       return {
         success: true,
@@ -168,14 +180,14 @@ export class CodeAwareEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
 
-      const content = await fs.readFile(resolvedPath, 'utf-8');
+      const content = await ops.promises.readFile(resolvedPath, 'utf-8');
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
 
@@ -212,7 +224,7 @@ export class CodeAwareEditorTool {
         }
       }
 
-      await fs.writeFile(resolvedPath, newContent, 'utf-8');
+      await ops.promises.writeFile(resolvedPath, newContent, 'utf-8');
 
       return {
         success: true,
@@ -233,14 +245,14 @@ export class CodeAwareEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
 
-      const content = await fs.readFile(resolvedPath, 'utf-8');
+      const content = await ops.promises.readFile(resolvedPath, 'utf-8');
       const language = this.detectLanguage(filePath);
       
       const formattedContent = await this.formatCodeContent(content, language, options);
@@ -274,7 +286,7 @@ export class CodeAwareEditorTool {
         }
       }
 
-      await fs.writeFile(resolvedPath, formattedContent, 'utf-8');
+      await ops.promises.writeFile(resolvedPath, formattedContent, 'utf-8');
 
       return {
         success: true,
@@ -295,14 +307,14 @@ export class CodeAwareEditorTool {
     try {
       const resolvedPath = path.resolve(filePath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `File not found: ${filePath}`
         };
       }
 
-      const content = await fs.readFile(resolvedPath, 'utf-8');
+      const content = await ops.promises.readFile(resolvedPath, 'utf-8');
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
 
@@ -349,7 +361,7 @@ export class CodeAwareEditorTool {
         }
       }
 
-      await fs.writeFile(resolvedPath, newContent, 'utf-8');
+      await ops.promises.writeFile(resolvedPath, newContent, 'utf-8');
 
       return {
         success: true,

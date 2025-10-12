@@ -15,7 +15,19 @@ try {
 } catch (error) {
   console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
 }
-import fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import path from "path";
 
 export interface ASTNode {
@@ -167,11 +179,11 @@ export class ASTParserTool {
         throw new Error("File path is required");
       }
 
-      if (!await fs.pathExists(filePath)) {
+      if (!await pathExists(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
 
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await ops.promises.readFile(filePath, 'utf-8');
       const language = this.detectLanguage(filePath);
       
       let result: ParseResult;

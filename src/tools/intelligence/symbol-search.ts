@@ -1,7 +1,19 @@
 import { ToolResult } from "../../types/index.js";
 import { ASTParserTool, SymbolInfo, ImportInfo, ExportInfo } from "./ast-parser.js";
 import Fuse from "fuse.js";
-import fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import path from "path";
 import { glob } from "glob";
 
@@ -244,7 +256,7 @@ export class SymbolSearchTool {
     const usages: SymbolUsage[] = [];
     
     try {
-      const content = await fs.readFile(symbolRef.filePath, 'utf-8');
+      const content = await ops.promises.readFile(symbolRef.filePath, 'utf-8');
       const lines = content.split('\n');
       
       // Simple text-based usage finding
@@ -326,7 +338,7 @@ export class SymbolSearchTool {
             .filter(usage => usage.type === 'export')
             .map(() => symbolRef.filePath);
 
-          crossRefs.push({
+          crossReops.push({
             symbol: symbolName,
             definitionFile,
             usageFiles: [...new Set(usageFiles)],

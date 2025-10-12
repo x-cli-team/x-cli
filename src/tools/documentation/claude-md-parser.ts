@@ -22,7 +22,7 @@ export class ClaudeMdParserImpl implements ClaudeMdParser {
     }
 
     try {
-      const content = await fs.readFile(claudePath, 'utf-8');
+      const content = await ops.promises.readFile(claudePath, 'utf-8');
       const hasDocumentationSection = content.includes('Documentation System Workflow') || 
                                      content.includes('.agent documentation system');
 
@@ -67,7 +67,7 @@ This document provides context and instructions for Claude Code when working wit
 ${documentationSection}`;
       }
 
-      await fs.writeFile(claudePath, newContent);
+      await ops.promises.writeFile(claudePath, newContent);
 
       return {
         success: true,

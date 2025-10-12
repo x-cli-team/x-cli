@@ -1,4 +1,16 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import { ToolResult } from "../../types/index.js";
 import { ConfirmationService } from "../../utils/confirmation-service.js";
@@ -52,14 +64,14 @@ export class AdvancedSearchTool {
     try {
       const resolvedPath = path.resolve(searchPath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `Path not found: ${searchPath}`
         };
       }
 
-      const stats = await fs.stat(resolvedPath);
+      const stats = await ops.promises.stat(resolvedPath);
       const filesToSearch: string[] = [];
 
       if (stats.isFile()) {
@@ -103,14 +115,14 @@ export class AdvancedSearchTool {
     try {
       const resolvedPath = path.resolve(searchPath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `Path not found: ${searchPath}`
         };
       }
 
-      const stats = await fs.stat(resolvedPath);
+      const stats = await ops.promises.stat(resolvedPath);
       const filesToProcess: string[] = [];
 
       if (stats.isFile()) {
@@ -165,7 +177,7 @@ export class AdvancedSearchTool {
         // Actually perform replacements
         for (const result of results) {
           if (result.success && result.preview) {
-            await fs.writeFile(result.filePath, result.preview, 'utf-8');
+            await ops.promises.writeFile(result.filePath, result.preview, 'utf-8');
           }
         }
       }
@@ -189,7 +201,7 @@ export class AdvancedSearchTool {
     try {
       const resolvedPath = path.resolve(searchPath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `Path not found: ${searchPath}`
@@ -240,7 +252,7 @@ export class AdvancedSearchTool {
    * Search in a single file
    */
   private async searchInFile(filePath: string, options: SearchOptions): Promise<SearchResult> {
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await ops.promises.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
     const matches: SearchMatch[] = [];
 
@@ -302,7 +314,7 @@ export class AdvancedSearchTool {
    */
   private async replaceInFile(filePath: string, options: ReplaceOptions): Promise<ReplaceResult> {
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await ops.promises.readFile(filePath, 'utf-8');
       
       let pattern: RegExp;
       try {
@@ -360,7 +372,7 @@ export class AdvancedSearchTool {
     const files: string[] = [];
     
     const walk = async (currentPath: string) => {
-      const entries = await fs.readdir(currentPath, { withFileTypes: true });
+      const entries = await ops.promises.readdir(currentPath, { withFileTypes: true });
       
       for (const entry of entries) {
         const fullPath = path.join(currentPath, entry.name);

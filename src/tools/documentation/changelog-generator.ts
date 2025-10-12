@@ -66,13 +66,13 @@ export class ChangelogGenerator {
       
       if (exists) {
         // Prepend to existing changelog
-        const existingContent = await fs.readFile(changelogPath, 'utf-8');
+        const existingContent = await ops.promises.readFile(changelogPath, 'utf-8');
         const newContent = content + '\n\n' + existingContent;
-        await fs.writeFile(changelogPath, newContent);
+        await ops.promises.writeFile(changelogPath, newContent);
       } else {
         // Create new changelog
         const fullContent = this.generateChangelogHeader() + content;
-        await fs.writeFile(changelogPath, fullContent);
+        await ops.promises.writeFile(changelogPath, fullContent);
       }
 
       return {

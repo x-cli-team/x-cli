@@ -1,4 +1,16 @@
-import * as fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import * as path from "path";
 import { ToolResult } from "../../types/index.js";
 import { ConfirmationService } from "../../utils/confirmation-service.js";
@@ -43,7 +55,7 @@ export class FileTreeOperationsTool {
     try {
       const resolvedPath = path.resolve(rootPath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `Path not found: ${rootPath}`
@@ -140,14 +152,14 @@ export class FileTreeOperationsTool {
       const resolvedSource = path.resolve(sourcePath);
       const resolvedDest = path.resolve(destinationPath);
 
-      if (!(await fs.pathExists(resolvedSource))) {
+      if (!(await pathExists(resolvedSource))) {
         return {
           success: false,
           error: `Source path not found: ${sourcePath}`
         };
       }
 
-      if (await fs.pathExists(resolvedDest) && !options.overwrite) {
+      if (await pathExists(resolvedDest) && !options.overwrite) {
         return {
           success: false,
           error: `Destination already exists: ${destinationPath}`
@@ -199,7 +211,7 @@ export class FileTreeOperationsTool {
     try {
       const resolvedSource = path.resolve(sourcePath);
       
-      if (!(await fs.pathExists(resolvedSource))) {
+      if (!(await pathExists(resolvedSource))) {
         return {
           success: false,
           error: `Source path not found: ${sourcePath}`
@@ -248,12 +260,12 @@ export class FileTreeOperationsTool {
       let movedFiles = 0;
       for (const [category, fileList] of Object.entries(organization)) {
         const categoryDir = path.join(destBase, category);
-        await fs.ensureDir(categoryDir);
+        await ops.promises.mkdir(categoryDir, { recursive: true });
 
         for (const filePath of fileList) {
           const fileName = path.basename(filePath);
           const destPath = path.join(categoryDir, fileName);
-          await fs.move(filePath, destPath);
+          await ops.move(filePath, destPath);
           movedFiles++;
         }
       }
@@ -277,7 +289,7 @@ export class FileTreeOperationsTool {
     try {
       const resolvedPath = path.resolve(rootPath);
       
-      if (!(await fs.pathExists(resolvedPath))) {
+      if (!(await pathExists(resolvedPath))) {
         return {
           success: false,
           error: `Path not found: ${rootPath}`
@@ -318,7 +330,7 @@ export class FileTreeOperationsTool {
       // Remove empty directories (deepest first)
       emptyDirs.sort((a, b) => b.length - a.length);
       for (const dir of emptyDirs) {
-        await fs.rmdir(dir);
+        await ops.rmdir(dir);
       }
 
       return {
@@ -341,7 +353,7 @@ export class FileTreeOperationsTool {
     options: TreeFilterOptions, 
     currentDepth: number
   ): Promise<FileTreeNode> {
-    const stats = await fs.stat(dirPath);
+    const stats = await ops.promises.stat(dirPath);
     const name = path.basename(dirPath);
     
     const node: FileTreeNode = {
@@ -356,7 +368,7 @@ export class FileTreeOperationsTool {
       node.children = [];
       
       try {
-        const entries = await fs.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
         
         for (const entry of entries) {
           // Skip hidden files unless specified
@@ -421,7 +433,7 @@ export class FileTreeOperationsTool {
    */
   private passesFilters(
     fullPath: string, 
-    entry: fs.Dirent, 
+    entry: ops.Dirent, 
     options: TreeFilterOptions
   ): boolean {
     const name = entry.name;
@@ -496,7 +508,7 @@ export class FileTreeOperationsTool {
       switch (operation.type) {
         case 'copy':
         case 'move':
-          if (!(await fs.pathExists(sourcePath))) {
+          if (!(await pathExists(sourcePath))) {
             return { valid: false, error: "Source path does not exist" };
           }
           if (!operation.destination) {
@@ -505,19 +517,19 @@ export class FileTreeOperationsTool {
           break;
 
         case 'delete':
-          if (!(await fs.pathExists(sourcePath))) {
+          if (!(await pathExists(sourcePath))) {
             return { valid: false, error: "Path does not exist" };
           }
           break;
 
         case 'create_dir':
-          if (await fs.pathExists(sourcePath)) {
+          if (await pathExists(sourcePath)) {
             return { valid: false, error: "Directory already exists" };
           }
           break;
 
         case 'chmod':
-          if (!(await fs.pathExists(sourcePath))) {
+          if (!(await pathExists(sourcePath))) {
             return { valid: false, error: "Path does not exist" };
           }
           if (!operation.mode) {
@@ -526,7 +538,7 @@ export class FileTreeOperationsTool {
           break;
 
         case 'rename':
-          if (!(await fs.pathExists(sourcePath))) {
+          if (!(await pathExists(sourcePath))) {
             return { valid: false, error: "Source path does not exist" };
           }
           if (!operation.destination) {
@@ -550,29 +562,29 @@ export class FileTreeOperationsTool {
     switch (operation.type) {
       case 'copy':
         const copyDest = path.resolve(operation.destination!);
-        await fs.copy(sourcePath, copyDest);
+        await ops.copy(sourcePath, copyDest);
         return `Copied ${operation.source} to ${operation.destination}`;
 
       case 'move':
         const moveDest = path.resolve(operation.destination!);
-        await fs.move(sourcePath, moveDest);
+        await ops.move(sourcePath, moveDest);
         return `Moved ${operation.source} to ${operation.destination}`;
 
       case 'delete':
-        await fs.remove(sourcePath);
+        await ops.promises.rm(sourcePath);
         return `Deleted ${operation.source}`;
 
       case 'create_dir':
-        await fs.ensureDir(sourcePath);
+        await ops.promises.mkdir(sourcePath, { recursive: true });
         return `Created directory ${operation.source}`;
 
       case 'chmod':
-        await fs.chmod(sourcePath, operation.mode!);
+        await ops.promises.chmod(sourcePath, operation.mode!);
         return `Changed permissions of ${operation.source} to ${operation.mode}`;
 
       case 'rename':
         const renameDest = path.resolve(operation.destination!);
-        await fs.move(sourcePath, renameDest);
+        await ops.move(sourcePath, renameDest);
         return `Renamed ${operation.source} to ${operation.destination}`;
 
       default:
@@ -608,19 +620,19 @@ export class FileTreeOperationsTool {
     destination: string, 
     options: { includeFiles?: boolean; overwrite?: boolean }
   ): Promise<void> {
-    const stats = await fs.stat(source);
+    const stats = await ops.promises.stat(source);
 
     if (stats.isDirectory()) {
-      await fs.ensureDir(destination);
+      await ops.promises.mkdir(destination, { recursive: true });
       
-      const entries = await fs.readdir(source);
+      const entries = await ops.promises.readdir(source);
       for (const entry of entries) {
         const srcPath = path.join(source, entry);
         const destPath = path.join(destination, entry);
         await this.copyStructureRecursive(srcPath, destPath, options);
       }
     } else if (options.includeFiles) {
-      await fs.copy(source, destination, { overwrite: options.overwrite });
+      await ops.copy(source, destination, { overwrite: options.overwrite });
     }
   }
 
@@ -631,7 +643,7 @@ export class FileTreeOperationsTool {
     const files: string[] = [];
     
     const walk = async (currentPath: string) => {
-      const entries = await fs.readdir(currentPath, { withFileTypes: true });
+      const entries = await ops.promises.readdir(currentPath, { withFileTypes: true });
       
       for (const entry of entries) {
         const fullPath = path.join(currentPath, entry.name);
@@ -667,7 +679,7 @@ export class FileTreeOperationsTool {
           break;
 
         case 'size':
-          const stats = await fs.stat(filePath);
+          const stats = await ops.promises.stat(filePath);
           if (stats.size < 1024) category = 'small (< 1KB)';
           else if (stats.size < 1024 * 1024) category = 'medium (< 1MB)';
           else if (stats.size < 1024 * 1024 * 10) category = 'large (< 10MB)';
@@ -675,7 +687,7 @@ export class FileTreeOperationsTool {
           break;
 
         case 'date':
-          const fileStats = await fs.stat(filePath);
+          const fileStats = await ops.promises.stat(filePath);
           const year = fileStats.mtime.getFullYear();
           const month = fileStats.mtime.getMonth() + 1;
           category = `${year}-${month.toString().padStart(2, '0')}`;
@@ -702,7 +714,7 @@ export class FileTreeOperationsTool {
 
     const checkDirectory = async (currentPath: string): Promise<boolean> => {
       try {
-        const entries = await fs.readdir(currentPath);
+        const entries = await ops.promises.readdir(currentPath);
         
         if (entries.length === 0) {
           emptyDirs.push(currentPath);
@@ -712,7 +724,7 @@ export class FileTreeOperationsTool {
         let hasNonEmptyChildren = false;
         for (const entry of entries) {
           const fullPath = path.join(currentPath, entry);
-          const stats = await fs.stat(fullPath);
+          const stats = await ops.promises.stat(fullPath);
           
           if (stats.isDirectory()) {
             const isEmpty = await checkDirectory(fullPath);

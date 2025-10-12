@@ -3,7 +3,19 @@ import { ASTParserTool, SymbolInfo } from "./ast-parser.js";
 import { SymbolSearchTool, SymbolReference } from "./symbol-search.js";
 import { MultiFileEditorTool } from "../advanced/multi-file-editor.js";
 import { OperationHistoryTool } from "../advanced/operation-history.js";
-import fs from "fs-extra";
+import * as ops from "fs";
+
+const pathExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await ops.promises.access(filePath, ops.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+
+
 import path from "path";
 
 export interface RefactoringOperation {
@@ -174,10 +186,10 @@ export class RefactoringAssistantTool {
     
     // Filter by scope
     const relevantRefs = scope === 'file' && filePath 
-      ? symbolRefs.filter(ref => ref.filePath === filePath)
+      ? symbolReops.filter(ref => ref.filePath === filePath)
       : symbolRefs;
 
-    if (relevantRefs.length === 0) {
+    if (relevantReops.length === 0) {
       throw new Error(`Symbol '${symbolName}' not found in specified scope`);
     }
 
@@ -226,11 +238,11 @@ export class RefactoringAssistantTool {
       throw new Error("File path, line range, and function name are required");
     }
 
-    if (!await fs.pathExists(filePath)) {
+    if (!await pathExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
 
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await ops.promises.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
 
     if (startLine < 0 || endLine >= lines.length || startLine > endLine) {
@@ -325,7 +337,7 @@ export class RefactoringAssistantTool {
       throw new Error("File path and variable name are required");
     }
 
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await ops.promises.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
 
     // Extract expression
@@ -419,7 +431,7 @@ export class RefactoringAssistantTool {
     }
 
     // Get function body
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await ops.promises.readFile(filePath, 'utf-8');
     const lines = content.split('\n');
     const functionLines = lines.slice(functionSymbol.startPosition.row, functionSymbol.endPosition.row + 1);
     const functionBody = this.extractFunctionBody(functionLines.join('\n'));
@@ -526,8 +538,8 @@ export class RefactoringAssistantTool {
   }
 
   private async analyzeSafety(refs: SymbolReference[], operation: string): Promise<SafetyAnalysis> {
-    const affectedFiles = new Set(refs.map(ref => ref.filePath)).size;
-    const affectedSymbols = refs.length;
+    const affectedFiles = new Set(reops.map(ref => ref.filePath)).size;
+    const affectedSymbols = reops.length;
 
     let riskLevel: 'low' | 'medium' | 'high' = 'low';
     const potentialIssues: string[] = [];
@@ -564,7 +576,7 @@ export class RefactoringAssistantTool {
     includeStrings: boolean
   ): Promise<TextChange[]> {
     const changes: TextChange[] = [];
-    const content = await fs.readFile(ref.filePath, 'utf-8');
+    const content = await ops.promises.readFile(ref.filePath, 'utf-8');
     const lines = content.split('\n');
 
     // Simple text replacement for now

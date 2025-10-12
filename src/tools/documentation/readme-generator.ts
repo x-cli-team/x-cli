@@ -49,7 +49,7 @@ export class ReadmeGenerator {
       const content = this.generateReadmeContent(analysis);
 
       // Write file
-      await fs.writeFile(readmePath, content);
+      await ops.promises.writeFile(readmePath, content);
 
       return {
         success: true,
@@ -83,7 +83,7 @@ export class ReadmeGenerator {
       // Check package.json
       const packagePath = path.join(this.config.rootPath, 'package.json');
       if (existsSync(packagePath)) {
-        const packageContent = await fs.readFile(packagePath, 'utf-8');
+        const packageContent = await ops.promises.readFile(packagePath, 'utf-8');
         analysis.packageJson = JSON.parse(packageContent);
         
         // Extract dependencies

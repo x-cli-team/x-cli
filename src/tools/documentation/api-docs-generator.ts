@@ -108,7 +108,7 @@ export class ApiDocsGenerator {
       // Write documentation file
       const outputFileName = `api-docs.${this.config.outputFormat}`;
       const outputPath = path.join(this.config.rootPath, outputFileName);
-      await fs.writeFile(outputPath, content);
+      await ops.promises.writeFile(outputPath, content);
 
       const stats = this.getDocumentationStats(documentation);
 
@@ -152,7 +152,7 @@ export class ApiDocsGenerator {
 
   private async scanDirectory(dirPath: string, documentation: ApiDocumentation): Promise<void> {
     try {
-      const entries = await fs.readdir(dirPath, { withFileTypes: true });
+      const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
 
       for (const entry of entries) {
         const fullPath = path.join(dirPath, entry.name);
@@ -179,7 +179,7 @@ export class ApiDocsGenerator {
 
   private async parseApiFile(filePath: string, documentation: ApiDocumentation): Promise<void> {
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await ops.promises.readFile(filePath, 'utf-8');
       const relativePath = path.relative(this.config.rootPath, filePath);
       const moduleName = this.getModuleName(relativePath);
 
