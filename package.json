@@ -26,8 +26,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
     "install:bun": "bun install",
-    "preinstall": "echo 'Installing Grok CLI...'",
-    "postinstall": "echo 'Grok CLI installed successfully! Run: grok --help'"
+    "preinstall": "echo '🤖 Installing Grok CLI...'",
+    "postinstall": "echo '✅ Grok CLI installed successfully!' && echo '🚀 Try: grok --help' && echo '💡 Need help? Visit: https://github.com/hinetapora/grok-cli-hurry-mode#installation'"
   },
   "keywords": [
     "cli",
