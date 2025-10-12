@@ -17,6 +17,7 @@
 ## Command System
 - **Slash Commands**: Handled in useInputHandler.ts
 - **Current Commands**: /help, /clear, /models, /commit-and-push, /exit, /init-agent, /docs, /readme, /api-docs, /changelog, /comments, /update-agent-docs, /compact, /heal, /guardrails
+- **Recent Fixes**: Fixed chat history compression bug - `/compact` now actually compresses history instead of just simulating, preventing CLI slowdown after ~10 prompts. 
 - **Command Registration**: Direct implementation in input handler
 - **Extension Pattern**: Add to handleDirectCommand function
 - **Documentation Commands**: Full suite with /init-agent, /docs menu, /readme generation, /api-docs, /changelog, /comments, /update-agent-docs, /compact (subagent), /heal (self-healing), /guardrails

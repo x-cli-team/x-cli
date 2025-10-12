@@ -186,6 +186,70 @@ export function useInputHandler({
       return;
     }
 
+    // Auto-compression check
+    const AUTO_COMPRESS_THRESHOLD = 20;
+    const MIN_HISTORY_SIZE = 10;
+    const PRESERVE_RECENT = 5;
+
+    if (chatHistory.length > AUTO_COMPRESS_THRESHOLD) {
+      const currentHistoryLength = chatHistory.length;
+      const canCompress = currentHistoryLength >= MIN_HISTORY_SIZE;
+
+      if (canCompress) {
+        try {
+          setIsProcessing(true);
+
+          // Show auto-compress message
+          const autoCompressEntry: ChatEntry = {
+            type: "assistant",
+            content: `🤖 **Automatic Compression Triggered**\n\nHistory has ${currentHistoryLength} entries (threshold: ${AUTO_COMPRESS_THRESHOLD}). Compressing to maintain performance...`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, autoCompressEntry]);
+
+          // Perform compression
+          const olderEntries = chatHistory.slice(0, -PRESERVE_RECENT);
+          const contentToCompress = olderEntries.map(entry => entry.content).join('\n');
+
+          const subagentFramework = new SubagentFramework();
+          const taskId = await subagentFramework.spawnSubagent({
+            type: 'summarizer',
+            input: {
+              content: contentToCompress,
+              compressionTarget: 0.3
+            },
+            priority: 'medium'
+          });
+
+          const result = await subagentFramework.waitForResult(taskId, 10000);
+
+          if (result.success) {
+            const compressedEntry: ChatEntry = {
+              type: "assistant",
+              content: `📝 **Auto-Compressed History Summary**\n\n${result.summary}\n\n*Auto-compressed ${currentHistoryLength - PRESERVE_RECENT} entries at ${new Date().toLocaleString()}*`,
+              timestamp: new Date(),
+            };
+            const recentEntries = chatHistory.slice(-PRESERVE_RECENT);
+            const newHistory = [compressedEntry, ...recentEntries];
+            setChatHistory(newHistory);
+
+            // Add success message
+            const successEntry: ChatEntry = {
+              type: "assistant",
+              content: `✅ **Auto-Compression Complete**\n\nReduced from ${currentHistoryLength} to ${PRESERVE_RECENT + 1} entries.`,
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, successEntry]);
+          }
+
+          setIsProcessing(false);
+        } catch (error) {
+          // Silent fail for auto-compression to not interrupt user flow
+          setIsProcessing(false);
+        }
+      }
+    }
+
     if (userInput.trim()) {
       const directCommandResult = await handleDirectCommand(userInput);
       if (!directCommandResult) {
@@ -1027,12 +1091,20 @@ Respond with ONLY the commit message, no additional text.`;
         const force = args.includes('--force');
         const dryRun = args.includes('--dry-run');
 
+        const MIN_HISTORY_SIZE = 10;
+        const PRESERVE_RECENT = 5;
+        const currentHistoryLength = chatHistory.length;
+
+        // Prepare content for summarizer: older entries only, preserve recent context
+        const olderEntries = chatHistory.slice(0, -PRESERVE_RECENT);
+        const contentToCompress = olderEntries.map(entry => entry.content).join('\n');
+
         // Simulate context compression using subagent framework
         const subagentFramework = new SubagentFramework();
         const taskId = await subagentFramework.spawnSubagent({
           type: 'summarizer',
           input: {
-            content: chatHistory.map(entry => entry.content).join('\n'),
+            content: contentToCompress,
             compressionTarget: 0.3 // 70% reduction
           },
           priority: 'medium'
@@ -1042,21 +1114,40 @@ Respond with ONLY the commit message, no additional text.`;
 
         if (result.success) {
           const metrics = subagentFramework.getPerformanceMetrics();
-          
+
+          const canCompress = currentHistoryLength >= MIN_HISTORY_SIZE || force;
+          const wouldCompressCount = Math.max(0, currentHistoryLength - PRESERVE_RECENT);
+
           const resultEntry: ChatEntry = {
             type: "assistant",
-            content: dryRun 
-              ? `📊 **Compression Preview (Dry Run)**\n\n${result.summary}\n\n💡 Use \`/compact\` to apply compression`
-              : `🧹 **Context Compressed Successfully**\n\n${result.summary}\n\n📈 **Performance:**\n- Tokens saved: ~${result.output.compressionRatio * 100}%\n- Processing time: ${result.executionTime}ms\n- Subagent tokens used: ${result.tokensUsed}`,
+            content: dryRun
+              ? `📊 **Compression Preview (Dry Run)**\n\n**Current history:** ${currentHistoryLength} entries\n**Would compress:** ${wouldCompressCount} older entries into 1 summary\n**Would preserve:** Last ${PRESERVE_RECENT} recent entries\n**Estimated reduction:** ~70%\n\n**Compressed summary:**\n${result.summary}\n\n💡 Use \`/compact\` to apply compression${!canCompress ? ` (requires ${MIN_HISTORY_SIZE}+ entries or --force)` : ''}`
+              : canCompress
+                ? `🧹 **Context Compressed Successfully**\n\n${result.summary}\n\n📈 **Performance:**\n- Original entries: ${currentHistoryLength}\n- Compressed to: ${PRESERVE_RECENT + 1} entries\n- Tokens saved: ~${result.output.compressionRatio * 100}%\n- Processing time: ${result.executionTime}ms\n- Subagent tokens used: ${result.tokensUsed}`
+                : `⚠️ **Compression Skipped**\n\nHistory too small for compression (${currentHistoryLength} < ${MIN_HISTORY_SIZE} entries).\n\n**Preview:**\n${result.summary}\n\n💡 Use \`/compact --force\` to compress anyway`,
             timestamp: new Date(),
           };
+
+          // Perform actual compression if not dry-run and conditions met
+          if (!dryRun && canCompress) {
+            const compressedEntry: ChatEntry = {
+              type: "assistant",
+              content: `📝 **Compressed History Summary**\n\n${result.summary}\n\n*Compressed ${wouldCompressCount} entries at ${new Date().toLocaleString()}*`,
+              timestamp: new Date(),
+            };
+            const recentEntries = chatHistory.slice(-PRESERVE_RECENT);
+            const newHistory = [compressedEntry, ...recentEntries];
+            setChatHistory(newHistory);
+          }
+
+          // Add result feedback
           setChatHistory((prev) => [...prev, resultEntry]);
 
-          if (!dryRun && result.success) {
-            // In a real implementation, this would actually compress the chat history
+          // Add tips if compression was performed
+          if (!dryRun && canCompress) {
             const tipsEntry: ChatEntry = {
               type: "assistant",
-              content: `✨ **Context Optimization Complete**\n\n**What happened:**\n- Older conversations summarized\n- Recent context preserved\n- Key decisions and TODOs maintained\n\n**Options:**\n- \`/compact --dry-run\` - Preview compression\n- \`/compact --force\` - Force compression even if below threshold`,
+              content: `✨ **Context Optimization Complete**\n\n**What happened:**\n- ${wouldCompressCount} older conversations summarized\n- Last ${PRESERVE_RECENT} recent entries preserved\n- Key decisions and TODOs maintained\n\n**Options:**\n- \`/compact --dry-run\` - Preview compression\n- \`/compact --force\` - Force compression even if below threshold`,
               timestamp: new Date(),
             };
             setChatHistory((prev) => [...prev, tipsEntry]);

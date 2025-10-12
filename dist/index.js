@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as fs from 'fs';
-import { existsSync } from 'fs';
+import fs__default, { existsSync } from 'fs';
 import * as path7 from 'path';
 import path7__default from 'path';
 import * as os from 'os';
@@ -7027,10 +7027,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path24) => {
+    const dfs = (filePath, path25) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path24.indexOf(filePath);
-        const cycle = path24.slice(cycleStart).concat([filePath]);
+        const cycleStart = path25.indexOf(filePath);
+        const cycle = path25.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7046,7 +7046,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path24, filePath]);
+            dfs(dependency, [...path25, filePath]);
           }
         }
       }
@@ -9012,10 +9012,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path24 = args.path;
-            let command = `cat "${path24}"`;
+            const path25 = args.path;
+            let command = `cat "${path25}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path24}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path25}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9239,10 +9239,6 @@ EOF`;
     }
   }
 };
-
-// package.json
-var package_default = {
-  version: "1.0.29"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -10648,13 +10644,13 @@ var ReadmeGenerator = class {
     }
   }
   generateReadmeContent(analysis) {
-    const pkg = analysis.packageJson;
-    const projectName = this.config.projectName || pkg?.name || "Project";
+    const pkg2 = analysis.packageJson;
+    const projectName = this.config.projectName || pkg2?.name || "Project";
     let content = `# ${projectName}
 
 `;
-    if (pkg?.description) {
-      content += `${pkg.description}
+    if (pkg2?.description) {
+      content += `${pkg2.description}
 
 `;
     } else {
@@ -10662,7 +10658,7 @@ var ReadmeGenerator = class {
 
 `;
     }
-    if (pkg) {
+    if (pkg2) {
       content += this.generateBadges(analysis);
     }
     content += `## \u{1F4CB} Table of Contents
@@ -10676,7 +10672,7 @@ var ReadmeGenerator = class {
 `;
     if (analysis.hasTests) content += `- [Testing](#testing)
 `;
-    if (pkg?.scripts?.build) content += `- [Building](#building)
+    if (pkg2?.scripts?.build) content += `- [Building](#building)
 `;
     content += `- [Configuration](#configuration)
 `;
@@ -10688,10 +10684,10 @@ var ReadmeGenerator = class {
     content += `## \u{1F680} Installation
 
 `;
-    if (pkg?.bin) {
+    if (pkg2?.bin) {
       content += `### Global Installation
 \`\`\`bash
-npm install -g ${pkg.name}
+npm install -g ${pkg2.name}
 \`\`\`
 
 `;
@@ -10702,7 +10698,7 @@ npm install -g ${pkg.name}
     content += `# Clone the repository
 git clone <repository-url>
 `;
-    content += `cd ${pkg?.name || projectName.toLowerCase()}
+    content += `cd ${pkg2?.name || projectName.toLowerCase()}
 
 `;
     content += `# Install dependencies
@@ -10713,8 +10709,8 @@ npm install
     content += `## \u{1F4BB} Usage
 
 `;
-    if (pkg?.bin) {
-      const binName = Object.keys(pkg.bin)[0];
+    if (pkg2?.bin) {
+      const binName = Object.keys(pkg2.bin)[0];
       content += `### Command Line
 \`\`\`bash
 ${binName} [options]
@@ -10773,7 +10769,7 @@ npm run test:watch
 `;
       }
     }
-    if (pkg?.scripts?.build) {
+    if (pkg2?.scripts?.build) {
       content += `## \u{1F4E6} Building
 
 `;
@@ -10824,7 +10820,7 @@ TypeScript is configured via \`tsconfig.json\`.
 
 `;
     }
-    if (analysis.framework === "Express.js" || pkg?.main?.includes("api")) {
+    if (analysis.framework === "Express.js" || pkg2?.main?.includes("api")) {
       content += `## \u{1F4D6} API Documentation
 
 `;
@@ -10849,8 +10845,8 @@ TypeScript is configured via \`tsconfig.json\`.
     content += `## \u{1F4C4} License
 
 `;
-    if (pkg?.license) {
-      content += `This project is licensed under the ${pkg.license} License.
+    if (pkg2?.license) {
+      content += `This project is licensed under the ${pkg2.license} License.
 
 `;
     } else {
@@ -12901,6 +12897,63 @@ function useInputHandler({
       process.exit(0);
       return;
     }
+    const AUTO_COMPRESS_THRESHOLD = 20;
+    const MIN_HISTORY_SIZE = 10;
+    const PRESERVE_RECENT = 5;
+    if (chatHistory.length > AUTO_COMPRESS_THRESHOLD) {
+      const currentHistoryLength = chatHistory.length;
+      const canCompress = currentHistoryLength >= MIN_HISTORY_SIZE;
+      if (canCompress) {
+        try {
+          setIsProcessing(true);
+          const autoCompressEntry = {
+            type: "assistant",
+            content: `\u{1F916} **Automatic Compression Triggered**
+
+History has ${currentHistoryLength} entries (threshold: ${AUTO_COMPRESS_THRESHOLD}). Compressing to maintain performance...`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, autoCompressEntry]);
+          const olderEntries = chatHistory.slice(0, -PRESERVE_RECENT);
+          const contentToCompress = olderEntries.map((entry) => entry.content).join("\n");
+          const subagentFramework = new SubagentFramework();
+          const taskId = await subagentFramework.spawnSubagent({
+            type: "summarizer",
+            input: {
+              content: contentToCompress,
+              compressionTarget: 0.3
+            },
+            priority: "medium"
+          });
+          const result = await subagentFramework.waitForResult(taskId, 1e4);
+          if (result.success) {
+            const compressedEntry = {
+              type: "assistant",
+              content: `\u{1F4DD} **Auto-Compressed History Summary**
+
+${result.summary}
+
+*Auto-compressed ${currentHistoryLength - PRESERVE_RECENT} entries at ${(/* @__PURE__ */ new Date()).toLocaleString()}*`,
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            const recentEntries = chatHistory.slice(-PRESERVE_RECENT);
+            const newHistory = [compressedEntry, ...recentEntries];
+            setChatHistory(newHistory);
+            const successEntry = {
+              type: "assistant",
+              content: `\u2705 **Auto-Compression Complete**
+
+Reduced from ${currentHistoryLength} to ${PRESERVE_RECENT + 1} entries.`,
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, successEntry]);
+          }
+          setIsProcessing(false);
+        } catch (error) {
+          setIsProcessing(false);
+        }
+      }
+    }
     if (userInput.trim()) {
       const directCommandResult = await handleDirectCommand(userInput);
       if (!directCommandResult) {
@@ -13611,11 +13664,16 @@ ${result.suggestions.map((s) => `- ${s}`).join("\n")}
         const args = trimmedInput.split(" ").slice(1);
         const force = args.includes("--force");
         const dryRun = args.includes("--dry-run");
+        const MIN_HISTORY_SIZE = 10;
+        const PRESERVE_RECENT = 5;
+        const currentHistoryLength = chatHistory.length;
+        const olderEntries = chatHistory.slice(0, -PRESERVE_RECENT);
+        const contentToCompress = olderEntries.map((entry) => entry.content).join("\n");
         const subagentFramework = new SubagentFramework();
         const taskId = await subagentFramework.spawnSubagent({
           type: "summarizer",
           input: {
-            content: chatHistory.map((entry) => entry.content).join("\n"),
+            content: contentToCompress,
             compressionTarget: 0.3
             // 70% reduction
           },
@@ -13624,31 +13682,62 @@ ${result.suggestions.map((s) => `- ${s}`).join("\n")}
         const result = await subagentFramework.waitForResult(taskId, 1e4);
         if (result.success) {
           const metrics = subagentFramework.getPerformanceMetrics();
+          const canCompress = currentHistoryLength >= MIN_HISTORY_SIZE || force;
+          const wouldCompressCount = Math.max(0, currentHistoryLength - PRESERVE_RECENT);
           const resultEntry = {
             type: "assistant",
             content: dryRun ? `\u{1F4CA} **Compression Preview (Dry Run)**
 
+**Current history:** ${currentHistoryLength} entries
+**Would compress:** ${wouldCompressCount} older entries into 1 summary
+**Would preserve:** Last ${PRESERVE_RECENT} recent entries
+**Estimated reduction:** ~70%
+
+**Compressed summary:**
 ${result.summary}
 
-\u{1F4A1} Use \`/compact\` to apply compression` : `\u{1F9F9} **Context Compressed Successfully**
+\u{1F4A1} Use \`/compact\` to apply compression${!canCompress ? ` (requires ${MIN_HISTORY_SIZE}+ entries or --force)` : ""}` : canCompress ? `\u{1F9F9} **Context Compressed Successfully**
 
 ${result.summary}
 
 \u{1F4C8} **Performance:**
+- Original entries: ${currentHistoryLength}
+- Compressed to: ${PRESERVE_RECENT + 1} entries
 - Tokens saved: ~${result.output.compressionRatio * 100}%
 - Processing time: ${result.executionTime}ms
-- Subagent tokens used: ${result.tokensUsed}`,
+- Subagent tokens used: ${result.tokensUsed}` : `\u26A0\uFE0F **Compression Skipped**
+
+History too small for compression (${currentHistoryLength} < ${MIN_HISTORY_SIZE} entries).
+
+**Preview:**
+${result.summary}
+
+\u{1F4A1} Use \`/compact --force\` to compress anyway`,
             timestamp: /* @__PURE__ */ new Date()
           };
+          if (!dryRun && canCompress) {
+            const compressedEntry = {
+              type: "assistant",
+              content: `\u{1F4DD} **Compressed History Summary**
+
+${result.summary}
+
+*Compressed ${wouldCompressCount} entries at ${(/* @__PURE__ */ new Date()).toLocaleString()}*`,
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            const recentEntries = chatHistory.slice(-PRESERVE_RECENT);
+            const newHistory = [compressedEntry, ...recentEntries];
+            setChatHistory(newHistory);
+          }
           setChatHistory((prev) => [...prev, resultEntry]);
-          if (!dryRun && result.success) {
+          if (!dryRun && canCompress) {
             const tipsEntry = {
               type: "assistant",
               content: `\u2728 **Context Optimization Complete**
 
 **What happened:**
-- Older conversations summarized
-- Recent context preserved
+- ${wouldCompressCount} older conversations summarized
+- Last ${PRESERVE_RECENT} recent entries preserved
 - Key decisions and TODOs maintained
 
 **Options:**
@@ -14606,6 +14695,10 @@ function ApiKeyInput({ onApiKeySet }) {
 }
 
 // src/ui/components/chat-interface.tsx
+var pkgPath = path7__default.resolve(process.cwd(), "package.json");
+console.log("Reading package.json from:", pkgPath);
+var pkg = JSON.parse(fs__default.readFileSync(pkgPath, "utf8"));
+console.log("Version:", pkg.version);
 function ChatInterfaceWithAgent({
   agent,
   initialMessage
@@ -14652,7 +14745,7 @@ function ChatInterfaceWithAgent({
     const grokLogo = {
       string: "\x1B[33m  #####   #####   #####   #    #\n#        #    #  #     #  #   #\n#  ###   #    #  #     #  #  #\n#    #   #####   #     #  # #\n#  ###   #  #    #     #  #  #\n#        #   #   #     #  #   #\n  #####   #    #   #####   #    #\x1B[0m"
     };
-    const logoOutput = (typeof grokLogo === "object" && "string" in grokLogo ? grokLogo.string : String(grokLogo)) + "\nHURRY MODE\n" + package_default.version;
+    const logoOutput = (typeof grokLogo === "object" && "string" in grokLogo ? grokLogo.string : String(grokLogo)) + "\nHURRY MODE\n" + pkg.version;
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line) => {
       if (line.trim()) {
@@ -15078,6 +15171,10 @@ function createMCPCommand() {
   });
   return mcpCommand;
 }
+
+// package.json
+var package_default = {
+  version: "1.0.30"};
 
 // src/index.ts
 dotenv.config();

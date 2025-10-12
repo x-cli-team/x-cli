@@ -53,6 +53,22 @@
 - Reference related documents
 - Maintain clear navigation
 
+## PRD Creation and Saving
+
+### Location
+- All PRDs must be saved in `.agent/tasks/` as Markdown files
+- Use descriptive filenames (e.g., `feature-name-prd.md`)
+
+### Format
+- Follow the structure from `example-prd.md`
+- Include sections: Objective, Background, Requirements, etc.
+- Add metadata: Date, Author
+
+### Process
+- Create PRD before implementation
+- Reference in related tasks
+- Update if requirements change
+
 ## Automation
 - Auto-update triggers configured in .grok/settings.json
 - Smart prompts after key file changes

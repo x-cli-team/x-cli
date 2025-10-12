@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import pkg from '../../../package.json' with { type: 'json' };
+import fs from 'fs';
+import path from 'path';
+
+const pkgPath = path.resolve(process.cwd(), 'package.json');
+console.log('Reading package.json from:', pkgPath);
+const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+console.log('Version:', pkg.version);
 
 import { Box, Text } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
