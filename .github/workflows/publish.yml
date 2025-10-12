@@ -30,10 +30,6 @@ jobs:
     - name: Install dependencies
       run: bun install
 
-    - name: Build
-      run: bun run build
-      continue-on-error: true  # Continue even if existing TS errors
-
     - name: Configure Git
       run: |
         git config --local user.email "action@github.com"
@@ -72,6 +68,10 @@ jobs:
       run: |
         git add package.json
         git commit -m "Bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+
+    - name: Build with correct version
+      run: bun run build
+      continue-on-error: true  # Continue even if existing TS errors
 
     - name: Create and push tag
       run: |
