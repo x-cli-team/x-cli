@@ -9242,7 +9242,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.24"};
+  version: "1.0.26"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -15087,7 +15087,7 @@ function createMCPCommand() {
 
 // package.json with { type: 'json' }
 var package_default2 = {
-  version: "1.0.24"};
+  version: "1.0.26"};
 
 // src/index.ts
 dotenv.config();

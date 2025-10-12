@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import pkg from '../../../package.json' assert { type: 'json' };
+import pkg from '../../../package.json' with { type: 'json' };
 
 import { Box, Text } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";

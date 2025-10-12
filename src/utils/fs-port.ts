@@ -8,6 +8,7 @@ export interface FsPort {
   exists(p: string): Promise<boolean>;
   ensureDir(p: string): Promise<void>;
   readdir(p: string): Promise<string[]>;
+}
 
 export const nodeFsPort: FsPort = {
   readFile: (p, enc = 'utf8') => rf(p, { encoding: enc }),
@@ -18,3 +19,4 @@ export const nodeFsPort: FsPort = {
   },
   ensureDir: async (p) => { try { await mkdir(p, { recursive: true }); } catch { /* ignore EEXIST */ } },
   readdir: (p) => rd(p),
+};
