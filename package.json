@@ -51,6 +51,7 @@
     "fs-extra": "^11.2.0",
     "fuse.js": "^7.1.0",
     "glob": "^11.0.3",
+    "grok-cli-hurry-mode": "^1.0.6",
     "ink": "^4.4.1",
     "marked": "^15.0.12",
     "marked-terminal": "^7.3.0",

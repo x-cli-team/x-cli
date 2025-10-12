@@ -8,6 +8,7 @@ import { getSettingsManager } from "./utils/settings-manager.js";
 import { ConfirmationService } from "./utils/confirmation-service.js";
 import { createMCPCommand } from "./commands/mcp.js";
 import type { ChatCompletionMessageParam } from "openai/resources/chat";
+import pkg from "../package.json" assert { type: "json" };
 
 // Load environment variables
 dotenv.config();
@@ -310,7 +311,7 @@ program
   .description(
     "A conversational AI CLI tool powered by Grok with text editor capabilities"
   )
-  .version("1.0.1")
+  .version(pkg.version)
   .argument("[message...]", "Initial message to send to Grok")
   .option("-d, --directory <dir>", "set working directory", process.cwd())
   .option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)")
