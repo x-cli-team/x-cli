@@ -338,7 +338,7 @@ export class SymbolSearchTool {
             .filter(usage => usage.type === 'export')
             .map(() => symbolRef.filePath);
 
-          crossReops.push({
+          crossRefs.push({
             symbol: symbolName,
             definitionFile,
             usageFiles: [...new Set(usageFiles)],

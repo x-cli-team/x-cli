@@ -185,11 +185,11 @@ export class RefactoringAssistantTool {
     const symbolRefs = parsed.result.symbols as SymbolReference[];
     
     // Filter by scope
-    const relevantRefs = scope === 'file' && filePath 
-      ? symbolReops.filter(ref => ref.filePath === filePath)
+    const relevantRefs = scope === 'file' && filePath
+      ? symbolRefs.filter(ref => ref.filePath === filePath)
       : symbolRefs;
 
-    if (relevantReops.length === 0) {
+    if (relevantRefs.length === 0) {
       throw new Error(`Symbol '${symbolName}' not found in specified scope`);
     }
 
@@ -538,8 +538,8 @@ export class RefactoringAssistantTool {
   }
 
   private async analyzeSafety(refs: SymbolReference[], operation: string): Promise<SafetyAnalysis> {
-    const affectedFiles = new Set(reops.map(ref => ref.filePath)).size;
-    const affectedSymbols = reops.length;
+    const affectedFiles = new Set(refs.map((ref: SymbolReference) => ref.filePath)).size;
+    const affectedSymbols = refs.length;
 
     let riskLevel: 'low' | 'medium' | 'high' = 'low';
     const potentialIssues: string[] = [];

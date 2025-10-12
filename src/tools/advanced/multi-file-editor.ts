@@ -1,4 +1,4 @@
-import * as ops from "fs";
+import * as ops from "fs-extra";
 
 const pathExists = async (filePath: string): Promise<boolean> => {
   try {

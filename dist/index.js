@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import * as ops7 from 'fs';
+import * as fs from 'fs';
 import { existsSync } from 'fs';
 import * as path7 from 'path';
 import path7__default from 'path';
@@ -16,6 +16,7 @@ import axios from 'axios';
 import { exec, execSync, spawn } from 'child_process';
 import { promisify } from 'util';
 import { writeFile } from 'fs/promises';
+import * as ops6 from 'fs-extra';
 import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
 import { glob } from 'glob';
@@ -90,8 +91,8 @@ var init_settings_manager = __esm({
        */
       ensureDirectoryExists(filePath) {
         const dir = path7.dirname(filePath);
-        if (!ops7.existsSync(dir)) {
-          ops7.mkdirSync(dir, { recursive: true, mode: 448 });
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true, mode: 448 });
         }
       }
       /**
@@ -99,11 +100,11 @@ var init_settings_manager = __esm({
        */
       loadUserSettings() {
         try {
-          if (!ops7.existsSync(this.userSettingsPath)) {
+          if (!fs.existsSync(this.userSettingsPath)) {
             this.saveUserSettings(DEFAULT_USER_SETTINGS);
             return { ...DEFAULT_USER_SETTINGS };
           }
-          const content = ops7.readFileSync(this.userSettingsPath, "utf-8");
+          const content = fs.readFileSync(this.userSettingsPath, "utf-8");
           const settings = JSON.parse(content);
           return { ...DEFAULT_USER_SETTINGS, ...settings };
         } catch (error) {
@@ -121,9 +122,9 @@ var init_settings_manager = __esm({
         try {
           this.ensureDirectoryExists(this.userSettingsPath);
           let existingSettings = { ...DEFAULT_USER_SETTINGS };
-          if (ops7.existsSync(this.userSettingsPath)) {
+          if (fs.existsSync(this.userSettingsPath)) {
             try {
-              const content = ops7.readFileSync(this.userSettingsPath, "utf-8");
+              const content = fs.readFileSync(this.userSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_USER_SETTINGS, ...parsed };
             } catch (error) {
@@ -131,7 +132,7 @@ var init_settings_manager = __esm({
             }
           }
           const mergedSettings = { ...existingSettings, ...settings };
-          ops7.writeFileSync(
+          fs.writeFileSync(
             this.userSettingsPath,
             JSON.stringify(mergedSettings, null, 2),
             { mode: 384 }
@@ -164,11 +165,11 @@ var init_settings_manager = __esm({
        */
       loadProjectSettings() {
         try {
-          if (!ops7.existsSync(this.projectSettingsPath)) {
+          if (!fs.existsSync(this.projectSettingsPath)) {
             this.saveProjectSettings(DEFAULT_PROJECT_SETTINGS);
             return { ...DEFAULT_PROJECT_SETTINGS };
           }
-          const content = ops7.readFileSync(this.projectSettingsPath, "utf-8");
+          const content = fs.readFileSync(this.projectSettingsPath, "utf-8");
           const settings = JSON.parse(content);
           return { ...DEFAULT_PROJECT_SETTINGS, ...settings };
         } catch (error) {
@@ -186,9 +187,9 @@ var init_settings_manager = __esm({
         try {
           this.ensureDirectoryExists(this.projectSettingsPath);
           let existingSettings = { ...DEFAULT_PROJECT_SETTINGS };
-          if (ops7.existsSync(this.projectSettingsPath)) {
+          if (fs.existsSync(this.projectSettingsPath)) {
             try {
-              const content = ops7.readFileSync(this.projectSettingsPath, "utf-8");
+              const content = fs.readFileSync(this.projectSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_PROJECT_SETTINGS, ...parsed };
             } catch (error) {
@@ -196,7 +197,7 @@ var init_settings_manager = __esm({
             }
           }
           const mergedSettings = { ...existingSettings, ...settings };
-          ops7.writeFileSync(
+          fs.writeFileSync(
             this.projectSettingsPath,
             JSON.stringify(mergedSettings, null, 2)
           );
@@ -1469,7 +1470,7 @@ STDERR: ${stderr}` : "");
 };
 var pathExists = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -1482,16 +1483,16 @@ var TextEditorTool = class {
     try {
       const resolvedPath = path7.resolve(filePath);
       if (await pathExists(resolvedPath)) {
-        const stats = await ops7.promises.stat(resolvedPath);
+        const stats = await fs.promises.stat(resolvedPath);
         if (stats.isDirectory()) {
-          const files = await ops7.promises.readdir(resolvedPath);
+          const files = await fs.promises.readdir(resolvedPath);
           return {
             success: true,
             output: `Directory contents of ${filePath}:
 ${files.join("\n")}`
           };
         }
-        const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+        const content = await fs.promises.readFile(resolvedPath, "utf-8");
         const lines = content.split("\n");
         if (viewRange) {
           const [start, end] = viewRange;
@@ -1541,7 +1542,7 @@ ${numberedLines}${additionalLinesMessage}`
           error: `File not found: ${filePath}`
         };
       }
-      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const content = await fs.promises.readFile(resolvedPath, "utf-8");
       if (!content.includes(oldStr)) {
         if (oldStr.includes("\n")) {
           const fuzzyResult = this.findFuzzyMatch(content, oldStr);
@@ -1641,7 +1642,7 @@ ${numberedLines}${additionalLinesMessage}`
         }
       }
       const dir = path7.dirname(resolvedPath);
-      await ops7.promises.mkdir(dir, { recursive: true });
+      await fs.promises.mkdir(dir, { recursive: true });
       await writeFile(resolvedPath, content, "utf-8");
       this.editHistory.push({
         command: "create",
@@ -1671,7 +1672,7 @@ ${numberedLines}${additionalLinesMessage}`
           error: `File not found: ${filePath}`
         };
       }
-      const fileContent = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const fileContent = await fs.promises.readFile(resolvedPath, "utf-8");
       const lines = fileContent.split("\n");
       if (startLine < 1 || startLine > lines.length) {
         return {
@@ -1739,7 +1740,7 @@ ${numberedLines}${additionalLinesMessage}`
           error: `File not found: ${filePath}`
         };
       }
-      const fileContent = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const fileContent = await fs.promises.readFile(resolvedPath, "utf-8");
       const lines = fileContent.split("\n");
       lines.splice(insertLine - 1, 0, content);
       const newContent = lines.join("\n");
@@ -1773,7 +1774,7 @@ ${numberedLines}${additionalLinesMessage}`
       switch (lastEdit.command) {
         case "str_replace":
           if (lastEdit.path && lastEdit.old_str && lastEdit.new_str) {
-            const content = await ops7.promises.readFile(lastEdit.path, "utf-8");
+            const content = await fs.promises.readFile(lastEdit.path, "utf-8");
             const revertedContent = content.replace(
               lastEdit.new_str,
               lastEdit.old_str
@@ -1783,12 +1784,12 @@ ${numberedLines}${additionalLinesMessage}`
           break;
         case "create":
           if (lastEdit.path) {
-            await ops7.promises.rm(lastEdit.path);
+            await fs.promises.rm(lastEdit.path);
           }
           break;
         case "insert":
           if (lastEdit.path && lastEdit.insert_line) {
-            const content = await ops7.promises.readFile(lastEdit.path, "utf-8");
+            const content = await fs.promises.readFile(lastEdit.path, "utf-8");
             const lines = content.split("\n");
             lines.splice(lastEdit.insert_line - 1, 1);
             await writeFile(lastEdit.path, lines.join("\n"), "utf-8");
@@ -1988,7 +1989,7 @@ ${numberedLines}${additionalLinesMessage}`
 };
 var pathExists2 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -2042,7 +2043,7 @@ var MorphEditorTool = class {
           error: "MORPH_API_KEY not configured. Please set your Morph API key."
         };
       }
-      const initialCode = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const initialCode = await fs.promises.readFile(resolvedPath, "utf-8");
       const sessionFlags = this.confirmationService.getSessionFlags();
       if (!sessionFlags.fileOperations && !sessionFlags.allOperations) {
         const confirmationResult = await this.confirmationService.requestConfirmation(
@@ -2065,7 +2066,7 @@ ${codeEdit}`
         }
       }
       const mergedCode = await this.callMorphApply(instructions, initialCode, codeEdit);
-      await ops7.promises.writeFile(resolvedPath, mergedCode, "utf-8");
+      await fs.promises.writeFile(resolvedPath, mergedCode, "utf-8");
       const oldLines = initialCode.split("\n");
       const newLines = mergedCode.split("\n");
       const diff = this.generateDiff(oldLines, newLines, targetFile);
@@ -2239,16 +2240,16 @@ ${codeEdit}`
     try {
       const resolvedPath = path7.resolve(filePath);
       if (await pathExists2(resolvedPath)) {
-        const stats = await ops7.promises.stat(resolvedPath);
+        const stats = await fs.promises.stat(resolvedPath);
         if (stats.isDirectory()) {
-          const files = await ops7.promises.readdir(resolvedPath);
+          const files = await fs.promises.readdir(resolvedPath);
           return {
             success: true,
             output: `Directory contents of ${filePath}:
 ${files.join("\n")}`
           };
         }
-        const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+        const content = await fs.promises.readFile(resolvedPath, "utf-8");
         const lines = content.split("\n");
         if (viewRange) {
           const [start, end] = viewRange;
@@ -2656,7 +2657,7 @@ var SearchTool = class {
     const walkDir = async (dir, depth = 0) => {
       if (depth > 10 || files.length >= maxResults) return;
       try {
-        const entries = await ops7.promises.readdir(dir, { withFileTypes: true });
+        const entries = await fs.promises.readdir(dir, { withFileTypes: true });
         for (const entry of entries) {
           if (files.length >= maxResults) break;
           const fullPath = path7.join(dir, entry.name);
@@ -2770,7 +2771,7 @@ var SearchTool = class {
 };
 var pathExists3 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await ops6.promises.access(filePath, ops6.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -3125,15 +3126,15 @@ ${results.join("\n")}`
           filePath: operation.filePath
         };
       case "edit":
-        const originalContent = await ops7.promises.readFile(resolvedPath, "utf-8");
+        const originalContent = await ops6.promises.readFile(resolvedPath, "utf-8");
         return {
           type: "restore_content",
           filePath: operation.filePath,
           originalContent
         };
       case "delete":
-        const contentToRestore = await ops7.promises.readFile(resolvedPath, "utf-8");
-        const stats = await ops7.promises.stat(resolvedPath);
+        const contentToRestore = await ops6.promises.readFile(resolvedPath, "utf-8");
+        const stats = await ops6.promises.stat(resolvedPath);
         return {
           type: "restore_deleted",
           filePath: operation.filePath,
@@ -3159,25 +3160,25 @@ ${results.join("\n")}`
     switch (operation.type) {
       case "create":
         const dir = path7.dirname(resolvedPath);
-        await ops7.promises.mkdir(dir, { recursive: true });
+        await ops6.promises.mkdir(dir, { recursive: true });
         await writeFile(resolvedPath, operation.content, "utf-8");
         return { success: true, output: `Created ${operation.filePath}` };
       case "edit":
-        let content = await ops7.promises.readFile(resolvedPath, "utf-8");
+        let content = await ops6.promises.readFile(resolvedPath, "utf-8");
         for (const editOp of operation.operations) {
           content = await this.applyEditOperation(content, editOp);
         }
         await writeFile(resolvedPath, content, "utf-8");
         return { success: true, output: `Edited ${operation.filePath}` };
       case "delete":
-        await ops7.promises.rm(resolvedPath);
+        await ops6.promises.rm(resolvedPath);
         return { success: true, output: `Deleted ${operation.filePath}` };
       case "rename":
       case "move":
         const newResolvedPath = path7.resolve(operation.newFilePath);
         const newDir = path7.dirname(newResolvedPath);
-        await ops7.promises.mkdir(newDir, { recursive: true });
-        await ops7.move(resolvedPath, newResolvedPath);
+        await ops6.promises.mkdir(newDir, { recursive: true });
+        await ops6.move(resolvedPath, newResolvedPath);
         return { success: true, output: `${operation.type === "rename" ? "Renamed" : "Moved"} ${operation.filePath} to ${operation.newFilePath}` };
       default:
         throw new Error(`Unknown operation type: ${operation.type}`);
@@ -3221,7 +3222,7 @@ ${results.join("\n")}`
         case "delete_created":
           const createdPath = path7.resolve(rollback.filePath);
           if (await pathExists3(createdPath)) {
-            await ops7.promises.rm(createdPath);
+            await ops6.promises.rm(createdPath);
           }
           break;
         case "restore_content":
@@ -3231,7 +3232,7 @@ ${results.join("\n")}`
         case "restore_deleted":
           const deletedPath = path7.resolve(rollback.filePath);
           const deletedDir = path7.dirname(deletedPath);
-          await ops7.promises.mkdir(deletedDir, { recursive: true });
+          await ops6.promises.mkdir(deletedDir, { recursive: true });
           await writeFile(deletedPath, rollback.content, "utf-8");
           break;
         case "restore_move":
@@ -3239,8 +3240,8 @@ ${results.join("\n")}`
           const movedOldPath = path7.resolve(rollback.oldPath);
           if (await pathExists3(movedNewPath)) {
             const oldDir = path7.dirname(movedOldPath);
-            await ops7.promises.mkdir(oldDir, { recursive: true });
-            await ops7.move(movedNewPath, movedOldPath);
+            await ops6.promises.mkdir(oldDir, { recursive: true });
+            await ops6.move(movedNewPath, movedOldPath);
           }
           break;
       }
@@ -3282,7 +3283,7 @@ ${results.join("\n")}`
 };
 var pathExists4 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -3302,7 +3303,7 @@ var AdvancedSearchTool = class {
           error: `Path not found: ${searchPath}`
         };
       }
-      const stats = await ops7.promises.stat(resolvedPath);
+      const stats = await fs.promises.stat(resolvedPath);
       const filesToSearch = [];
       if (stats.isFile()) {
         filesToSearch.push(resolvedPath);
@@ -3345,7 +3346,7 @@ var AdvancedSearchTool = class {
           error: `Path not found: ${searchPath}`
         };
       }
-      const stats = await ops7.promises.stat(resolvedPath);
+      const stats = await fs.promises.stat(resolvedPath);
       const filesToProcess = [];
       if (stats.isFile()) {
         filesToProcess.push(resolvedPath);
@@ -3390,7 +3391,7 @@ var AdvancedSearchTool = class {
         }
         for (const result of results) {
           if (result.success && result.preview) {
-            await ops7.promises.writeFile(result.filePath, result.preview, "utf-8");
+            await fs.promises.writeFile(result.filePath, result.preview, "utf-8");
           }
         }
       }
@@ -3452,7 +3453,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
    * Search in a single file
    */
   async searchInFile(filePath, options) {
-    const content = await ops7.promises.readFile(filePath, "utf-8");
+    const content = await fs.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const matches = [];
     let pattern;
@@ -3503,7 +3504,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
    */
   async replaceInFile(filePath, options) {
     try {
-      const content = await ops7.promises.readFile(filePath, "utf-8");
+      const content = await fs.promises.readFile(filePath, "utf-8");
       let pattern;
       try {
         if (options.isRegex) {
@@ -3554,7 +3555,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
   async getFilesRecursively(dirPath, options) {
     const files = [];
     const walk = async (currentPath) => {
-      const entries = await ops7.promises.readdir(currentPath, { withFileTypes: true });
+      const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7.join(currentPath, entry.name);
         if (entry.isDirectory()) {
@@ -3717,7 +3718,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
 };
 var pathExists5 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await ops6.promises.access(filePath, ops6.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -3906,11 +3907,11 @@ ${category}/
       let movedFiles = 0;
       for (const [category, fileList] of Object.entries(organization)) {
         const categoryDir = path7.join(destBase, category);
-        await ops7.promises.mkdir(categoryDir, { recursive: true });
+        await ops6.promises.mkdir(categoryDir, { recursive: true });
         for (const filePath of fileList) {
           const fileName = path7.basename(filePath);
           const destPath = path7.join(categoryDir, fileName);
-          await ops7.move(filePath, destPath);
+          await ops6.move(filePath, destPath);
           movedFiles++;
         }
       }
@@ -3966,7 +3967,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
       }
       emptyDirs.sort((a, b) => b.length - a.length);
       for (const dir of emptyDirs) {
-        await ops7.rmdir(dir);
+        await ops6.rmdir(dir);
       }
       return {
         success: true,
@@ -3983,7 +3984,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
    * Build tree structure recursively
    */
   async buildTreeStructure(dirPath, options, currentDepth) {
-    const stats = await ops7.promises.stat(dirPath);
+    const stats = await ops6.promises.stat(dirPath);
     const name = path7.basename(dirPath);
     const node = {
       name: name || path7.basename(dirPath),
@@ -3995,7 +3996,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     if (stats.isDirectory() && (!options.maxDepth || currentDepth < options.maxDepth)) {
       node.children = [];
       try {
-        const entries = await ops7.promises.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops6.promises.readdir(dirPath, { withFileTypes: true });
         for (const entry of entries) {
           if (!options.includeHidden && entry.name.startsWith(".")) {
             continue;
@@ -4145,24 +4146,24 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     switch (operation.type) {
       case "copy":
         const copyDest = path7.resolve(operation.destination);
-        await ops7.copy(sourcePath, copyDest);
+        await ops6.copy(sourcePath, copyDest);
         return `Copied ${operation.source} to ${operation.destination}`;
       case "move":
         const moveDest = path7.resolve(operation.destination);
-        await ops7.move(sourcePath, moveDest);
+        await ops6.move(sourcePath, moveDest);
         return `Moved ${operation.source} to ${operation.destination}`;
       case "delete":
-        await ops7.promises.rm(sourcePath);
+        await ops6.promises.rm(sourcePath);
         return `Deleted ${operation.source}`;
       case "create_dir":
-        await ops7.promises.mkdir(sourcePath, { recursive: true });
+        await ops6.promises.mkdir(sourcePath, { recursive: true });
         return `Created directory ${operation.source}`;
       case "chmod":
-        await ops7.promises.chmod(sourcePath, operation.mode);
+        await ops6.promises.chmod(sourcePath, operation.mode);
         return `Changed permissions of ${operation.source} to ${operation.mode}`;
       case "rename":
         const renameDest = path7.resolve(operation.destination);
-        await ops7.move(sourcePath, renameDest);
+        await ops6.move(sourcePath, renameDest);
         return `Renamed ${operation.source} to ${operation.destination}`;
       default:
         throw new Error(`Unknown operation type: ${operation.type}`);
@@ -4191,17 +4192,17 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
    * Copy structure recursively
    */
   async copyStructureRecursive(source, destination, options) {
-    const stats = await ops7.promises.stat(source);
+    const stats = await ops6.promises.stat(source);
     if (stats.isDirectory()) {
-      await ops7.promises.mkdir(destination, { recursive: true });
-      const entries = await ops7.promises.readdir(source);
+      await ops6.promises.mkdir(destination, { recursive: true });
+      const entries = await ops6.promises.readdir(source);
       for (const entry of entries) {
         const srcPath = path7.join(source, entry);
         const destPath = path7.join(destination, entry);
         await this.copyStructureRecursive(srcPath, destPath, options);
       }
     } else if (options.includeFiles) {
-      await ops7.copy(source, destination, { overwrite: options.overwrite });
+      await ops6.copy(source, destination, { overwrite: options.overwrite });
     }
   }
   /**
@@ -4210,7 +4211,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
   async getFilesRecursively(dirPath) {
     const files = [];
     const walk = async (currentPath) => {
-      const entries = await ops7.promises.readdir(currentPath, { withFileTypes: true });
+      const entries = await ops6.promises.readdir(currentPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7.join(currentPath, entry.name);
         if (entry.isDirectory()) {
@@ -4236,14 +4237,14 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
           category = ext || "no-extension";
           break;
         case "size":
-          const stats = await ops7.promises.stat(filePath);
+          const stats = await ops6.promises.stat(filePath);
           if (stats.size < 1024) category = "small (< 1KB)";
           else if (stats.size < 1024 * 1024) category = "medium (< 1MB)";
           else if (stats.size < 1024 * 1024 * 10) category = "large (< 10MB)";
           else category = "very-large (> 10MB)";
           break;
         case "date":
-          const fileStats = await ops7.promises.stat(filePath);
+          const fileStats = await ops6.promises.stat(filePath);
           const year = fileStats.mtime.getFullYear();
           const month = fileStats.mtime.getMonth() + 1;
           category = `${year}-${month.toString().padStart(2, "0")}`;
@@ -4265,7 +4266,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
     const emptyDirs = [];
     const checkDirectory = async (currentPath) => {
       try {
-        const entries = await ops7.promises.readdir(currentPath);
+        const entries = await ops6.promises.readdir(currentPath);
         if (entries.length === 0) {
           emptyDirs.push(currentPath);
           return true;
@@ -4273,7 +4274,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
         let hasNonEmptyChildren = false;
         for (const entry of entries) {
           const fullPath = path7.join(currentPath, entry);
-          const stats = await ops7.promises.stat(fullPath);
+          const stats = await ops6.promises.stat(fullPath);
           if (stats.isDirectory()) {
             const isEmpty = await checkDirectory(fullPath);
             if (!isEmpty) {
@@ -4298,7 +4299,7 @@ ${emptyDirs.map((dir) => `- ${path7.relative(rootPath, dir)}`).join("\n")}`;
 };
 var pathExists6 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -4318,7 +4319,7 @@ var CodeAwareEditorTool = class {
           error: `File not found: ${filePath}`
         };
       }
-      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const content = await fs.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const output = this.formatCodeAnalysis(context, filePath);
@@ -4345,7 +4346,7 @@ var CodeAwareEditorTool = class {
           error: `File not found: ${filePath}`
         };
       }
-      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const content = await fs.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const result = await this.performRefactoring(content, context, operation, language);
@@ -4371,7 +4372,7 @@ var CodeAwareEditorTool = class {
           };
         }
       }
-      await ops7.promises.writeFile(resolvedPath, result.newContent, "utf-8");
+      await fs.promises.writeFile(resolvedPath, result.newContent, "utf-8");
       return {
         success: true,
         output: result.output
@@ -4395,7 +4396,7 @@ var CodeAwareEditorTool = class {
           error: `File not found: ${filePath}`
         };
       }
-      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const content = await fs.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const insertionPoint = this.findInsertionPoint(content, context, location, target);
@@ -4425,7 +4426,7 @@ var CodeAwareEditorTool = class {
           };
         }
       }
-      await ops7.promises.writeFile(resolvedPath, newContent, "utf-8");
+      await fs.promises.writeFile(resolvedPath, newContent, "utf-8");
       return {
         success: true,
         output: `Code inserted at line ${insertionPoint.line + 1} in ${filePath}`
@@ -4449,7 +4450,7 @@ var CodeAwareEditorTool = class {
           error: `File not found: ${filePath}`
         };
       }
-      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const content = await fs.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const formattedContent = await this.formatCodeContent(content, language, options);
       if (formattedContent === content) {
@@ -4477,7 +4478,7 @@ var CodeAwareEditorTool = class {
           };
         }
       }
-      await ops7.promises.writeFile(resolvedPath, formattedContent, "utf-8");
+      await fs.promises.writeFile(resolvedPath, formattedContent, "utf-8");
       return {
         success: true,
         output: `Code formatted in ${filePath}`
@@ -4501,7 +4502,7 @@ var CodeAwareEditorTool = class {
           error: `File not found: ${filePath}`
         };
       }
-      const content = await ops7.promises.readFile(resolvedPath, "utf-8");
+      const content = await fs.promises.readFile(resolvedPath, "utf-8");
       const language = this.detectLanguage(filePath);
       const context = await this.parseCodeContext(content, language);
       const missingImports = symbols.filter(
@@ -4542,7 +4543,7 @@ ${importsToAdd.join("\n")}`;
           };
         }
       }
-      await ops7.promises.writeFile(resolvedPath, newContent, "utf-8");
+      await fs.promises.writeFile(resolvedPath, newContent, "utf-8");
       return {
         success: true,
         output: `Added ${missingImports.length} missing imports to ${filePath}`
@@ -5239,7 +5240,7 @@ ${extractedCode}`;
 };
 var pathExists7 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await ops6.promises.access(filePath, ops6.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -5560,9 +5561,9 @@ This action cannot be undone.`
           existed: exists
         };
         if (exists) {
-          const stats = await ops7.promises.stat(resolvedPath);
+          const stats = await ops6.promises.stat(resolvedPath);
           if (stats.isFile() && this.shouldSnapshotFile(resolvedPath)) {
-            snapshot.content = await ops7.promises.readFile(resolvedPath, "utf-8");
+            snapshot.content = await ops6.promises.readFile(resolvedPath, "utf-8");
             snapshot.size = stats.size;
             snapshot.lastModified = stats.mtime;
             snapshot.permissions = stats.mode.toString(8);
@@ -5583,7 +5584,7 @@ This action cannot be undone.`
    */
   shouldSnapshotFile(filePath) {
     try {
-      const stats = ops7.statSync(filePath);
+      const stats = ops6.statSync(filePath);
       if (stats.size > 1024 * 1024) {
         return false;
       }
@@ -5676,14 +5677,14 @@ This action cannot be undone.`
       try {
         const currentExists = await pathExists7(snapshot.filePath);
         if (snapshot.existed && snapshot.content !== void 0) {
-          await ops7.ensureDir(path7.dirname(snapshot.filePath));
-          await ops7.promises.writeFile(snapshot.filePath, snapshot.content, "utf-8");
+          await ops6.ensureDir(path7.dirname(snapshot.filePath));
+          await ops6.promises.writeFile(snapshot.filePath, snapshot.content, "utf-8");
           if (snapshot.permissions) {
-            await ops7.promises.chmod(snapshot.filePath, parseInt(snapshot.permissions, 8));
+            await ops6.promises.chmod(snapshot.filePath, parseInt(snapshot.permissions, 8));
           }
           restored.push(`Restored: ${snapshot.filePath}`);
         } else if (!snapshot.existed && currentExists) {
-          await ops7.promises.rm(snapshot.filePath);
+          await ops6.promises.rm(snapshot.filePath);
           restored.push(`Removed: ${snapshot.filePath}`);
         }
       } catch (error) {
@@ -5830,7 +5831,7 @@ ${errors.join("\n")}`;
   async loadHistory() {
     try {
       if (await pathExists7(this.historyFile)) {
-        const data = await ops7.promises.readFile(this.historyFile, "utf-8");
+        const data = await ops6.promises.readFile(this.historyFile, "utf-8");
         const parsed = JSON.parse(data);
         this.history = parsed.entries.map((entry) => ({
           ...entry,
@@ -5848,13 +5849,13 @@ ${errors.join("\n")}`;
    */
   async saveHistory() {
     try {
-      await ops7.ensureDir(path7.dirname(this.historyFile));
+      await ops6.ensureDir(path7.dirname(this.historyFile));
       const data = {
         entries: this.history,
         currentPosition: this.currentPosition,
         lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
       };
-      await ops7.promises.writeFile(this.historyFile, JSON.stringify(data, null, 2), "utf-8");
+      await ops6.promises.writeFile(this.historyFile, JSON.stringify(data, null, 2), "utf-8");
     } catch (error) {
     }
   }
@@ -5884,7 +5885,7 @@ try {
 }
 var pathExists8 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -5960,7 +5961,7 @@ var ASTParserTool = class {
       if (!await pathExists8(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
-      const content = await ops7.promises.readFile(filePath, "utf-8");
+      const content = await fs.promises.readFile(filePath, "utf-8");
       const language = this.detectLanguage(filePath);
       let result;
       if (language === "typescript" || language === "tsx") {
@@ -6649,7 +6650,7 @@ var SymbolSearchTool = class {
   async findSymbolUsages(symbolRef) {
     const usages = [];
     try {
-      const content = await ops7.promises.readFile(symbolRef.filePath, "utf-8");
+      const content = await fs.promises.readFile(symbolRef.filePath, "utf-8");
       const lines = content.split("\n");
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -6704,7 +6705,7 @@ var SymbolSearchTool = class {
           const usageFiles = symbolRef.usages.filter((usage) => usage.type === "reference" || usage.type === "call").map(() => symbolRef.filePath);
           const importedBy = symbolRef.usages.filter((usage) => usage.type === "import").map(() => symbolRef.filePath);
           const exportedTo = symbolRef.usages.filter((usage) => usage.type === "export").map(() => symbolRef.filePath);
-          crossReops.push({
+          crossRefs.push({
             symbol: symbolName,
             definitionFile,
             usageFiles: [...new Set(usageFiles)],
@@ -6823,7 +6824,7 @@ var SymbolSearchTool = class {
 };
 var pathExists9 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -7294,7 +7295,7 @@ var DependencyAnalyzerTool = class {
 };
 var pathExists10 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -7442,7 +7443,7 @@ var CodeContextTool = class {
   async analyzeUsagePatterns(symbol, filePath) {
     const patterns = [];
     try {
-      const content = await ops7.promises.readFile(filePath, "utf-8");
+      const content = await fs.promises.readFile(filePath, "utf-8");
       const lines = content.split("\n");
       let callCount = 0;
       let assignmentCount = 0;
@@ -7595,7 +7596,7 @@ var CodeContextTool = class {
   }
   async analyzeSemanticContext(filePath, symbols, dependencies) {
     const fileName = path7__default.basename(filePath);
-    const content = await ops7.promises.readFile(filePath, "utf-8");
+    const content = await fs.promises.readFile(filePath, "utf-8");
     const purpose = this.inferPurpose(fileName, symbols, content);
     const domain = this.extractDomain(filePath, symbols, dependencies);
     const patterns = this.detectDesignPatterns(content, symbols);
@@ -7724,7 +7725,7 @@ var CodeContextTool = class {
     };
   }
   async calculateCodeMetrics(filePath, symbols) {
-    const content = await ops7.promises.readFile(filePath, "utf-8");
+    const content = await fs.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const codeLines = lines.filter((line) => line.trim().length > 0 && !line.trim().startsWith("//"));
     const linesOfCode = codeLines.length;
@@ -7824,7 +7825,7 @@ var CodeContextTool = class {
 };
 var pathExists11 = async (filePath) => {
   try {
-    await ops7.promises.access(filePath, ops7.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
     return true;
   } catch {
     return false;
@@ -7908,8 +7909,8 @@ var RefactoringAssistantTool = class {
       throw new Error("Failed to find symbol occurrences");
     }
     const symbolRefs = parsed.result.symbols;
-    const relevantRefs = scope === "file" && filePath ? symbolReops.filter((ref) => ref.filePath === filePath) : symbolRefs;
-    if (relevantReops.length === 0) {
+    const relevantRefs = scope === "file" && filePath ? symbolRefs.filter((ref) => ref.filePath === filePath) : symbolRefs;
+    if (relevantRefs.length === 0) {
       throw new Error(`Symbol '${symbolName}' not found in specified scope`);
     }
     const safety = await this.analyzeSafety(relevantRefs, "rename");
@@ -7948,7 +7949,7 @@ var RefactoringAssistantTool = class {
     if (!await pathExists11(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
-    const content = await ops7.promises.readFile(filePath, "utf-8");
+    const content = await fs.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     if (startLine < 0 || endLine >= lines.length || startLine > endLine) {
       throw new Error("Invalid line range");
@@ -8023,7 +8024,7 @@ var RefactoringAssistantTool = class {
     if (!filePath || !variableName) {
       throw new Error("File path and variable name are required");
     }
-    const content = await ops7.promises.readFile(filePath, "utf-8");
+    const content = await fs.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const startLineContent = lines[startLine];
     const endLineContent = lines[endLine];
@@ -8098,7 +8099,7 @@ var RefactoringAssistantTool = class {
     if (!functionSymbol) {
       throw new Error(`Function '${symbolName}' not found`);
     }
-    const content = await ops7.promises.readFile(filePath, "utf-8");
+    const content = await fs.promises.readFile(filePath, "utf-8");
     const lines = content.split("\n");
     const functionLines = lines.slice(functionSymbol.startPosition.row, functionSymbol.endPosition.row + 1);
     const functionBody = this.extractFunctionBody(functionLines.join("\n"));
@@ -8182,8 +8183,8 @@ var RefactoringAssistantTool = class {
     return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name);
   }
   async analyzeSafety(refs, operation) {
-    const affectedFiles = new Set(reops.map((ref) => ref.filePath)).size;
-    const affectedSymbols = reops.length;
+    const affectedFiles = new Set(refs.map((ref) => ref.filePath)).size;
+    const affectedSymbols = refs.length;
     let riskLevel = "low";
     const potentialIssues = [];
     if (affectedFiles > 5) {
@@ -8208,7 +8209,7 @@ var RefactoringAssistantTool = class {
   }
   async generateRenameChanges(ref, oldName, newName, includeComments, includeStrings) {
     const changes = [];
-    const content = await ops7.promises.readFile(ref.filePath, "utf-8");
+    const content = await fs.promises.readFile(ref.filePath, "utf-8");
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -8499,10 +8500,10 @@ function createTokenCounter(model) {
 function loadCustomInstructions(workingDirectory = process.cwd()) {
   try {
     const instructionsPath = path7.join(workingDirectory, ".grok", "GROK.md");
-    if (!ops7.existsSync(instructionsPath)) {
+    if (!fs.existsSync(instructionsPath)) {
       return null;
     }
-    const customInstructions = ops7.readFileSync(instructionsPath, "utf-8");
+    const customInstructions = fs.readFileSync(instructionsPath, "utf-8");
     return customInstructions.trim();
   } catch (error) {
     console.warn("Failed to load custom instructions:", error);
@@ -9241,7 +9242,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.27"};
+  version: "1.0.29"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -9636,7 +9637,7 @@ var ClaudeMdParserImpl = class {
       };
     }
     try {
-      const content = await ops.promises.readFile(claudePath, "utf-8");
+      const content = await ops6.promises.readFile(claudePath, "utf-8");
       const hasDocumentationSection = content.includes("Documentation System Workflow") || content.includes(".agent documentation system");
       return {
         exists: true,
@@ -9671,7 +9672,7 @@ This document provides context and instructions for Claude Code when working wit
 
 ${documentationSection}`;
       }
-      await ops.promises.writeFile(claudePath, newContent);
+      await ops6.promises.writeFile(claudePath, newContent);
       return {
         success: true,
         message: exists ? "\u2705 Updated existing CLAUDE.md with documentation system instructions" : "\u2705 Created CLAUDE.md with documentation system instructions"
@@ -9739,15 +9740,15 @@ var AgentSystemGenerator = class {
           filesCreated: []
         };
       }
-      await ops.mkdir(agentPath, { recursive: true });
-      await ops.mkdir(path7__default.join(agentPath, "system"), { recursive: true });
-      await ops.mkdir(path7__default.join(agentPath, "tasks"), { recursive: true });
-      await ops.mkdir(path7__default.join(agentPath, "sop"), { recursive: true });
-      await ops.mkdir(path7__default.join(agentPath, "incidents"), { recursive: true });
-      await ops.mkdir(path7__default.join(agentPath, "guardrails"), { recursive: true });
-      await ops.mkdir(path7__default.join(agentPath, "commands"), { recursive: true });
+      await ops6.mkdir(agentPath, { recursive: true });
+      await ops6.mkdir(path7__default.join(agentPath, "system"), { recursive: true });
+      await ops6.mkdir(path7__default.join(agentPath, "tasks"), { recursive: true });
+      await ops6.mkdir(path7__default.join(agentPath, "sop"), { recursive: true });
+      await ops6.mkdir(path7__default.join(agentPath, "incidents"), { recursive: true });
+      await ops6.mkdir(path7__default.join(agentPath, "guardrails"), { recursive: true });
+      await ops6.mkdir(path7__default.join(agentPath, "commands"), { recursive: true });
       const readmeContent = this.generateReadmeContent();
-      await ops.promises.writeFile(path7__default.join(agentPath, "README.md"), readmeContent);
+      await ops6.promises.writeFile(path7__default.join(agentPath, "README.md"), readmeContent);
       filesCreated.push(".agent/README.md");
       const systemFiles = await this.generateSystemDocs(agentPath);
       filesCreated.push(...systemFiles);
@@ -9857,13 +9858,13 @@ Documentation for documentation system commands:
     const systemPath = path7__default.join(agentPath, "system");
     const files = [];
     const archContent = this.config.projectType === "grok-cli" ? this.generateGrokArchitecture() : this.generateExternalArchitecture();
-    await ops.promises.writeFile(path7__default.join(systemPath, "architecture.md"), archContent);
+    await ops6.promises.writeFile(path7__default.join(systemPath, "architecture.md"), archContent);
     files.push(".agent/system/architecture.md");
     const criticalStateContent = this.generateCriticalState();
-    await ops.promises.writeFile(path7__default.join(systemPath, "critical-state.md"), criticalStateContent);
+    await ops6.promises.writeFile(path7__default.join(systemPath, "critical-state.md"), criticalStateContent);
     files.push(".agent/system/critical-state.md");
     const apiContent = this.generateApiSchema();
-    await ops.promises.writeFile(path7__default.join(systemPath, "api-schema.md"), apiContent);
+    await ops6.promises.writeFile(path7__default.join(systemPath, "api-schema.md"), apiContent);
     files.push(".agent/system/api-schema.md");
     return files;
   }
@@ -10220,7 +10221,7 @@ interface Tool {
 
 *Updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
-    await ops.promises.writeFile(path7__default.join(sopPath, "documentation-workflow.md"), docWorkflowContent);
+    await ops6.promises.writeFile(path7__default.join(sopPath, "documentation-workflow.md"), docWorkflowContent);
     files.push(".agent/sop/documentation-workflow.md");
     if (this.config.projectType === "grok-cli") {
       const newCommandContent = `# \u2699\uFE0F Adding New Commands SOP
@@ -10295,7 +10296,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
 
 *Updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
-      await ops.promises.writeFile(path7__default.join(sopPath, "adding-new-command.md"), newCommandContent);
+      await ops6.promises.writeFile(path7__default.join(sopPath, "adding-new-command.md"), newCommandContent);
       files.push(".agent/sop/adding-new-command.md");
     }
     return files;
@@ -10304,7 +10305,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
     const tasksPath = path7__default.join(agentPath, "tasks");
     const files = [];
     const exampleContent = this.config.projectType === "grok-cli" ? this.generateGrokExampleTask() : this.generateExternalExampleTask();
-    await ops.promises.writeFile(path7__default.join(tasksPath, "example-prd.md"), exampleContent);
+    await ops6.promises.writeFile(path7__default.join(tasksPath, "example-prd.md"), exampleContent);
     files.push(".agent/tasks/example-prd.md");
     return files;
   }
@@ -10496,7 +10497,7 @@ After initialization:
 
 *Updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
-    await ops.promises.writeFile(path7__default.join(commandsPath, "init-agent.md"), initAgentContent);
+    await ops6.promises.writeFile(path7__default.join(commandsPath, "init-agent.md"), initAgentContent);
     files.push(".agent/commands/init-agent.md");
     return files;
   }
@@ -10504,7 +10505,7 @@ After initialization:
     const agentPath = path7__default.join(this.config.rootPath, ".agent");
     try {
       if (existsSync(agentPath)) {
-        await ops.rm(agentPath, { recursive: true, force: true });
+        await ops6.rm(agentPath, { recursive: true, force: true });
       }
       return await this.generateAgentSystem();
     } catch (error) {
@@ -10591,7 +10592,7 @@ var ReadmeGenerator = class {
         };
       }
       const content = this.generateReadmeContent(analysis);
-      await ops.promises.writeFile(readmePath, content);
+      await ops6.promises.writeFile(readmePath, content);
       return {
         success: true,
         message: readmeExists ? "\u2705 Updated existing README.md with comprehensive documentation" : "\u2705 Created new README.md with project documentation",
@@ -10618,7 +10619,7 @@ var ReadmeGenerator = class {
     try {
       const packagePath = path7__default.join(this.config.rootPath, "package.json");
       if (existsSync(packagePath)) {
-        const packageContent = await ops.promises.readFile(packagePath, "utf-8");
+        const packageContent = await ops6.promises.readFile(packagePath, "utf-8");
         analysis.packageJson = JSON.parse(packageContent);
         analysis.dependencies = Object.keys(analysis.packageJson.dependencies || {});
         analysis.devDependencies = Object.keys(analysis.packageJson.devDependencies || {});
@@ -10909,7 +10910,7 @@ var CommentsGenerator = class {
           message: "File not found"
         };
       }
-      const content = await ops.promises.readFile(this.config.filePath, "utf-8");
+      const content = await ops6.promises.readFile(this.config.filePath, "utf-8");
       const analysis = this.analyzeCode(content);
       if (analysis.hasExistingComments) {
         return {
@@ -10919,8 +10920,8 @@ var CommentsGenerator = class {
       }
       const modifiedContent = this.addComments(content, analysis);
       const backupPath = this.config.filePath + ".backup";
-      await ops.promises.writeFile(backupPath, content);
-      await ops.promises.writeFile(this.config.filePath, modifiedContent);
+      await ops6.promises.writeFile(backupPath, content);
+      await ops6.promises.writeFile(this.config.filePath, modifiedContent);
       const commentCount = this.countAddedComments(analysis);
       return {
         success: true,
@@ -11136,7 +11137,7 @@ var ApiDocsGenerator = class {
       const content = this.config.outputFormat === "md" ? this.generateMarkdown(documentation) : this.generateHtml(documentation);
       const outputFileName = `api-docs.${this.config.outputFormat}`;
       const outputPath = path7__default.join(this.config.rootPath, outputFileName);
-      await ops.promises.writeFile(outputPath, content);
+      await ops6.promises.writeFile(outputPath, content);
       const stats = this.getDocumentationStats(documentation);
       return {
         success: true,
@@ -11172,7 +11173,7 @@ ${stats}`,
   }
   async scanDirectory(dirPath, documentation) {
     try {
-      const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
+      const entries = await ops6.promises.readdir(dirPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7__default.join(dirPath, entry.name);
         if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
@@ -11191,7 +11192,7 @@ ${stats}`,
   }
   async parseApiFile(filePath, documentation) {
     try {
-      const content = await ops.promises.readFile(filePath, "utf-8");
+      const content = await ops6.promises.readFile(filePath, "utf-8");
       const relativePath = path7__default.relative(this.config.rootPath, filePath);
       const moduleName = this.getModuleName(relativePath);
       const lines = content.split("\n");
@@ -11518,12 +11519,12 @@ var ChangelogGenerator = class {
       const changelogPath = path7__default.join(this.config.rootPath, "CHANGELOG.md");
       const exists = existsSync(changelogPath);
       if (exists) {
-        const existingContent = await ops.promises.readFile(changelogPath, "utf-8");
+        const existingContent = await ops6.promises.readFile(changelogPath, "utf-8");
         const newContent = content + "\n\n" + existingContent;
-        await ops.promises.writeFile(changelogPath, newContent);
+        await ops6.promises.writeFile(changelogPath, newContent);
       } else {
         const fullContent = this.generateChangelogHeader() + content;
-        await ops.promises.writeFile(changelogPath, fullContent);
+        await ops6.promises.writeFile(changelogPath, fullContent);
       }
       return {
         success: true,
@@ -11815,13 +11816,13 @@ var UpdateAgentDocs = class {
     const recentFiles = [];
     const scanDir = async (dirPath) => {
       try {
-        const entries = await ops.promises.readdir(dirPath, { withFileTypes: true });
+        const entries = await ops6.promises.readdir(dirPath, { withFileTypes: true });
         for (const entry of entries) {
           const fullPath = path7__default.join(dirPath, entry.name);
           if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
             await scanDir(fullPath);
           } else if (entry.isFile()) {
-            const stats = await ops.promises.stat(fullPath);
+            const stats = await ops6.promises.stat(fullPath);
             if (stats.mtime.getTime() > oneDayAgo) {
               recentFiles.push(path7__default.relative(this.config.rootPath, fullPath));
             }
@@ -11877,9 +11878,9 @@ var UpdateAgentDocs = class {
       try {
         const archPath = path7__default.join(systemPath, "architecture.md");
         if (existsSync(archPath)) {
-          const content = await ops.promises.readFile(archPath, "utf-8");
+          const content = await ops6.promises.readFile(archPath, "utf-8");
           const updatedContent = await this.updateArchitectureDoc(content, analysis);
-          await ops.promises.writeFile(archPath, updatedContent);
+          await ops6.promises.writeFile(archPath, updatedContent);
           updatedFiles.push(".agent/system/architecture.md");
         }
       } catch (error) {
@@ -11893,7 +11894,7 @@ var UpdateAgentDocs = class {
       if (!existsSync(criticalStatePath)) {
         return false;
       }
-      const content = await ops.promises.readFile(criticalStatePath, "utf-8");
+      const content = await ops6.promises.readFile(criticalStatePath, "utf-8");
       const timestamp = (/* @__PURE__ */ new Date()).toISOString();
       const changesSummary = this.generateChangesSummary(analysis);
       let updatedContent = content.replace(
@@ -11918,7 +11919,7 @@ Updated By: /update-agent-docs after detecting changes${recentChangesSection}`
           );
         }
       }
-      await ops.promises.writeFile(criticalStatePath, updatedContent);
+      await ops6.promises.writeFile(criticalStatePath, updatedContent);
       return true;
     } catch (error) {
       return false;
@@ -12368,9 +12369,9 @@ var SelfHealingSystem = class {
     try {
       const incident = await this.analyzeAndCreateIncident(error, context);
       const incidentPath = path7__default.join(this.agentPath, "incidents", `${incident.id}.md`);
-      await ops.mkdir(path7__default.dirname(incidentPath), { recursive: true });
+      await ops6.mkdir(path7__default.dirname(incidentPath), { recursive: true });
       const incidentContent = this.generateIncidentContent(incident);
-      await ops.promises.writeFile(incidentPath, incidentContent);
+      await ops6.promises.writeFile(incidentPath, incidentContent);
       const guardrail = await this.generateGuardrailFromIncident(incident);
       if (guardrail) {
         await this.saveGuardrail(guardrail);
@@ -12500,12 +12501,12 @@ ${guardrail ? `\u{1F6E1}\uFE0F Guardrail created: ${guardrail.name}` : ""}
       if (!existsSync(incidentsPath)) {
         return 0;
       }
-      const files = await ops.promises.readdir(incidentsPath);
+      const files = await ops6.promises.readdir(incidentsPath);
       let count = 0;
       for (const file of files) {
         if (file.endsWith(".md")) {
           const filePath = path7__default.join(incidentsPath, file);
-          const content = await ops.promises.readFile(filePath, "utf-8");
+          const content = await ops6.promises.readFile(filePath, "utf-8");
           if (content.includes(title)) {
             count++;
           }
@@ -12598,10 +12599,10 @@ ${incident.guardrailCreated ? `Guardrail created: ${incident.guardrailCreated}` 
   }
   async saveGuardrail(guardrail) {
     const guardrailsPath = path7__default.join(this.agentPath, "guardrails");
-    await ops.mkdir(guardrailsPath, { recursive: true });
+    await ops6.mkdir(guardrailsPath, { recursive: true });
     const filePath = path7__default.join(guardrailsPath, `${guardrail.id}.md`);
     const content = this.generateGuardrailContent(guardrail);
-    await ops.promises.writeFile(filePath, content);
+    await ops6.promises.writeFile(filePath, content);
   }
   generateGuardrailContent(guardrail) {
     return `# ${guardrail.name}
@@ -12660,12 +12661,12 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
     if (!existsSync(guardrailsPath)) {
       return [];
     }
-    const files = await ops.promises.readdir(guardrailsPath);
+    const files = await ops6.promises.readdir(guardrailsPath);
     const guardrails = [];
     for (const file of files) {
       if (file.endsWith(".md")) {
         try {
-          const content = await ops.promises.readFile(path7__default.join(guardrailsPath, file), "utf-8");
+          const content = await ops6.promises.readFile(path7__default.join(guardrailsPath, file), "utf-8");
           const guardrail = this.parseGuardrailFromContent(content);
           if (guardrail) {
             guardrails.push(guardrail);
@@ -12725,12 +12726,12 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
     if (!existsSync(incidentsPath)) {
       return [];
     }
-    const files = await ops.promises.readdir(incidentsPath);
+    const files = await ops6.promises.readdir(incidentsPath);
     const incidents = [];
     for (const file of files) {
       if (file.endsWith(".md")) {
         try {
-          const content = await ops.promises.readFile(path7__default.join(incidentsPath, file), "utf-8");
+          const content = await ops6.promises.readFile(path7__default.join(incidentsPath, file), "utf-8");
           const incident = this.parseIncidentFromContent(content);
           if (incident) {
             incidents.push(incident);

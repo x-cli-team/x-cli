@@ -1,3 +1,4 @@
+import * as ops from 'fs-extra';
 import path from 'path';
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
