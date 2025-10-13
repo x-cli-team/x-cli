@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+
+# Auto-generate changelog after merge
+echo "🔄 Post-merge hook: Checking for changelog updates..."
+
+# Check if we're in a git repository
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "⚠️  Not a git repository, skipping changelog generation"
+  exit 0
+fi
+
+# Generate changelog using git log
+CHANGELOG_CONTENT="# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+$(git log --oneline --pretty=format:"- %s (%h)" | head -20)
+
+---
+
+Generated automatically from git history.
+"
+
+# Backup existing changelog
+if [ -f "CHANGELOG.md" ]; then
+  cp CHANGELOG.md CHANGELOG.md.backup
+fi
+
+# Write new changelog
+echo "$CHANGELOG_CONTENT" > CHANGELOG.md
+
+# Check if content changed
+if [ -f "CHANGELOG.md.backup" ] && cmp -s CHANGELOG.md CHANGELOG.md.backup; then
+  echo "ℹ️  Changelog is already up-to-date"
+  rm CHANGELOG.md.backup
+else
+  echo "✅ CHANGELOG.md updated with latest changes"
+  echo "💡 Consider committing the updated changelog"
+  rm -f CHANGELOG.md.backup
+fi
