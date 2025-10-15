@@ -22,6 +22,7 @@
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     "start": "node dist/index.js",
+    "local": "npm run build && npm link && grok",
     "start:bun": "bun run dist/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
