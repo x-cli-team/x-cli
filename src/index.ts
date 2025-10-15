@@ -387,7 +387,24 @@ program
         ? message.join(" ")
         : message;
 
-      render(React.createElement(ChatInterface, { agent, initialMessage }));
+      const app = render(React.createElement(ChatInterface, { agent, initialMessage }));
+
+      // Cleanup on exit
+      const cleanup = () => {
+        app.unmount();
+        agent.abortCurrentOperation();
+        if (process.env.DEBUG === '1') {
+          const handles = (process as any)._getActiveHandles?.() || [];
+          console.log(`[DEBUG] Active handles on exit: ${handles.length}`);
+        }
+      };
+
+      process.on('exit', cleanup);
+      process.on('SIGINT', () => {
+        cleanup();
+        process.exit(0);
+      });
+      process.on('SIGTERM', cleanup);
     } catch (error: any) {
       console.error("❌ Error initializing Grok CLI:", error.message);
       process.exit(1);
