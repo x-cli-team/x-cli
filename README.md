@@ -1,3 +1,12 @@
+## 1.0.34 – Stability Release
+
+This release restores the proven 1.0.31 baseline.
+- Fixes all Read/Update tool reliability issues
+- Ensures consistent FS imports (`node:` namespace)
+- Adds proper Node shebang for global installs
+- Temporarily removes experimental features (e.g. compress)
+
+
 # Grok CLI
 
 [![NPM Version](https://img.shields.io/npm/v/grok-cli-hurry-mode?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/grok-cli-hurry-mode)
