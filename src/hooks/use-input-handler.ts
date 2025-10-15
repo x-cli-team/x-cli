@@ -463,33 +463,40 @@ Respond with ONLY the commit message, no additional text.`;
 
         let commitMessage = "";
         let streamingEntry: ChatEntry | null = null;
+        let accumulatedCommitContent = "";
+        let lastCommitUpdateTime = Date.now();
 
         for await (const chunk of agent.processUserMessageStream(
           commitPrompt
         )) {
           if (chunk.type === "content" && chunk.content) {
-            if (!streamingEntry) {
-              const newEntry = {
-                type: "assistant" as const,
-                content: `Generating commit message...\n\n${chunk.content}`,
-                timestamp: new Date(),
-                isStreaming: true,
-              };
-              setChatHistory((prev) => [...prev, newEntry]);
-              streamingEntry = newEntry;
-              commitMessage = chunk.content;
-            } else {
-              commitMessage += chunk.content;
-              setChatHistory((prev) =>
-                prev.map((entry, idx) =>
-                  idx === prev.length - 1 && entry.isStreaming
-                    ? {
-                        ...entry,
-                        content: `Generating commit message...\n\n${commitMessage}`,
-                      }
-                    : entry
-                )
-              );
+            accumulatedCommitContent += chunk.content;
+            const now = Date.now();
+            if (now - lastCommitUpdateTime >= 150 || chunk.type === "done") {
+              commitMessage += accumulatedCommitContent;
+              if (!streamingEntry) {
+                const newEntry = {
+                  type: "assistant" as const,
+                  content: `Generating commit message...\n\n${commitMessage}`,
+                  timestamp: new Date(),
+                  isStreaming: true,
+                };
+                setChatHistory((prev) => [...prev, newEntry]);
+                streamingEntry = newEntry;
+              } else {
+                setChatHistory((prev) =>
+                  prev.map((entry, idx) =>
+                    idx === prev.length - 1 && entry.isStreaming
+                      ? {
+                          ...entry,
+                          content: `Generating commit message...\n\n${commitMessage}`,
+                        }
+                      : entry
+                  )
+                );
+              }
+              accumulatedCommitContent = "";
+              lastCommitUpdateTime = now;
             }
           } else if (chunk.type === "done") {
             if (streamingEntry) {
@@ -1291,28 +1298,36 @@ ${incidents.slice(0, 3).map(i => `- ${i.title} (${i.impact} impact)`).join('\n')
     try {
       setIsStreaming(true);
       let streamingEntry: ChatEntry | null = null;
+      let accumulatedContent = "";
+      let lastUpdateTime = Date.now();
 
       for await (const chunk of agent.processUserMessageStream(userInput)) {
         switch (chunk.type) {
           case "content":
             if (chunk.content) {
-              if (!streamingEntry) {
-                const newStreamingEntry = {
-                  type: "assistant" as const,
-                  content: chunk.content,
-                  timestamp: new Date(),
-                  isStreaming: true,
-                };
-                setChatHistory((prev) => [...prev, newStreamingEntry]);
-                streamingEntry = newStreamingEntry;
-              } else {
-                setChatHistory((prev) =>
-                  prev.map((entry, idx) =>
-                    idx === prev.length - 1 && entry.isStreaming
-                      ? { ...entry, content: entry.content + chunk.content }
-                      : entry
-                  )
-                );
+              accumulatedContent += chunk.content;
+              const now = Date.now();
+              if (now - lastUpdateTime >= 150 || chunk.type === "done") { // Flush on interval or end
+                if (!streamingEntry) {
+                  const newStreamingEntry = {
+                    type: "assistant" as const,
+                    content: accumulatedContent,
+                    timestamp: new Date(),
+                    isStreaming: true,
+                  };
+                  setChatHistory((prev) => [...prev, newStreamingEntry]);
+                  streamingEntry = newStreamingEntry;
+                } else {
+                  setChatHistory((prev) =>
+                    prev.map((entry, idx) =>
+                      idx === prev.length - 1 && entry.isStreaming
+                        ? { ...entry, content: entry.content + accumulatedContent }
+                        : entry
+                    )
+                  );
+                }
+                accumulatedContent = "";
+                lastUpdateTime = now;
               }
             }
             break;
@@ -1381,6 +1396,28 @@ ${incidents.slice(0, 3).map(i => `- ${i.title} (${i.impact} impact)`).join('\n')
             break;
 
           case "done":
+            // Flush any remaining accumulated content
+            if (accumulatedContent) {
+              if (!streamingEntry) {
+                const newStreamingEntry = {
+                  type: "assistant" as const,
+                  content: accumulatedContent,
+                  timestamp: new Date(),
+                  isStreaming: true,
+                };
+                setChatHistory((prev) => [...prev, newStreamingEntry]);
+                streamingEntry = newStreamingEntry;
+              } else {
+                setChatHistory((prev) =>
+                  prev.map((entry, idx) =>
+                    idx === prev.length - 1 && entry.isStreaming
+                      ? { ...entry, content: entry.content + accumulatedContent }
+                      : entry
+                  )
+                );
+              }
+              accumulatedContent = "";
+            }
             if (streamingEntry) {
               setChatHistory((prev) =>
                 prev.map((entry) =>
