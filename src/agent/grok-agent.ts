@@ -74,6 +74,10 @@ export class GrokAgent extends EventEmitter {
   private abortController: AbortController | null = null;
   private mcpInitialized: boolean = false;
   private maxToolRounds: number;
+  private lastRequestTime: number = 0;
+  private activeToolCalls: number = 0;
+  private readonly maxConcurrentToolCalls: number = 2;
+  private readonly minRequestInterval: number = 500; // ms
 
   constructor(
     apiKey: string,
@@ -475,6 +479,15 @@ Current working directory: ${process.cwd()}`,
           return;
         }
 
+        // Enforce global rate limit
+        const now = Date.now();
+        const timeSinceLastRequest = now - this.lastRequestTime;
+        if (timeSinceLastRequest < this.minRequestInterval) {
+          const delay = this.minRequestInterval - timeSinceLastRequest;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        this.lastRequestTime = Date.now();
+
         // Stream response and accumulate
         const tools = await getAllGrokTools();
         const stream = this.grokClient.chatStream(
@@ -579,10 +592,50 @@ Current working directory: ${process.cwd()}`,
             };
           }
 
-          // Execute tools
-          for (const toolCall of accumulatedMessage.tool_calls) {
-            // Check for cancellation before executing each tool
-            if (this.abortController?.signal.aborted) {
+          // Execute tools with concurrency limit
+          const toolCalls = accumulatedMessage.tool_calls;
+          for (let i = 0; i < toolCalls.length; i += this.maxConcurrentToolCalls) {
+            const batch = toolCalls.slice(i, i + this.maxConcurrentToolCalls);
+            const batchPromises = batch.map(async (toolCall) => {
+              // Check for cancellation before executing each tool
+              if (this.abortController?.signal.aborted) {
+                return null;
+              }
+
+              const result = await this.executeTool(toolCall);
+
+              const toolResultEntry: ChatEntry = {
+                type: "tool_result",
+                content: result.success
+                  ? result.output || "Success"
+                  : result.error || "Error occurred",
+                timestamp: new Date(),
+                toolCall: toolCall,
+                toolResult: result,
+              };
+              this.chatHistory.push(toolResultEntry);
+
+              yield {
+                type: "tool_result",
+                toolCall,
+                toolResult: result,
+              };
+
+              // Add tool result with proper format (needed for AI context)
+              this.messages.push({
+                role: "tool",
+                content: result.success
+                  ? result.output || "Success"
+                  : result.error || "Error",
+                tool_call_id: toolCall.id,
+              });
+
+              return result;
+            });
+
+            const results = await Promise.all(batchPromises);
+            if (results.includes(null)) {
+              // Cancelled
               yield {
                 type: "content",
                 content: "\n\n[Operation cancelled by user]",
@@ -590,34 +643,6 @@ Current working directory: ${process.cwd()}`,
               yield { type: "done" };
               return;
             }
-
-            const result = await this.executeTool(toolCall);
-
-            const toolResultEntry: ChatEntry = {
-              type: "tool_result",
-              content: result.success
-                ? result.output || "Success"
-                : result.error || "Error occurred",
-              timestamp: new Date(),
-              toolCall: toolCall,
-              toolResult: result,
-            };
-            this.chatHistory.push(toolResultEntry);
-
-            yield {
-              type: "tool_result",
-              toolCall,
-              toolResult: result,
-            };
-
-            // Add tool result with proper format (needed for AI context)
-            this.messages.push({
-              role: "tool",
-              content: result.success
-                ? result.output || "Success"
-                : result.error || "Error",
-              tool_call_id: toolCall.id,
-            });
           }
 
           // Update token count after processing all tool calls to include tool results
