@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import pkg from '../../../package.json' with { type: 'json' };
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 import { Box, Text, DOMElement } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
@@ -39,6 +42,7 @@ function ChatInterfaceWithAgent({
     useState<ConfirmationOptions | null>(null);
   const scrollRef = useRef<DOMElement | null>(null);
   const processingStartTime = useRef<number>(0);
+  const lastChatHistoryLength = useRef<number>(0);
 
   const confirmationService = ConfirmationService.getInstance();
 
@@ -101,6 +105,25 @@ function ChatInterfaceWithAgent({
 
     setChatHistory([]);
   }, []);
+
+  // Session logging: append new chat entries to ~/.grok/session.log
+  useEffect(() => {
+    const newEntries = chatHistory.slice(lastChatHistoryLength.current);
+    if (newEntries.length > 0) {
+      const sessionFile = path.join(os.homedir(), '.grok', 'session.log');
+      try {
+        const dir = path.dirname(sessionFile);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        const lines = newEntries.map(entry => JSON.stringify(entry)).join('\n') + '\n';
+        fs.appendFileSync(sessionFile, lines);
+      } catch {
+        // Silently ignore session logging errors
+      }
+    }
+    lastChatHistoryLength.current = chatHistory.length;
+  }, [chatHistory]);
 
   // Process initial message if provided (streaming for faster feedback)
   useEffect(() => {

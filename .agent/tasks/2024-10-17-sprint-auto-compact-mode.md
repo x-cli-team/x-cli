@@ -73,11 +73,11 @@ Instead of file-based detection, track chatHistory.length in the app and auto-en
 
 ## Mini Checklist
 - [x] Choose Option A implementation
-- [x] Session logging implemented
+- [x] Session logging implemented (appends chatHistory to ~/.grok/session.log on each new entry)
 - [x] grok-smart script created and executable
-- [x] Override flags handled
+- [x] Override flags handled (--compact/--no-compact)
 - [x] UI compact mode implemented (show fewer entries when COMPACT=1)
-- [x] Auto-detection tested (script sets COMPACT=1 when session.log >800 lines)
+- [x] Auto-detection tested (script sets COMPACT=1 when session.log >800 lines or 200KB)
 - [x] Thresholds tuned (defaults: 800 lines or 200KB, configurable via GROK_COMPACT_LINES/GROK_COMPACT_BYTES)</content>
 </xai:function_call xmlns:xai:function_call="http://example.com/xai" xmlns:parameter="http://example.com/parameter">The ideas are solid—not terrible at all! Option A is the better choice for flexibility (works everywhere) and simplicity. A potentially better approach would be in-app detection using `chatHistory.length` instead of file I/O, but that requires more UI changes. For now, let's implement Option A with session logging.
 

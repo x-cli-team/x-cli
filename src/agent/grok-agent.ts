@@ -76,7 +76,7 @@ export class GrokAgent extends EventEmitter {
   private abortController: AbortController | null = null;
   private mcpInitialized: boolean = false;
   private maxToolRounds: number;
-  private lastRequestTime: number = 0;
+  private lastToolExecutionTime: number = 0;
   private activeToolCalls: number = 0;
   private readonly maxConcurrentToolCalls: number = 2;
   private readonly minRequestInterval: number = 500; // ms
@@ -601,6 +601,14 @@ Current working directory: ${process.cwd()}`,
           // Execute tools with concurrency limit
           const toolCalls = accumulatedMessage.tool_calls;
           for (let i = 0; i < toolCalls.length; i += this.maxConcurrentToolCalls) {
+            // Enforce minimum request interval between tool batches
+            const now = Date.now();
+            const timeSinceLastExecution = now - this.lastToolExecutionTime;
+            if (timeSinceLastExecution < this.minRequestInterval) {
+              const delay = this.minRequestInterval - timeSinceLastExecution;
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
             const batch = toolCalls.slice(i, i + this.maxConcurrentToolCalls);
             const batchPromises = batch.map(async (toolCall: GrokToolCall) => {
               // Check for cancellation before executing each tool
@@ -634,6 +642,7 @@ Current working directory: ${process.cwd()}`,
             });
 
             const batchResults = await Promise.all(batchPromises);
+            this.lastToolExecutionTime = Date.now();
             if (batchResults.includes(null)) {
               // Cancelled
               yield {
