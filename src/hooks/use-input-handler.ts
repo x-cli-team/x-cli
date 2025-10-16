@@ -4,6 +4,8 @@ import path from "path";
 import { GrokAgent, ChatEntry } from "../agent/grok-agent.js";
 import { ConfirmationService } from "../utils/confirmation-service.js";
 import { useEnhancedInput, Key } from "./use-enhanced-input.js";
+import { GrokToolCall } from "../grok/client.js";
+import { ToolResult } from "../types/index.js";
 
 import { filterCommandSuggestions } from "../ui/components/command-suggestions.js";
 import { loadModelConfig, updateCurrentModel } from "../utils/model-config.js";

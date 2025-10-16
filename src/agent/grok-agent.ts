@@ -35,7 +35,7 @@ export interface ChatEntry {
   type: "user" | "assistant" | "tool_result" | "tool_call";
   content: string;
   timestamp: Date;
-  toolCalls?: GrokToolCall[];
+  toolCalls?: GrokToolCall[] | null;
   toolCall?: GrokToolCall;
   toolResult?: { success: boolean; output?: string; error?: string };
   isStreaming?: boolean;
@@ -80,6 +80,7 @@ export class GrokAgent extends EventEmitter {
   private activeToolCalls: number = 0;
   private readonly maxConcurrentToolCalls: number = 2;
   private readonly minRequestInterval: number = 500; // ms
+  private lastRequestTime: number = 0;
   private sessionLogPath: string;
 
   constructor(
