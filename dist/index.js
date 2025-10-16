@@ -21,7 +21,6 @@ import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
 import { glob } from 'glob';
 import { encoding_for_model, get_encoding } from 'tiktoken';
-import terminalImage from 'terminal-image';
 import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
 import crypto from 'crypto';
 import { marked } from 'marked';
@@ -9241,7 +9240,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.45"};
+  version: "1.0.46"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -14773,14 +14772,6 @@ function ChatInterfaceWithAgent({
       console.clear();
     }
     console.log("    ");
-    (async () => {
-      try {
-        const image = await terminalImage.file("src/image.png", { width: 20, height: 10 });
-        console.log(image);
-      } catch {
-        console.log(" Logo not available");
-      }
-    })();
     console.log(" ");
     const logoOutput = "HURRY MODE\n" + package_default.version;
     const logoLines = logoOutput.split("\n");

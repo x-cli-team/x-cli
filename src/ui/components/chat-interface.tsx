@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import pkg from '../../../package.json' with { type: 'json' };
-import terminalImage from 'terminal-image';
 
 import { Box, Text, DOMElement } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
@@ -82,15 +81,7 @@ function ChatInterfaceWithAgent({
     // Add top padding
     console.log("    ");
 
-    // Display image logo
-    (async () => {
-      try {
-        const image = await terminalImage.file('src/image.png', { width: 20, height: 10 });
-        console.log(image);
-      } catch {
-        console.log(" Logo not available");
-      }
-    })();
+
 
     console.log(" ");
 
