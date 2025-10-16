@@ -1,6 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+if [ "$CI" = "true" ]; then
+  exit 0
+fi
+
 echo "Are you sure you want to push? (y/N)"
 read -r response
 if [ "$response" != "y" ] && [ "$response" != "Y" ]; then
