@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import pkg from '../../../package.json' with { type: 'json' };
+import terminalImage from 'terminal-image';
 
 import { Box, Text } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
@@ -37,7 +38,7 @@ function ChatInterfaceWithAgent({
   const [isStreaming, setIsStreaming] = useState(false);
   const [confirmationOptions, setConfirmationOptions] =
     useState<ConfirmationOptions | null>(null);
-  const scrollRef = useRef<any>();
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const processingStartTime = useRef<number>(0);
 
   const confirmationService = ConfirmationService.getInstance();
@@ -80,6 +81,18 @@ function ChatInterfaceWithAgent({
 
     // Add top padding
     console.log("    ");
+
+    // Display image logo
+    (async () => {
+      try {
+        const image = await terminalImage.file('src/image.png', { width: 20, height: 10 });
+        console.log(image);
+      } catch {
+        console.log(" Logo not available");
+      }
+    })();
+
+    console.log(" ");
 
     // Generate welcome text with margin to match Ink paddingX={2}
     const logoOutput = "HURRY MODE" + "\n" + pkg.version;
@@ -209,10 +222,11 @@ function ChatInterfaceWithAgent({
                 break;
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
           const errorEntry: ChatEntry = {
             type: "assistant",
-            content: `Error: ${error.message}`,
+            content: `Error: ${errorMessage}`,
             timestamp: new Date(),
           };
           setChatHistory((prev) => [...prev, errorEntry]);
@@ -280,9 +294,41 @@ function ChatInterfaceWithAgent({
 
   return (
     <Box flexDirection="column" paddingX={2}>
-      {/* Show tips only when no chat history and no confirmation dialog */}
+      {/* Show logo and tips only when no chat history and no confirmation dialog */}
       {chatHistory.length === 0 && !confirmationOptions && (
         <Box flexDirection="column" marginBottom={2}>
+          <Text color="cyan">
+{`                     @@@@@#                          %@@@@@
+                     @@@@@#                          %@@@@@
+                     @@@@@#                          %@@@@@
+                           @@@@@                @@@@@
+                           @@@@@                @@@@@
+                           @@@@@                @@@@@
+                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                     @@@@@@     @@@@@@@@@@@@@@@@     @@@@@@
+               @@@@@@@@@@@#      @@@@@@@@@@@@@@      #@@@@@@@@@@@
+               @@@@@@@@@@@#      @@@@@@@@@@@@@@      #@@@@@@@@@@@
+               @@@@@@@@@@@@      @@@@@@@@@@@@@@      @@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
+          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
+          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
+          @@@@@      @@@@@@                          @@@@@@      @@@@@+
+          @@@@@      @@@@@@                          @@@@@@      @@@@@+
+          @@@@@      @@@@@@                          @@@@@@      @@@@@+
+          @@@@@      @@@@@#                          #@@@@@      @@@@@+
+
+                           @@@@@@@@@        @@@@@@@@@
+                           @@@@@@@@@        @@@@@@@@@
+                           @@@@@@@@          @@@@@@@@
+                     @@@@@#                          #@@@@@
+                     @@@@@#                          %@@@@@
+                     @@@@@#                          %@@@@@`}
+          </Text>
           <Text color="cyan" bold>
             Tips for getting started:
           </Text>

@@ -8,9 +8,9 @@ This directory contains AI agent documentation for Grok CLI. This system helps A
 ### 📋 system/
 Core project information and architecture:
 - **architecture.md** - Project structure and design patterns
-- **api-schema.md** - API endpoints and data schemas  
-- **database-schema.md** - Data models and database structure
+- **api-schema.md** - API endpoints and data schemas
 - **critical-state.md** - Current system state snapshot
+- **installation.md** - Installation and setup guide
 
 ### 📝 tasks/
 Product requirement documents and feature specifications:

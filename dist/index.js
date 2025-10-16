@@ -21,6 +21,7 @@ import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
 import { glob } from 'glob';
 import { encoding_for_model, get_encoding } from 'tiktoken';
+import terminalImage from 'terminal-image';
 import crypto from 'crypto';
 import { marked } from 'marked';
 import TerminalRenderer from 'marked-terminal';
@@ -9265,7 +9266,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.42"};
+  version: "1.0.44"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -14629,7 +14630,7 @@ function ChatInterfaceWithAgent({
   const [tokenCount, setTokenCount] = useState(0);
   const [isStreaming, setIsStreaming] = useState(false);
   const [confirmationOptions, setConfirmationOptions] = useState(null);
-  const scrollRef = useRef();
+  const scrollRef = useRef(null);
   const processingStartTime = useRef(0);
   const confirmationService = ConfirmationService.getInstance();
   const {
@@ -14662,6 +14663,15 @@ function ChatInterfaceWithAgent({
       console.clear();
     }
     console.log("    ");
+    (async () => {
+      try {
+        const image = await terminalImage.file("src/image.png", { width: 20, height: 10 });
+        console.log(image);
+      } catch (_e) {
+        console.log(" Logo not available");
+      }
+    })();
+    console.log(" ");
     const logoOutput = "HURRY MODE\n" + package_default.version;
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line) => {
@@ -14771,9 +14781,10 @@ function ChatInterfaceWithAgent({
             }
           }
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
           const errorEntry = {
             type: "assistant",
-            content: `Error: ${error.message}`,
+            content: `Error: ${errorMessage}`,
             timestamp: /* @__PURE__ */ new Date()
           };
           setChatHistory((prev) => [...prev, errorEntry]);
@@ -14825,7 +14836,36 @@ function ChatInterfaceWithAgent({
     setProcessingTime(0);
     processingStartTime.current = 0;
   };
-  return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", paddingX: 2 }, chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 2 }, /* @__PURE__ */ React12.createElement(Text, { color: "cyan", bold: true }, "Tips for getting started:"), /* @__PURE__ */ React12.createElement(Box, { marginTop: 1, flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "1. Ask questions, edit files, or run commands."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "2. Be specific for the best results."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "3. Create GROK.md files to customize your interactions with Grok."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "4. Press Shift+Tab to toggle auto-edit mode."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, '5. Run "/init-agent" to set up an .agent docs system for this project.'), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, '6. Run "/heal" after errors to capture a fix and add a guardrail.'), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "7. /help for more information."))), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "Type your request in natural language. Ctrl+C to clear, 'exit' to quit.")), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", ref: scrollRef }, /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", paddingX: 2 }, chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 2 }, /* @__PURE__ */ React12.createElement(Text, { color: "cyan" }, `                     @@@@@#                          %@@@@@
+                     @@@@@#                          %@@@@@
+                     @@@@@#                          %@@@@@
+                           @@@@@                @@@@@
+                           @@@@@                @@@@@
+                           @@@@@                @@@@@
+                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                     @@@@@@     @@@@@@@@@@@@@@@@     @@@@@@
+               @@@@@@@@@@@#      @@@@@@@@@@@@@@      #@@@@@@@@@@@
+               @@@@@@@@@@@#      @@@@@@@@@@@@@@      #@@@@@@@@@@@
+               @@@@@@@@@@@@      @@@@@@@@@@@@@@      @@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
+          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
+          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
+          @@@@@      @@@@@@                          @@@@@@      @@@@@+
+          @@@@@      @@@@@@                          @@@@@@      @@@@@+
+          @@@@@      @@@@@@                          @@@@@@      @@@@@+
+          @@@@@      @@@@@#                          #@@@@@      @@@@@+
+
+                           @@@@@@@@@        @@@@@@@@@
+                           @@@@@@@@@        @@@@@@@@@
+                           @@@@@@@@          @@@@@@@@
+                     @@@@@#                          #@@@@@
+                     @@@@@#                          %@@@@@
+                     @@@@@#                          %@@@@@`), /* @__PURE__ */ React12.createElement(Text, { color: "cyan", bold: true }, "Tips for getting started:"), /* @__PURE__ */ React12.createElement(Box, { marginTop: 1, flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "1. Ask questions, edit files, or run commands."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "2. Be specific for the best results."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "3. Create GROK.md files to customize your interactions with Grok."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "4. Press Shift+Tab to toggle auto-edit mode."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, '5. Run "/init-agent" to set up an .agent docs system for this project.'), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, '6. Run "/heal" after errors to capture a fix and add a guardrail.'), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "7. /help for more information."))), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "Type your request in natural language. Ctrl+C to clear, 'exit' to quit.")), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", ref: scrollRef }, /* @__PURE__ */ React12.createElement(
     ChatHistory,
     {
       entries: chatHistory,

@@ -28,7 +28,7 @@
     "typecheck": "tsc --noEmit",
     "install:bun": "bun install",
     "preinstall": "echo '🤖 Installing Grok CLI...'",
-    "postinstall": "echo '✅ Grok CLI installed successfully!' && echo '🚀 Try: grok --help' && echo '💡 Need help? Visit: https://github.com/hinetapora/grok-cli-hurry-mode#installation'",
+    "postinstall": "echo '==================================================' && echo '✅ Grok CLI installed successfully!' && echo '==================================================' && echo '🚀 Try: grok --help' && echo '💡 If \"command not found\", add to PATH:' && node -e \"const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shell=isMac?'zshrc':'bashrc';console.log((isMac?'🍎 Mac':'🐧 Linux')+': echo \\'export PATH=\\\"$(npm config get prefix)/bin:$PATH\\\"\\' >> ~/.'+shell+' && source ~/.'+shell);}\" && echo '📖 Docs: https://github.com/hinetapora/grok-cli-hurry-mode#installation' && echo '🔑 Set API key: export GROK_API_KEY=your_key_here' && echo '==================================================' && echo '🔧 Auto-setup PATH? Press Enter to add (or Ctrl+C to skip)' && read -t 10 && node -e \"const fs=require('fs');const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shellFile=isMac?'.zshrc':'.bashrc';const rcPath=process.env.HOME+'/'+shellFile;const pathCmd='export PATH=\\\"$(npm config get prefix)/bin:$PATH\\\"';try{const content=fs.readFileSync(rcPath,'utf8');if(!content.includes(pathCmd)){fs.appendFileSync(rcPath,'\\n'+pathCmd+'\\n');console.log('✅ Added to ~/'+shellFile+' - restart terminal');}else{console.log('ℹ️ Already in ~/'+shellFile);}}catch(e){console.log('⚠️ Could not modify ~/'+shellFile+' - add manually');}}\" && echo '🔍 Verifying: ' && grok --version 2>/dev/null || echo '⚠️ grok not in PATH yet - follow above steps'",
     "prepare": "husky install"
   },
   "lint-staged": {
@@ -67,6 +67,7 @@
     "openai": "^5.10.1",
     "react": "^18.3.1",
     "ripgrep-node": "^1.0.0",
+    "terminal-image": "^4.0.0",
     "tiktoken": "^1.0.21"
   },
   "devDependencies": {
