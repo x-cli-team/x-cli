@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import pkg from '../../../package.json' with { type: 'json' };
 import terminalImage from 'terminal-image';
 
-import { Box, Text } from "ink";
+import { Box, Text, DOMElement } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
 import { useInputHandler } from "../../hooks/use-input-handler.js";
 import { LoadingSpinner } from "./loading-spinner.js";
@@ -38,7 +38,7 @@ function ChatInterfaceWithAgent({
   const [isStreaming, setIsStreaming] = useState(false);
   const [confirmationOptions, setConfirmationOptions] =
     useState<ConfirmationOptions | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<DOMElement | null>(null);
   const processingStartTime = useRef<number>(0);
 
   const confirmationService = ConfirmationService.getInstance();
