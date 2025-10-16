@@ -1,4 +1,4 @@
-## 1.0.34 – Stability Release
+## 1.0.37 – Stability Release
 
 This release restores the proven 1.0.31 baseline.
 - Fixes all Read/Update tool reliability issues

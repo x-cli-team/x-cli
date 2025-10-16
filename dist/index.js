@@ -9265,7 +9265,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.34"};
+  version: "1.0.37"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
