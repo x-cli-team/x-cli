@@ -298,7 +298,11 @@ function ChatInterfaceWithAgent({
       {chatHistory.length === 0 && !confirmationOptions && (
         <Box flexDirection="column" marginBottom={2}>
           <Text color="cyan" bold>
-GROK-CLI (HURRY MODE)
+{`    dBBBBb dBBBBBb    dBBBBP  dBP dBP          dBBBP  dBP    dBP
+               dBP   dB'.BP  dBP.d8P                            
+  dBBBB    dBBBBK'  dB'.BP  dBBBBP'          dBP    dBP    dBP  
+ dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
+dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    `}
           </Text>
           <Text color="cyan" bold>
             Tips for getting started:

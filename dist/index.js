@@ -9241,7 +9241,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.44"};
+  version: "1.0.45"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -14948,7 +14948,11 @@ function ChatInterfaceWithAgent({
   };
   return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, children: [
     chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginBottom: 2, children: [
-      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "GROK-CLI (HURRY MODE)" }),
+      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: `    dBBBBb dBBBBBb    dBBBBP  dBP dBP          dBBBP  dBP    dBP
+               dBP   dB'.BP  dBP.d8P                            
+  dBBBB    dBBBBK'  dB'.BP  dBBBBP'          dBP    dBP    dBP  
+ dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
+dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    ` }),
       /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "Tips for getting started:" }),
       /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
         /* @__PURE__ */ jsx(Text, { color: "gray", children: "1. Ask questions, edit files, or run commands." }),
