@@ -472,7 +472,7 @@ Respond with ONLY the commit message, no additional text.`;
           if (chunk.type === "content" && chunk.content) {
             accumulatedCommitContent += chunk.content;
             const now = Date.now();
-            if (now - lastCommitUpdateTime >= 150 || chunk.type === "done") {
+            if (now - lastCommitUpdateTime >= 150) {
               commitMessage += accumulatedCommitContent;
               if (!streamingEntry) {
                 const newEntry = {
@@ -1307,7 +1307,7 @@ ${incidents.slice(0, 3).map(i => `- ${i.title} (${i.impact} impact)`).join('\n')
             if (chunk.content) {
               accumulatedContent += chunk.content;
               const now = Date.now();
-              if (now - lastUpdateTime >= 150 || chunk.type === "done") { // Flush on interval or end
+              if (now - lastUpdateTime >= 150) { // Flush on interval
                 if (!streamingEntry) {
                   const newStreamingEntry = {
                     type: "assistant" as const,

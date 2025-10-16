@@ -523,6 +523,20 @@ bun run lint
 bun run typecheck
 ```
 
+### Pre-commit Hooks
+
+This project uses [Husky](https://typicode.github.com/husky/) and [lint-staged](https://github.com/okonet/lint-staged) to run automated checks before commits:
+
+- **ESLint**: Automatically fixes linting issues and checks for errors
+- **TypeScript**: Runs type checking to prevent compilation errors
+- **Staged files only**: Only checks files that are staged for commit
+
+The pre-commit hook runs `npx lint-staged`, which processes `*.{ts,tsx}` files with:
+1. `eslint --fix` - Auto-fix linting issues where possible
+2. `tsc --noEmit` - Type check without emitting files
+
+If checks fail, the commit is blocked until issues are resolved.
+
 ## Architecture
 
 - **Agent**: Core command processing and execution logic

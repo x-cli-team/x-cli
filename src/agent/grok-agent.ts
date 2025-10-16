@@ -596,7 +596,7 @@ Current working directory: ${process.cwd()}`,
           const toolCalls = accumulatedMessage.tool_calls;
           for (let i = 0; i < toolCalls.length; i += this.maxConcurrentToolCalls) {
             const batch = toolCalls.slice(i, i + this.maxConcurrentToolCalls);
-            const batchPromises = batch.map(async (toolCall) => {
+            const batchPromises = batch.map(async (toolCall: GrokToolCall) => {
               // Check for cancellation before executing each tool
               if (this.abortController?.signal.aborted) {
                 return null;
@@ -615,12 +615,6 @@ Current working directory: ${process.cwd()}`,
               };
               this.chatHistory.push(toolResultEntry);
 
-              yield {
-                type: "tool_result",
-                toolCall,
-                toolResult: result,
-              };
-
               // Add tool result with proper format (needed for AI context)
               this.messages.push({
                 role: "tool",
@@ -630,11 +624,11 @@ Current working directory: ${process.cwd()}`,
                 tool_call_id: toolCall.id,
               });
 
-              return result;
+              return { toolCall, result, entry: toolResultEntry };
             });
 
-            const results = await Promise.all(batchPromises);
-            if (results.includes(null)) {
+            const batchResults = await Promise.all(batchPromises);
+            if (batchResults.includes(null)) {
               // Cancelled
               yield {
                 type: "content",
@@ -642,6 +636,15 @@ Current working directory: ${process.cwd()}`,
               };
               yield { type: "done" };
               return;
+            }
+
+            // Yield results after batch completes
+            for (const { toolCall, result } of batchResults) {
+              yield {
+                type: "tool_result",
+                toolCall,
+                toolResult: result,
+              };
             }
           }
 

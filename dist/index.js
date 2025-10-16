@@ -8539,6 +8539,11 @@ var GrokAgent = class extends EventEmitter {
   abortController = null;
   mcpInitialized = false;
   maxToolRounds;
+  lastRequestTime = 0;
+  activeToolCalls = 0;
+  maxConcurrentToolCalls = 2;
+  minRequestInterval = 500;
+  // ms
   constructor(apiKey, baseURL, model, maxToolRounds) {
     super();
     const manager = getSettingsManager();
@@ -8858,6 +8863,13 @@ Current working directory: ${process.cwd()}`
           yield { type: "done" };
           return;
         }
+        const now = Date.now();
+        const timeSinceLastRequest = now - this.lastRequestTime;
+        if (timeSinceLastRequest < this.minRequestInterval) {
+          const delay = this.minRequestInterval - timeSinceLastRequest;
+          await new Promise((resolve8) => setTimeout(resolve8, delay));
+        }
+        this.lastRequestTime = Date.now();
         const tools = await getAllGrokTools();
         const stream = this.grokClient.chatStream(
           this.messages,
@@ -8901,9 +8913,9 @@ Current working directory: ${process.cwd()}`
               type: "content",
               content: chunk.choices[0].delta.content
             };
-            const now = Date.now();
-            if (now - lastTokenUpdate > 250) {
-              lastTokenUpdate = now;
+            const now2 = Date.now();
+            if (now2 - lastTokenUpdate > 250) {
+              lastTokenUpdate = now2;
               yield {
                 type: "token_count",
                 tokenCount: inputTokens + totalOutputTokens
@@ -8931,8 +8943,31 @@ Current working directory: ${process.cwd()}`
               toolCalls: accumulatedMessage.tool_calls
             };
           }
-          for (const toolCall of accumulatedMessage.tool_calls) {
-            if (this.abortController?.signal.aborted) {
+          const toolCalls = accumulatedMessage.tool_calls;
+          for (let i = 0; i < toolCalls.length; i += this.maxConcurrentToolCalls) {
+            const batch = toolCalls.slice(i, i + this.maxConcurrentToolCalls);
+            const batchPromises = batch.map(async (toolCall) => {
+              if (this.abortController?.signal.aborted) {
+                return null;
+              }
+              const result = await this.executeTool(toolCall);
+              const toolResultEntry = {
+                type: "tool_result",
+                content: result.success ? result.output || "Success" : result.error || "Error occurred",
+                timestamp: /* @__PURE__ */ new Date(),
+                toolCall,
+                toolResult: result
+              };
+              this.chatHistory.push(toolResultEntry);
+              this.messages.push({
+                role: "tool",
+                content: result.success ? result.output || "Success" : result.error || "Error",
+                tool_call_id: toolCall.id
+              });
+              return { toolCall, result, entry: toolResultEntry };
+            });
+            const batchResults = await Promise.all(batchPromises);
+            if (batchResults.includes(null)) {
               yield {
                 type: "content",
                 content: "\n\n[Operation cancelled by user]"
@@ -8940,25 +8975,13 @@ Current working directory: ${process.cwd()}`
               yield { type: "done" };
               return;
             }
-            const result = await this.executeTool(toolCall);
-            const toolResultEntry = {
-              type: "tool_result",
-              content: result.success ? result.output || "Success" : result.error || "Error occurred",
-              timestamp: /* @__PURE__ */ new Date(),
-              toolCall,
-              toolResult: result
-            };
-            this.chatHistory.push(toolResultEntry);
-            yield {
-              type: "tool_result",
-              toolCall,
-              toolResult: result
-            };
-            this.messages.push({
-              role: "tool",
-              content: result.success ? result.output || "Success" : result.error || "Error",
-              tool_call_id: toolCall.id
-            });
+            for (const { toolCall, result } of batchResults) {
+              yield {
+                type: "tool_result",
+                toolCall,
+                toolResult: result
+              };
+            }
           }
           inputTokens = this.tokenCounter.countMessageTokens(
             this.messages
@@ -13133,34 +13156,41 @@ Follow conventional commit format (feat:, fix:, docs:, etc.) and keep it under 7
 Respond with ONLY the commit message, no additional text.`;
         let commitMessage = "";
         let streamingEntry = null;
+        let accumulatedCommitContent = "";
+        let lastCommitUpdateTime = Date.now();
         for await (const chunk of agent.processUserMessageStream(
           commitPrompt
         )) {
           if (chunk.type === "content" && chunk.content) {
-            if (!streamingEntry) {
-              const newEntry = {
-                type: "assistant",
-                content: `Generating commit message...
+            accumulatedCommitContent += chunk.content;
+            const now = Date.now();
+            if (now - lastCommitUpdateTime >= 150) {
+              commitMessage += accumulatedCommitContent;
+              if (!streamingEntry) {
+                const newEntry = {
+                  type: "assistant",
+                  content: `Generating commit message...
 
-${chunk.content}`,
-                timestamp: /* @__PURE__ */ new Date(),
-                isStreaming: true
-              };
-              setChatHistory((prev) => [...prev, newEntry]);
-              streamingEntry = newEntry;
-              commitMessage = chunk.content;
-            } else {
-              commitMessage += chunk.content;
-              setChatHistory(
-                (prev) => prev.map(
-                  (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? {
-                    ...entry,
-                    content: `Generating commit message...
+${commitMessage}`,
+                  timestamp: /* @__PURE__ */ new Date(),
+                  isStreaming: true
+                };
+                setChatHistory((prev) => [...prev, newEntry]);
+                streamingEntry = newEntry;
+              } else {
+                setChatHistory(
+                  (prev) => prev.map(
+                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? {
+                      ...entry,
+                      content: `Generating commit message...
 
 ${commitMessage}`
-                  } : entry
-                )
-              );
+                    } : entry
+                  )
+                );
+              }
+              accumulatedCommitContent = "";
+              lastCommitUpdateTime = now;
             }
           } else if (chunk.type === "done") {
             if (streamingEntry) {
@@ -13859,25 +13889,33 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
     try {
       setIsStreaming(true);
       let streamingEntry = null;
+      let accumulatedContent = "";
+      let lastUpdateTime = Date.now();
       for await (const chunk of agent.processUserMessageStream(userInput)) {
         switch (chunk.type) {
           case "content":
             if (chunk.content) {
-              if (!streamingEntry) {
-                const newStreamingEntry = {
-                  type: "assistant",
-                  content: chunk.content,
-                  timestamp: /* @__PURE__ */ new Date(),
-                  isStreaming: true
-                };
-                setChatHistory((prev) => [...prev, newStreamingEntry]);
-                streamingEntry = newStreamingEntry;
-              } else {
-                setChatHistory(
-                  (prev) => prev.map(
-                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + chunk.content } : entry
-                  )
-                );
+              accumulatedContent += chunk.content;
+              const now = Date.now();
+              if (now - lastUpdateTime >= 150) {
+                if (!streamingEntry) {
+                  const newStreamingEntry = {
+                    type: "assistant",
+                    content: accumulatedContent,
+                    timestamp: /* @__PURE__ */ new Date(),
+                    isStreaming: true
+                  };
+                  setChatHistory((prev) => [...prev, newStreamingEntry]);
+                  streamingEntry = newStreamingEntry;
+                } else {
+                  setChatHistory(
+                    (prev) => prev.map(
+                      (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
+                    )
+                  );
+                }
+                accumulatedContent = "";
+                lastUpdateTime = now;
               }
             }
             break;
@@ -13931,6 +13969,25 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
             }
             break;
           case "done":
+            if (accumulatedContent) {
+              if (!streamingEntry) {
+                const newStreamingEntry = {
+                  type: "assistant",
+                  content: accumulatedContent,
+                  timestamp: /* @__PURE__ */ new Date(),
+                  isStreaming: true
+                };
+                setChatHistory((prev) => [...prev, newStreamingEntry]);
+                streamingEntry = newStreamingEntry;
+              } else {
+                setChatHistory(
+                  (prev) => prev.map(
+                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
+                  )
+                );
+              }
+              accumulatedContent = "";
+            }
             if (streamingEntry) {
               setChatHistory(
                 (prev) => prev.map(
@@ -13967,59 +14024,15 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
     autoEditEnabled
   };
 }
-var loadingTexts = [
-  "Thinking...",
-  "Processing...",
-  "Analyzing...",
-  "Working...",
-  "Computing...",
-  "Generating...",
-  "Herding electrons...",
-  "Combobulating...",
-  "Discombobulating...",
-  "Recombobulating...",
-  "Calibrating flux capacitors...",
-  "Reticulating splines...",
-  "Adjusting bell curves...",
-  "Optimizing bit patterns...",
-  "Harmonizing frequencies...",
-  "Synchronizing timelines...",
-  "Defragmenting thoughts...",
-  "Compiling wisdom...",
-  "Bootstrapping reality...",
-  "Untangling quantum states...",
-  "Negotiating with servers...",
-  "Convincing pixels to cooperate...",
-  "Summoning digital spirits...",
-  "Caffeinating algorithms...",
-  "Debugging the universe..."
-];
 function LoadingSpinner({
   isActive,
   processingTime,
   tokenCount
 }) {
-  const [spinnerFrame, setSpinnerFrame] = useState(0);
-  const [loadingTextIndex, setLoadingTextIndex] = useState(0);
-  useEffect(() => {
-    if (!isActive) return;
-    const spinnerFrames2 = ["\u280B", "\u2819", "\u2839", "\u2838", "\u283C", "\u2834", "\u2826", "\u2827", "\u2807", "\u280F"];
-    const interval = setInterval(() => {
-      setSpinnerFrame((prev) => (prev + 1) % spinnerFrames2.length);
-    }, 80);
-    return () => clearInterval(interval);
-  }, [isActive]);
-  useEffect(() => {
-    if (!isActive) return;
-    setLoadingTextIndex(Math.floor(Math.random() * loadingTexts.length));
-    const interval = setInterval(() => {
-      setLoadingTextIndex(Math.floor(Math.random() * loadingTexts.length));
-    }, 4e3);
-    return () => clearInterval(interval);
-  }, [isActive]);
   if (!isActive) return null;
-  const spinnerFrames = ["\u280B", "\u2819", "\u2839", "\u2838", "\u283C", "\u2834", "\u2826", "\u2827", "\u2807", "\u280F"];
-  return /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "blue" }, spinnerFrames[spinnerFrame], " ", loadingTexts[loadingTextIndex]), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, " ", "(", processingTime, "s \xB7 \u2191 ", formatTokenCount(tokenCount), " tokens \xB7 esc to interrupt)"));
+  const staticSpinner = "\u280B";
+  const staticText = "Processing...";
+  return /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "blue" }, staticSpinner, " ", staticText), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, " ", "(", processingTime, "s \xB7 \u2191 ", formatTokenCount(tokenCount), " tokens \xB7 esc to interrupt)"));
 }
 function ModelSelection({
   models,
@@ -14649,10 +14662,7 @@ function ChatInterfaceWithAgent({
       console.clear();
     }
     console.log("    ");
-    const grokLogo = {
-      string: "\x1B[33m  #####   #####   #####   #    #\n#        #    #  #     #  #   #\n#  ###   #    #  #     #  #  #\n#    #   #####   #     #  # #\n#  ###   #  #    #     #  #  #\n#        #   #   #     #  #   #\n  #####   #    #   #####   #    #\x1B[0m"
-    };
-    const logoOutput = (typeof grokLogo === "object" && "string" in grokLogo ? grokLogo.string : String(grokLogo)) + "\nHURRY MODE\n" + package_default.version;
+    const logoOutput = "HURRY MODE\n" + package_default.version;
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line) => {
       if (line.trim()) {
@@ -15331,7 +15341,21 @@ program.name("grok").description(
     console.log("\u{1F916} Starting Grok CLI Conversational Assistant...\n");
     ensureUserSettingsDirectory();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
-    render(React12.createElement(ChatInterface, { agent, initialMessage }));
+    const app = render(React12.createElement(ChatInterface, { agent, initialMessage }));
+    const cleanup = () => {
+      app.unmount();
+      agent.abortCurrentOperation();
+      if (process.env.DEBUG === "1") {
+        const handles = process._getActiveHandles?.() || [];
+        console.log(`[DEBUG] Active handles on exit: ${handles.length}`);
+      }
+    };
+    process.on("exit", cleanup);
+    process.on("SIGINT", () => {
+      cleanup();
+      process.exit(0);
+    });
+    process.on("SIGTERM", cleanup);
   } catch (error) {
     console.error("\u274C Error initializing Grok CLI:", error.message);
     process.exit(1);

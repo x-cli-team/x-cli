@@ -1,4 +1,5 @@
-import { getSettingsManager, UserSettings, ProjectSettings } from './settings-manager.js';
+import { getSettingsManager } from './settings-manager.js';
+import type { UserSettings, ProjectSettings } from './settings-manager.js';
 
 export interface ModelOption {
   model: string;

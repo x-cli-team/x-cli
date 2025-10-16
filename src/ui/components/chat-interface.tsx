@@ -16,7 +16,6 @@ import {
   ConfirmationOptions,
 } from "../../utils/confirmation-service.js";
 import ApiKeyInput from "./api-key-input.js";
-import cfonts from "cfonts";
 
 interface ChatInterfaceProps {
   agent?: GrokAgent;
@@ -82,14 +81,8 @@ function ChatInterfaceWithAgent({
     // Add top padding
     console.log("    ");
 
-    // Generate logo with margin to match Ink paddingX={2}
-    const grokLogo = {
-      string: "\x1b[33m  #####   #####   #####   #    #\n#        #    #  #     #  #   #\n#  ###   #    #  #     #  #  #\n#    #   #####   #     #  # #\n#  ###   #  #    #     #  #  #\n#        #   #   #     #  #   #\n  #####   #    #   #####   #    #\x1b[0m"
-    };
-
-    // Add horizontal margin (2 spaces) to match Ink paddingX={2}
-
-    const logoOutput = (typeof grokLogo === 'object' && 'string' in grokLogo ? grokLogo.string : String(grokLogo)) + "\nHURRY MODE" + "\n" + pkg.version;
+    // Generate welcome text with margin to match Ink paddingX={2}
+    const logoOutput = "HURRY MODE" + "\n" + pkg.version;
 
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line: string) => {

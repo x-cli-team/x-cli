@@ -22,13 +22,20 @@
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     "start": "node dist/index.js",
-    "local": "npm run build && npm link && grok",
+    "local": "npm run build && npm link && node dist/index.js",
     "start:bun": "bun run dist/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
     "install:bun": "bun install",
     "preinstall": "echo '🤖 Installing Grok CLI...'",
-    "postinstall": "echo '✅ Grok CLI installed successfully!' && echo '🚀 Try: grok --help' && echo '💡 Need help? Visit: https://github.com/hinetapora/grok-cli-hurry-mode#installation'"
+    "postinstall": "echo '✅ Grok CLI installed successfully!' && echo '🚀 Try: grok --help' && echo '💡 Need help? Visit: https://github.com/hinetapora/grok-cli-hurry-mode#installation'",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "tsc --noEmit"
+    ]
   },
   "keywords": [
     "cli",
@@ -54,7 +61,6 @@
     "fs-extra": "^11.2.0",
     "fuse.js": "^7.1.0",
     "glob": "^11.0.3",
-    "grok-cli-hurry-mode": "^1.0.21",
     "ink": "^4.4.1",
     "marked": "^15.0.12",
     "marked-terminal": "^7.3.0",
@@ -72,6 +78,8 @@
     "@typescript-eslint/parser": "^8.37.0",
     "esbuild": "^0.25.10",
     "eslint": "^9.31.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.4",
     "tsup": "^8.5.0",
     "tsx": "^4.0.0"
   },
