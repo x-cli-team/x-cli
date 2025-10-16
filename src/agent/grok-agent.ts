@@ -1,4 +1,6 @@
 import { GrokClient, GrokMessage, GrokToolCall } from "../grok/client.js";
+import fs from "fs";
+import path from "path";
 import {
   getAllGrokTools,
   getMCPManager,
@@ -78,6 +80,7 @@ export class GrokAgent extends EventEmitter {
   private activeToolCalls: number = 0;
   private readonly maxConcurrentToolCalls: number = 2;
   private readonly minRequestInterval: number = 500; // ms
+  private sessionLogPath: string;
 
   constructor(
     apiKey: string,
@@ -90,6 +93,7 @@ export class GrokAgent extends EventEmitter {
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
     this.maxToolRounds = maxToolRounds || 400;
+    this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
     this.grokClient = new GrokClient(apiKey, modelToUse, baseURL);
     this.textEditor = new TextEditorTool();
     this.morphEditor = process.env.MORPH_API_KEY ? new MorphEditorTool() : null;
@@ -253,6 +257,7 @@ Current working directory: ${process.cwd()}`,
       timestamp: new Date(),
     };
     this.chatHistory.push(userEntry);
+    this.logEntry(userEntry);
     this.messages.push({ role: "user", content: message });
 
     const newEntries: ChatEntry[] = [userEntry];
@@ -293,6 +298,7 @@ Current working directory: ${process.cwd()}`,
             toolCalls: assistantMessage.tool_calls,
           };
           this.chatHistory.push(assistantEntry);
+          this.logEntry(assistantEntry);
           newEntries.push(assistantEntry);
 
           // Add assistant message to conversation
@@ -958,6 +964,21 @@ Current working directory: ${process.cwd()}`,
     return [...this.chatHistory];
   }
 
+  saveSessionLog(): void {
+    try {
+      const sessionDir = path.join(require('os').homedir(), '.grok');
+      if (!fs.existsSync(sessionDir)) {
+        fs.mkdirSync(sessionDir, { recursive: true });
+      }
+      const sessionFile = path.join(sessionDir, 'session.log');
+      const logLines = this.chatHistory.map(entry => JSON.stringify(entry)).join('\n') + '\n';
+      fs.writeFileSync(sessionFile, logLines);
+    } catch (error) {
+      // Silently ignore logging errors to not disrupt the app
+      console.warn('Failed to save session log:', error);
+    }
+  }
+
   getCurrentDirectory(): string {
     return this.bash.getCurrentDirectory();
   }
@@ -980,6 +1001,30 @@ Current working directory: ${process.cwd()}`,
   abortCurrentOperation(): void {
     if (this.abortController) {
       this.abortController.abort();
+    }
+  }
+
+  private logEntry(entry: ChatEntry): void {
+    try {
+      // Ensure directory exists
+      const dir = path.dirname(this.sessionLogPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      // Log as JSON line
+      const logLine = JSON.stringify({
+        type: entry.type,
+        content: entry.content,
+        timestamp: entry.timestamp.toISOString(),
+        toolCallId: entry.toolCall?.id,
+        toolCallsCount: entry.toolCalls?.length,
+      }) + '\n';
+
+      fs.appendFileSync(this.sessionLogPath, logLine);
+    } catch (error) {
+      // Silently ignore logging errors to avoid disrupting the app
+      console.warn('Failed to log session entry:', error);
     }
   }
 }

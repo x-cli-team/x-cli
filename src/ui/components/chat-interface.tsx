@@ -118,101 +118,149 @@ function ChatInterfaceWithAgent({
 
         try {
           let streamingEntry: ChatEntry | null = null;
+          let accumulatedContent = "";
+          let lastTokenCount = 0;
+          let pendingToolCalls: any[] | null = null;
+          let pendingToolResults: Array<{ toolCall: any; toolResult: any }> = [];
+          let lastUpdateTime = Date.now();
+
+          const flushUpdates = () => {
+            const now = Date.now();
+            if (now - lastUpdateTime < 150) return; // Throttle to ~6-7 FPS
+
+            // Update token count if changed
+            if (lastTokenCount !== 0) {
+              setTokenCount(lastTokenCount);
+            }
+
+            // Handle accumulated content
+            if (accumulatedContent) {
+              if (!streamingEntry) {
+                const newStreamingEntry = {
+                  type: "assistant" as const,
+                  content: accumulatedContent,
+                  timestamp: new Date(),
+                  isStreaming: true,
+                };
+                setChatHistory((prev) => [...prev, newStreamingEntry]);
+                streamingEntry = newStreamingEntry;
+              } else {
+                setChatHistory((prev) =>
+                  prev.map((entry, idx) =>
+                    idx === prev.length - 1 && entry.isStreaming
+                      ? { ...entry, content: entry.content + accumulatedContent }
+                      : entry
+                  )
+                );
+              }
+              accumulatedContent = "";
+            }
+
+            // Handle pending tool calls
+            if (pendingToolCalls) {
+              setChatHistory((prev) =>
+                prev.map((entry) =>
+                  entry.isStreaming
+                    ? {
+                        ...entry,
+                        isStreaming: false,
+                        toolCalls: pendingToolCalls,
+                      }
+                    : entry
+                )
+              );
+              streamingEntry = null;
+
+              // Add individual tool call entries
+              pendingToolCalls.forEach((toolCall) => {
+                const toolCallEntry: ChatEntry = {
+                  type: "tool_call",
+                  content: "Executing...",
+                  timestamp: new Date(),
+                  toolCall: toolCall,
+                };
+                setChatHistory((prev) => [...prev, toolCallEntry]);
+              });
+              pendingToolCalls = null;
+            }
+
+            // Handle pending tool results
+            if (pendingToolResults.length > 0) {
+              setChatHistory((prev) =>
+                prev.map((entry) => {
+                  if (entry.isStreaming) {
+                    return { ...entry, isStreaming: false };
+                  }
+                  // Update matching tool_call entries
+                  const matchingResult = pendingToolResults.find(
+                    (result) => entry.type === "tool_call" && entry.toolCall?.id === result.toolCall.id
+                  );
+                  if (matchingResult) {
+                    return {
+                      ...entry,
+                      type: "tool_result",
+                      content: matchingResult.toolResult.success
+                        ? matchingResult.toolResult.output || "Success"
+                        : matchingResult.toolResult.error || "Error occurred",
+                      toolResult: matchingResult.toolResult,
+                    };
+                  }
+                  return entry;
+                })
+              );
+              streamingEntry = null;
+              pendingToolResults = [];
+            }
+
+            lastUpdateTime = now;
+          };
+
           for await (const chunk of agent.processUserMessageStream(initialMessage)) {
             switch (chunk.type) {
               case "content":
                 if (chunk.content) {
-                  if (!streamingEntry) {
-                    const newStreamingEntry = {
-                      type: "assistant" as const,
-                      content: chunk.content,
-                      timestamp: new Date(),
-                      isStreaming: true,
-                    };
-                    setChatHistory((prev) => [...prev, newStreamingEntry]);
-                    streamingEntry = newStreamingEntry;
-                  } else {
-                    setChatHistory((prev) =>
-                      prev.map((entry, idx) =>
-                        idx === prev.length - 1 && entry.isStreaming
-                          ? { ...entry, content: entry.content + chunk.content }
-                          : entry
-                      )
-                    );
-                  }
+                  accumulatedContent += chunk.content;
                 }
                 break;
+
               case "token_count":
                 if (chunk.tokenCount !== undefined) {
-                  setTokenCount(chunk.tokenCount);
+                  lastTokenCount = chunk.tokenCount;
                 }
                 break;
+
               case "tool_calls":
                 if (chunk.toolCalls) {
-                  // Stop streaming for the current assistant message
-                  setChatHistory((prev) =>
-                    prev.map((entry) =>
-                      entry.isStreaming
-                        ? {
-                            ...entry,
-                            isStreaming: false,
-                            toolCalls: chunk.toolCalls,
-                          }
-                        : entry
-                    )
-                  );
-                  streamingEntry = null;
-
-                  // Add individual tool call entries to show tools are being executed
-                  chunk.toolCalls.forEach((toolCall) => {
-                    const toolCallEntry: ChatEntry = {
-                      type: "tool_call",
-                      content: "Executing...",
-                      timestamp: new Date(),
-                      toolCall: toolCall,
-                    };
-                    setChatHistory((prev) => [...prev, toolCallEntry]);
-                  });
+                  pendingToolCalls = chunk.toolCalls;
                 }
                 break;
+
               case "tool_result":
                 if (chunk.toolCall && chunk.toolResult) {
-                  setChatHistory((prev) =>
-                    prev.map((entry) => {
-                      if (entry.isStreaming) {
-                        return { ...entry, isStreaming: false };
-                      }
-                      if (
-                        entry.type === "tool_call" &&
-                        entry.toolCall?.id === chunk.toolCall?.id
-                      ) {
-                        return {
-                          ...entry,
-                          type: "tool_result",
-                          content: chunk.toolResult?.success
-                            ? chunk.toolResult.output || "Success"
-                            : chunk.toolResult?.error || "Error occurred",
-                          toolResult: chunk.toolResult,
-                        };
-                      }
-                      return entry;
-                    })
-                  );
-                  streamingEntry = null;
+                  pendingToolResults.push({ toolCall: chunk.toolCall, toolResult: chunk.toolResult });
                 }
                 break;
+
               case "done":
-                if (streamingEntry) {
-                  setChatHistory((prev) =>
-                    prev.map((entry) =>
-                      entry.isStreaming ? { ...entry, isStreaming: false } : entry
-                    )
-                  );
-                }
-                setIsStreaming(false);
+                // Flush all remaining updates
+                flushUpdates();
                 break;
             }
+
+            // Flush updates periodically
+            flushUpdates();
           }
+
+          // Final flush and cleanup
+          flushUpdates();
+          if (streamingEntry) {
+            setChatHistory((prev) =>
+              prev.map((entry) =>
+                entry.isStreaming ? { ...entry, isStreaming: false } : entry
+              )
+            );
+          }
+          setIsStreaming(false);
         } catch (error: unknown) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           const errorEntry: ChatEntry = {

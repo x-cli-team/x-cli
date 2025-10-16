@@ -21,7 +21,7 @@ process.on("SIGTERM", () => {
   if (process.stdin.isTTY && process.stdin.setRawMode) {
     try {
       process.stdin.setRawMode(false);
-    } catch (e) {
+    } catch {
       // Ignore errors when setting raw mode
     }
   }
@@ -46,7 +46,7 @@ function ensureUserSettingsDirectory(): void {
     const manager = getSettingsManager();
     // This will create default settings if they don't exist
     manager.loadUserSettings();
-  } catch (error) {
+  } catch {
     // Silently ignore errors during setup
   }
 }
@@ -98,7 +98,7 @@ function loadModel(): string | undefined {
     try {
       const manager = getSettingsManager();
       model = manager.getCurrentModel();
-    } catch (error) {
+    } catch {
       // Ignore errors, model will remain undefined
     }
   }
@@ -377,6 +377,11 @@ program
       }
 
       // Interactive mode: launch UI
+      if (!process.stdin.isTTY) {
+        console.error("❌ Error: Grok CLI requires an interactive terminal. Please run in a TTY environment.");
+        process.exit(1);
+      }
+
       const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
       console.log("🤖 Starting Grok CLI Conversational Assistant...\n");
 

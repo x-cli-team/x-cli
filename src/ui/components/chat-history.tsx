@@ -9,6 +9,12 @@ interface ChatHistoryProps {
   isConfirmationActive?: boolean;
 }
 
+// Helper to truncate content in compact mode
+const truncateContent = (content: string, maxLength: number = 100): string => {
+  if (process.env.COMPACT !== '1') return content;
+  return content.length > maxLength ? content.substring(0, maxLength) + '...' : content;
+};
+
 // Memoized ChatEntry component to prevent unnecessary re-renders
 const MemoizedChatEntry = React.memo(
   ({ entry, index }: { entry: ChatEntry; index: number }) => {
@@ -53,7 +59,7 @@ const MemoizedChatEntry = React.memo(
           <Box key={index} flexDirection="column" marginTop={1}>
             <Box>
               <Text color="gray">
-                {">"} {entry.content}
+                {">"} {truncateContent(entry.content)}
               </Text>
             </Box>
           </Box>
@@ -67,10 +73,10 @@ const MemoizedChatEntry = React.memo(
               <Box flexDirection="column" flexGrow={1}>
                 {entry.toolCalls ? (
                   // If there are tool calls, just show plain text
-                  <Text color="white">{entry.content.trim()}</Text>
+                  <Text color="white">{truncateContent(entry.content.trim())}</Text>
                 ) : (
                   // If no tool calls, render as markdown
-                  <MarkdownRenderer content={entry.content.trim()} />
+                  <MarkdownRenderer content={truncateContent(entry.content.trim())} />
                 )}
                 {entry.isStreaming && <Text color="cyan">█</Text>}
               </Box>
@@ -134,10 +140,11 @@ const MemoizedChatEntry = React.memo(
         
         // Format JSON content for better readability
         const formatToolContent = (content: string, toolName: string) => {
+          const truncated = truncateContent(content, 200); // Allow longer for tools
           if (toolName.startsWith("mcp__")) {
             try {
               // Try to parse as JSON and format it
-              const parsed = JSON.parse(content);
+              const parsed = JSON.parse(truncated);
               if (Array.isArray(parsed)) {
                 // For arrays, show a summary instead of full JSON
                 return `Found ${parsed.length} items`;
@@ -147,10 +154,10 @@ const MemoizedChatEntry = React.memo(
               }
             } catch {
               // If not JSON, return as is
-              return content;
+              return truncated;
             }
           }
-          return content;
+          return truncated;
         };
         const shouldShowDiff =
           entry.toolCall?.function?.name === "str_replace_editor" &&
@@ -219,9 +226,12 @@ export function ChatHistory({
       )
     : entries;
 
+  // Compact mode: show fewer entries to reduce rendering overhead
+  const maxEntries = process.env.COMPACT === '1' ? 5 : 20;
+
   return (
     <Box flexDirection="column">
-      {filteredEntries.slice(-20).map((entry, index) => (
+      {filteredEntries.slice(-maxEntries).map((entry, index) => (
         <MemoizedChatEntry
           key={`${entry.timestamp.getTime()}-${index}`}
           entry={entry}

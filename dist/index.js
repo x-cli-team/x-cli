@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as fs from 'fs';
-import { existsSync } from 'fs';
+import fs__default, { existsSync } from 'fs';
 import * as path7 from 'path';
 import path7__default from 'path';
 import * as os from 'os';
@@ -7031,10 +7031,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path24) => {
+    const dfs = (filePath, path25) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path24.indexOf(filePath);
-        const cycle = path24.slice(cycleStart).concat([filePath]);
+        const cycleStart = path25.indexOf(filePath);
+        const cycle = path25.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7050,7 +7050,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path24, filePath]);
+            dfs(dependency, [...path25, filePath]);
           }
         }
       }
@@ -8510,7 +8510,6 @@ function loadCustomInstructions(workingDirectory = process.cwd()) {
 // src/agent/grok-agent.ts
 init_settings_manager();
 var GrokAgent = class extends EventEmitter {
-  // ms
   constructor(apiKey, baseURL, model, maxToolRounds) {
     super();
     this.chatHistory = [];
@@ -8525,6 +8524,7 @@ var GrokAgent = class extends EventEmitter {
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
     this.maxToolRounds = maxToolRounds || 400;
+    this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
     this.grokClient = new GrokClient(apiKey, modelToUse, baseURL);
     this.textEditor = new TextEditorTool();
     this.morphEditor = process.env.MORPH_API_KEY ? new MorphEditorTool() : null;
@@ -8672,6 +8672,7 @@ Current working directory: ${process.cwd()}`
       timestamp: /* @__PURE__ */ new Date()
     };
     this.chatHistory.push(userEntry);
+    this.logEntry(userEntry);
     this.messages.push({ role: "user", content: message });
     const newEntries = [userEntry];
     const maxToolRounds = this.maxToolRounds;
@@ -8698,6 +8699,7 @@ Current working directory: ${process.cwd()}`
             toolCalls: assistantMessage.tool_calls
           };
           this.chatHistory.push(assistantEntry);
+          this.logEntry(assistantEntry);
           newEntries.push(assistantEntry);
           this.messages.push({
             role: "assistant",
@@ -9010,10 +9012,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path24 = args.path;
-            let command = `cat "${path24}"`;
+            const path25 = args.path;
+            let command = `cat "${path25}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path24}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path25}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9217,6 +9219,19 @@ EOF`;
   getChatHistory() {
     return [...this.chatHistory];
   }
+  saveSessionLog() {
+    try {
+      const sessionDir = path7__default.join(__require("os").homedir(), ".grok");
+      if (!fs__default.existsSync(sessionDir)) {
+        fs__default.mkdirSync(sessionDir, { recursive: true });
+      }
+      const sessionFile = path7__default.join(sessionDir, "session.log");
+      const logLines = this.chatHistory.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
+      fs__default.writeFileSync(sessionFile, logLines);
+    } catch (error) {
+      console.warn("Failed to save session log:", error);
+    }
+  }
   getCurrentDirectory() {
     return this.bash.getCurrentDirectory();
   }
@@ -9236,11 +9251,29 @@ EOF`;
       this.abortController.abort();
     }
   }
+  logEntry(entry) {
+    try {
+      const dir = path7__default.dirname(this.sessionLogPath);
+      if (!fs__default.existsSync(dir)) {
+        fs__default.mkdirSync(dir, { recursive: true });
+      }
+      const logLine = JSON.stringify({
+        type: entry.type,
+        content: entry.content,
+        timestamp: entry.timestamp.toISOString(),
+        toolCallId: entry.toolCall?.id,
+        toolCallsCount: entry.toolCalls?.length
+      }) + "\n";
+      fs__default.appendFileSync(this.sessionLogPath, logLine);
+    } catch (error) {
+      console.warn("Failed to log session entry:", error);
+    }
+  }
 };
 
 // package.json
 var package_default = {
-  version: "1.0.46"};
+  version: "1.0.47"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -13862,115 +13895,119 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
       setIsStreaming(true);
       let streamingEntry = null;
       let accumulatedContent = "";
+      let lastTokenCount = 0;
+      let pendingToolCalls = null;
+      let pendingToolResults = [];
       let lastUpdateTime = Date.now();
+      const flushUpdates = () => {
+        const now = Date.now();
+        if (now - lastUpdateTime < 150) return;
+        if (lastTokenCount !== 0) {
+          setTokenCount(lastTokenCount);
+        }
+        if (accumulatedContent) {
+          if (!streamingEntry) {
+            const newStreamingEntry = {
+              type: "assistant",
+              content: accumulatedContent,
+              timestamp: /* @__PURE__ */ new Date(),
+              isStreaming: true
+            };
+            setChatHistory((prev) => [...prev, newStreamingEntry]);
+            streamingEntry = newStreamingEntry;
+          } else {
+            setChatHistory(
+              (prev) => prev.map(
+                (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
+              )
+            );
+          }
+          accumulatedContent = "";
+        }
+        if (pendingToolCalls) {
+          setChatHistory(
+            (prev) => prev.map(
+              (entry) => entry.isStreaming ? {
+                ...entry,
+                isStreaming: false,
+                toolCalls: pendingToolCalls
+              } : entry
+            )
+          );
+          streamingEntry = null;
+          pendingToolCalls.forEach((toolCall) => {
+            const toolCallEntry = {
+              type: "tool_call",
+              content: "Executing...",
+              timestamp: /* @__PURE__ */ new Date(),
+              toolCall
+            };
+            setChatHistory((prev) => [...prev, toolCallEntry]);
+          });
+          pendingToolCalls = null;
+        }
+        if (pendingToolResults.length > 0) {
+          setChatHistory(
+            (prev) => prev.map((entry) => {
+              if (entry.isStreaming) {
+                return { ...entry, isStreaming: false };
+              }
+              const matchingResult = pendingToolResults.find(
+                (result) => entry.type === "tool_call" && entry.toolCall?.id === result.toolCall.id
+              );
+              if (matchingResult) {
+                return {
+                  ...entry,
+                  type: "tool_result",
+                  content: matchingResult.toolResult.success ? matchingResult.toolResult.output || "Success" : matchingResult.toolResult.error || "Error occurred",
+                  toolResult: matchingResult.toolResult
+                };
+              }
+              return entry;
+            })
+          );
+          streamingEntry = null;
+          pendingToolResults = [];
+        }
+        lastUpdateTime = now;
+      };
       for await (const chunk of agent.processUserMessageStream(userInput)) {
         switch (chunk.type) {
           case "content":
             if (chunk.content) {
               accumulatedContent += chunk.content;
-              const now = Date.now();
-              if (now - lastUpdateTime >= 150) {
-                if (!streamingEntry) {
-                  const newStreamingEntry = {
-                    type: "assistant",
-                    content: accumulatedContent,
-                    timestamp: /* @__PURE__ */ new Date(),
-                    isStreaming: true
-                  };
-                  setChatHistory((prev) => [...prev, newStreamingEntry]);
-                  streamingEntry = newStreamingEntry;
-                } else {
-                  setChatHistory(
-                    (prev) => prev.map(
-                      (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
-                    )
-                  );
-                }
-                accumulatedContent = "";
-                lastUpdateTime = now;
-              }
             }
             break;
           case "token_count":
             if (chunk.tokenCount !== void 0) {
-              setTokenCount(chunk.tokenCount);
+              lastTokenCount = chunk.tokenCount;
             }
             break;
           case "tool_calls":
             if (chunk.toolCalls) {
-              setChatHistory(
-                (prev) => prev.map(
-                  (entry) => entry.isStreaming ? {
-                    ...entry,
-                    isStreaming: false,
-                    toolCalls: chunk.toolCalls
-                  } : entry
-                )
-              );
-              streamingEntry = null;
-              chunk.toolCalls.forEach((toolCall) => {
-                const toolCallEntry = {
-                  type: "tool_call",
-                  content: "Executing...",
-                  timestamp: /* @__PURE__ */ new Date(),
-                  toolCall
-                };
-                setChatHistory((prev) => [...prev, toolCallEntry]);
-              });
+              pendingToolCalls = chunk.toolCalls;
             }
             break;
           case "tool_result":
             if (chunk.toolCall && chunk.toolResult) {
-              setChatHistory(
-                (prev) => prev.map((entry) => {
-                  if (entry.isStreaming) {
-                    return { ...entry, isStreaming: false };
-                  }
-                  if (entry.type === "tool_call" && entry.toolCall?.id === chunk.toolCall?.id) {
-                    return {
-                      ...entry,
-                      type: "tool_result",
-                      content: chunk.toolResult?.success ? chunk.toolResult.output || "Success" : chunk.toolResult?.error || "Error occurred",
-                      toolResult: chunk.toolResult
-                    };
-                  }
-                  return entry;
-                })
-              );
-              streamingEntry = null;
+              pendingToolResults.push({ toolCall: chunk.toolCall, toolResult: chunk.toolResult });
             }
             break;
           case "done":
-            if (accumulatedContent) {
-              if (!streamingEntry) {
-                const newStreamingEntry = {
-                  type: "assistant",
-                  content: accumulatedContent,
-                  timestamp: /* @__PURE__ */ new Date(),
-                  isStreaming: true
-                };
-                setChatHistory((prev) => [...prev, newStreamingEntry]);
-                streamingEntry = newStreamingEntry;
-              } else {
-                setChatHistory(
-                  (prev) => prev.map(
-                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
-                  )
-                );
-              }
-              accumulatedContent = "";
-            }
-            if (streamingEntry) {
-              setChatHistory(
-                (prev) => prev.map(
-                  (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
-                )
-              );
-            }
-            setIsStreaming(false);
+            flushUpdates();
             break;
         }
+        flushUpdates();
       }
+      flushUpdates();
+      if (streamingEntry) {
+        setChatHistory(
+          (prev) => prev.map(
+            (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
+          )
+        );
+      }
+      setIsStreaming(false);
     } catch (error) {
       const errorEntry = {
         type: "assistant",
@@ -14246,6 +14283,10 @@ function MarkdownRenderer({ content }) {
     return /* @__PURE__ */ jsx(Text, { children: content });
   }
 }
+var truncateContent = (content, maxLength = 100) => {
+  if (process.env.COMPACT !== "1") return content;
+  return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
+};
 var MemoizedChatEntry = React2.memo(
   ({ entry, index }) => {
     const renderDiff = (diffContent, filename) => {
@@ -14280,7 +14321,7 @@ var MemoizedChatEntry = React2.memo(
         return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
           ">",
           " ",
-          entry.content
+          truncateContent(entry.content)
         ] }) }) }, index);
       case "assistant":
         return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
@@ -14288,10 +14329,10 @@ var MemoizedChatEntry = React2.memo(
           /* @__PURE__ */ jsxs(Box, { flexDirection: "column", flexGrow: 1, children: [
             entry.toolCalls ? (
               // If there are tool calls, just show plain text
-              /* @__PURE__ */ jsx(Text, { color: "white", children: entry.content.trim() })
+              /* @__PURE__ */ jsx(Text, { color: "white", children: truncateContent(entry.content.trim()) })
             ) : (
               // If no tool calls, render as markdown
-              /* @__PURE__ */ jsx(MarkdownRenderer, { content: entry.content.trim() })
+              /* @__PURE__ */ jsx(MarkdownRenderer, { content: truncateContent(entry.content.trim()) })
             ),
             entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" })
           ] })
@@ -14345,19 +14386,20 @@ var MemoizedChatEntry = React2.memo(
         const filePath = getFilePath(entry.toolCall);
         const isExecuting = entry.type === "tool_call" || !entry.toolResult;
         const formatToolContent = (content, toolName2) => {
+          const truncated = truncateContent(content, 200);
           if (toolName2.startsWith("mcp__")) {
             try {
-              const parsed = JSON.parse(content);
+              const parsed = JSON.parse(truncated);
               if (Array.isArray(parsed)) {
                 return `Found ${parsed.length} items`;
               } else if (typeof parsed === "object") {
                 return JSON.stringify(parsed, null, 2);
               }
             } catch {
-              return content;
+              return truncated;
             }
           }
-          return content;
+          return truncated;
         };
         const shouldShowDiff = entry.toolCall?.function?.name === "str_replace_editor" && entry.toolResult?.success && entry.content.includes("Updated") && entry.content.includes("---") && entry.content.includes("+++");
         const shouldShowFileContent = (entry.toolCall?.function?.name === "view_file" || entry.toolCall?.function?.name === "create_file") && entry.toolResult?.success && !shouldShowDiff;
@@ -14397,7 +14439,8 @@ function ChatHistory({
   const filteredEntries = isConfirmationActive ? entries.filter(
     (entry) => !(entry.type === "tool_call" && entry.content === "Executing...")
   ) : entries;
-  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: filteredEntries.slice(-20).map((entry, index) => /* @__PURE__ */ jsx(
+  const maxEntries = process.env.COMPACT === "1" ? 5 : 20;
+  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: filteredEntries.slice(-maxEntries).map((entry, index) => /* @__PURE__ */ jsx(
     MemoizedChatEntry,
     {
       entry,
@@ -14798,89 +14841,120 @@ function ChatInterfaceWithAgent({
         setIsStreaming(true);
         try {
           let streamingEntry = null;
+          let accumulatedContent = "";
+          let lastTokenCount = 0;
+          let pendingToolCalls = null;
+          let pendingToolResults = [];
+          let lastUpdateTime = Date.now();
+          const flushUpdates = () => {
+            const now = Date.now();
+            if (now - lastUpdateTime < 150) return;
+            if (lastTokenCount !== 0) {
+              setTokenCount(lastTokenCount);
+            }
+            if (accumulatedContent) {
+              if (!streamingEntry) {
+                const newStreamingEntry = {
+                  type: "assistant",
+                  content: accumulatedContent,
+                  timestamp: /* @__PURE__ */ new Date(),
+                  isStreaming: true
+                };
+                setChatHistory((prev) => [...prev, newStreamingEntry]);
+                streamingEntry = newStreamingEntry;
+              } else {
+                setChatHistory(
+                  (prev) => prev.map(
+                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
+                  )
+                );
+              }
+              accumulatedContent = "";
+            }
+            if (pendingToolCalls) {
+              setChatHistory(
+                (prev) => prev.map(
+                  (entry) => entry.isStreaming ? {
+                    ...entry,
+                    isStreaming: false,
+                    toolCalls: pendingToolCalls
+                  } : entry
+                )
+              );
+              streamingEntry = null;
+              pendingToolCalls.forEach((toolCall) => {
+                const toolCallEntry = {
+                  type: "tool_call",
+                  content: "Executing...",
+                  timestamp: /* @__PURE__ */ new Date(),
+                  toolCall
+                };
+                setChatHistory((prev) => [...prev, toolCallEntry]);
+              });
+              pendingToolCalls = null;
+            }
+            if (pendingToolResults.length > 0) {
+              setChatHistory(
+                (prev) => prev.map((entry) => {
+                  if (entry.isStreaming) {
+                    return { ...entry, isStreaming: false };
+                  }
+                  const matchingResult = pendingToolResults.find(
+                    (result) => entry.type === "tool_call" && entry.toolCall?.id === result.toolCall.id
+                  );
+                  if (matchingResult) {
+                    return {
+                      ...entry,
+                      type: "tool_result",
+                      content: matchingResult.toolResult.success ? matchingResult.toolResult.output || "Success" : matchingResult.toolResult.error || "Error occurred",
+                      toolResult: matchingResult.toolResult
+                    };
+                  }
+                  return entry;
+                })
+              );
+              streamingEntry = null;
+              pendingToolResults = [];
+            }
+            lastUpdateTime = now;
+          };
           for await (const chunk of agent.processUserMessageStream(initialMessage)) {
             switch (chunk.type) {
               case "content":
                 if (chunk.content) {
-                  if (!streamingEntry) {
-                    const newStreamingEntry = {
-                      type: "assistant",
-                      content: chunk.content,
-                      timestamp: /* @__PURE__ */ new Date(),
-                      isStreaming: true
-                    };
-                    setChatHistory((prev) => [...prev, newStreamingEntry]);
-                    streamingEntry = newStreamingEntry;
-                  } else {
-                    setChatHistory(
-                      (prev) => prev.map(
-                        (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + chunk.content } : entry
-                      )
-                    );
-                  }
+                  accumulatedContent += chunk.content;
                 }
                 break;
               case "token_count":
                 if (chunk.tokenCount !== void 0) {
-                  setTokenCount(chunk.tokenCount);
+                  lastTokenCount = chunk.tokenCount;
                 }
                 break;
               case "tool_calls":
                 if (chunk.toolCalls) {
-                  setChatHistory(
-                    (prev) => prev.map(
-                      (entry) => entry.isStreaming ? {
-                        ...entry,
-                        isStreaming: false,
-                        toolCalls: chunk.toolCalls
-                      } : entry
-                    )
-                  );
-                  streamingEntry = null;
-                  chunk.toolCalls.forEach((toolCall) => {
-                    const toolCallEntry = {
-                      type: "tool_call",
-                      content: "Executing...",
-                      timestamp: /* @__PURE__ */ new Date(),
-                      toolCall
-                    };
-                    setChatHistory((prev) => [...prev, toolCallEntry]);
-                  });
+                  pendingToolCalls = chunk.toolCalls;
                 }
                 break;
               case "tool_result":
                 if (chunk.toolCall && chunk.toolResult) {
-                  setChatHistory(
-                    (prev) => prev.map((entry) => {
-                      if (entry.isStreaming) {
-                        return { ...entry, isStreaming: false };
-                      }
-                      if (entry.type === "tool_call" && entry.toolCall?.id === chunk.toolCall?.id) {
-                        return {
-                          ...entry,
-                          type: "tool_result",
-                          content: chunk.toolResult?.success ? chunk.toolResult.output || "Success" : chunk.toolResult?.error || "Error occurred",
-                          toolResult: chunk.toolResult
-                        };
-                      }
-                      return entry;
-                    })
-                  );
-                  streamingEntry = null;
+                  pendingToolResults.push({ toolCall: chunk.toolCall, toolResult: chunk.toolResult });
                 }
                 break;
               case "done":
-                if (streamingEntry) {
-                  setChatHistory(
-                    (prev) => prev.map(
-                      (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
-                    )
-                  );
-                }
-                setIsStreaming(false);
+                flushUpdates();
                 break;
             }
+            flushUpdates();
           }
+          flushUpdates();
+          if (streamingEntry) {
+            setChatHistory(
+              (prev) => prev.map(
+                (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
+              )
+            );
+          }
+          setIsStreaming(false);
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           const errorEntry = {
@@ -15494,6 +15568,10 @@ program.name("grok").description(
         maxToolRounds
       );
       return;
+    }
+    if (!process.stdin.isTTY) {
+      console.error("\u274C Error: Grok CLI requires an interactive terminal. Please run in a TTY environment.");
+      process.exit(1);
     }
     const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
     console.log("\u{1F916} Starting Grok CLI Conversational Assistant...\n");

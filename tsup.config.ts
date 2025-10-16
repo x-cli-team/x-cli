@@ -16,8 +16,8 @@ export default defineConfig({
     'ink',
     'tree-sitter',
     'tree-sitter-javascript',
-    'tree-sitter-python', 
-    'tree-sitter-typescript', 'node:*', 'fs/promises', 'path', 'url'
+    'tree-sitter-python',
+    'tree-sitter-typescript', 'node:*', 'fs', 'fs/promises', 'path', 'url'
   ],
   platform: 'node',
   minify: false,
