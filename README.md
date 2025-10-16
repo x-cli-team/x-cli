@@ -1,4 +1,4 @@
-## 1.0.42 – Stability Release
+## 1.0.43 – Stability Release
 
 This release restores the proven 1.0.31 baseline. Auto-version test.
 - Fixes all Read/Update tool reliability issues

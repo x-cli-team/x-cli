@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Are you sure you want to push? (y/N)"
+read -r response
+if [ "$response" != "y" ] && [ "$response" != "Y" ]; then
+  echo "Push cancelled."
+  exit 1
+fi
