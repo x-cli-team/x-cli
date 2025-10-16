@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 import * as path7 from 'path';
 import path7__default from 'path';
 import * as os from 'os';
-import React12, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import React2, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Box, Text, render, useApp, useInput } from 'ink';
 import { program, Command } from 'commander';
 import * as dotenv from 'dotenv';
@@ -22,6 +22,7 @@ import Fuse from 'fuse.js';
 import { glob } from 'glob';
 import { encoding_for_model, get_encoding } from 'tiktoken';
 import terminalImage from 'terminal-image';
+import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
 import crypto from 'crypto';
 import { marked } from 'marked';
 import TerminalRenderer from 'marked-terminal';
@@ -63,9 +64,6 @@ var init_settings_manager = __esm({
       model: "grok-code-fast-1"
     };
     SettingsManager = class _SettingsManager {
-      static instance;
-      userSettingsPath;
-      projectSettingsPath;
       constructor() {
         this.userSettingsPath = path7.join(
           os.homedir(),
@@ -332,10 +330,8 @@ var init_config = __esm({
   }
 });
 var GrokClient = class {
-  client;
-  currentModel = "grok-code-fast-1";
-  defaultMaxTokens;
   constructor(apiKey, model, baseURL) {
+    this.currentModel = "grok-code-fast-1";
     this.client = new OpenAI({
       apiKey,
       baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",
@@ -414,8 +410,6 @@ var StdioTransport = class {
       throw new Error("Command is required for stdio transport");
     }
   }
-  transport;
-  process;
   async connect() {
     const env = {
       ...process.env,
@@ -451,12 +445,11 @@ var HttpTransport = class extends EventEmitter {
   constructor(config2) {
     super();
     this.config = config2;
+    this.connected = false;
     if (!config2.url) {
       throw new Error("URL is required for HTTP transport");
     }
   }
-  client;
-  connected = false;
   async connect() {
     this.client = axios.create({
       baseURL: this.config.url,
@@ -485,11 +478,11 @@ var SSETransport = class extends EventEmitter {
   constructor(config2) {
     super();
     this.config = config2;
+    this.connected = false;
     if (!config2.url) {
       throw new Error("URL is required for SSE transport");
     }
   }
-  connected = false;
   async connect() {
     return new Promise((resolve8, reject) => {
       try {
@@ -549,11 +542,11 @@ var StreamableHttpTransport = class extends EventEmitter {
   constructor(config2) {
     super();
     this.config = config2;
+    this.connected = false;
     if (!config2.url) {
       throw new Error("URL is required for streamable_http transport");
     }
   }
-  connected = false;
   async connect() {
     return new Promise((resolve8, reject) => {
       try {
@@ -604,9 +597,12 @@ function createTransport(config2) {
 
 // src/mcp/client.ts
 var MCPManager = class extends EventEmitter {
-  clients = /* @__PURE__ */ new Map();
-  transports = /* @__PURE__ */ new Map();
-  tools = /* @__PURE__ */ new Map();
+  constructor() {
+    super(...arguments);
+    this.clients = /* @__PURE__ */ new Map();
+    this.transports = /* @__PURE__ */ new Map();
+    this.tools = /* @__PURE__ */ new Map();
+  }
   async addServer(config2) {
     try {
       let transportConfig = config2.transport;
@@ -1308,24 +1304,23 @@ async function getAllGrokTools() {
 init_config();
 var execAsync = promisify(exec);
 var ConfirmationService = class _ConfirmationService extends EventEmitter {
-  static instance;
-  skipConfirmationThisSession = false;
-  pendingConfirmation = null;
-  resolveConfirmation = null;
-  // Session flags for different operation types
-  sessionFlags = {
-    fileOperations: false,
-    bashCommands: false,
-    allOperations: false
-  };
+  constructor() {
+    super();
+    this.skipConfirmationThisSession = false;
+    this.pendingConfirmation = null;
+    this.resolveConfirmation = null;
+    // Session flags for different operation types
+    this.sessionFlags = {
+      fileOperations: false,
+      bashCommands: false,
+      allOperations: false
+    };
+  }
   static getInstance() {
     if (!_ConfirmationService.instance) {
       _ConfirmationService.instance = new _ConfirmationService();
     }
     return _ConfirmationService.instance;
-  }
-  constructor() {
-    super();
   }
   async requestConfirmation(options, operationType = "file") {
     if (this.sessionFlags.allOperations || operationType === "file" && this.sessionFlags.fileOperations || operationType === "bash" && this.sessionFlags.bashCommands) {
@@ -1402,8 +1397,10 @@ var ConfirmationService = class _ConfirmationService extends EventEmitter {
 // src/tools/bash.ts
 var execAsync2 = promisify(exec);
 var BashTool = class {
-  currentDirectory = process.cwd();
-  confirmationService = ConfirmationService.getInstance();
+  constructor() {
+    this.currentDirectory = process.cwd();
+    this.confirmationService = ConfirmationService.getInstance();
+  }
   async execute(command, timeout = 6e4) {
     try {
       const sessionFlags = this.confirmationService.getSessionFlags();
@@ -1478,8 +1475,10 @@ var pathExists = async (filePath) => {
   }
 };
 var TextEditorTool = class {
-  editHistory = [];
-  confirmationService = ConfirmationService.getInstance();
+  constructor() {
+    this.editHistory = [];
+    this.confirmationService = ConfirmationService.getInstance();
+  }
   async view(filePath, viewRange) {
     try {
       const resolvedPath = path7.resolve(filePath);
@@ -1997,10 +1996,9 @@ var pathExists2 = async (filePath) => {
   }
 };
 var MorphEditorTool = class {
-  confirmationService = ConfirmationService.getInstance();
-  morphApiKey;
-  morphBaseUrl = "https://api.morphllm.com/v1";
   constructor(apiKey) {
+    this.confirmationService = ConfirmationService.getInstance();
+    this.morphBaseUrl = "https://api.morphllm.com/v1";
     this.morphApiKey = apiKey || process.env.MORPH_API_KEY || "";
     if (!this.morphApiKey) {
       console.warn("MORPH_API_KEY not found. Morph editor functionality will be limited.");
@@ -2295,7 +2293,9 @@ ${numberedLines}${additionalLinesMessage}`
 
 // src/tools/todo-tool.ts
 var TodoTool = class {
-  todos = [];
+  constructor() {
+    this.todos = [];
+  }
   formatTodoList() {
     if (this.todos.length === 0) {
       return "No todos created yet";
@@ -2423,7 +2423,6 @@ var TodoTool = class {
 
 // src/tools/confirmation-tool.ts
 var ConfirmationTool = class {
-  confirmationService;
   constructor() {
     this.confirmationService = ConfirmationService.getInstance();
   }
@@ -2487,8 +2486,10 @@ var ConfirmationTool = class {
   }
 };
 var SearchTool = class {
-  confirmationService = ConfirmationService.getInstance();
-  currentDirectory = process.cwd();
+  constructor() {
+    this.confirmationService = ConfirmationService.getInstance();
+    this.currentDirectory = process.cwd();
+  }
   /**
    * Unified search method that can search for text content or find files
    */
@@ -2779,9 +2780,11 @@ var pathExists3 = async (filePath) => {
   }
 };
 var MultiFileEditorTool = class {
-  confirmationService = ConfirmationService.getInstance();
-  transactions = /* @__PURE__ */ new Map();
-  currentTransactionId = null;
+  constructor() {
+    this.confirmationService = ConfirmationService.getInstance();
+    this.transactions = /* @__PURE__ */ new Map();
+    this.currentTransactionId = null;
+  }
   /**
    * Begin a multi-file transaction
    */
@@ -3291,7 +3294,9 @@ var pathExists4 = async (filePath) => {
   }
 };
 var AdvancedSearchTool = class {
-  confirmationService = ConfirmationService.getInstance();
+  constructor() {
+    this.confirmationService = ConfirmationService.getInstance();
+  }
   /**
    * Search for patterns across files
    */
@@ -3726,7 +3731,9 @@ var pathExists5 = async (filePath) => {
   }
 };
 var FileTreeOperationsTool = class {
-  confirmationService = ConfirmationService.getInstance();
+  constructor() {
+    this.confirmationService = ConfirmationService.getInstance();
+  }
   /**
    * Generate a visual tree representation of directory structure
    */
@@ -4307,7 +4314,9 @@ var pathExists6 = async (filePath) => {
   }
 };
 var CodeAwareEditorTool = class {
-  confirmationService = ConfirmationService.getInstance();
+  constructor() {
+    this.confirmationService = ConfirmationService.getInstance();
+  }
   /**
    * Analyze code structure and context
    */
@@ -5248,13 +5257,10 @@ var pathExists7 = async (filePath) => {
   }
 };
 var OperationHistoryTool = class {
-  history = [];
-  confirmationService = ConfirmationService.getInstance();
-  currentPosition = -1;
-  // For undo/redo navigation
-  options;
-  historyFile;
   constructor(options = {}) {
+    this.history = [];
+    this.confirmationService = ConfirmationService.getInstance();
+    this.currentPosition = -1;
     this.options = {
       maxEntries: 100,
       maxAge: 7 * 24 * 60 * 60 * 1e3,
@@ -5893,10 +5899,10 @@ var pathExists8 = async (filePath) => {
   }
 };
 var ASTParserTool = class {
-  name = "ast_parser";
-  description = "Parse source code files to extract AST, symbols, imports, exports, and structural information";
-  parsers = /* @__PURE__ */ new Map();
   constructor() {
+    this.name = "ast_parser";
+    this.description = "Parse source code files to extract AST, symbols, imports, exports, and structural information";
+    this.parsers = /* @__PURE__ */ new Map();
     this.initializeParsers();
   }
   initializeParsers() {
@@ -6498,14 +6504,13 @@ var ASTParserTool = class {
   }
 };
 var SymbolSearchTool = class {
-  name = "symbol_search";
-  description = "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references";
-  astParser;
-  symbolIndex = /* @__PURE__ */ new Map();
-  lastIndexTime = 0;
-  indexCacheDuration = 5 * 60 * 1e3;
   // 5 minutes
   constructor() {
+    this.name = "symbol_search";
+    this.description = "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references";
+    this.symbolIndex = /* @__PURE__ */ new Map();
+    this.lastIndexTime = 0;
+    this.indexCacheDuration = 5 * 60 * 1e3;
     this.astParser = new ASTParserTool();
   }
   async execute(args) {
@@ -6832,10 +6837,9 @@ var pathExists9 = async (filePath) => {
   }
 };
 var DependencyAnalyzerTool = class {
-  name = "dependency_analyzer";
-  description = "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs";
-  astParser;
   constructor() {
+    this.name = "dependency_analyzer";
+    this.description = "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs";
     this.astParser = new ASTParserTool();
   }
   async execute(args) {
@@ -7303,12 +7307,9 @@ var pathExists10 = async (filePath) => {
   }
 };
 var CodeContextTool = class {
-  name = "code_context";
-  description = "Build intelligent code context, analyze relationships, and provide semantic understanding";
-  astParser;
-  symbolSearch;
-  dependencyAnalyzer;
   constructor() {
+    this.name = "code_context";
+    this.description = "Build intelligent code context, analyze relationships, and provide semantic understanding";
     this.astParser = new ASTParserTool();
     this.symbolSearch = new SymbolSearchTool();
     this.dependencyAnalyzer = new DependencyAnalyzerTool();
@@ -7833,13 +7834,9 @@ var pathExists11 = async (filePath) => {
   }
 };
 var RefactoringAssistantTool = class {
-  name = "refactoring_assistant";
-  description = "Perform safe code refactoring operations including rename, extract, inline, and move operations";
-  astParser;
-  symbolSearch;
-  multiFileEditor;
-  operationHistory;
   constructor() {
+    this.name = "refactoring_assistant";
+    this.description = "Perform safe code refactoring operations including rename, extract, inline, and move operations";
     this.astParser = new ASTParserTool();
     this.symbolSearch = new SymbolSearchTool();
     this.multiFileEditor = new MultiFileEditorTool();
@@ -8435,7 +8432,6 @@ ${body}
   }
 };
 var TokenCounter = class {
-  encoder;
   constructor(model = "gpt-4") {
     try {
       this.encoder = encoding_for_model(model);
@@ -8515,38 +8511,17 @@ function loadCustomInstructions(workingDirectory = process.cwd()) {
 // src/agent/grok-agent.ts
 init_settings_manager();
 var GrokAgent = class extends EventEmitter {
-  grokClient;
-  textEditor;
-  morphEditor;
-  bash;
-  todoTool;
-  confirmationTool;
-  search;
-  // Advanced tools
-  multiFileEditor;
-  advancedSearch;
-  fileTreeOps;
-  codeAwareEditor;
-  operationHistory;
-  // Intelligence tools
-  astParser;
-  symbolSearch;
-  dependencyAnalyzer;
-  codeContext;
-  refactoringAssistant;
-  chatHistory = [];
-  messages = [];
-  tokenCounter;
-  abortController = null;
-  mcpInitialized = false;
-  maxToolRounds;
-  lastRequestTime = 0;
-  activeToolCalls = 0;
-  maxConcurrentToolCalls = 2;
-  minRequestInterval = 500;
   // ms
   constructor(apiKey, baseURL, model, maxToolRounds) {
     super();
+    this.chatHistory = [];
+    this.messages = [];
+    this.abortController = null;
+    this.mcpInitialized = false;
+    this.lastRequestTime = 0;
+    this.activeToolCalls = 0;
+    this.maxConcurrentToolCalls = 2;
+    this.minRequestInterval = 500;
     const manager = getSettingsManager();
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
@@ -9627,14 +9602,20 @@ function CommandSuggestions({
     () => filterCommandSuggestions(suggestions, input),
     [suggestions, input]
   );
-  return /* @__PURE__ */ React12.createElement(Box, { marginTop: 1, flexDirection: "column" }, filteredSuggestions.map((suggestion, index) => /* @__PURE__ */ React12.createElement(Box, { key: index, paddingLeft: 1 }, /* @__PURE__ */ React12.createElement(
-    Text,
-    {
-      color: index === selectedIndex ? "black" : "white",
-      backgroundColor: index === selectedIndex ? "cyan" : void 0
-    },
-    suggestion.command
-  ), /* @__PURE__ */ React12.createElement(Box, { marginLeft: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, suggestion.description)))), /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2191\u2193 navigate \u2022 Enter/Tab select \u2022 Esc cancel")));
+  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+    filteredSuggestions.map((suggestion, index) => /* @__PURE__ */ jsxs(Box, { paddingLeft: 1, children: [
+      /* @__PURE__ */ jsx(
+        Text,
+        {
+          color: index === selectedIndex ? "black" : "white",
+          backgroundColor: index === selectedIndex ? "cyan" : void 0,
+          children: suggestion.command
+        }
+      ),
+      /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: suggestion.description }) })
+    ] }, index)),
+    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter/Tab select \u2022 Esc cancel" }) })
+  ] });
 }
 
 // src/utils/model-config.ts
@@ -9749,7 +9730,6 @@ var claudeMdParser = new ClaudeMdParserImpl();
 
 // src/tools/documentation/agent-system-generator.ts
 var AgentSystemGenerator = class {
-  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -10600,7 +10580,6 @@ function findDocsMenuOption(input) {
   return DOCS_MENU_OPTIONS.find((option) => option.key === trimmed) || null;
 }
 var ReadmeGenerator = class {
-  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -10922,7 +10901,6 @@ TypeScript is configured via \`tsconfig.json\`.
   }
 };
 var CommentsGenerator = class {
-  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -11145,7 +11123,6 @@ var CommentsGenerator = class {
   }
 };
 var ApiDocsGenerator = class {
-  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -11518,7 +11495,6 @@ type ${type.name} = ${type.definition}
   }
 };
 var ChangelogGenerator = class {
-  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -11747,7 +11723,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
 };
 var UpdateAgentDocs = class {
-  config;
   constructor(config2) {
     this.config = config2;
   }
@@ -12033,10 +12008,10 @@ Updated By: /update-agent-docs after detecting changes${recentChangesSection}`
 
 // src/subagents/subagent-framework.ts
 var SubagentFramework = class {
-  activeTasks = /* @__PURE__ */ new Map();
-  results = /* @__PURE__ */ new Map();
-  configs = /* @__PURE__ */ new Map();
   constructor() {
+    this.activeTasks = /* @__PURE__ */ new Map();
+    this.results = /* @__PURE__ */ new Map();
+    this.configs = /* @__PURE__ */ new Map();
     this.initializeConfigs();
   }
   initializeConfigs() {
@@ -12375,9 +12350,6 @@ This is a generated document for ${projectPath}.
   }
 };
 var SelfHealingSystem = class {
-  rootPath;
-  agentPath;
-  config;
   constructor(rootPath, config2) {
     this.rootPath = rootPath;
     this.agentPath = path7__default.join(rootPath, ".agent");
@@ -14033,7 +14005,21 @@ function LoadingSpinner({
   if (!isActive) return null;
   const staticSpinner = "\u280B";
   const staticText = "Processing...";
-  return /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "blue" }, staticSpinner, " ", staticText), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, " ", "(", processingTime, "s \xB7 \u2191 ", formatTokenCount(tokenCount), " tokens \xB7 esc to interrupt)"));
+  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
+    /* @__PURE__ */ jsxs(Text, { color: "blue", children: [
+      staticSpinner,
+      " ",
+      staticText
+    ] }),
+    /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+      " ",
+      "(",
+      processingTime,
+      "s \xB7 \u2191 ",
+      formatTokenCount(tokenCount),
+      " tokens \xB7 esc to interrupt)"
+    ] })
+  ] });
 }
 function ModelSelection({
   models,
@@ -14042,14 +14028,22 @@ function ModelSelection({
   currentModel
 }) {
   if (!isVisible) return null;
-  return /* @__PURE__ */ React12.createElement(Box, { marginTop: 1, flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Box, { marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "cyan" }, "Select Grok Model (current: ", currentModel, "):")), models.map((modelOption, index) => /* @__PURE__ */ React12.createElement(Box, { key: index, paddingLeft: 1 }, /* @__PURE__ */ React12.createElement(
-    Text,
-    {
-      color: index === selectedIndex ? "black" : "white",
-      backgroundColor: index === selectedIndex ? "cyan" : void 0
-    },
-    modelOption.model
-  ))), /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2191\u2193 navigate \u2022 Enter/Tab select \u2022 Esc cancel")));
+  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+    /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsxs(Text, { color: "cyan", children: [
+      "Select Grok Model (current: ",
+      currentModel,
+      "):"
+    ] }) }),
+    models.map((modelOption, index) => /* @__PURE__ */ jsx(Box, { paddingLeft: 1, children: /* @__PURE__ */ jsx(
+      Text,
+      {
+        color: index === selectedIndex ? "black" : "white",
+        backgroundColor: index === selectedIndex ? "cyan" : void 0,
+        children: modelOption.model
+      }
+    ) }, index)),
+    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter/Tab select \u2022 Esc cancel" }) })
+  ] });
 }
 
 // src/ui/utils/colors.ts
@@ -14062,17 +14056,15 @@ var MaxSizedBox = ({
   children,
   ...props
 }) => {
-  return /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ jsx(
     Box,
     {
       flexDirection: "column",
-      ...props
-    },
-    children
+      ...props,
+      children
+    }
   );
 };
-
-// src/ui/components/diff-renderer.tsx
 function parseDiffWithLineNumbers(diffContent) {
   const lines = diffContent.split("\n");
   const result = [];
@@ -14134,7 +14126,7 @@ var DiffRenderer = ({
   terminalWidth = 80
 }) => {
   if (!diffContent || typeof diffContent !== "string") {
-    return /* @__PURE__ */ React12.createElement(Text, { color: Colors.AccentYellow }, "No diff content.");
+    return /* @__PURE__ */ jsx(Text, { color: Colors.AccentYellow, children: "No diff content." });
   }
   const lines = diffContent.split("\n");
   const firstLine = lines[0];
@@ -14144,7 +14136,7 @@ var DiffRenderer = ({
   }
   const parsedLines = parseDiffWithLineNumbers(actualDiffContent);
   if (parsedLines.length === 0) {
-    return /* @__PURE__ */ React12.createElement(Text, { dimColor: true }, "No changes detected.");
+    return /* @__PURE__ */ jsx(Text, { dimColor: true, children: "No changes detected." });
   }
   const renderedOutput = renderDiffContent(
     parsedLines,
@@ -14153,7 +14145,7 @@ var DiffRenderer = ({
     availableTerminalHeight,
     terminalWidth
   );
-  return /* @__PURE__ */ React12.createElement(React12.Fragment, null, renderedOutput);
+  return /* @__PURE__ */ jsx(Fragment, { children: renderedOutput });
 };
 var renderDiffContent = (parsedLines, filename, tabWidth = DEFAULT_TAB_WIDTH, availableTerminalHeight, terminalWidth) => {
   const normalizedLines = parsedLines.map((line) => ({
@@ -14164,7 +14156,7 @@ var renderDiffContent = (parsedLines, filename, tabWidth = DEFAULT_TAB_WIDTH, av
     (l) => l.type !== "hunk" && l.type !== "other"
   );
   if (displayableLines.length === 0) {
-    return /* @__PURE__ */ React12.createElement(Text, { dimColor: true }, "No changes detected.");
+    return /* @__PURE__ */ jsx(Text, { dimColor: true, children: "No changes detected." });
   }
   let baseIndentation = Infinity;
   for (const line of displayableLines) {
@@ -14179,60 +14171,67 @@ var renderDiffContent = (parsedLines, filename, tabWidth = DEFAULT_TAB_WIDTH, av
   const key = filename ? `diff-box-${filename}` : `diff-box-${crypto.createHash("sha1").update(JSON.stringify(parsedLines)).digest("hex")}`;
   let lastLineNumber = null;
   const MAX_CONTEXT_LINES_WITHOUT_GAP = 5;
-  return /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ jsx(
     MaxSizedBox,
     {
       maxHeight: availableTerminalHeight,
       maxWidth: terminalWidth,
-      key
-    },
-    displayableLines.reduce((acc, line, index) => {
-      let relevantLineNumberForGapCalc = null;
-      if (line.type === "add" || line.type === "context") {
-        relevantLineNumberForGapCalc = line.newLine ?? null;
-      } else if (line.type === "del") {
-        relevantLineNumberForGapCalc = line.oldLine ?? null;
-      }
-      if (lastLineNumber !== null && relevantLineNumberForGapCalc !== null && relevantLineNumberForGapCalc > lastLineNumber + MAX_CONTEXT_LINES_WITHOUT_GAP + 1) {
+      children: displayableLines.reduce((acc, line, index) => {
+        let relevantLineNumberForGapCalc = null;
+        if (line.type === "add" || line.type === "context") {
+          relevantLineNumberForGapCalc = line.newLine ?? null;
+        } else if (line.type === "del") {
+          relevantLineNumberForGapCalc = line.oldLine ?? null;
+        }
+        if (lastLineNumber !== null && relevantLineNumberForGapCalc !== null && relevantLineNumberForGapCalc > lastLineNumber + MAX_CONTEXT_LINES_WITHOUT_GAP + 1) {
+          acc.push(
+            /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsx(Text, { wrap: "truncate", children: "\u2550".repeat(terminalWidth) }) }, `gap-${index}`)
+          );
+        }
+        const lineKey = `diff-line-${index}`;
+        let gutterNumStr = "";
+        let backgroundColor = void 0;
+        let prefixSymbol = " ";
+        let dim = false;
+        switch (line.type) {
+          case "add":
+            gutterNumStr = (line.newLine ?? "").toString();
+            backgroundColor = "#86efac";
+            prefixSymbol = "+";
+            lastLineNumber = line.newLine ?? null;
+            break;
+          case "del":
+            gutterNumStr = (line.oldLine ?? "").toString();
+            backgroundColor = "redBright";
+            prefixSymbol = "-";
+            if (line.oldLine !== void 0) {
+              lastLineNumber = line.oldLine;
+            }
+            break;
+          case "context":
+            gutterNumStr = (line.newLine ?? "").toString();
+            dim = true;
+            prefixSymbol = " ";
+            lastLineNumber = line.newLine ?? null;
+            break;
+          default:
+            return acc;
+        }
+        const displayContent = line.content.substring(baseIndentation);
         acc.push(
-          /* @__PURE__ */ React12.createElement(Box, { key: `gap-${index}` }, /* @__PURE__ */ React12.createElement(Text, { wrap: "truncate" }, "\u2550".repeat(terminalWidth)))
+          /* @__PURE__ */ jsxs(Box, { flexDirection: "row", children: [
+            /* @__PURE__ */ jsx(Text, { color: Colors.Gray, dimColor: dim, children: gutterNumStr.padEnd(4) }),
+            /* @__PURE__ */ jsxs(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, children: [
+              prefixSymbol,
+              " "
+            ] }),
+            /* @__PURE__ */ jsx(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, wrap: "wrap", children: displayContent })
+          ] }, lineKey)
         );
-      }
-      const lineKey = `diff-line-${index}`;
-      let gutterNumStr = "";
-      let backgroundColor = void 0;
-      let prefixSymbol = " ";
-      let dim = false;
-      switch (line.type) {
-        case "add":
-          gutterNumStr = (line.newLine ?? "").toString();
-          backgroundColor = "#86efac";
-          prefixSymbol = "+";
-          lastLineNumber = line.newLine ?? null;
-          break;
-        case "del":
-          gutterNumStr = (line.oldLine ?? "").toString();
-          backgroundColor = "redBright";
-          prefixSymbol = "-";
-          if (line.oldLine !== void 0) {
-            lastLineNumber = line.oldLine;
-          }
-          break;
-        case "context":
-          gutterNumStr = (line.newLine ?? "").toString();
-          dim = true;
-          prefixSymbol = " ";
-          lastLineNumber = line.newLine ?? null;
-          break;
-        default:
-          return acc;
-      }
-      const displayContent = line.content.substring(baseIndentation);
-      acc.push(
-        /* @__PURE__ */ React12.createElement(Box, { key: lineKey, flexDirection: "row" }, /* @__PURE__ */ React12.createElement(Text, { color: Colors.Gray, dimColor: dim }, gutterNumStr.padEnd(4)), /* @__PURE__ */ React12.createElement(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim }, prefixSymbol, " "), /* @__PURE__ */ React12.createElement(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, wrap: "wrap" }, displayContent))
-      );
-      return acc;
-    }, [])
+        return acc;
+      }, [])
+    },
+    key
   );
 };
 marked.setOptions({
@@ -14242,18 +14241,16 @@ function MarkdownRenderer({ content }) {
   try {
     const result = marked.parse(content);
     const rendered = typeof result === "string" ? result : content;
-    return /* @__PURE__ */ React12.createElement(Text, null, rendered);
+    return /* @__PURE__ */ jsx(Text, { children: rendered });
   } catch (error) {
     console.error("Markdown rendering error:", error);
-    return /* @__PURE__ */ React12.createElement(Text, null, content);
+    return /* @__PURE__ */ jsx(Text, { children: content });
   }
 }
-
-// src/ui/components/chat-history.tsx
-var MemoizedChatEntry = React12.memo(
+var MemoizedChatEntry = React2.memo(
   ({ entry, index }) => {
     const renderDiff = (diffContent, filename) => {
-      return /* @__PURE__ */ React12.createElement(
+      return /* @__PURE__ */ jsx(
         DiffRenderer,
         {
           diffContent,
@@ -14276,20 +14273,30 @@ var MemoizedChatEntry = React12.memo(
       }
       return lines.map((line, index2) => {
         const displayContent = line.substring(baseIndentation);
-        return /* @__PURE__ */ React12.createElement(Text, { key: index2, color: "gray" }, displayContent);
+        return /* @__PURE__ */ jsx(Text, { color: "gray", children: displayContent }, index2);
       });
     };
     switch (entry.type) {
       case "user":
-        return /* @__PURE__ */ React12.createElement(Box, { key: index, flexDirection: "column", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Box, null, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, ">", " ", entry.content)));
+        return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          ">",
+          " ",
+          entry.content
+        ] }) }) }, index);
       case "assistant":
-        return /* @__PURE__ */ React12.createElement(Box, { key: index, flexDirection: "column", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Box, { flexDirection: "row", alignItems: "flex-start" }, /* @__PURE__ */ React12.createElement(Text, { color: "white" }, "\u23FA "), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", flexGrow: 1 }, entry.toolCalls ? (
-          // If there are tool calls, just show plain text
-          /* @__PURE__ */ React12.createElement(Text, { color: "white" }, entry.content.trim())
-        ) : (
-          // If no tool calls, render as markdown
-          /* @__PURE__ */ React12.createElement(MarkdownRenderer, { content: entry.content.trim() })
-        ), entry.isStreaming && /* @__PURE__ */ React12.createElement(Text, { color: "cyan" }, "\u2588"))));
+        return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
+          /* @__PURE__ */ jsx(Text, { color: "white", children: "\u23FA " }),
+          /* @__PURE__ */ jsxs(Box, { flexDirection: "column", flexGrow: 1, children: [
+            entry.toolCalls ? (
+              // If there are tool calls, just show plain text
+              /* @__PURE__ */ jsx(Text, { color: "white", children: entry.content.trim() })
+            ) : (
+              // If no tool calls, render as markdown
+              /* @__PURE__ */ jsx(MarkdownRenderer, { content: entry.content.trim() })
+            ),
+            entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" })
+          ] })
+        ] }) }, index);
       case "tool_call":
       case "tool_result":
         const getToolActionName = (toolName2) => {
@@ -14355,10 +14362,29 @@ var MemoizedChatEntry = React12.memo(
         };
         const shouldShowDiff = entry.toolCall?.function?.name === "str_replace_editor" && entry.toolResult?.success && entry.content.includes("Updated") && entry.content.includes("---") && entry.content.includes("+++");
         const shouldShowFileContent = (entry.toolCall?.function?.name === "view_file" || entry.toolCall?.function?.name === "create_file") && entry.toolResult?.success && !shouldShowDiff;
-        return /* @__PURE__ */ React12.createElement(Box, { key: index, flexDirection: "column", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Box, null, /* @__PURE__ */ React12.createElement(Text, { color: "magenta" }, "\u23FA"), /* @__PURE__ */ React12.createElement(Text, { color: "white" }, " ", filePath ? `${actionName}(${filePath})` : actionName)), /* @__PURE__ */ React12.createElement(Box, { marginLeft: 2, flexDirection: "column" }, isExecuting ? /* @__PURE__ */ React12.createElement(Text, { color: "cyan" }, "\u23BF Executing...") : shouldShowFileContent ? /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u23BF File contents:"), /* @__PURE__ */ React12.createElement(Box, { marginLeft: 2, flexDirection: "column" }, renderFileContent(entry.content))) : shouldShowDiff ? (
-          // For diff results, show only the summary line, not the raw content
-          /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u23BF ", entry.content.split("\n")[0])
-        ) : /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u23BF ", formatToolContent(entry.content, toolName))), shouldShowDiff && !isExecuting && /* @__PURE__ */ React12.createElement(Box, { marginLeft: 4, flexDirection: "column" }, renderDiff(entry.content, filePath)));
+        return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+          /* @__PURE__ */ jsxs(Box, { children: [
+            /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
+            /* @__PURE__ */ jsxs(Text, { color: "white", children: [
+              " ",
+              filePath ? `${actionName}(${filePath})` : actionName
+            ] })
+          ] }),
+          /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: isExecuting ? /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u23BF Executing..." }) : shouldShowFileContent ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+            /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF File contents:" }),
+            /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: renderFileContent(entry.content) })
+          ] }) : shouldShowDiff ? (
+            // For diff results, show only the summary line, not the raw content
+            /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+              "\u23BF ",
+              entry.content.split("\n")[0]
+            ] })
+          ) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u23BF ",
+            formatToolContent(entry.content, toolName)
+          ] }) }),
+          shouldShowDiff && !isExecuting && /* @__PURE__ */ jsx(Box, { marginLeft: 4, flexDirection: "column", children: renderDiff(entry.content, filePath) })
+        ] }, index);
       default:
         return null;
     }
@@ -14372,14 +14398,14 @@ function ChatHistory({
   const filteredEntries = isConfirmationActive ? entries.filter(
     (entry) => !(entry.type === "tool_call" && entry.content === "Executing...")
   ) : entries;
-  return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column" }, filteredEntries.slice(-20).map((entry, index) => /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: filteredEntries.slice(-20).map((entry, index) => /* @__PURE__ */ jsx(
     MemoizedChatEntry,
     {
-      key: `${entry.timestamp.getTime()}-${index}`,
       entry,
       index
-    }
-  )));
+    },
+    `${entry.timestamp.getTime()}-${index}`
+  )) });
 }
 function ChatInput({
   input,
@@ -14407,40 +14433,68 @@ function ChatInput({
   const placeholderText = "Ask me anything...";
   const isPlaceholder = !input;
   if (isMultiline) {
-    return /* @__PURE__ */ React12.createElement(
+    return /* @__PURE__ */ jsx(
       Box,
       {
         borderStyle: "round",
         borderColor,
         paddingY: 0,
-        marginTop: 1
-      },
-      lines.map((line, index) => {
-        const isCurrentLine = index === currentLineIndex;
-        const promptChar = index === 0 ? "\u276F" : "\u2502";
-        if (isCurrentLine) {
-          const beforeCursorInLine = line.slice(0, currentCharIndex);
-          const cursorChar2 = line.slice(currentCharIndex, currentCharIndex + 1) || " ";
-          const afterCursorInLine = line.slice(currentCharIndex + 1);
-          return /* @__PURE__ */ React12.createElement(Box, { key: index }, /* @__PURE__ */ React12.createElement(Text, { color: promptColor }, promptChar, " "), /* @__PURE__ */ React12.createElement(Text, null, beforeCursorInLine, showCursor && /* @__PURE__ */ React12.createElement(Text, { backgroundColor: "white", color: "black" }, cursorChar2), !showCursor && cursorChar2 !== " " && cursorChar2, afterCursorInLine));
-        } else {
-          return /* @__PURE__ */ React12.createElement(Box, { key: index }, /* @__PURE__ */ React12.createElement(Text, { color: promptColor }, promptChar, " "), /* @__PURE__ */ React12.createElement(Text, null, line));
-        }
-      })
+        marginTop: 1,
+        children: lines.map((line, index) => {
+          const isCurrentLine = index === currentLineIndex;
+          const promptChar = index === 0 ? "\u276F" : "\u2502";
+          if (isCurrentLine) {
+            const beforeCursorInLine = line.slice(0, currentCharIndex);
+            const cursorChar2 = line.slice(currentCharIndex, currentCharIndex + 1) || " ";
+            const afterCursorInLine = line.slice(currentCharIndex + 1);
+            return /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsxs(Text, { color: promptColor, children: [
+                promptChar,
+                " "
+              ] }),
+              /* @__PURE__ */ jsxs(Text, { children: [
+                beforeCursorInLine,
+                showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar2 }),
+                !showCursor && cursorChar2 !== " " && cursorChar2,
+                afterCursorInLine
+              ] })
+            ] }, index);
+          } else {
+            return /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsxs(Text, { color: promptColor, children: [
+                promptChar,
+                " "
+              ] }),
+              /* @__PURE__ */ jsx(Text, { children: line })
+            ] }, index);
+          }
+        })
+      }
     );
   }
   const cursorChar = input.slice(cursorPosition, cursorPosition + 1) || " ";
   const afterCursorText = input.slice(cursorPosition + 1);
-  return /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ jsx(
     Box,
     {
       borderStyle: "round",
       borderColor,
       paddingX: 1,
       paddingY: 0,
-      marginTop: 1
-    },
-    /* @__PURE__ */ React12.createElement(Box, null, /* @__PURE__ */ React12.createElement(Text, { color: promptColor }, "\u276F "), isPlaceholder ? /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, placeholderText), showCursor && /* @__PURE__ */ React12.createElement(Text, { backgroundColor: "white", color: "black" }, " ")) : /* @__PURE__ */ React12.createElement(Text, null, beforeCursor, showCursor && /* @__PURE__ */ React12.createElement(Text, { backgroundColor: "white", color: "black" }, cursorChar), !showCursor && cursorChar !== " " && cursorChar, afterCursorText))
+      marginTop: 1,
+      children: /* @__PURE__ */ jsxs(Box, { children: [
+        /* @__PURE__ */ jsx(Text, { color: promptColor, children: "\u276F " }),
+        isPlaceholder ? /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: placeholderText }),
+          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: " " })
+        ] }) : /* @__PURE__ */ jsxs(Text, { children: [
+          beforeCursor,
+          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar }),
+          !showCursor && cursorChar !== " " && cursorChar,
+          afterCursorText
+        ] })
+      ] })
+    }
   );
 }
 function MCPStatus({}) {
@@ -14469,7 +14523,11 @@ function MCPStatus({}) {
   if (connectedServers.length === 0) {
     return null;
   }
-  return /* @__PURE__ */ React12.createElement(Box, { marginLeft: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "green" }, "\u2692 mcps: ", connectedServers.length, " "));
+  return /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: "green", children: [
+    "\u2692 mcps: ",
+    connectedServers.length,
+    " "
+  ] }) });
 }
 function ConfirmationDialog({
   operation,
@@ -14534,35 +14592,72 @@ function ConfirmationDialog({
     }
   });
   if (feedbackMode) {
-    return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", padding: 1 }, /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "Type your feedback and press Enter, or press Escape to go back.")), /* @__PURE__ */ React12.createElement(
-      Box,
-      {
-        borderStyle: "round",
-        borderColor: "yellow",
-        paddingX: 1,
-        marginTop: 1
-      },
-      /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u276F "),
-      /* @__PURE__ */ React12.createElement(Text, null, feedback, /* @__PURE__ */ React12.createElement(Text, { color: "white" }, "\u2588"))
-    ));
+    return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", padding: 1, children: [
+      /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Type your feedback and press Enter, or press Escape to go back." }) }),
+      /* @__PURE__ */ jsxs(
+        Box,
+        {
+          borderStyle: "round",
+          borderColor: "yellow",
+          paddingX: 1,
+          marginTop: 1,
+          children: [
+            /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u276F " }),
+            /* @__PURE__ */ jsxs(Text, { children: [
+              feedback,
+              /* @__PURE__ */ jsx(Text, { color: "white", children: "\u2588" })
+            ] })
+          ]
+        }
+      )
+    ] });
   }
-  return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Box, null, /* @__PURE__ */ React12.createElement(Text, { color: "magenta" }, "\u23FA"), /* @__PURE__ */ React12.createElement(Text, { color: "white" }, " ", operation, "(", filename, ")"))), /* @__PURE__ */ React12.createElement(Box, { marginLeft: 2, flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u23BF Requesting user confirmation"), showVSCodeOpen && /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u23BF Opened changes in Visual Studio Code \u29C9")), content && /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u23BF ", content.split("\n")[0]), /* @__PURE__ */ React12.createElement(Box, { marginLeft: 4, flexDirection: "column" }, /* @__PURE__ */ React12.createElement(
-    DiffRenderer,
-    {
-      diffContent: content,
-      filename,
-      terminalWidth: 80
-    }
-  )))), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Box, { marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, null, "Do you want to proceed with this operation?")), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column" }, options.map((option, index) => /* @__PURE__ */ React12.createElement(Box, { key: index, paddingLeft: 1 }, /* @__PURE__ */ React12.createElement(
-    Text,
-    {
-      color: selectedOption === index ? "black" : "white",
-      backgroundColor: selectedOption === index ? "cyan" : void 0
-    },
-    index + 1,
-    ". ",
-    option
-  )))), /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2191\u2193 navigate \u2022 Enter select \u2022 Esc cancel"))));
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { children: [
+      /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
+      /* @__PURE__ */ jsxs(Text, { color: "white", children: [
+        " ",
+        operation,
+        "(",
+        filename,
+        ")"
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxs(Box, { marginLeft: 2, flexDirection: "column", children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Requesting user confirmation" }),
+      showVSCodeOpen && /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Opened changes in Visual Studio Code \u29C9" }) }),
+      content && /* @__PURE__ */ jsxs(Fragment, { children: [
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u23BF ",
+          content.split("\n")[0]
+        ] }),
+        /* @__PURE__ */ jsx(Box, { marginLeft: 4, flexDirection: "column", children: /* @__PURE__ */ jsx(
+          DiffRenderer,
+          {
+            diffContent: content,
+            filename,
+            terminalWidth: 80
+          }
+        ) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { children: "Do you want to proceed with this operation?" }) }),
+      /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: options.map((option, index) => /* @__PURE__ */ jsx(Box, { paddingLeft: 1, children: /* @__PURE__ */ jsxs(
+        Text,
+        {
+          color: selectedOption === index ? "black" : "white",
+          backgroundColor: selectedOption === index ? "cyan" : void 0,
+          children: [
+            index + 1,
+            ". ",
+            option
+          ]
+        }
+      ) }, index)) }),
+      /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter select \u2022 Esc cancel" }) })
+    ] })
+  ] });
 }
 init_settings_manager();
 function ApiKeyInput({ onApiKeySet }) {
@@ -14616,10 +14711,25 @@ function ApiKeyInput({ onApiKeySet }) {
     }
   };
   const displayText = input.length > 0 ? isSubmitting ? "*".repeat(input.length) : "*".repeat(input.length) + "\u2588" : isSubmitting ? " " : "\u2588";
-  return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", paddingX: 2, paddingY: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "yellow" }, "\u{1F511} Grok API Key Required"), /* @__PURE__ */ React12.createElement(Box, { marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "Please enter your Grok API key to continue:")), /* @__PURE__ */ React12.createElement(Box, { borderStyle: "round", borderColor: "blue", paddingX: 1, marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "\u276F "), /* @__PURE__ */ React12.createElement(Text, null, displayText)), error ? /* @__PURE__ */ React12.createElement(Box, { marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "red" }, "\u274C ", error)) : null, /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2022 Press Enter to submit"), /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "\u2022 Press Ctrl+C to exit"), /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, "Note: API key will be saved to ~/.grok/user-settings.json")), isSubmitting ? /* @__PURE__ */ React12.createElement(Box, { marginTop: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "yellow" }, "\u{1F504} Validating API key...")) : null);
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, paddingY: 1, children: [
+    /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F511} Grok API Key Required" }),
+    /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Please enter your Grok API key to continue:" }) }),
+    /* @__PURE__ */ jsxs(Box, { borderStyle: "round", borderColor: "blue", paddingX: 1, marginBottom: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u276F " }),
+      /* @__PURE__ */ jsx(Text, { children: displayText })
+    ] }),
+    error ? /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsxs(Text, { color: "red", children: [
+      "\u274C ",
+      error
+    ] }) }) : null,
+    /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Enter to submit" }),
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Ctrl+C to exit" }),
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Note: API key will be saved to ~/.grok/user-settings.json" })
+    ] }),
+    isSubmitting ? /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F504} Validating API key..." }) }) : null
+  ] });
 }
-
-// src/ui/components/chat-interface.tsx
 function ChatInterfaceWithAgent({
   agent,
   initialMessage
@@ -14667,7 +14777,7 @@ function ChatInterfaceWithAgent({
       try {
         const image = await terminalImage.file("src/image.png", { width: 20, height: 10 });
         console.log(image);
-      } catch (_e) {
+      } catch {
         console.log(" Logo not available");
       }
     })();
@@ -14836,83 +14946,96 @@ function ChatInterfaceWithAgent({
     setProcessingTime(0);
     processingStartTime.current = 0;
   };
-  return /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", paddingX: 2 }, chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 2 }, /* @__PURE__ */ React12.createElement(Text, { color: "cyan" }, `                     @@@@@#                          %@@@@@
-                     @@@@@#                          %@@@@@
-                     @@@@@#                          %@@@@@
-                           @@@@@                @@@@@
-                           @@@@@                @@@@@
-                           @@@@@                @@@@@
-                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                     @@@@@@     @@@@@@@@@@@@@@@@     @@@@@@
-               @@@@@@@@@@@#      @@@@@@@@@@@@@@      #@@@@@@@@@@@
-               @@@@@@@@@@@#      @@@@@@@@@@@@@@      #@@@@@@@@@@@
-               @@@@@@@@@@@@      @@@@@@@@@@@@@@      @@@@@@@@@@@@
-          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
-          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
-          @@@@@      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@
-          @@@@@      @@@@@@                          @@@@@@      @@@@@+
-          @@@@@      @@@@@@                          @@@@@@      @@@@@+
-          @@@@@      @@@@@@                          @@@@@@      @@@@@+
-          @@@@@      @@@@@#                          #@@@@@      @@@@@+
-
-                           @@@@@@@@@        @@@@@@@@@
-                           @@@@@@@@@        @@@@@@@@@
-                           @@@@@@@@          @@@@@@@@
-                     @@@@@#                          #@@@@@
-                     @@@@@#                          %@@@@@
-                     @@@@@#                          %@@@@@`), /* @__PURE__ */ React12.createElement(Text, { color: "cyan", bold: true }, "Tips for getting started:"), /* @__PURE__ */ React12.createElement(Box, { marginTop: 1, flexDirection: "column" }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "1. Ask questions, edit files, or run commands."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "2. Be specific for the best results."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "3. Create GROK.md files to customize your interactions with Grok."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "4. Press Shift+Tab to toggle auto-edit mode."), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, '5. Run "/init-agent" to set up an .agent docs system for this project.'), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, '6. Run "/heal" after errors to capture a fix and add a guardrail.'), /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "7. /help for more information."))), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", marginBottom: 1 }, /* @__PURE__ */ React12.createElement(Text, { color: "gray" }, "Type your request in natural language. Ctrl+C to clear, 'exit' to quit.")), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "column", ref: scrollRef }, /* @__PURE__ */ React12.createElement(
-    ChatHistory,
-    {
-      entries: chatHistory,
-      isConfirmationActive: !!confirmationOptions
-    }
-  )), confirmationOptions && /* @__PURE__ */ React12.createElement(
-    ConfirmationDialog,
-    {
-      operation: confirmationOptions.operation,
-      filename: confirmationOptions.filename,
-      showVSCodeOpen: confirmationOptions.showVSCodeOpen,
-      content: confirmationOptions.content,
-      onConfirm: handleConfirmation,
-      onReject: handleRejection
-    }
-  ), !confirmationOptions && /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement(
-    LoadingSpinner,
-    {
-      isActive: isProcessing || isStreaming,
-      processingTime,
-      tokenCount
-    }
-  ), /* @__PURE__ */ React12.createElement(
-    ChatInput,
-    {
-      input,
-      cursorPosition,
-      isProcessing,
-      isStreaming
-    }
-  ), /* @__PURE__ */ React12.createElement(Box, { flexDirection: "row", marginTop: 1 }, /* @__PURE__ */ React12.createElement(Box, { marginRight: 2 }, /* @__PURE__ */ React12.createElement(Text, { color: "cyan" }, autoEditEnabled ? "\u25B6" : "\u23F8", " auto-edit:", " ", autoEditEnabled ? "on" : "off"), /* @__PURE__ */ React12.createElement(Text, { color: "gray", dimColor: true }, " ", "(shift + tab)")), /* @__PURE__ */ React12.createElement(Box, { marginRight: 2 }, /* @__PURE__ */ React12.createElement(Text, { color: "yellow" }, "\u224B ", agent.getCurrentModel())), /* @__PURE__ */ React12.createElement(MCPStatus, null)), /* @__PURE__ */ React12.createElement(
-    CommandSuggestions,
-    {
-      suggestions: commandSuggestions,
-      input,
-      selectedIndex: selectedCommandIndex,
-      isVisible: showCommandSuggestions
-    }
-  ), /* @__PURE__ */ React12.createElement(
-    ModelSelection,
-    {
-      models: availableModels,
-      selectedIndex: selectedModelIndex,
-      isVisible: showModelSelection,
-      currentModel: agent.getCurrentModel()
-    }
-  )));
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, children: [
+    chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginBottom: 2, children: [
+      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "GROK-CLI (HURRY MODE)" }),
+      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "Tips for getting started:" }),
+      /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: "1. Ask questions, edit files, or run commands." }),
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: "2. Be specific for the best results." }),
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: "3. Create GROK.md files to customize your interactions with Grok." }),
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: "4. Press Shift+Tab to toggle auto-edit mode." }),
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: '5. Run "/init-agent" to set up an .agent docs system for this project.' }),
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: '6. Run "/heal" after errors to capture a fix and add a guardrail.' }),
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: "7. /help for more information." })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Type your request in natural language. Ctrl+C to clear, 'exit' to quit." }) }),
+    /* @__PURE__ */ jsx(Box, { flexDirection: "column", ref: scrollRef, children: /* @__PURE__ */ jsx(
+      ChatHistory,
+      {
+        entries: chatHistory,
+        isConfirmationActive: !!confirmationOptions
+      }
+    ) }),
+    confirmationOptions && /* @__PURE__ */ jsx(
+      ConfirmationDialog,
+      {
+        operation: confirmationOptions.operation,
+        filename: confirmationOptions.filename,
+        showVSCodeOpen: confirmationOptions.showVSCodeOpen,
+        content: confirmationOptions.content,
+        onConfirm: handleConfirmation,
+        onReject: handleRejection
+      }
+    ),
+    !confirmationOptions && /* @__PURE__ */ jsxs(Fragment, { children: [
+      /* @__PURE__ */ jsx(
+        LoadingSpinner,
+        {
+          isActive: isProcessing || isStreaming,
+          processingTime,
+          tokenCount
+        }
+      ),
+      /* @__PURE__ */ jsx(
+        ChatInput,
+        {
+          input,
+          cursorPosition,
+          isProcessing,
+          isStreaming
+        }
+      ),
+      /* @__PURE__ */ jsxs(Box, { flexDirection: "row", marginTop: 1, children: [
+        /* @__PURE__ */ jsxs(Box, { marginRight: 2, children: [
+          /* @__PURE__ */ jsxs(Text, { color: "cyan", children: [
+            autoEditEnabled ? "\u25B6" : "\u23F8",
+            " auto-edit:",
+            " ",
+            autoEditEnabled ? "on" : "off"
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", dimColor: true, children: [
+            " ",
+            "(shift + tab)"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(Box, { marginRight: 2, children: /* @__PURE__ */ jsxs(Text, { color: "yellow", children: [
+          "\u224B ",
+          agent.getCurrentModel()
+        ] }) }),
+        /* @__PURE__ */ jsx(MCPStatus, {})
+      ] }),
+      /* @__PURE__ */ jsx(
+        CommandSuggestions,
+        {
+          suggestions: commandSuggestions,
+          input,
+          selectedIndex: selectedCommandIndex,
+          isVisible: showCommandSuggestions
+        }
+      ),
+      /* @__PURE__ */ jsx(
+        ModelSelection,
+        {
+          models: availableModels,
+          selectedIndex: selectedModelIndex,
+          isVisible: showModelSelection,
+          currentModel: agent.getCurrentModel()
+        }
+      )
+    ] })
+  ] });
 }
 function ChatInterface({
   agent,
@@ -14925,9 +15048,9 @@ function ChatInterface({
     setCurrentAgent(newAgent);
   };
   if (!currentAgent) {
-    return /* @__PURE__ */ React12.createElement(ApiKeyInput, { onApiKeySet: handleApiKeySet });
+    return /* @__PURE__ */ jsx(ApiKeyInput, { onApiKeySet: handleApiKeySet });
   }
-  return /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ jsx(
     ChatInterfaceWithAgent,
     {
       agent: currentAgent,
@@ -15014,7 +15137,7 @@ function createMCPCommand() {
       let config2;
       try {
         config2 = JSON.parse(jsonConfig);
-      } catch (error) {
+      } catch {
         console.error(chalk.red("Error: Invalid JSON configuration"));
         process.exit(1);
       }
@@ -15381,7 +15504,7 @@ program.name("grok").description(
     console.log("\u{1F916} Starting Grok CLI Conversational Assistant...\n");
     ensureUserSettingsDirectory();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
-    const app = render(React12.createElement(ChatInterface, { agent, initialMessage }));
+    const app = render(React2.createElement(ChatInterface, { agent, initialMessage }));
     const cleanup = () => {
       app.unmount();
       agent.abortCurrentOperation();
