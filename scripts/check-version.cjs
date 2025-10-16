@@ -10,16 +10,39 @@ let currentVersion = pkg.version;
 // Get the latest tag
 const latestTag = execSync('git tag --sort=-version:refname | head -1', { encoding: 'utf8' }).trim().replace('v', '');
 
+// Analyze commits since last tag for conventional commits
+let bumpType = 'patch';
+try {
+  const commits = execSync(`git log --oneline ${latestTag}..HEAD`, { encoding: 'utf8' });
+  if (commits.includes('BREAKING CHANGE')) {
+    bumpType = 'major';
+  } else if (commits.includes('feat:')) {
+    bumpType = 'minor';
+  } else if (commits.includes('fix:')) {
+    bumpType = 'patch';
+  }
+  console.log(`Recommended bump: ${bumpType} (based on commits since ${latestTag})`);
+} catch (e) {
+  console.log('No commits since last tag, defaulting to patch bump');
+}
+
 // Compare versions
 const [major, minor, patch] = currentVersion.split('.').map(Number);
 const [tagMajor, tagMinor, tagPatch] = latestTag.split('.').map(Number);
 
 if (major < tagMajor || (major === tagMajor && minor < tagMinor) || (major === tagMajor && minor === tagMinor && patch <= tagPatch)) {
-  // Auto-bump patch version
-  const newVersion = `${major}.${minor}.${patch + 1}`;
+  // Auto-bump based on recommended type
+  let newVersion;
+  if (bumpType === 'major') {
+    newVersion = `${major + 1}.0.0`;
+  } else if (bumpType === 'minor') {
+    newVersion = `${major}.${minor + 1}.0`;
+  } else {
+    newVersion = `${major}.${minor}.${patch + 1}`;
+  }
   pkg.version = newVersion;
   fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-  console.log(`Auto-bumped version from ${currentVersion} to ${newVersion}`);
+  console.log(`Auto-bumped version from ${currentVersion} to ${newVersion} (${bumpType})`);
 
   // Update README.md
   const readmePath = 'README.md';
