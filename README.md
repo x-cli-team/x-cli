@@ -1,4 +1,4 @@
-## 1.0.56 – Stability Release
+## 1.0.58 – Stability Release
 
 This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
@@ -6,6 +6,20 @@ This release includes latest updates and automated publishing via GitHub Actions
 - Adds proper Node shebang for global installs
 - Temporarily removes experimental features (e.g. compress)
 
+---
+
+## 🚨 Critical Configuration Warnings
+
+**DO NOT MODIFY THESE SETTINGS UNLESS YOU KNOW WHAT YOU'RE DOING:**
+
+- **`package.json` name**: Must remain `"grok-cli-hurry-mode"` (unscoped). Changing to scoped (e.g., `@username/grok-cli-hurry-mode`) will break NPM publishing unless you have token access for that scope.
+- **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
+- **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `grok-cli-hurry-mode`.
+- **Git Hooks**: Do not re-enable interactive pre-push hooks, as they block CI/CD pushes.
+
+**Why?** Previous changes to these broke the entire publishing flow. If you need to change the package name or scope, create a new package and update all references.
+
+---
 
 # Grok CLI
 

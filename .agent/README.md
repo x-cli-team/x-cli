@@ -3,6 +3,17 @@
 ## Overview
 This directory contains AI agent documentation for Grok CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
 
+## 🚨 Critical Configuration Warnings
+
+**DO NOT MODIFY THESE SETTINGS UNLESS YOU KNOW WHAT YOU'RE DOING:**
+
+- **`package.json` name**: Must remain `"grok-cli-hurry-mode"` (unscoped). Changing to scoped (e.g., `@username/grok-cli-hurry-mode`) will break NPM publishing unless you have token access for that scope.
+- **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
+- **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `grok-cli-hurry-mode`.
+- **Git Hooks**: Do not re-enable interactive pre-push hooks, as they block CI/CD pushes.
+
+**Why?** Previous changes to these broke the entire publishing flow. If you need to change the package name or scope, create a new package and update all references.
+
 ## 📁 Directory Structure
 
 ### 📋 system/
