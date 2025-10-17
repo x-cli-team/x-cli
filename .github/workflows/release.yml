@@ -18,8 +18,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install (bun optional)
-        run: npm ci
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
       # Prevent loops if last commit was an automated bump
       - name: Skip if previous commit was auto-bump
