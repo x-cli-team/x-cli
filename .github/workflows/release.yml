@@ -9,6 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Check for version bump commit
+      run: |
+        if git log --oneline -1 | grep -q "Bump version to"; then
+          echo "Skipping release for version bump commit"
+          exit 0
+        fi
     - name: Checkout
       uses: actions/checkout@v4
       with:
