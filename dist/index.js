@@ -4,6 +4,7 @@ import fs__default, { existsSync } from 'fs';
 import * as path7 from 'path';
 import path7__default from 'path';
 import * as os from 'os';
+import os__default from 'os';
 import React2, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Box, Text, render, useApp, useInput } from 'ink';
 import { program, Command } from 'commander';
@@ -7031,10 +7032,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path25) => {
+    const dfs = (filePath, path26) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path25.indexOf(filePath);
-        const cycle = path25.slice(cycleStart).concat([filePath]);
+        const cycleStart = path26.indexOf(filePath);
+        const cycle = path26.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7050,7 +7051,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path25, filePath]);
+            dfs(dependency, [...path26, filePath]);
           }
         }
       }
@@ -8516,10 +8517,12 @@ var GrokAgent = class extends EventEmitter {
     this.messages = [];
     this.abortController = null;
     this.mcpInitialized = false;
-    this.lastRequestTime = 0;
+    this.lastToolExecutionTime = 0;
     this.activeToolCalls = 0;
     this.maxConcurrentToolCalls = 2;
     this.minRequestInterval = 500;
+    // ms
+    this.lastRequestTime = 0;
     const manager = getSettingsManager();
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
@@ -8922,6 +8925,12 @@ Current working directory: ${process.cwd()}`
           }
           const toolCalls = accumulatedMessage.tool_calls;
           for (let i = 0; i < toolCalls.length; i += this.maxConcurrentToolCalls) {
+            const now2 = Date.now();
+            const timeSinceLastExecution = now2 - this.lastToolExecutionTime;
+            if (timeSinceLastExecution < this.minRequestInterval) {
+              const delay = this.minRequestInterval - timeSinceLastExecution;
+              await new Promise((resolve8) => setTimeout(resolve8, delay));
+            }
             const batch = toolCalls.slice(i, i + this.maxConcurrentToolCalls);
             const batchPromises = batch.map(async (toolCall) => {
               if (this.abortController?.signal.aborted) {
@@ -8944,6 +8953,7 @@ Current working directory: ${process.cwd()}`
               return { toolCall, result, entry: toolResultEntry };
             });
             const batchResults = await Promise.all(batchPromises);
+            this.lastToolExecutionTime = Date.now();
             if (batchResults.includes(null)) {
               yield {
                 type: "content",
@@ -9012,10 +9022,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path25 = args.path;
-            let command = `cat "${path25}"`;
+            const path26 = args.path;
+            let command = `cat "${path26}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path25}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path26}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9273,7 +9283,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.47"};
+  version: "1.0.58"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -13644,7 +13654,6 @@ ${result.suggestions.map((s) => `- ${s}`).join("\n")}
       setIsProcessing(true);
       try {
         const args = trimmedInput.split(" ").slice(1);
-        const force = args.includes("--force");
         const dryRun = args.includes("--dry-run");
         const subagentFramework = new SubagentFramework();
         const taskId = await subagentFramework.spawnSubagent({
@@ -13658,7 +13667,6 @@ ${result.suggestions.map((s) => `- ${s}`).join("\n")}
         });
         const result = await subagentFramework.waitForResult(taskId, 1e4);
         if (result.success) {
-          const metrics = subagentFramework.getPerformanceMetrics();
           const resultEntry = {
             type: "assistant",
             content: dryRun ? `\u{1F4CA} **Compression Preview (Dry Run)**
@@ -13715,9 +13723,6 @@ ${result.summary}
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput.split(" ").slice(1);
-        const classify = args.includes("--classify");
-        const playbook = args.includes("--playbook");
         const healingSystem = new SelfHealingSystem(process.cwd());
         const mockError = {
           message: "Example error for demonstration",
@@ -13781,8 +13786,6 @@ ${result.summary}
       try {
         const args = trimmedInput.split(" ").slice(1);
         const check = args.includes("--check");
-        const enable = args.find((arg) => arg.startsWith("--enable"))?.split("=")[1];
-        const disable = args.find((arg) => arg.startsWith("--disable"))?.split("=")[1];
         const healingSystem = new SelfHealingSystem(process.cwd());
         if (check) {
           const checkResult = await healingSystem.checkGuardrails("example-operation", {});
@@ -14784,6 +14787,7 @@ function ChatInterfaceWithAgent({
   const [confirmationOptions, setConfirmationOptions] = useState(null);
   const scrollRef = useRef(null);
   const processingStartTime = useRef(0);
+  const lastChatHistoryLength = useRef(0);
   const confirmationService = ConfirmationService.getInstance();
   const {
     input,
@@ -14828,6 +14832,22 @@ function ChatInterfaceWithAgent({
     console.log(" ");
     setChatHistory([]);
   }, []);
+  useEffect(() => {
+    const newEntries = chatHistory.slice(lastChatHistoryLength.current);
+    if (newEntries.length > 0) {
+      const sessionFile = path7__default.join(os__default.homedir(), ".grok", "session.log");
+      try {
+        const dir = path7__default.dirname(sessionFile);
+        if (!fs__default.existsSync(dir)) {
+          fs__default.mkdirSync(dir, { recursive: true });
+        }
+        const lines = newEntries.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
+        fs__default.appendFileSync(sessionFile, lines);
+      } catch {
+      }
+    }
+    lastChatHistoryLength.current = chatHistory.length;
+  }, [chatHistory]);
   useEffect(() => {
     if (initialMessage && agent) {
       const userEntry = {
@@ -15327,7 +15347,7 @@ process.on("SIGTERM", () => {
   if (process.stdin.isTTY && process.stdin.setRawMode) {
     try {
       process.stdin.setRawMode(false);
-    } catch (e) {
+    } catch {
     }
   }
   console.log("\nGracefully shutting down...");
@@ -15345,7 +15365,7 @@ function ensureUserSettingsDirectory() {
   try {
     const manager = getSettingsManager();
     manager.loadUserSettings();
-  } catch (error) {
+  } catch {
   }
 }
 function loadApiKey() {
@@ -15380,7 +15400,7 @@ function loadModel() {
     try {
       const manager = getSettingsManager();
       model = manager.getCurrentModel();
-    } catch (error) {
+    } catch {
     }
   }
   return model;
