@@ -138,5 +138,5 @@ jobs:
 - [x] Ownership confirmed/updated (pending user check)
 - [x] Publish token set (user updated to Publish type)
 - [x] Workflows updated
-- [ ] Test publish successful (token updated to Publish type; test with next push)
+- [ ] Test publish successful (Publish token fails; likely 2FA issue—switch to Automation token)
 - [ ] Close incident
