@@ -136,7 +136,7 @@ jobs:
 
 ## Resolution
 - [x] Ownership confirmed/updated (pending user check)
-- [x] Automation token set (pending user update to Automation type)
+- [x] Publish token set (user updated to Publish type)
 - [x] Workflows updated
-- [ ] Test publish successful (release works, tags pushed, but publish fails – likely NPM_TOKEN not Automation type)
+- [ ] Test publish successful (token updated to Publish type; test with next push)
 - [ ] Close incident
