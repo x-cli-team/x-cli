@@ -30,8 +30,22 @@ try {
 const [major, minor, patch] = currentVersion.split('.').map(Number);
 const [tagMajor, tagMinor, tagPatch] = latestTag.split('.').map(Number);
 
-if (process.env.CI && (major < tagMajor || (major === tagMajor && minor < tagMinor) || (major === tagMajor && minor === tagMinor && patch <= tagPatch))) {
-  // Auto-bump based on recommended type (only in CI)
+// Update README.md to match package.json version
+const readmePath = 'README.md';
+if (fs.existsSync(readmePath)) {
+  let readme = fs.readFileSync(readmePath, 'utf8');
+  const versionRegex = /## \d+\.\d+\.\d+ – Stability Release/;
+  const newHeader = `## ${currentVersion} – Stability Release`;
+  if (!readme.includes(newHeader)) {
+    readme = readme.replace(versionRegex, newHeader);
+    fs.writeFileSync(readmePath, readme);
+    console.log(`Updated README.md to ${currentVersion}`);
+    execSync('git add README.md');
+  }
+}
+
+if (major < tagMajor || (major === tagMajor && minor < tagMinor) || (major === tagMajor && minor === tagMinor && patch <= tagPatch)) {
+  // Auto-bump based on recommended type
   let newVersion;
   if (bumpType === 'major') {
     newVersion = `${major + 1}.0.0`;
@@ -44,19 +58,8 @@ if (process.env.CI && (major < tagMajor || (major === tagMajor && minor < tagMin
   fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
   console.log(`Auto-bumped version from ${currentVersion} to ${newVersion} (${bumpType})`);
 
-  // Update README.md
-  const readmePath = 'README.md';
-  if (fs.existsSync(readmePath)) {
-    let readme = fs.readFileSync(readmePath, 'utf8');
-    const versionRegex = /## \d+\.\d+\.\d+ – Stability Release/;
-    const newHeader = `## ${newVersion} – Stability Release`;
-    readme = readme.replace(versionRegex, newHeader);
-    fs.writeFileSync(readmePath, readme);
-    console.log(`Updated README.md to ${newVersion}`);
-  }
-
   // Re-stage the updated files
-  execSync('git add package.json README.md');
+  execSync('git add package.json');
 
   currentVersion = newVersion;
 }

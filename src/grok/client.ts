@@ -105,7 +105,8 @@ export class GrokClient {
     messages: GrokMessage[],
     tools?: GrokTool[],
     model?: string,
-    searchOptions?: SearchOptions
+    searchOptions?: SearchOptions,
+    abortSignal?: AbortSignal
   ): AsyncGenerator<any, void, unknown> {
     try {
       const requestPayload: any = {
@@ -124,7 +125,8 @@ export class GrokClient {
       }
 
       const stream = (await this.client.chat.completions.create(
-        requestPayload
+        requestPayload,
+        { signal: abortSignal }
       )) as any;
 
       for await (const chunk of stream) {

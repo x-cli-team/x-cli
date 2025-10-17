@@ -150,7 +150,7 @@ function ChatInterfaceWithAgent({
 
           const flushUpdates = () => {
             const now = Date.now();
-            if (now - lastUpdateTime < 150) return; // Throttle to ~6-7 FPS
+            if (now - lastUpdateTime < 500) return; // Throttle to ~2 FPS to reduce re-render frequency
 
             // Batch all chat history updates into a single setState call
             setChatHistory((prev) => {

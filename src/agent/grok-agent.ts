@@ -503,7 +503,8 @@ Current working directory: ${process.cwd()}`,
           undefined,
           this.isGrokModel() && this.shouldUseSearchFor(message)
             ? { search_parameters: { mode: "auto" } }
-            : { search_parameters: { mode: "off" } }
+            : { search_parameters: { mode: "off" } },
+          this.abortController?.signal
         );
         let accumulatedMessage: any = {};
         let accumulatedContent = "";

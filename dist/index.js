@@ -368,7 +368,7 @@ var GrokClient = class {
       throw new Error(`Grok API error: ${error.message}`);
     }
   }
-  async *chatStream(messages, tools, model, searchOptions) {
+  async *chatStream(messages, tools, model, searchOptions, abortSignal) {
     try {
       const requestPayload = {
         model: model || this.currentModel,
@@ -383,7 +383,8 @@ var GrokClient = class {
         requestPayload.search_parameters = searchOptions.search_parameters;
       }
       const stream = await this.client.chat.completions.create(
-        requestPayload
+        requestPayload,
+        { signal: abortSignal }
       );
       for await (const chunk of stream) {
         yield chunk;
@@ -8855,7 +8856,8 @@ Current working directory: ${process.cwd()}`
           this.messages,
           tools,
           void 0,
-          this.isGrokModel() && this.shouldUseSearchFor(message) ? { search_parameters: { mode: "auto" } } : { search_parameters: { mode: "off" } }
+          this.isGrokModel() && this.shouldUseSearchFor(message) ? { search_parameters: { mode: "auto" } } : { search_parameters: { mode: "off" } },
+          this.abortController?.signal
         );
         let accumulatedMessage = {};
         let accumulatedContent = "";
@@ -9283,7 +9285,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.58"};
+  version: "1.0.60"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -14784,6 +14786,7 @@ function ChatInterfaceWithAgent({
   const [processingTime, setProcessingTime] = useState(0);
   const [tokenCount, setTokenCount] = useState(0);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isCancelled, setIsCancelled] = useState(false);
   const [confirmationOptions, setConfirmationOptions] = useState(null);
   const scrollRef = useRef(null);
   const processingStartTime = useRef(0);
@@ -14868,54 +14871,48 @@ function ChatInterfaceWithAgent({
           let lastUpdateTime = Date.now();
           const flushUpdates = () => {
             const now = Date.now();
-            if (now - lastUpdateTime < 150) return;
-            if (lastTokenCount !== 0) {
-              setTokenCount(lastTokenCount);
-            }
-            if (accumulatedContent) {
-              if (!streamingEntry) {
-                const newStreamingEntry = {
-                  type: "assistant",
-                  content: accumulatedContent,
-                  timestamp: /* @__PURE__ */ new Date(),
-                  isStreaming: true
-                };
-                setChatHistory((prev) => [...prev, newStreamingEntry]);
-                streamingEntry = newStreamingEntry;
-              } else {
-                setChatHistory(
-                  (prev) => prev.map(
-                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? { ...entry, content: entry.content + accumulatedContent } : entry
-                  )
-                );
+            if (now - lastUpdateTime < 500) return;
+            setChatHistory((prev) => {
+              let newHistory = [...prev];
+              if (lastTokenCount !== 0) {
               }
-              accumulatedContent = "";
-            }
-            if (pendingToolCalls) {
-              setChatHistory(
-                (prev) => prev.map(
-                  (entry) => entry.isStreaming ? {
-                    ...entry,
-                    isStreaming: false,
-                    toolCalls: pendingToolCalls
-                  } : entry
-                )
-              );
-              streamingEntry = null;
-              pendingToolCalls.forEach((toolCall) => {
-                const toolCallEntry = {
-                  type: "tool_call",
-                  content: "Executing...",
-                  timestamp: /* @__PURE__ */ new Date(),
-                  toolCall
-                };
-                setChatHistory((prev) => [...prev, toolCallEntry]);
-              });
-              pendingToolCalls = null;
-            }
-            if (pendingToolResults.length > 0) {
-              setChatHistory(
-                (prev) => prev.map((entry) => {
+              if (accumulatedContent) {
+                if (!streamingEntry) {
+                  const newStreamingEntry = {
+                    type: "assistant",
+                    content: accumulatedContent,
+                    timestamp: /* @__PURE__ */ new Date(),
+                    isStreaming: true
+                  };
+                  newHistory.push(newStreamingEntry);
+                  streamingEntry = newStreamingEntry;
+                } else {
+                  const lastIdx = newHistory.length - 1;
+                  if (lastIdx >= 0 && newHistory[lastIdx].isStreaming) {
+                    newHistory[lastIdx] = { ...newHistory[lastIdx], content: newHistory[lastIdx].content + accumulatedContent };
+                  }
+                }
+                accumulatedContent = "";
+              }
+              if (pendingToolCalls) {
+                const streamingIdx = newHistory.findIndex((entry) => entry.isStreaming);
+                if (streamingIdx >= 0) {
+                  newHistory[streamingIdx] = { ...newHistory[streamingIdx], isStreaming: false, toolCalls: pendingToolCalls };
+                }
+                streamingEntry = null;
+                pendingToolCalls.forEach((toolCall) => {
+                  const toolCallEntry = {
+                    type: "tool_call",
+                    content: "Executing...",
+                    timestamp: /* @__PURE__ */ new Date(),
+                    toolCall
+                  };
+                  newHistory.push(toolCallEntry);
+                });
+                pendingToolCalls = null;
+              }
+              if (pendingToolResults.length > 0) {
+                newHistory = newHistory.map((entry) => {
                   if (entry.isStreaming) {
                     return { ...entry, isStreaming: false };
                   }
@@ -14931,10 +14928,14 @@ function ChatInterfaceWithAgent({
                     };
                   }
                   return entry;
-                })
-              );
-              streamingEntry = null;
-              pendingToolResults = [];
+                });
+                streamingEntry = null;
+                pendingToolResults = [];
+              }
+              return newHistory;
+            });
+            if (lastTokenCount !== 0) {
+              setTokenCount(lastTokenCount);
             }
             lastUpdateTime = now;
           };

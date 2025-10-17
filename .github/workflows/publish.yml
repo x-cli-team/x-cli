@@ -1,8 +1,6 @@
 name: Publish to NPM
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -35,43 +33,14 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
 
-    - name: Determine and bump version
-      id: version
+
+
+
+
+    - name: Clean and build with current version
       run: |
-        # Get last commit message
-        COMMIT_MSG=$(git log -1 --pretty=%B)
-        
-        # Extract current version
         CURRENT_VERSION=$(node -p "require('./package.json').version")
-        echo "Current version: $CURRENT_VERSION"
-        
-        # Determine bump type
-        if [[ $COMMIT_MSG =~ \[major\] ]]; then
-          BUMP_TYPE="major"
-        elif [[ $COMMIT_MSG =~ \[minor\] ]]; then
-          BUMP_TYPE="minor"
-        else
-          BUMP_TYPE="patch"
-        fi
-        
-        echo "Bump type: $BUMP_TYPE"
-        
-        # Bump version and capture new version
-        NEW_VERSION=$(npm version $BUMP_TYPE --no-git-tag-version)
-        echo "New version: $NEW_VERSION"
-        
-        # Set output for later steps
-        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-        echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
-
-    - name: Commit version bump
-      run: |
-        git add package.json
-        git commit -m "Bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
-
-    - name: Clean and build with correct version
-      run: |
-        echo "🏗️ Building with version: ${{ steps.version.outputs.new_version }}"
+        echo "🏗️ Building with version: $CURRENT_VERSION"
         rm -rf dist/
         bun run build
         echo "📦 Checking embedded version in built file:"
@@ -80,9 +49,9 @@ jobs:
 
     - name: Create and push tag
       run: |
-        git tag ${{ steps.version.outputs.new_version }}
-        git push origin main
-        git push origin ${{ steps.version.outputs.new_version }}
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        git tag $CURRENT_VERSION
+        git push origin $CURRENT_VERSION
 
     - name: Publish to NPM
       run: npm publish --access public
