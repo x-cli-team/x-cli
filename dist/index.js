@@ -14786,7 +14786,6 @@ function ChatInterfaceWithAgent({
   const [processingTime, setProcessingTime] = useState(0);
   const [tokenCount, setTokenCount] = useState(0);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [isCancelled, setIsCancelled] = useState(false);
   const [confirmationOptions, setConfirmationOptions] = useState(null);
   const scrollRef = useRef(null);
   const processingStartTime = useRef(0);
