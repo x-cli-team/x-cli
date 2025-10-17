@@ -31,8 +31,8 @@ jobs:
 
       - name: Bump patch version (no tag yet)
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
           NEW_VER=$(npm version patch --no-git-tag-version)
           git add package.json package-lock.json || true
           git commit -m "Bump version to ${NEW_VER#v}"
