@@ -138,5 +138,5 @@ jobs:
 - [x] Ownership confirmed/updated (pending user check)
 - [x] Automation token set (pending user update to Automation type)
 - [x] Workflows updated
-- [ ] Test publish successful (latest push triggered release, awaiting results)
+- [ ] Test publish successful (release works, tags pushed, but publish fails – likely NPM_TOKEN not Automation type)
 - [ ] Close incident
