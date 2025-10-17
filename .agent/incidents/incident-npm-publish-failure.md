@@ -2,7 +2,7 @@
 
 ## Summary
 - **Date Created**: [Current Date]
-- **Status**: Resolved
+- **Status**: Open
 - **Issue**: Automated NPM publishing fails despite successful builds and tag creation. Version 1.0.63 was tagged but not published to NPM.
 - **Root Cause**: Likely NPM token/auth mismatch, ownership issues, or workflow misconfiguration (e.g., missing permissions, incorrect token type, or .npmrc setup).
 - **Impact**: New versions are not released to NPM, blocking users from installing updates.
@@ -138,5 +138,5 @@ jobs:
 - [x] Ownership confirmed (using grok_cli account)
 - [x] Publish token set (user updated to Publish type)
 - [x] Workflows updated
-- [x] Test publish successful (token updated to Classic Publish from grok_cli account)
-- [x] Close incident
+- [ ] Test publish successful (still failing after token update)
+- [ ] Close incident
