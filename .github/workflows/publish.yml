@@ -2,7 +2,8 @@ name: Publish to NPM
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 jobs:
   publish:
@@ -47,12 +48,6 @@ jobs:
         echo "📦 Checking embedded version in built file:"
         grep -A2 -B2 "version.*:" dist/index.js | head -5 || echo "Version check failed"
       continue-on-error: true  # Continue even if existing TS errors
-
-    - name: Create and push tag
-      run: |
-        CURRENT_VERSION=$(node -p "require('./package.json').version")
-        git tag $CURRENT_VERSION
-        git push origin $CURRENT_VERSION
 
     - name: Publish to NPM
       run: npm publish --access public
