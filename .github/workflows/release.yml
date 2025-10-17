@@ -41,4 +41,5 @@ jobs:
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
           git tag "v${NEW_VER}"
-          git push origin HEAD:main --follow-tags
+          git push origin HEAD:main
+          git push origin "v${NEW_VER}"
