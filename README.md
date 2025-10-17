@@ -1,6 +1,6 @@
-## 1.0.50 – Stability Release
+## 1.0.52 – Stability Release
 
-This release restores the proven 1.0.31 baseline. Auto-version test.
+This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
 - Ensures consistent FS imports (`node:` namespace)
 - Adds proper Node shebang for global installs
