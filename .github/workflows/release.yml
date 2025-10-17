@@ -1,61 +1,42 @@
 name: Release
-
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Check for version bump commit
-      run: |
-        if git log --oneline -1 | grep -q "Bump version to"; then
-          echo "Skipping release for version bump commit"
-          exit 0
-        fi
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        registry-url: 'https://registry.npmjs.org'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
-      with:
-        bun-version: latest
+      - name: Install (bun optional)
+        run: npm ci
 
-    - name: Install dependencies
-      run: bun install
+      # Prevent loops if last commit was an automated bump
+      - name: Skip if previous commit was auto-bump
+        run: |
+          if git log -1 --pretty=%B | grep -qiE "^Bump version to "; then
+            echo "Auto-bump detected; skipping."
+            exit 78
+          fi
 
-    - name: Configure Git
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+      - name: Bump patch version (no tag yet)
+        run: |
+          NEW_VER=$(npm version patch --no-git-tag-version)
+          git add package.json package-lock.json || true
+          git commit -m "Bump version to ${NEW_VER#v}"
 
-    - name: Bump version
-      run: npm version patch --no-git-tag-version
-
-    - name: Get new version
-      id: version
-      run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-    - name: Commit version bump
-      run: |
-        git add package.json
-        git commit -m "Bump version to ${{ steps.version.outputs.version }}"
-
-    - name: Push commit
-      run: git push
-
-    - name: Create and push tag
-      run: |
-        git tag v${{ steps.version.outputs.version }}
-        git push origin v${{ steps.version.outputs.version }}
+      - name: Create tag and push
+        run: |
+          NEW_VER=$(node -p "require('./package.json').version")
+          git tag "v${NEW_VER}"
+          git push origin HEAD:main --follow-tags
