@@ -69,7 +69,7 @@ If CPU drops under ~30–40% with those, you've confirmed the issue is the rende
 ## Mini Checklist for Tracker
 
 - [x] Immediate Triage: Run CLI with guardrails (CPU drops under 40%?)
-- [x] Hotfix Task 1: Render Throttle implemented (150ms batch updates ~6-7 FPS)
+- [x] Hotfix Task 1: Render Throttle implemented (150ms batch updates ~6-7 FPS) - COMPLETED: Batched all chat history updates into single setState call in flushUpdates()
 - [x] Hotfix Task 2: Spinner Snapshot implemented (static spinner, no animation)
 - [x] Hotfix Task 3: Quiet Default Logs implemented (debug logs behind DEBUG=1)
 - [x] Hotfix Task 4: Concurrency & Pacing implemented (max 2 concurrent tools, 500ms spacing)

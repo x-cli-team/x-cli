@@ -30,8 +30,8 @@ try {
 const [major, minor, patch] = currentVersion.split('.').map(Number);
 const [tagMajor, tagMinor, tagPatch] = latestTag.split('.').map(Number);
 
-if (major < tagMajor || (major === tagMajor && minor < tagMinor) || (major === tagMajor && minor === tagMinor && patch <= tagPatch)) {
-  // Auto-bump based on recommended type
+if (process.env.CI && (major < tagMajor || (major === tagMajor && minor < tagMinor) || (major === tagMajor && minor === tagMinor && patch <= tagPatch))) {
+  // Auto-bump based on recommended type (only in CI)
   let newVersion;
   if (bumpType === 'major') {
     newVersion = `${major + 1}.0.0`;

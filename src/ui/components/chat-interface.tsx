@@ -44,6 +44,7 @@ function ChatInterfaceWithAgent({
   const processingStartTime = useRef<number>(0);
   const lastChatHistoryLength = useRef<number>(0);
 
+
   const confirmationService = ConfirmationService.getInstance();
 
   const {
@@ -151,66 +152,60 @@ function ChatInterfaceWithAgent({
             const now = Date.now();
             if (now - lastUpdateTime < 150) return; // Throttle to ~6-7 FPS
 
-            // Update token count if changed
-            if (lastTokenCount !== 0) {
-              setTokenCount(lastTokenCount);
-            }
+            // Batch all chat history updates into a single setState call
+            setChatHistory((prev) => {
+              let newHistory = [...prev];
 
-            // Handle accumulated content
-            if (accumulatedContent) {
-              if (!streamingEntry) {
-                const newStreamingEntry = {
-                  type: "assistant" as const,
-                  content: accumulatedContent,
-                  timestamp: new Date(),
-                  isStreaming: true,
-                };
-                setChatHistory((prev) => [...prev, newStreamingEntry]);
-                streamingEntry = newStreamingEntry;
-              } else {
-                setChatHistory((prev) =>
-                  prev.map((entry, idx) =>
-                    idx === prev.length - 1 && entry.isStreaming
-                      ? { ...entry, content: entry.content + accumulatedContent }
-                      : entry
-                  )
-                );
+              // Update token count if changed
+              if (lastTokenCount !== 0) {
+                // Note: token count is handled separately, not in chat history
               }
-              accumulatedContent = "";
-            }
 
-            // Handle pending tool calls
-            if (pendingToolCalls) {
-              setChatHistory((prev) =>
-                prev.map((entry) =>
-                  entry.isStreaming
-                    ? {
-                        ...entry,
-                        isStreaming: false,
-                        toolCalls: pendingToolCalls,
-                      }
-                    : entry
-                )
-              );
-              streamingEntry = null;
+              // Handle accumulated content
+              if (accumulatedContent) {
+                if (!streamingEntry) {
+                  const newStreamingEntry = {
+                    type: "assistant" as const,
+                    content: accumulatedContent,
+                    timestamp: new Date(),
+                    isStreaming: true,
+                  };
+                  newHistory.push(newStreamingEntry);
+                  streamingEntry = newStreamingEntry;
+                } else {
+                  const lastIdx = newHistory.length - 1;
+                  if (lastIdx >= 0 && newHistory[lastIdx].isStreaming) {
+                    newHistory[lastIdx] = { ...newHistory[lastIdx], content: newHistory[lastIdx].content + accumulatedContent };
+                  }
+                }
+                accumulatedContent = "";
+              }
 
-              // Add individual tool call entries
-              pendingToolCalls.forEach((toolCall) => {
-                const toolCallEntry: ChatEntry = {
-                  type: "tool_call",
-                  content: "Executing...",
-                  timestamp: new Date(),
-                  toolCall: toolCall,
-                };
-                setChatHistory((prev) => [...prev, toolCallEntry]);
-              });
-              pendingToolCalls = null;
-            }
+              // Handle pending tool calls
+              if (pendingToolCalls) {
+                // Mark streaming entry as complete
+                const streamingIdx = newHistory.findIndex(entry => entry.isStreaming);
+                if (streamingIdx >= 0) {
+                  newHistory[streamingIdx] = { ...newHistory[streamingIdx], isStreaming: false, toolCalls: pendingToolCalls };
+                }
+                streamingEntry = null;
 
-            // Handle pending tool results
-            if (pendingToolResults.length > 0) {
-              setChatHistory((prev) =>
-                prev.map((entry) => {
+                // Add individual tool call entries
+                pendingToolCalls.forEach((toolCall) => {
+                  const toolCallEntry: ChatEntry = {
+                    type: "tool_call",
+                    content: "Executing...",
+                    timestamp: new Date(),
+                    toolCall: toolCall,
+                  };
+                  newHistory.push(toolCallEntry);
+                });
+                pendingToolCalls = null;
+              }
+
+              // Handle pending tool results
+              if (pendingToolResults.length > 0) {
+                newHistory = newHistory.map((entry) => {
                   if (entry.isStreaming) {
                     return { ...entry, isStreaming: false };
                   }
@@ -229,10 +224,17 @@ function ChatInterfaceWithAgent({
                     };
                   }
                   return entry;
-                })
-              );
-              streamingEntry = null;
-              pendingToolResults = [];
+                });
+                streamingEntry = null;
+                pendingToolResults = [];
+              }
+
+              return newHistory;
+            });
+
+            // Update token count separately
+            if (lastTokenCount !== 0) {
+              setTokenCount(lastTokenCount);
             }
 
             lastUpdateTime = now;
