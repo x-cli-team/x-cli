@@ -257,6 +257,198 @@
 /* === Hide emoji and decorative elements === */
 /* This will be handled by content cleanup */
 
+/* === X.AI-style Cards === */
+
+/* Hero feature card */
+.hero-card {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.hero-card-content {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.hero-card-text {
+  flex: 1;
+}
+
+.hero-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--ifm-color-content);
+}
+
+.hero-card p {
+  color: var(--ifm-color-content-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.feature-item strong {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ifm-color-content-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feature-item span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ifm-color-content);
+}
+
+.feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tag {
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-content-secondary);
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.card-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--ifm-color-primary);
+  color: white;
+  border: 1px solid var(--ifm-color-primary);
+}
+
+.btn-primary:hover {
+  background: var(--ifm-color-primary-dark);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ifm-color-content);
+  border: 1px solid var(--ifm-border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-content);
+  text-decoration: none;
+}
+
+.hero-card-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+}
+
+.placeholder-image {
+  width: 100%;
+  height: 100%;
+  background: var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.terminal-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--ifm-color-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Jump right in cards */
+.jump-in-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.jump-card {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.jump-card:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.jump-card h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: var(--ifm-color-content);
+}
+
+.jump-card p {
+  color: var(--ifm-color-content-secondary);
+  margin-bottom: 1rem;
+  font-size: 0.925rem;
+  line-height: 1.5;
+}
+
+.jump-card a {
+  color: var(--ifm-color-primary);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.jump-card a:hover {
+  text-decoration: underline;
+}
+
 /* === Mobile responsive === */
 @media (max-width: 768px) {
   .navbar__brand {
@@ -269,5 +461,22 @@
   
   .markdown h2 {
     font-size: 1.5rem;
+  }
+  
+  .hero-card-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-actions {
+    justify-content: center;
+  }
+  
+  .jump-in-grid {
+    grid-template-columns: 1fr;
   }
 }

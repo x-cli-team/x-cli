@@ -6,6 +6,68 @@ title: Overview
 
 Grok CLI is a conversational AI tool that brings Claude Code-level intelligence directly into your terminal. Built with X.AI's Grok models, it provides advanced file operations, code analysis, and workflow automation through natural language interaction.
 
+<div className="hero-card">
+  <div className="hero-card-content">
+    <div className="hero-card-text">
+      <h3>Grok CLI v1.0.96</h3>
+      <p>We're excited to release the latest advancement in terminal-based AI development tools with Claude Code-level capabilities.</p>
+      
+      <div className="feature-grid">
+        <div className="feature-item">
+          <strong>Tool System</strong>
+          <span>15+ specialized tools</span>
+        </div>
+        <div className="feature-item">
+          <strong>Context</strong>
+          <span>Unlimited project context</span>
+        </div>
+      </div>
+      
+      <div className="feature-tags">
+        <span className="tag">File operations</span>
+        <span className="tag">Code intelligence</span>
+        <span className="tag">Web integration</span>
+        <span className="tag">Lightning fast</span>
+        <span className="tag">Terminal native</span>
+      </div>
+      
+      <div className="card-actions">
+        <a href="getting-started/installation" className="btn-primary">Get Started</a>
+        <a href="architecture/overview" className="btn-secondary">View Architecture</a>
+      </div>
+    </div>
+    <div className="hero-card-image">
+      <div className="placeholder-image">
+        <div className="terminal-icon">
+          <span>$</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+## Jump right in
+
+<div className="jump-in-grid">
+  <div className="jump-card">
+    <h4>Quickstart</h4>
+    <p>Install globally and make your first request with natural language.</p>
+    <a href="getting-started/installation">Learn more</a>
+  </div>
+  
+  <div className="jump-card">
+    <h4>Tool System</h4>
+    <p>Let Grok CLI perform file operations, code analysis, and workflow automation.</p>
+    <a href="architecture/overview">Learn more</a>
+  </div>
+  
+  <div className="jump-card">
+    <h4>MCP Integration</h4>
+    <p>Extend capabilities with Model Context Protocol servers and external services.</p>
+    <a href="api/schema">Learn more</a>
+  </div>
+</div>
+
 ## Key Features
 
 **Advanced File Operations**
@@ -28,26 +90,6 @@ Grok CLI is a conversational AI tool that brings Claude Code-level intelligence 
 - Specialized agent delegation for complex operations
 - IDE integration with VS Code and Jupyter
 
-## Quick Start
-
-Install globally via npm:
-
-```bash
-npm install -g grok-cli-hurry-mode@latest
-```
-
-Set your API key:
-
-```bash
-export GROK_API_KEY=your_api_key_here
-```
-
-Start the CLI:
-
-```bash
-grok
-```
-
 ## Architecture
 
 Grok CLI is built on a modular architecture with:
@@ -68,10 +110,12 @@ Grok CLI is built on a modular architecture with:
 **IDE Integration**
 - NotebookEdit, BashOutput, KillBash
 
-## Getting Help
+---
 
-- [Installation Guide](getting-started/installation) - Complete setup instructions
-- [Architecture Overview](architecture/overview) - Technical details
-- [API Reference](api/schema) - Tool schemas and configurations
+Are you looking for a different AI coding assistant? Visit [Claude Code](https://claude.ai/code) or check out our [comparison table](https://github.com/hinetapora/grok-cli-hurry-mode#comparison) for the differences.
 
-For support, visit our [GitHub repository](https://github.com/hinetapora/grok-cli-hurry-mode) or join the [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064).
+## Questions and feedback
+
+If you have any questions or feedback, feel free to create an issue on our [GitHub repository](https://github.com/hinetapora/grok-cli-hurry-mode/issues) or join the [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064).
+
+**Happy Grokking in the Terminal!** ⚡
