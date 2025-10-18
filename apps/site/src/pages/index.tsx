@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import styles from './index.module.css';
+import TestimonialsSection from '@site/src/components/TestimonialsSection';
 
 export default function Page() {
-  return <GrokCliHero />;
+  return (
+    <>
+      <GrokCliHero />
+      <TestimonialsSection />
+    </>
+  );
 }
 
 function GrokCliHero() {
@@ -50,7 +56,7 @@ function GrokCliHero() {
             <div className={styles.heroCardContent}>
               <div className={styles.heroCardText}>
                 <h3 className={styles.heroCardTitle}>Grok CLI</h3>
-                <p className={styles.heroCardDescription}>Experience Claude Code-level intelligence in your terminal. Built for developers who need powerful AI assistance without leaving their workflow.</p>
+                <p className={styles.heroCardDescription}>Open source terminal AI assistant reaching for Claude Code-level intelligence. Community-driven project built by developers, for developers who need powerful AI assistance without leaving their workflow.</p>
                 
                 <div className={styles.featureGrid}>
                   <div className={styles.featureItem}>

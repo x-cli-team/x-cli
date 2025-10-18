@@ -1,0 +1,145 @@
+name: 📝 Share Your Grok CLI Experience
+description: Submit a testimonial about your experience with Grok CLI
+title: "[Testimonial] Your Experience with Grok CLI"
+labels: ["testimonial", "community"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 🎉 Thank you for using Grok CLI!
+        
+        We'd love to hear about your experience and showcase your story to help other developers discover Grok CLI.
+        
+        **Your testimonial will be:**
+        - ✅ Reviewed automatically for content guidelines
+        - 🚀 Published to our website within 10 minutes
+        - 🌟 Featured in our community showcase
+        - 🔗 Linked back to your profile for attribution
+        
+        *All testimonials are added via automated pull requests that you can review before they're merged.*
+
+  - type: input
+    id: name
+    attributes:
+      label: 👤 Your Name
+      description: How would you like to be credited? (First and Last name)
+      placeholder: "Alex Chen"
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: 💼 Job Title
+      description: Your current role or position
+      placeholder: "Senior Software Engineer"
+    validations:
+      required: true
+
+  - type: input
+    id: company
+    attributes:
+      label: 🏢 Company/Organization
+      description: Where you work or your professional affiliation
+      placeholder: "TechCorp"
+    validations:
+      required: true
+
+  - type: textarea
+    id: quote
+    attributes:
+      label: 💬 Your Experience with Grok CLI
+      description: |
+        Share your experience with Grok CLI! What problem did it solve? How has it improved your workflow?
+        
+        **Guidelines:**
+        - Keep it under 480 characters (about 2-3 sentences)
+        - Focus on specific benefits or use cases
+        - Be authentic and honest about your experience
+        
+        **Examples:**
+        - "Grok CLI transformed my development workflow..."
+        - "Finally, an AI assistant that works in the terminal..."
+        - "The tool system is incredibly powerful for..."
+      placeholder: "Grok CLI transformed my development workflow. The AI assistance is incredible and it never leaves my terminal."
+    validations:
+      required: true
+
+  - type: input
+    id: link
+    attributes:
+      label: 🔗 Your Profile Link
+      description: |
+        Link to your professional profile for attribution
+        
+        **Accepted domains:**
+        - GitHub: https://github.com/username
+        - LinkedIn: https://linkedin.com/in/username  
+        - Personal website: https://yoursite.dev
+        - Dev.to: https://dev.to/username
+        - Twitter/X: https://x.com/username
+      placeholder: "https://github.com/username"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tags
+    attributes:
+      label: 🏷️ What aspect of Grok CLI do you want to highlight?
+      description: Choose up to 3 tags that best describe your experience
+      multiple: true
+      options:
+        - productivity
+        - ai-assistance
+        - terminal
+        - automation
+        - developer-experience
+        - tools
+        - workflow
+        - open-source
+        - community
+        - performance
+        - ease-of-use
+        - innovation
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: avatar_consent
+    attributes:
+      label: 📸 Avatar Permission
+      description: We'll use your GitHub avatar if you provided a GitHub link, or a placeholder if not
+      options:
+        - label: I consent to using my profile avatar for the testimonial display
+          required: true
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: ✅ Consent & Verification
+      description: Please confirm your agreement to share this testimonial
+      options:
+        - label: I consent to having my testimonial featured on the Grok CLI website and documentation
+          required: true
+        - label: I confirm that this testimonial is truthful and based on my actual experience with Grok CLI
+          required: true
+        - label: I understand that this testimonial will be publicly visible and attributed to me
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        ### 🤖 What happens next?
+        
+        1. **Automated Processing**: A bot will create a pull request with your testimonial
+        2. **Validation**: Automatic checks ensure content meets guidelines
+        3. **Publication**: Your testimonial goes live on our website within 10 minutes
+        4. **Attribution**: Your profile link will be included for proper credit
+        
+        **Questions?** Feel free to ask in our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064) or comment on the generated PR.
+        
+        Thank you for being part of the Grok CLI community! 🙏
