@@ -56,18 +56,18 @@ function filterContent(content, filePath) {
   filtered = filtered.replace(/Last Updated: \d{4}-\d{2}-\d{2}T[\d:.]+Z/g, '');
   filtered = filtered.replace(/Updated By: .*/g, '');
   
-  // Remove emojis for clean X.AI-inspired look
+  // Remove emojis for clean X.AI-inspired look - but preserve line breaks
   filtered = filtered.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
   
   // Remove emoji shortcodes like :emoji:
   filtered = filtered.replace(/:[a-z_+-]+:/g, '');
   
-  // Remove common emoji patterns in markdown (🚀 ✅ 📚 etc)
+  // Remove common emoji patterns in markdown (🚀 ✅ 📚 etc) - but preserve line structure
   filtered = filtered.replace(/[🚀✅📚🔧🎯⚡🔍🌐📊🤖💻🏗️🛠️📦🔄📝💡🆕🔗📖🌍⚙️💬🧠📄🔎🌳📋🛡️🎨🔥💻]/g, '');
   
-  // Clean up extra spaces left by emoji removal
-  filtered = filtered.replace(/\s+/g, ' ');
-  filtered = filtered.replace(/^\s+|\s+$/gm, '');
+  // Clean up multiple spaces but preserve line breaks
+  filtered = filtered.replace(/ +/g, ' ');
+  filtered = filtered.replace(/^ +| +$/gm, '');
   
   // Filter critical-state.md for public consumption
   if (filePath.includes('critical-state.md')) {
@@ -144,8 +144,9 @@ function syncAgentDocs() {
       content = filterContent(content, sourcePath);
       content = rewriteLinks(content);
       
-      // Add frontmatter
-      const title = content.match(/# (.+)/)?.[1] || path.basename(target, '.md');
+      // Add frontmatter - extract just the first line after #
+      const titleMatch = content.match(/^# (.+?)(?:\n|$)/m);
+      const title = titleMatch ? titleMatch[1].trim() : path.basename(target, '.md');
       content = addFrontmatter(content, title);
       
       // Write to target
@@ -161,35 +162,17 @@ function syncAgentDocs() {
   const roadmapContent = generateRoadmap();
   fs.writeFileSync(path.join(DOCS_DIR, 'roadmap.md'), roadmapContent);
   
-  // Create sidebar config for TypeScript
+  // Create flat sidebar config like X.AI docs (no categories)
   const sidebarConfig = {
     tutorialSidebar: [
       'overview',
-      {
-        type: 'category',
-        label: 'Getting Started',
-        items: ['getting-started/installation'],
-      },
-      {
-        type: 'category', 
-        label: 'Architecture',
-        items: ['architecture/overview', 'architecture/current-state'],
-      },
-      {
-        type: 'category',
-        label: 'API Reference', 
-        items: ['api/schema'],
-      },
-      {
-        type: 'category',
-        label: 'Guides',
-        items: ['guides/releases', 'guides/automation'],
-      },
-      {
-        type: 'category',
-        label: 'Troubleshooting',
-        items: ['troubleshooting/npm'],
-      },
+      'getting-started/installation',
+      'architecture/overview',
+      'architecture/current-state', 
+      'api/schema',
+      'guides/releases',
+      'guides/automation',
+      'troubleshooting/npm',
       'roadmap',
     ],
   };

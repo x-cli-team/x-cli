@@ -3,43 +3,13 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   "tutorialSidebar": [
     "overview",
-    {
-      "type": "category",
-      "label": "Getting Started",
-      "items": [
-        "getting-started/installation"
-      ]
-    },
-    {
-      "type": "category",
-      "label": "Architecture",
-      "items": [
-        "architecture/overview",
-        "architecture/current-state"
-      ]
-    },
-    {
-      "type": "category",
-      "label": "API Reference",
-      "items": [
-        "api/schema"
-      ]
-    },
-    {
-      "type": "category",
-      "label": "Guides",
-      "items": [
-        "guides/releases",
-        "guides/automation"
-      ]
-    },
-    {
-      "type": "category",
-      "label": "Troubleshooting",
-      "items": [
-        "troubleshooting/npm"
-      ]
-    },
+    "getting-started/installation",
+    "architecture/overview",
+    "architecture/current-state",
+    "api/schema",
+    "guides/releases",
+    "guides/automation",
+    "troubleshooting/npm",
     "roadmap"
   ]
 };
