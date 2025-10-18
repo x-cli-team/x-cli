@@ -6,45 +6,16 @@ title: Overview
 
 Grok CLI is a conversational AI tool that brings Claude Code-level intelligence directly into your terminal. Built with X.AI's Grok models, it provides advanced file operations, code analysis, and workflow automation through natural language interaction.
 
-<div className="hero-card">
-  <div className="hero-card-content">
-    <div className="hero-card-text">
-      <h3>Grok CLI v1.0.96</h3>
-      <p>We're excited to release the latest advancement in terminal-based AI development tools with Claude Code-level capabilities.</p>
-      
-      <div className="feature-grid">
-        <div className="feature-item">
-          <strong>Tool System</strong>
-          <span>15+ specialized tools</span>
-        </div>
-        <div className="feature-item">
-          <strong>Context</strong>
-          <span>Unlimited project context</span>
-        </div>
-      </div>
-      
-      <div className="feature-tags">
-        <span className="tag">File operations</span>
-        <span className="tag">Code intelligence</span>
-        <span className="tag">Web integration</span>
-        <span className="tag">Lightning fast</span>
-        <span className="tag">Terminal native</span>
-      </div>
-      
-      <div className="card-actions">
-        <a href="getting-started/installation" className="btn-primary">Get Started</a>
-        <a href="architecture/overview" className="btn-secondary">View Architecture</a>
-      </div>
-    </div>
-    <div className="hero-card-image">
-      <div className="placeholder-image">
-        <div className="terminal-icon">
-          <span>$</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+## Quick Overview
+
+**Grok CLI v1.0.99** brings Claude Code-level intelligence to your terminal with advanced AI-powered development tools.
+
+### Key Capabilities
+
+- **15+ Specialized Tools** - File operations, code analysis, web integration
+- **Unlimited Context** - Full project understanding and conversation memory  
+- **MCP Integration** - Extensible via Model Context Protocol servers
+- **Terminal Native** - Lightning fast, no GUI required
 
 ## Jump right in
 
