@@ -11,12 +11,25 @@
 4. **Creates git tag** for the release
 
 ### What You Need to Do
-**Nothing!** Just push your changes to main. The system handles:
-- ✅ Version bumping (patch increments)
-- ✅ README updates 
+**Use Smart Push!** GitHub Actions creates version bump commits, so use:
+
+```bash
+# ✅ CORRECT - Use smart push to handle automated version bumps
+git pushup              # Git alias method
+npm run smart-push      # NPM script method  
+./scripts/smart-push.sh # Direct script method
+
+# ❌ WRONG - Will cause "fetch first" errors
+git push origin main
+```
+
+The system handles:
+- ✅ Version bumping (patch increments)  
+- ✅ README updates
 - ✅ NPM publishing
 - ✅ Git tagging
 - ✅ Build validation
+- ✅ Auto-rebase with remote changes
 
 ## 🚨 Critical Workflow Dependencies
 

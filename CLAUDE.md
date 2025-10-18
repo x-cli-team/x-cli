@@ -203,7 +203,8 @@ This CLI aims to bring the power of Claude Code to terminal-based workflows whil
 - Use cross-references between .agent docs
 
 ### After Implementation:
-- Run `/update-agent-docs` to capture changes
+- **ALWAYS use smart push**: `git pushup` or `npm run smart-push` (never `git push origin main`)
+- Run `/update-agent-docs` to capture changes  
 - Update `.agent/system/` if architecture changed
 - Add new SOPs for repeatable processes
 - Link related tasks and documents

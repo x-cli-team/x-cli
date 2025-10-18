@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# Reminder for agents and developers about smart push workflow
+echo ""
+echo "📝 Ready to push? Remember to use SMART PUSH to handle automated version bumps:"
+echo ""
+echo "✅ Use: git pushup"
+echo "✅ Use: npm run smart-push"  
+echo "✅ Use: ./scripts/smart-push.sh"
+echo ""
+echo "❌ DON'T use: git push origin main (will cause 'fetch first' errors)"
+echo ""
+echo "💡 See .agent/sop/git-workflow.md for details"
+echo ""

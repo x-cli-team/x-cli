@@ -116,8 +116,8 @@ npm error `always-auth` is not a valid npm option
 
 ### Required GitHub Secrets
 ```
-PAT_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-NPM_TOKEN=npm_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+PAT_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+NPM_TOKEN=npm_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ### Critical Workflow Steps
