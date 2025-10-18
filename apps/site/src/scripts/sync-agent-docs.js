@@ -13,8 +13,8 @@ const AGENT_DIR = path.resolve(__dirname, '../../../../.agent');
 const DOCS_DIR = path.resolve(__dirname, '../../docs');
 
 // Mapping of .agent files to public docs
+// Note: overview.md is excluded to preserve custom overview page
 const SYNC_MAP = {
-  'README.md': 'overview.md',
   'system/architecture.md': 'architecture/overview.md', 
   'system/critical-state.md': 'architecture/current-state.md',
   'system/installation.md': 'getting-started/installation.md',
@@ -124,13 +124,12 @@ function ensureDir(filePath) {
 function syncAgentDocs() {
   console.log('🔄 Syncing .agent docs to Docusaurus...');
   
-  // Clean existing docs
-  if (fs.existsSync(DOCS_DIR)) {
-    fs.rmSync(DOCS_DIR, { recursive: true, force: true });
+  // Ensure docs directory exists but don't delete everything
+  if (!fs.existsSync(DOCS_DIR)) {
+    fs.mkdirSync(DOCS_DIR, { recursive: true });
   }
-  fs.mkdirSync(DOCS_DIR, { recursive: true });
   
-  // Process mapped files
+  // Process mapped files (only sync specific files, preserving custom docs)
   Object.entries(SYNC_MAP).forEach(([source, target]) => {
     const sourcePath = path.join(AGENT_DIR, source);
     const targetPath = path.join(DOCS_DIR, target);
