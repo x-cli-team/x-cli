@@ -1,4 +1,4 @@
-## 1.0.91 – Stability Release
+## 1.0.92 – Stability Release
 
 This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
