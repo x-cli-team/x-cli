@@ -2,7 +2,6 @@ name: 📝 Share Your Grok CLI Experience
 description: Submit a testimonial about your experience with Grok CLI
 title: "[Testimonial] Your Experience with Grok CLI"
 labels: ["testimonial", "community"]
-assignees: []
 
 body:
   - type: markdown
