@@ -1,124 +1,93 @@
 ---
-title: Overview
----
+title: .agent Documentation System
+---# .agent Documentation System
 
-# Grok CLI
+## Overview
+This directory contains AI agent documentation for Grok CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
 
-Grok CLI is a conversational AI tool that brings Claude Code-level intelligence directly into your terminal. Built with X.AI's Grok models, it provides advanced file operations, code analysis, and workflow automation through natural language interaction.
+## Critical Configuration Warnings
 
-<div className="hero-card">
-  <div className="hero-card-background">
-    <video className="hero-card-video" autoPlay muted loop playsInline preload="auto">
-      <source src="/grok-video-93ef685c-b1de-4696-a757-359c20e0ca0f.mp4" type="video/mp4" />
-      <source src="/img/grok-hero-video.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </div>
-  <div className="hero-card-overlay"></div>
-  <div className="hero-card-content">
-    <div className="hero-card-text">
-      <h3>Grok CLI v1.0.96</h3>
-      <p>We're excited to release the latest advancement in terminal-based AI development tools with Claude Code-level capabilities.</p>
-      
-      <div className="feature-grid">
-        <div className="feature-item">
-          <strong>Tool System</strong>
-          <span>15+ specialized tools</span>
-        </div>
-        <div className="feature-item">
-          <strong>Context</strong>
-          <span>Unlimited project context</span>
-        </div>
-      </div>
-      
-      <div className="feature-list">
-        <ul>
-          <li>File operations</li>
-          <li>Code intelligence</li>
-          <li>Web integration</li>
-          <li>Lightning fast</li>
-          <li>Terminal native</li>
-        </ul>
-      </div>
-    </div>
-    
-    <div className="card-actions">
-      <a href="getting-started/installation" className="btn-primary">Get Started</a>
-      <a href="architecture/overview" className="btn-secondary">View Architecture</a>
-    </div>
-  </div>
-</div>
+** AUTOMATED RELEASE SYSTEM IS NOW FULLY OPERATIONAL (2025-10-17)**
 
-## Jump right in
+**DO NOT MODIFY THESE SETTINGS UNLESS YOU KNOW WHAT YOU'RE DOING:**
 
-<div className="jump-in-grid">
-  <div className="jump-card">
-    <h4>Quickstart</h4>
-    <p>Install globally and make your first request with natural language.</p>
-    <a href="getting-started/installation">Learn more</a>
-  </div>
-  
-  <div className="jump-card">
-    <h4>Tool System</h4>
-    <p>Let Grok CLI perform file operations, code analysis, and workflow automation.</p>
-    <a href="architecture/overview">Learn more</a>
-  </div>
-  
-  <div className="jump-card">
-    <h4>MCP Integration</h4>
-    <p>Extend capabilities with Model Context Protocol servers and external services.</p>
-    <a href="api/schema">Learn more</a>
-  </div>
-</div>
+### Protected NPM Publishing Settings
+- **`package.json` name**: Must remain `"grok-cli-hurry-mode"` (unscoped). Changing to scoped (e.g., `@username/grok-cli-hurry-mode`) will break NPM publishing unless you have token access for that scope.
+- **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
+- **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `grok-cli-hurry-mode`.
 
-## Key Features
+### Protected Automation Workflow
+- **`.github/workflows/release.yml`**: Combined workflow handling version bump + NPM publish
+- **`.husky/pre-commit`**: Git hook for version synchronization
+- **`scripts/check-version.cjs`**: Automated version bumping and README updates
+- **GitHub Secrets**: `PAT_TOKEN` (git operations) + `NPM_TOKEN` (NPM publishing)
 
-**Advanced File Operations**
-- Read, Write, Edit with atomic multi-file support
-- Search and discovery with Grep, Glob, LS tools
-- Transaction-based editing with rollback capabilities
+### Protected Git Operations
+- **Git Hooks**: Do not re-enable interactive pre-push hooks, as they block CI/CD pushes.
+- **Branch Protection**: Do not prevent GitHub Actions from pushing to main branch.
 
-**Code Intelligence**
-- Syntax-aware editing with AST parsing
-- Symbol search across codebases
-- Dependency analysis and refactoring tools
+**Why?** Previous changes to these broke the entire publishing flow. The current system took multiple iterations to get working.
 
-**Web Integration**
-- Real-time web search and content retrieval
-- HTTP client capabilities for API testing
-- External service integration via MCP protocol
+** Full Protection Details**: See `sop/automation-protection.md`
 
-**Workflow Automation**
-- Task management and progress tracking
-- Specialized agent delegation for complex operations
-- IDE integration with VS Code and Jupyter
+## Directory Structure
 
-## Architecture
+### system/
+Core project information and architecture:
+- **architecture.md** - Project structure and design patterns
+- **api-schema.md** - API endpoints and data schemas
+- **critical-state.md** - Current system state snapshot
+- **installation.md** - Installation and setup guide
 
-Grok CLI is built on a modular architecture with:
+### tasks/
+Product requirement documents and feature specifications:
+- Store PRDs before implementation
+- Reference related architecture and dependencies
+- Track implementation progress
 
-- **Agent System**: Central orchestration with streaming responses
-- **Tool System**: Modular tools for specific operations
-- **MCP Integration**: Extensible server integration
-- **Configuration Management**: User and project-level settings
+### sop/
+Standard operating procedures and workflows:
+- Development patterns and conventions
+- Deployment and maintenance procedures
+- Code review and testing guidelines
 
-## Tool Categories
+### incidents/
+Documented failures with root cause analysis:
+- Error patterns and their fixes
+- Recovery procedures
+- Prevention strategies
 
-**Core Tools**
-- Read, Write, Edit, Bash, Grep, Glob, LS
+### guardrails/
+Enforceable rules to prevent recurring mistakes:
+- Naming conventions
+- Configuration constraints
+- Implementation patterns
 
-**Advanced Tools**
-- MultiEdit, WebFetch, WebSearch, Task, TodoWrite
+### commands/
+Documentation for documentation system commands:
+- Usage guides for /init-agent, /update-agent-docs, etc.
+- Integration workflows
 
-**IDE Integration**
-- NotebookEdit, BashOutput, KillBash
+## Usage Guidelines
+
+### For AI Agents
+1. **Always read README.md first** - Get project overview (this file)
+2. **Check system/critical-state.md** - Understand current architecture
+3. **Review relevant tasks/** - Check for related work or conflicts
+4. **Follow sop/** patterns - Use established conventions
+5. **Check guardrails/** - Avoid known failure patterns
+
+### For Updates
+- Run `/update-agent-docs` after significant changes
+- Add new PRDs to tasks/ before implementation
+- Update system docs when architecture changes
+- Document new patterns in sop/
+
+## Cross-References
+- Main project documentation: ../README.md
+- Configuration: ../.grok/settings.json
+- Build instructions: ../package.json
 
 ---
-
-Are you looking for a different AI coding assistant? Visit [Claude Code](https://claude.ai/code) or check out our [comparison table](https://github.com/hinetapora/grok-cli-hurry-mode#comparison) for the differences.
-
-## Questions and feedback
-
-If you have any questions or feedback, feel free to create an issue on our [GitHub repository](https://github.com/hinetapora/grok-cli-hurry-mode/issues) or join the [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064).
-
-**Happy Grokking in the Terminal!** ⚡
+*Generated by Grok CLI Documentation System*
+*Last updated: 2025-10-11*

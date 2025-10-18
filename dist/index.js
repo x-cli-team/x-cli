@@ -9285,7 +9285,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.60"};
+  version: "1.0.101"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -15038,15 +15038,52 @@ function ChatInterfaceWithAgent({
   dBBBB    dBBBBK'  dB'.BP  dBBBBP'          dBP    dBP    dBP  
  dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
 dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    ` }),
-      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "Tips for getting started:" }),
+      /* @__PURE__ */ jsx(Text, { color: "green", bold: true, marginTop: 1, children: "\u{1F680} Welcome to Grok CLI - Claude Code-level intelligence in your terminal!" }),
+      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, marginTop: 1, children: "\u{1F4A1} Quick Start Tips:" }),
       /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: "1. Ask questions, edit files, or run commands." }),
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: "2. Be specific for the best results." }),
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: "3. Create GROK.md files to customize your interactions with Grok." }),
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: "4. Press Shift+Tab to toggle auto-edit mode." }),
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: '5. Run "/init-agent" to set up an .agent docs system for this project.' }),
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: '6. Run "/heal" after errors to capture a fix and add a guardrail.' }),
-        /* @__PURE__ */ jsx(Text, { color: "gray", children: "7. /help for more information." })
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Ask anything:" }),
+          ' "Create a React component" or "Debug this Python script"'
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Edit files:" }),
+          ' "Add error handling to app.js"'
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Run commands:" }),
+          ' "Set up a new Node.js project"'
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Get help:" }),
+          ' Type "/help" for all commands'
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, marginTop: 1, children: "\u{1F6E0}\uFE0F Power Features:" }),
+      /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Auto-edit mode:" }),
+          " Press Shift+Tab to toggle hands-free editing"
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Project memory:" }),
+          " Create .grok/GROK.md to customize behavior"
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Documentation:" }),
+          ' Run "/init-agent" for .agent docs system'
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u2022 ",
+          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Error recovery:" }),
+          ' Run "/heal" after errors to add guardrails'
+        ] })
       ] })
     ] }),
     /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Type your request in natural language. Ctrl+C to clear, 'exit' to quit." }) }),
