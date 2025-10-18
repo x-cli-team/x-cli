@@ -1,6 +1,5 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "build",
-  "installCommand": "npm install",
-  "framework": "docusaurus2"
+  "installCommand": "npm install"
 }
