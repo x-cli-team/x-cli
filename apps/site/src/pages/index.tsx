@@ -58,6 +58,46 @@ function GrokCliHero() {
           <ChipBtn variant="outline" label="Documentation" href="/docs/overview" />
         </div>
       </div>
+
+      {/* X.AI Style Hero Card */}
+      <div className={styles.heroCardContainer}>
+        <div className="hero-card">
+          <div className="hero-card-background"></div>
+          <div className="hero-card-overlay"></div>
+          <div className="hero-card-content">
+            <div className="hero-card-text">
+              <h3>Grok CLI</h3>
+              <p>Experience Claude Code-level intelligence in your terminal. Built for developers who need powerful AI assistance without leaving their workflow.</p>
+              
+              <div className="feature-grid">
+                <div className="feature-item">
+                  <strong>Modalities</strong>
+                  <span>🗣️ → 📝</span>
+                </div>
+                <div className="feature-item">
+                  <strong>Tools Available</strong>
+                  <span>15+</span>
+                </div>
+              </div>
+
+              <div className="feature-list">
+                <ul>
+                  <li>Advanced file operations</li>
+                  <li>Code-aware editing</li>
+                  <li>Multi-file transactions</li>
+                  <li>Web integration</li>
+                  <li>MCP protocol support</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="card-actions">
+              <a className="btn-primary" href="/docs/getting-started/installation">Get Started</a>
+              <a className="btn-secondary" href="/docs/getting-started/quickstart">View Quickstart</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

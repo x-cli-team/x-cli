@@ -1,5 +1,11 @@
 /* Landing page styles - converted from Tailwind to CSS */
 
+.heroCardContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 .hero {
   position: relative;
   min-height: 100vh;

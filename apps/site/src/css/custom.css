@@ -313,35 +313,64 @@
 
 /* === X.AI-style Cards === */
 
-/* Hero feature card */
+/* Hero feature card - X.AI design pattern */
 .hero-card {
-  background: var(--ifm-background-surface-color);
-  border: 1px solid var(--ifm-border-color);
-  border-radius: 8px;
-  padding: 2rem;
+  background: #000000;
+  border-radius: 16px;
+  overflow: hidden;
   margin: 2rem 0;
+  position: relative;
+  height: 400px;
+  border: none;
+}
+
+.hero-card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/img/grok-hero-bg.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(1px);
 }
 
 .hero-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  height: 100%;
   display: flex;
-  gap: 2rem;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 50%;
 }
 
 .hero-card-text {
-  flex: 1;
+  color: white;
 }
 
 .hero-card h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-  color: var(--ifm-color-content);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: white;
 }
 
 .hero-card p {
-  color: var(--ifm-color-content-secondary);
-  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -349,8 +378,8 @@
 .feature-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .feature-item {
@@ -360,33 +389,42 @@
 }
 
 .feature-item strong {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--ifm-color-content-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .feature-item span {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--ifm-color-content);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
 }
 
-.feature-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+.feature-list {
+  margin-bottom: 2rem;
 }
 
-.tag {
-  background: var(--ifm-color-emphasis-300);
-  color: var(--ifm-color-content-secondary);
+.feature-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-list li {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
   font-size: 0.875rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feature-list li::before {
+  content: "✓";
+  color: #10b981;
+  font-weight: bold;
 }
 
 .card-actions {
@@ -396,65 +434,43 @@
 
 .btn-primary, .btn-secondary {
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 500;
   text-decoration: none;
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .btn-primary {
-  background: var(--ifm-color-primary);
-  color: white;
-  border: 1px solid var(--ifm-color-primary);
+  background: white;
+  color: black;
 }
 
 .btn-primary:hover {
-  background: var(--ifm-color-primary-dark);
-  color: white;
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
   text-decoration: none;
 }
 
 .btn-secondary {
   background: transparent;
-  color: var(--ifm-color-content);
-  border: 1px solid var(--ifm-border-color);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary:hover {
-  background: var(--ifm-color-emphasis-300);
-  color: var(--ifm-color-content);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
   text-decoration: none;
 }
 
-.hero-card-image {
-  flex-shrink: 0;
-  width: 120px;
-  height: 120px;
-}
-
-.placeholder-image {
-  width: 100%;
-  height: 100%;
-  background: var(--ifm-color-emphasis-300);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.terminal-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--ifm-color-primary);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
+/* Hero card container */
+.heroCardContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 /* Jump right in cards */
@@ -517,9 +533,23 @@
     font-size: 1.5rem;
   }
   
+  /* X.AI Hero Card Mobile */
+  .hero-card {
+    height: 500px;
+  }
+  
+  .hero-card-overlay {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+  }
+  
   .hero-card-content {
-    flex-direction: column;
-    text-align: center;
+    width: 100%;
+    text-align: left;
+  }
+  
+  .hero-card h3 {
+    font-size: 1.5rem;
   }
   
   .feature-grid {
@@ -527,7 +557,17 @@
   }
   
   .card-actions {
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn-primary, .btn-secondary {
+    text-align: center;
+    display: block;
+  }
+  
+  .heroCardContainer {
+    padding: 0 1rem;
   }
   
   .jump-in-grid {
