@@ -792,3 +792,13 @@ curl -I https://api.x.ai/v1/models
 - **Tool timeouts**: Complex operations may take time; the spinner indicates progress
 - **Slow responses**: Try a different model with `grok --model grok-code-fast-1`
 
+## 🙏 Credits
+
+This project is built upon the excellent foundation of the original [Grok CLI](https://github.com/superagent-ai/grok-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
+
+**Original Project**: [superagent-ai/grok-cli](https://github.com/superagent-ai/grok-cli)  
+**Founder**: [Ismail Pelaseyed](https://github.com/homanp)  
+**Organization**: [Superagent.ai](https://github.com/superagent-ai)
+
+This "Hurry Mode" fork extends the original with advanced file operations, enhanced tool systems, and comprehensive automation while maintaining the core vision of bringing AI-powered terminal intelligence to developers.
+

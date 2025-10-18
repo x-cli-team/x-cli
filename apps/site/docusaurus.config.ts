@@ -146,8 +146,25 @@ const config: Config = {
             },
           ],
         },
+        {
+          title: 'Credits',
+          items: [
+            {
+              label: 'Original Grok CLI',
+              href: 'https://github.com/superagent-ai/grok-cli',
+            },
+            {
+              label: 'Ismail Pelaseyed',
+              href: 'https://github.com/homanp',
+            },
+            {
+              label: 'Superagent.ai',
+              href: 'https://github.com/superagent-ai',
+            },
+          ],
+        },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Grok CLI. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Grok CLI. Built with Docusaurus. Original project by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a> at <a href="https://github.com/superagent-ai/grok-cli" target="_blank" rel="noopener noreferrer">Superagent.ai</a>.`,
     },
     prism: {
       theme: prismThemes.github,
