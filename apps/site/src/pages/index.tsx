@@ -22,13 +22,13 @@ function GrokCliHero() {
         <div className={styles.topNav}>
           <div className={styles.navLeft}>
             <LogoMark />
-            <NavLink>Docs</NavLink>
-            <NavLink>Roadmap</NavLink>
-            <NavLink>Discord</NavLink>
-            <NavLink>GitHub</NavLink>
+            <NavLink href="/docs/overview">Docs</NavLink>
+            <NavLink href="/docs/roadmap">Roadmap</NavLink>
+            <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
+            <NavLink href="https://github.com/hinetapora/grok-cli-hurry-mode">GitHub</NavLink>
           </div>
           <div className={styles.navRight}>
-            <ChipBtn variant="outline" label="Get Started" />
+            <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
           </div>
         </div>
 
@@ -55,7 +55,7 @@ function GrokCliHero() {
               <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v16.19l6.22-6.22a.75.75 0 111.06 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 111.06-1.06l6.22 6.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
             </svg>
           </div>
-          <ChipBtn variant="outline" label="Documentation" />
+          <ChipBtn variant="outline" label="Documentation" href="/docs/overview" />
         </div>
       </div>
     </div>
@@ -66,29 +66,36 @@ function ChipBtn({
   label,
   variant = "solid",
   leadingDot = false,
+  href,
 }: {
   label: string;
   variant?: "solid" | "outline" | "ghost";
   leadingDot?: boolean;
+  href?: string;
 }) {
   const variantClass = variant === "solid" ? styles.chipBtnSolid 
     : variant === "outline" ? styles.chipBtnOutline 
     : styles.chipBtnGhost;
     
+  const Element = href ? 'a' : 'button';
+  
   return (
-    <button className={`${styles.chipBtn} ${variantClass}`}>
+    <Element 
+      className={`${styles.chipBtn} ${variantClass}`}
+      {...(href ? { href } : {})}
+    >
       {leadingDot ? <span className={styles.leadingDot} /> : null}
       <span>{label}</span>
       <svg className={styles.btnIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
         <path fillRule="evenodd" d="M8.25 3.75H19.5a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-1.5 0V6.31L5.03 20.03a.75.75 0 0 1-1.06-1.06L17.69 5.25H8.25a.75.75 0 0 1 0-1.5Z" clipRule="evenodd" />
       </svg>
-    </button>
+    </Element>
   );
 }
 
-function NavLink({ children }: { children: React.ReactNode }) {
+function NavLink({ children, href }: { children: React.ReactNode; href: string }) {
   return (
-    <a href="#" className={styles.navLink}>
+    <a href={href} className={styles.navLink}>
       {children}
     </a>
   );
