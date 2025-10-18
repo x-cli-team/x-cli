@@ -139,6 +139,60 @@
   display: none !important;
 }
 
+/* Service status section at bottom of sidebar */
+.service-status {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ifm-background-surface-color);
+  border-top: 1px solid var(--ifm-border-color);
+  padding: 1rem;
+  font-size: 0.875rem;
+  z-index: 10;
+}
+
+.service-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.service-status-item:last-child {
+  margin-bottom: 0;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.status-text {
+  color: var(--ifm-color-content-secondary);
+}
+
+.support-links {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ifm-border-color);
+}
+
+.support-link {
+  display: block;
+  color: var(--ifm-color-content-secondary);
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.support-link:hover {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
 /* === Clean Content Area === */
 .main-wrapper {
   background: var(--ifm-background-color);
