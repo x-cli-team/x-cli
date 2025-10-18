@@ -19,8 +19,8 @@
 
 ### 🛠️ Tool System (`src/tools/`)
 - **Modular Design**: Independent tools for specific operations
-- **Core Tools**: File operations, bash execution, search
-- **Advanced Tools**: Multi-file editing, code analysis, operation history
+- **Core Tools**: Read, Write, Edit, Bash, Grep, Glob, LS
+- **Advanced Tools**: MultiEdit, WebFetch, WebSearch, Task, TodoWrite
 - **Documentation Tools**: NEW - Agent system generation and maintenance
 
 ### 🖥️ UI Components (`src/ui/`)
@@ -50,12 +50,13 @@
 - **Commands**: Add slash commands in input handler
 
 ## Current Capabilities
-✅ File operations (read, write, edit, multi-file)
-✅ Bash command execution
-✅ Code analysis and refactoring
-✅ Search and replace operations
-✅ MCP server integration
-✅ Operation history and undo/redo
+✅ Core file operations (Read, Write, Edit, MultiEdit)
+✅ Shell integration (Bash, BashOutput, KillBash)
+✅ Search and discovery (Grep, Glob, LS)
+✅ Web capabilities (WebFetch, WebSearch)
+✅ Task management (Task, TodoWrite)
+✅ IDE integration (NotebookEdit, mcp__ide__)
+✅ MCP server ecosystem
 ✅ Project-specific configuration
 
 ## Implemented Features (P1-P3 Complete)

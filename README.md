@@ -93,11 +93,11 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **🔧 Safe Refactoring**: Rename, extract, inline operations with preview and rollback support
 
 ### 🚀 **Advanced File Operations** 
-- **⚡ Multi-File Editing**: Atomic operations across multiple files with transaction support
-- **🔍 Advanced Search**: Regex patterns with bulk replace and context-aware results
-- **🌳 File Tree Operations**: Visual directory trees, bulk operations, and file organization
-- **📚 Operation History**: Comprehensive undo/redo with persistent history and snapshots
-- **🚀 Morph Fast Apply**: Optional high-speed code editing at 4,500+ tokens/sec with 98% accuracy
+- **⚡ MultiEdit**: Atomic operations across multiple files with transaction support
+- **🔍 Grep/Glob**: Advanced search with regex patterns and file discovery
+- **🌐 WebFetch/WebSearch**: Real-time web content retrieval and search capabilities
+- **📚 Task/TodoWrite**: Specialized agent delegation and comprehensive task management
+- **🚀 Read/Write/Edit**: Claude Code-standard file operations at high speed
 
 🌐 **Visit [grokcli.dev](https://grokcli.dev)** for complete documentation and guides.
 

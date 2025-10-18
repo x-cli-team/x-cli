@@ -20,49 +20,41 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
 ### Available Tools
 
 #### Core Tools
-1. **TextEditorTool** - File viewing, creation, and string replacement editing
-2. **MorphEditorTool** - High-speed editing with Morph API (4,500+ tokens/sec, 98% accuracy)
-3. **BashTool** - Shell command execution with output capture
-4. **SearchTool** - File and content search using ripgrep
-5. **TodoTool** - Task management and progress tracking
-6. **ConfirmationTool** - User confirmation for dangerous operations
+1. **Read** - File viewing and content inspection
+2. **Write** - File creation and complete content replacement
+3. **Edit** - Precise string replacement and file modification
+4. **Bash** - Shell command execution with output capture
+5. **Grep** - Content search using ripgrep with regex support
+6. **Glob** - File pattern matching and discovery
+7. **LS** - Directory listing and file system navigation
 
 #### Advanced Tools (NEW - P1 Complete!)
-7. **MultiFileEditorTool** - Atomic multi-file operations with transaction support
+8. **MultiEdit** - Atomic multi-file operations with transaction support
    - Multi-file editing with rollback capabilities
    - File operations: create, edit, delete, rename, move
    - Transaction management with preview and commit/rollback
    - Atomic operations ensuring consistency across multiple files
 
-8. **AdvancedSearchTool** - Enhanced search and replace with regex support
-   - Regex pattern matching with case sensitivity options
-   - File filtering with include/exclude patterns
-   - Context-aware search results with line numbers
-   - Bulk search and replace across multiple files
-   - Preview mode for safe replacements
+9. **WebFetch** - Web content retrieval and processing
+   - HTTP requests with automatic content processing
+   - HTML to markdown conversion
+   - AI-powered content analysis and extraction
+   - Caching for improved performance
 
-9. **FileTreeOperationsTool** - Comprehensive file system management
-   - Visual directory tree generation with filtering
-   - Bulk file operations (copy, move, delete, organize)
-   - File organization by type, size, or date
-   - Empty directory cleanup
-   - Structure copying with selective file inclusion
+10. **WebSearch** - Real-time web search capabilities
+    - Access to current information beyond training data
+    - Domain filtering and result customization
+    - Integration with search providers
 
-10. **CodeAwareEditorTool** - Intelligent code editing with syntax understanding
-    - Language-specific code analysis (JavaScript, TypeScript, Python, Java)
-    - Function/class/variable detection and mapping
-    - Smart refactoring: rename, extract function/variable, inline operations
-    - Code-aware insertion with proper indentation and structure
-    - Import management and missing symbol detection
-    - Syntax-preserving formatting
+11. **Task** - Specialized agent delegation system
+    - Launch sub-agents for complex multi-step tasks
+    - Token-optimized processing with specialized capabilities
+    - Autonomous task completion with final reporting
 
-11. **OperationHistoryTool** - Comprehensive undo/redo system
-    - Full operation history with metadata tracking
-    - Smart rollback with file snapshots
-    - Transaction-aware undo/redo navigation
-    - Persistent history across sessions
-    - Dangerous operation confirmation
-    - History point navigation and cleanup
+12. **TodoWrite** - Comprehensive task management
+    - Progress tracking with status management
+    - Multi-step task breakdown and organization
+    - Persistent task history and completion tracking
 
 ### Key Features
 
@@ -92,11 +84,12 @@ npm install -g grok-cli-hurry-mode
 ## Areas for Improvement (Inspired by Claude Code)
 
 ### 1. Enhanced Tool Capabilities
-- **File Operations**: More sophisticated file manipulation (multi-file edits, refactoring)
-- **Code Analysis**: Syntax parsing, dependency analysis, code understanding
-- **Git Integration**: Better version control operations and history management
-- **Testing Tools**: Automated test running and result analysis
-- **Debugging Tools**: Breakpoint management, variable inspection
+- **NotebookEdit**: Jupyter notebook cell editing and management
+- **mcp__ide__getDiagnostics**: VS Code language diagnostics integration
+- **mcp__ide__executeCode**: Code execution in Jupyter kernels
+- **BashOutput**: Background process monitoring and output streaming
+- **KillBash**: Process termination and cleanup
+- **ExitPlanMode**: Planning workflow management
 
 ### 2. Advanced AI Features
 - **Code Context**: Better understanding of project structure and relationships
@@ -113,11 +106,11 @@ npm install -g grok-cli-hurry-mode
 - **Session Management**: Persistent conversations and context
 
 ### 4. Integration Improvements
-- **IDE Integration**: VS Code extension, Vim plugin support
-- **CI/CD Hooks**: GitHub Actions, pre-commit hooks
-- **Cloud Services**: AWS, GCP, Azure integration via MCP
-- **Database Tools**: SQL execution, schema management
-- **API Testing**: HTTP client capabilities
+- **IDE Integration**: VS Code extension via MCP, Vim plugin support
+- **CI/CD Hooks**: GitHub Actions, pre-commit hooks integration
+- **Cloud Services**: AWS, GCP, Azure integration via MCP servers
+- **Database Tools**: SQL execution, schema management via MCP
+- **API Testing**: Advanced HTTP client with request/response management
 
 ### 5. Performance Optimizations
 - **Streaming UI**: Real-time response rendering
