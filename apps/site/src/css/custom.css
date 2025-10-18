@@ -111,27 +111,60 @@
   pointer-events: auto;
 }
 
-.menu__list .menu__list {
-  display: block !important; /* Force all submenus to be expanded */
-}
-
+/* Fix sidebar link visibility in dark mode */
 .menu__link {
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--ifm-color-content-secondary);
-  border-radius: var(--ifm-border-radius);
-  padding: 0.5rem 0.75rem;
+  color: var(--ifm-color-content-secondary) !important;
 }
 
 .menu__link:hover {
-  background: var(--ifm-color-emphasis-300);
-  color: var(--ifm-color-content);
+  color: var(--ifm-color-content) !important;
+  background: var(--ifm-color-emphasis-300) !important;
 }
 
 .menu__link--active {
-  background: var(--ifm-color-primary);
-  color: white;
-  font-weight: 500;
+  color: var(--ifm-color-primary) !important;
+  background: var(--ifm-color-emphasis-300) !important;
+}
+
+[data-theme='dark'] .menu__link {
+  color: #cccccc !important;
+}
+
+[data-theme='dark'] .menu__link:hover {
+  color: #ffffff !important;
+  background: #2a2a2a !important;
+}
+
+[data-theme='dark'] .menu__link--active {
+  color: #ffffff !important;
+  background: #2a2a2a !important;
+}
+
+/* Sidebar section dividers */
+.sidebar-divider {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ifm-color-content-secondary);
+  padding: 1rem 0.75rem 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-top: 1px solid var(--ifm-border-color);
+}
+
+.sidebar-divider:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0.5rem;
+}
+
+[data-theme='dark'] .sidebar-divider {
+  color: #888888;
+  border-color: #2a2a2a;
+}
+
+.menu__list .menu__list {
+  display: block !important; /* Force all submenus to be expanded */
 }
 
 /* Remove collapse arrows */
