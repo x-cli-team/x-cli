@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './index.module.css';
 
 export default function Page() {
@@ -32,16 +32,52 @@ function GrokCliHero() {
           </div>
         </div>
 
-        {/* Hero center row */}
-        <div className={styles.heroCenter}>
-          <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>
-              Claude Code-Level Intelligence in Your Terminal
-            </h1>
+        {/* NPM Install button */}
+        <div className={styles.installSection}>
+          <ChipBtn variant="solid" label="npm install -g grok-cli-hurry-mode@latest" showCopyIcon={true} />
+        </div>
 
-            {/* Single hero pill */}
-            <div className={styles.heroButtons}>
-              <ChipBtn variant="solid" label="npm install -g grok-cli-hurry-mode@latest" />
+        {/* Hero card (moved up from bottom) */}
+        <div className={styles.heroCardContainer}>
+          <div className={styles.heroCard}>
+            <div className={styles.heroCardBackground}>
+              <video className={styles.heroCardVideo} autoPlay muted loop playsInline>
+                <source src="/grok-video-93ef685c-b1de-4696-a757-359c20e0ca0f.mp4" type="video/mp4" />
+                <source src="/img/grok-hero-video.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div className={styles.heroCardOverlay}></div>
+            <div className={styles.heroCardContent}>
+              <div className={styles.heroCardText}>
+                <h3 className={styles.heroCardTitle}>Grok CLI</h3>
+                <p className={styles.heroCardDescription}>Experience Claude Code-level intelligence in your terminal. Built for developers who need powerful AI assistance without leaving their workflow.</p>
+                
+                <div className={styles.featureGrid}>
+                  <div className={styles.featureItem}>
+                    <strong className={styles.featureLabel}>Modalities</strong>
+                    <span className={styles.featureValue}>🗣️ → 📝</span>
+                  </div>
+                  <div className={styles.featureItem}>
+                    <strong className={styles.featureLabel}>Tools Available</strong>
+                    <span className={styles.featureValue}>15+</span>
+                  </div>
+                </div>
+
+                <div className={styles.featureList}>
+                  <ul>
+                    <li>Advanced file operations</li>
+                    <li>Code-aware editing</li>
+                    <li>Multi-file transactions</li>
+                    <li>Web integration</li>
+                    <li>MCP protocol support</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className={styles.cardActions}>
+                <a className={styles.btnPrimary} href="/docs/getting-started/installation">Get Started</a>
+                <a className={styles.btnSecondary} href="/docs/getting-started/quickstart">View Quickstart</a>
+              </div>
             </div>
           </div>
         </div>
@@ -59,49 +95,6 @@ function GrokCliHero() {
         </div>
       </div>
 
-      {/* X.AI Style Hero Card */}
-      <div className={styles.heroCardContainer}>
-        <div className={styles.heroCard}>
-          <div className={styles.heroCardBackground}>
-            <video className={styles.heroCardVideo} autoPlay muted loop playsInline>
-              <source src="/img/grok-hero-video.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <div className={styles.heroCardOverlay}></div>
-          <div className={styles.heroCardContent}>
-            <div className={styles.heroCardText}>
-              <h3 className={styles.heroCardTitle}>Grok CLI</h3>
-              <p className={styles.heroCardDescription}>Experience Claude Code-level intelligence in your terminal. Built for developers who need powerful AI assistance without leaving their workflow.</p>
-              
-              <div className={styles.featureGrid}>
-                <div className={styles.featureItem}>
-                  <strong className={styles.featureLabel}>Modalities</strong>
-                  <span className={styles.featureValue}>🗣️ → 📝</span>
-                </div>
-                <div className={styles.featureItem}>
-                  <strong className={styles.featureLabel}>Tools Available</strong>
-                  <span className={styles.featureValue}>15+</span>
-                </div>
-              </div>
-
-              <div className={styles.featureList}>
-                <ul>
-                  <li>Advanced file operations</li>
-                  <li>Code-aware editing</li>
-                  <li>Multi-file transactions</li>
-                  <li>Web integration</li>
-                  <li>MCP protocol support</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className={styles.cardActions}>
-              <a className={styles.btnPrimary} href="/docs/getting-started/installation">Get Started</a>
-              <a className={styles.btnSecondary} href="/docs/getting-started/quickstart">View Quickstart</a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -111,35 +104,69 @@ function ChipBtn({
   variant = "solid",
   leadingDot = false,
   href,
+  showCopyIcon = false,
 }: {
   label: string;
   variant?: "solid" | "outline" | "ghost";
   leadingDot?: boolean;
   href?: string;
+  showCopyIcon?: boolean;
 }) {
+  const [copied, setCopied] = useState(false);
+  
   const variantClass = variant === "solid" ? styles.chipBtnSolid 
     : variant === "outline" ? styles.chipBtnOutline 
     : styles.chipBtnGhost;
     
   const Element = href ? 'a' : 'button';
   
+  const handleCopy = async () => {
+    if (showCopyIcon && !href) {
+      try {
+        await navigator.clipboard.writeText(label);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  };
+  
   return (
     <Element 
-      className={`${styles.chipBtn} ${variantClass}`}
+      className={`${styles.chipBtn} ${variantClass} ${copied ? styles.copied : ''}`}
       {...(href ? { href } : {})}
+      {...(!href && showCopyIcon ? { onClick: handleCopy } : {})}
     >
       {leadingDot ? <span className={styles.leadingDot} /> : null}
       <span>{label}</span>
-      <svg className={styles.btnIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <path fillRule="evenodd" d="M8.25 3.75H19.5a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-1.5 0V6.31L5.03 20.03a.75.75 0 0 1-1.06-1.06L17.69 5.25H8.25a.75.75 0 0 1 0-1.5Z" clipRule="evenodd" />
-      </svg>
+      {showCopyIcon ? (
+        copied ? (
+          <svg className={styles.btnIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+          </svg>
+        ) : (
+          <svg className={styles.btnIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fillRule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 1-3 3H6.75a3 3 0 0 1-3-3V9.375A3.375 3.375 0 0 1 7.502 6ZM15 9.375a1.875 1.875 0 0 0-1.875-1.875H7.502a1.875 1.875 0 0 0-1.875 1.875V21a1.5 1.5 0 0 0 1.5 1.5h7.5A1.5 1.5 0 0 0 16.5 21V9.375ZM6 3.75A.75.75 0 0 1 6.75 3h6.75a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1-.75-.75ZM8.25 1.5a.75.75 0 0 1 .75-.75h6a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+          </svg>
+        )
+      ) : (
+        <svg className={styles.btnIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M8.25 3.75H19.5a.75.75 0 0 1 .75.75v11.25a.75.75 0 0 1-1.5 0V6.31L5.03 20.03a.75.75 0 0 1-1.06-1.06L17.69 5.25H8.25a.75.75 0 0 1 0-1.5Z" clipRule="evenodd" />
+        </svg>
+      )}
     </Element>
   );
 }
 
 function NavLink({ children, href }: { children: React.ReactNode; href: string }) {
+  const isExternal = href.startsWith('http');
   return (
-    <a href={href} className={styles.navLink}>
+    <a 
+      href={href} 
+      className={styles.navLink}
+      {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    >
       {children}
     </a>
   );

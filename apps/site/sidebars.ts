@@ -5,6 +5,7 @@ const sidebars: SidebarsConfig = {
     "overview",
     "getting-started/quickstart",
     "getting-started/installation",
+    "tools/overview",
     "architecture/overview", 
     "architecture/current-state",
     "api/schema",

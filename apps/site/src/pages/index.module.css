@@ -4,6 +4,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+  position: relative;
+  top: -8rem;
 }
 
 /* X.AI Hero Card Styles */
@@ -11,7 +13,7 @@
   background: #000000;
   border-radius: 16px;
   overflow: hidden;
-  margin: 2rem 0;
+  margin: 0rem 0 2rem 0;
   position: relative;
   height: 576px; /* Increased by 20% again (480px -> 576px) */
   border: none;
@@ -185,6 +187,8 @@
   -webkit-mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 35%, #fff 60%);
   transform: scaleX(1.05) scaleY(0.78);
   filter: blur(28px) saturate(1.07) contrast(1.04);
+  pointer-events: none;
+  z-index: 0;
 }
 
 @media (min-width: 768px) {
@@ -210,6 +214,7 @@
   pointer-events: none;
   background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,1) 25%, rgba(255,214,150,.25) 76%, rgba(255,244,232,.7) 92%, #ffffff 98%);
   mix-blend-mode: screen;
+  z-index: 0;
 }
 
 .lightOverlay2 {
@@ -221,6 +226,7 @@
   transform: translateX(1px);
   mix-blend-mode: soft-light;
   filter: blur(6px);
+  z-index: 0;
 }
 
 .content {
@@ -249,6 +255,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 0;
+  position: relative;
+  z-index: 30;
 }
 
 .navLeft {
@@ -263,10 +271,19 @@
   gap: 1rem;
 }
 
+.installSection {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0 0rem 0;
+  margin-bottom: 0;
+}
+
 .heroCenter {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 3rem 0;
+  gap: 3rem;
 }
 
 @media (min-width: 768px) {
@@ -275,10 +292,41 @@
   }
 }
 
+@media (max-width: 768px) {
+  .heroCenter {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .heroContent {
+    max-width: 100%;
+  }
+  
+  .heroVideo {
+    max-width: 100%;
+  }
+}
+
 .heroContent {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  flex: 1;
+  max-width: 50%;
+}
+
+.heroVideo {
+  flex: 1;
+  max-width: 45%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.heroVideoElement {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .heroTitle {
@@ -368,6 +416,14 @@
 .chipBtnSolid {
   background-color: white;
   color: black;
+  position: relative;
+  overflow: hidden;
+}
+
+.chipBtnSolid.copied {
+  background-color: #10b981;
+  color: white;
+  transition: background-color 0.3s ease;
 }
 
 .chipBtnOutline {
@@ -398,7 +454,7 @@
 }
 
 .navLink {
-  display: none;
+  display: inline-flex;
   align-items: center;
   border-radius: 9999px;
   padding: 0 0.75rem;
@@ -408,12 +464,9 @@
   transition: all 0.2s;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-}
-
-@media (min-width: 640px) {
-  .navLink {
-    display: inline-flex;
-  }
+  pointer-events: auto;
+  position: relative;
+  z-index: 40;
 }
 
 .navLink:hover {

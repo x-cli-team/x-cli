@@ -67,7 +67,7 @@ Grok CLI is a conversational AI tool that brings Claude Code-level intelligence 
   <div className="jump-card">
     <h4>MCP Integration</h4>
     <p>Extend capabilities with Model Context Protocol servers and external services.</p>
-    <a href="architecture/overview">Learn more</a>
+    <a href="api/schema">Learn more</a>
   </div>
 </div>
 
