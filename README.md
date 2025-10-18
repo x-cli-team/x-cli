@@ -99,6 +99,8 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **📚 Operation History**: Comprehensive undo/redo with persistent history and snapshots
 - **🚀 Morph Fast Apply**: Optional high-speed code editing at 4,500+ tokens/sec with 98% accuracy
 
+🌐 **Visit [grokcli.dev](https://grokcli.dev)** for complete documentation and guides.
+
 ### 🤖 **Core AI Capabilities**
 - **💬 Conversational Interface**: Natural language powered by Grok models
 - **🔧 Intelligent Tool Selection**: AI automatically chooses the right tools for your requests

@@ -1,23 +1,291 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
+/* Landing page styles - converted from Tailwind to CSS */
 
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
+.hero {
   position: relative;
+  min-height: 100vh;
+  color: white;
   overflow: hidden;
+  background-color: black;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+.lightStack {
+  position: absolute;
+  top: -28%;
+  bottom: -28%;
+  right: -24px;
+  display: flex;
+  width: 100vw;
+  flex-direction: column;
+  mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 35%, #fff 60%);
+  -webkit-mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 35%, #fff 60%);
+  transform: scaleX(1.05) scaleY(0.78);
+  filter: blur(28px) saturate(1.07) contrast(1.04);
+}
+
+@media (min-width: 768px) {
+  .lightStack {
+    right: -40px;
+    width: 1200px;
   }
 }
 
-.buttons {
+.lightGradient1 {
+  flex: 1;
+  background: conic-gradient(from 176deg at 99.8% 40% in lab, #ffffff 10deg, #ffd089 28deg, rgba(17,17,17,0) 86deg, rgba(17,17,17,0) 340deg, #ffffff 360deg);
+}
+
+.lightGradient2 {
+  flex: 1;
+  background: conic-gradient(from -2deg at 99.8% 60% in lab, #ffffff 0deg, rgba(17,17,17,0) 14deg, rgba(17,17,17,0) 264deg, #ffd089 316deg, #ffffff 338deg);
+}
+
+.lightOverlay1 {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,1) 25%, rgba(255,214,150,.25) 76%, rgba(255,244,232,.7) 92%, #ffffff 98%);
+  mix-blend-mode: screen;
+}
+
+.lightOverlay2 {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-radial-gradient(100% 60% at 100% 50%, rgba(255,255,255,0.12) 0px, rgba(255,255,255,0.12) 2px, rgba(255,255,255,0) 8px);
+  opacity: 0.25;
+  transform: translateX(1px);
+  mix-blend-mode: soft-light;
+  filter: blur(6px);
+}
+
+.content {
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 1rem;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+@media (min-width: 1024px) {
+  .content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .content {
+    max-width: 80rem;
+  }
+}
+
+.topNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.heroCenter {
+  display: flex;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+@media (min-width: 768px) {
+  .heroCenter {
+    padding: 5rem 0;
+  }
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.heroTitle {
+  max-width: 48rem;
+  text-wrap: balance;
+  font-size: 2.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  display: inline-block;
+  padding-bottom: 0.25rem;
+  background-image: linear-gradient(90deg, rgba(15,15,15,1) 0%, rgba(40,40,40,1) 20%, rgba(215,215,215,0.85) 45%, rgba(235,235,235,0.94) 75%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .heroTitle {
+    font-size: 5rem;
+    line-height: 5.25rem;
+  }
+}
+
+.heroButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bottomOverlay {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .bottomOverlay {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bottomOverlay {
+    max-width: 80rem;
+  }
+}
+
+.bottomContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bottomIcon {
+  color: rgba(255, 255, 255, 0.9);
+  user-select: none;
+}
+
+.chipBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  border-radius: 9999px;
+  padding: 0 1rem;
+  height: 42px;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.chipBtn:focus {
+  outline: none;
+}
+
+.chipBtnSolid {
+  background-color: white;
+  color: black;
+}
+
+.chipBtnOutline {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  background: transparent;
+}
+
+.chipBtnOutline:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.chipBtnGhost {
+  color: rgba(255, 255, 255, 0.9);
+  background: transparent;
+}
+
+.chipBtnGhost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.leadingDot {
+  margin-right: 0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #fb923c;
+}
+
+.navLink {
+  display: none;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+
+@media (min-width: 640px) {
+  .navLink {
+    display: inline-flex;
+  }
+}
+
+.navLink:hover {
+  color: white;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoIcon {
+  height: 2rem;
+  width: 2rem;
+  background-color: white;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: black;
+  font-weight: bold;
+}
+
+.logoText {
+  color: white;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.btnIcon {
+  margin-left: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+.arrowIcon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
