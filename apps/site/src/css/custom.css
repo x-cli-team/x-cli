@@ -1,30 +1,273 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * X.AI-inspired clean and minimal documentation theme
+ * Clean, professional, no unnecessary colors or distractions
  */
 
-/* You can override the default Infima variables here. */
+/* === X.AI Color Palette === */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Primary colors - clean grays and blacks, no green */
+  --ifm-color-primary: #1a1a1a;
+  --ifm-color-primary-dark: #0f0f0f;
+  --ifm-color-primary-darker: #0a0a0a;
+  --ifm-color-primary-darkest: #000000;
+  --ifm-color-primary-light: #2a2a2a;
+  --ifm-color-primary-lighter: #353535;
+  --ifm-color-primary-lightest: #404040;
+  
+  /* Clean neutral palette */
+  --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #fafafa;
+  --ifm-color-content: #1a1a1a;
+  --ifm-color-content-secondary: #666666;
+  --ifm-color-emphasis-300: #e5e5e5;
+  --ifm-color-emphasis-500: #cccccc;
+  --ifm-color-emphasis-700: #999999;
+  
+  /* Typography - clean and minimal */
+  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --ifm-font-family-monospace: 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.6;
+  
+  /* Clean spacing */
+  --ifm-spacing-horizontal: 1.5rem;
+  --ifm-spacing-vertical: 1.5rem;
+  --ifm-navbar-height: 60px;
+  
+  /* Minimal borders */
+  --ifm-border-color: #e5e5e5;
+  --ifm-border-radius: 4px;
+  
+  /* Code styling */
+  --ifm-code-font-size: 14px;
+  --ifm-code-background: #f6f6f6;
+  --ifm-code-color: #1a1a1a;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark mode - clean and minimal */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #ffffff;
+  --ifm-color-primary-dark: #e5e5e5;
+  --ifm-color-primary-darker: #d9d9d9;
+  --ifm-color-primary-darkest: #b3b3b3;
+  --ifm-color-primary-light: #ffffff;
+  --ifm-color-primary-lighter: #ffffff;
+  --ifm-color-primary-lightest: #ffffff;
+  
+  --ifm-background-color: #0f0f0f;
+  --ifm-background-surface-color: #1a1a1a;
+  --ifm-color-content: #ffffff;
+  --ifm-color-content-secondary: #cccccc;
+  --ifm-color-emphasis-300: #2a2a2a;
+  --ifm-color-emphasis-500: #404040;
+  --ifm-color-emphasis-700: #666666;
+  
+  --ifm-border-color: #2a2a2a;
+  --ifm-code-background: #1a1a1a;
+  --ifm-code-color: #ffffff;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+}
+
+/* === Clean Navigation === */
+.navbar {
+  border-bottom: 1px solid var(--ifm-border-color);
+  background: var(--ifm-background-color);
+  backdrop-filter: blur(10px);
+  box-shadow: none;
+}
+
+.navbar__brand {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--ifm-color-content);
+}
+
+.navbar__item {
+  font-weight: 400;
+  color: var(--ifm-color-content-secondary);
+}
+
+.navbar__link:hover {
+  color: var(--ifm-color-content);
+}
+
+/* === Clean Sidebar === */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--ifm-border-color);
+  background: var(--ifm-background-surface-color);
+}
+
+.theme-doc-sidebar-menu {
+  padding: 1rem;
+}
+
+/* Expand all categories by default */
+.theme-doc-sidebar-item-category > .menu__list-item-collapsible {
+  pointer-events: none;
+}
+
+.theme-doc-sidebar-item-category > .menu__list-item-collapsible > .menu__link {
+  pointer-events: auto;
+}
+
+.menu__list .menu__list {
+  display: block !important; /* Force all submenus to be expanded */
+}
+
+.menu__link {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ifm-color-content-secondary);
+  border-radius: var(--ifm-border-radius);
+  padding: 0.5rem 0.75rem;
+}
+
+.menu__link:hover {
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-content);
+}
+
+.menu__link--active {
+  background: var(--ifm-color-primary);
+  color: white;
+  font-weight: 500;
+}
+
+/* Remove collapse arrows */
+.menu__caret {
+  display: none !important;
+}
+
+/* === Clean Content Area === */
+.main-wrapper {
+  background: var(--ifm-background-color);
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Clean typography */
+.markdown h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--ifm-color-content);
+  margin-bottom: 1.5rem;
+  border-bottom: none;
+}
+
+.markdown h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--ifm-color-content);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--ifm-border-color);
+  padding-bottom: 0.5rem;
+}
+
+.markdown h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ifm-color-content);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown p {
+  color: var(--ifm-color-content-secondary);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+/* Clean code blocks */
+.prism-code {
+  border: 1px solid var(--ifm-border-color);
+  border-radius: var(--ifm-border-radius);
+  background: var(--ifm-code-background) !important;
+}
+
+.token.title {
+  color: var(--ifm-color-content);
+}
+
+/* Clean tables */
+.markdown table {
+  border: 1px solid var(--ifm-border-color);
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid var(--ifm-border-color);
+  padding: 0.75rem;
+}
+
+.markdown th {
+  background: var(--ifm-background-surface-color);
+  font-weight: 600;
+}
+
+/* Clean footer */
+.footer {
+  background: var(--ifm-background-surface-color);
+  border-top: 1px solid var(--ifm-border-color);
+}
+
+.footer__title {
+  font-weight: 600;
+  color: var(--ifm-color-content);
+}
+
+.footer__item {
+  color: var(--ifm-color-content-secondary);
+}
+
+.footer__item:hover {
+  color: var(--ifm-color-content);
+}
+
+/* === Remove Visual Noise === */
+/* Remove unnecessary shadows and gradients */
+.card {
+  box-shadow: none;
+  border: 1px solid var(--ifm-border-color);
+}
+
+.alert {
+  border-left: 4px solid var(--ifm-color-primary);
+  background: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-border-radius);
+}
+
+/* Clean breadcrumbs */
+.breadcrumbs {
+  font-size: 14px;
+  color: var(--ifm-color-content-secondary);
+}
+
+.breadcrumbs__link {
+  color: var(--ifm-color-content-secondary);
+}
+
+.breadcrumbs__link:hover {
+  color: var(--ifm-color-content);
+}
+
+/* === Hide emoji and decorative elements === */
+/* This will be handled by content cleanup */
+
+/* === Mobile responsive === */
+@media (max-width: 768px) {
+  .navbar__brand {
+    font-size: 16px;
+  }
+  
+  .markdown h1 {
+    font-size: 1.75rem;
+  }
+  
+  .markdown h2 {
+    font-size: 1.5rem;
+  }
 }

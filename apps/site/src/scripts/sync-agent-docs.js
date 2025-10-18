@@ -56,6 +56,19 @@ function filterContent(content, filePath) {
   filtered = filtered.replace(/Last Updated: \d{4}-\d{2}-\d{2}T[\d:.]+Z/g, '');
   filtered = filtered.replace(/Updated By: .*/g, '');
   
+  // Remove emojis for clean X.AI-inspired look
+  filtered = filtered.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+  
+  // Remove emoji shortcodes like :emoji:
+  filtered = filtered.replace(/:[a-z_+-]+:/g, '');
+  
+  // Remove common emoji patterns in markdown (🚀 ✅ 📚 etc)
+  filtered = filtered.replace(/[🚀✅📚🔧🎯⚡🔍🌐📊🤖💻🏗️🛠️📦🔄📝💡🆕🔗📖🌍⚙️💬🧠📄🔎🌳📋🛡️🎨🔥💻]/g, '');
+  
+  // Clean up extra spaces left by emoji removal
+  filtered = filtered.replace(/\s+/g, ' ');
+  filtered = filtered.replace(/^\s+|\s+$/gm, '');
+  
   // Filter critical-state.md for public consumption
   if (filePath.includes('critical-state.md')) {
     // Remove internal development notes

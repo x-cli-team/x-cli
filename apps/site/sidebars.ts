@@ -6,6 +6,7 @@ const sidebars: SidebarsConfig = {
     {
       "type": "category",
       "label": "Getting Started",
+      "collapsed": false,
       "items": [
         "getting-started/installation"
       ]
@@ -13,6 +14,7 @@ const sidebars: SidebarsConfig = {
     {
       "type": "category",
       "label": "Architecture",
+      "collapsed": false,
       "items": [
         "architecture/overview",
         "architecture/current-state"
@@ -21,6 +23,7 @@ const sidebars: SidebarsConfig = {
     {
       "type": "category",
       "label": "API Reference",
+      "collapsed": false,
       "items": [
         "api/schema"
       ]
@@ -28,6 +31,7 @@ const sidebars: SidebarsConfig = {
     {
       "type": "category",
       "label": "Guides",
+      "collapsed": false,
       "items": [
         "guides/releases",
         "guides/automation"
@@ -36,11 +40,11 @@ const sidebars: SidebarsConfig = {
     {
       "type": "category",
       "label": "Troubleshooting",
+      "collapsed": false,
       "items": [
         "troubleshooting/npm"
       ]
-    },
-    "roadmap"
+    }
   ]
 };
 
