@@ -368,27 +368,45 @@ function ChatInterfaceWithAgent({
  dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
 dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    `}
           </Text>
-          <Text color="cyan" bold>
-            Tips for getting started:
+          
+          <Text color="green" bold marginTop={1}>
+            🚀 Welcome to Grok CLI - Claude Code-level intelligence in your terminal!
+          </Text>
+          
+          <Text color="cyan" bold marginTop={1}>
+            💡 Quick Start Tips:
           </Text>
           <Box marginTop={1} flexDirection="column">
             <Text color="gray">
-              1. Ask questions, edit files, or run commands.
-            </Text>
-            <Text color="gray">2. Be specific for the best results.</Text>
-            <Text color="gray">
-              3. Create GROK.md files to customize your interactions with Grok.
+              • <Text color="yellow">Ask anything:</Text> "Create a React component" or "Debug this Python script"
             </Text>
             <Text color="gray">
-              4. Press Shift+Tab to toggle auto-edit mode.
+              • <Text color="yellow">Edit files:</Text> "Add error handling to app.js" 
             </Text>
             <Text color="gray">
-              5. Run "/init-agent" to set up an .agent docs system for this project.
+              • <Text color="yellow">Run commands:</Text> "Set up a new Node.js project"
             </Text>
             <Text color="gray">
-              6. Run "/heal" after errors to capture a fix and add a guardrail.
+              • <Text color="yellow">Get help:</Text> Type "/help" for all commands
             </Text>
-            <Text color="gray">7. /help for more information.</Text>
+          </Box>
+          
+          <Text color="cyan" bold marginTop={1}>
+            🛠️ Power Features:
+          </Text>
+          <Box marginTop={1} flexDirection="column">
+            <Text color="gray">
+              • <Text color="magenta">Auto-edit mode:</Text> Press Shift+Tab to toggle hands-free editing
+            </Text>
+            <Text color="gray">
+              • <Text color="magenta">Project memory:</Text> Create .grok/GROK.md to customize behavior
+            </Text>
+            <Text color="gray">
+              • <Text color="magenta">Documentation:</Text> Run "/init-agent" for .agent docs system
+            </Text>
+            <Text color="gray">
+              • <Text color="magenta">Error recovery:</Text> Run "/heal" after errors to add guardrails
+            </Text>
           </Box>
         </Box>
       )}

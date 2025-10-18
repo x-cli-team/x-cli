@@ -1,23 +1,10 @@
 ## 1.0.86 – Stability Release
 
-This release includes latest updates and automated publishing via GitHub Actions. (Test automated bump)
+This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
 - Ensures consistent FS imports (`node:` namespace)
 - Adds proper Node shebang for global installs
 - Temporarily removes experimental features (e.g. compress)
-
----
-
-## 🚨 Critical Configuration Warnings
-
-**DO NOT MODIFY THESE SETTINGS UNLESS YOU KNOW WHAT YOU'RE DOING:**
-
-- **`package.json` name**: Must remain `"grok-cli-hurry-mode"` (unscoped). Changing to scoped (e.g., `@username/grok-cli-hurry-mode`) will break NPM publishing unless you have token access for that scope.
-- **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
-- **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `grok-cli-hurry-mode`.
-- **Git Hooks**: Do not re-enable interactive pre-push hooks, as they block CI/CD pushes.
-
-**Why?** Previous changes to these broke the entire publishing flow. If you need to change the package name or scope, create a new package and update all references.
 
 ---
 
@@ -139,45 +126,62 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 
 ### 🚀 Quick Install
 
-**Recommended: Automated installer (handles all edge cases)**
+**Option 1: Latest version with npm (Recommended)**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hinetapora/grok-cli-hurry-mode/main/install.sh | bash
+npm install -g grok-cli-hurry-mode@latest
 ```
 
-**Alternative: Standard npm install**
+**Option 2: Try without installing (using npx)**
 ```bash
-npm install -g grok-cli-hurry-mode
+npx grok-cli-hurry-mode@latest
 ```
 
-**Alternative: Package managers**
+**Option 3: Alternative package managers**
 ```bash
 # Using Yarn
-yarn global add grok-cli-hurry-mode
+yarn global add grok-cli-hurry-mode@latest
 
 # Using pnpm  
-pnpm add -g grok-cli-hurry-mode
+pnpm add -g grok-cli-hurry-mode@latest
 
-# Using Homebrew (coming soon)
-brew install grok-cli-hurry-mode
+# Using bun
+bun add -g grok-cli-hurry-mode@latest
 ```
 
-### ⚡ One-liner with API key setup
+### 🛠️ PATH Setup (If `grok` command not found)
+
+After installation, if you get "command not found", add npm's global bin to your PATH:
+
+**macOS/Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hinetapora/grok-cli-hurry-mode/main/install.sh | bash && \
-echo 'export GROK_API_KEY=your_api_key_here' >> ~/.bashrc && \
+# Add to ~/.zshrc (macOS) or ~/.bashrc (Linux)
+echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Or for bash users:
+echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
-- Grok API key from X.AI
-- (Optional, Recommended) Morph API key for Fast Apply editing
 
-### Global Installation (Recommended)
+**Windows:**
 ```bash
-bun add -g grok-cli-hurry-mode
+# PowerShell
+$npmPath = npm config get prefix
+$env:PATH += ";$npmPath"
 ```
 
-Or with npm (fallback):
+**Verify installation:**
 ```bash
-npm install -g grok-cli-hurry-mode
+grok --version  # Should show current version
+which grok      # Should show installation path
+```
+
+### ⚡ Quick Start (One-liner)
+```bash
+npm install -g grok-cli-hurry-mode@latest && \
+echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc && \
+source ~/.zshrc && \
+grok --help
 ```
 
 ### Local Development
@@ -582,6 +586,103 @@ The pre-commit hook runs `npx lint-staged`, which processes `*.{ts,tsx}` files w
 
 If checks fail, the commit is blocked until issues are resolved.
 
+## 🤖 Automated Release System
+
+**Status**: ✅ **FULLY AUTOMATED** (as of 2025-10-17)
+
+### How It Works
+
+Every push to the `main` branch automatically:
+
+1. **🔄 Bumps version** (patch increment: 1.0.X → 1.0.X+1)
+2. **📝 Updates README** with new version number
+3. **🏗️ Builds the project** with fresh dependencies
+4. **📦 Publishes to NPM** at https://www.npmjs.com/package/grok-cli-hurry-mode
+5. **🏷️ Creates git tag** (e.g., `v1.0.87`)
+
+**⏱️ Timeline**: ~3-5 minutes from push to NPM availability
+
+### What You Need to Do
+
+**Nothing!** Just push your changes to main:
+
+```bash
+git add .
+git commit -m "your feature/fix"
+git push origin main
+# ✨ Automation handles the rest!
+```
+
+### 🚨 Critical Dependencies
+
+**⚠️ DO NOT MODIFY without understanding the full impact:**
+
+#### GitHub Secrets (Required)
+- **`PAT_TOKEN`**: Personal Access Token with repo permissions (for git operations)
+- **`NPM_TOKEN`**: NPM Automation token from `grok_cli` account (for publishing)
+
+#### Package Configuration (Sacred Settings)
+```json
+{
+  "name": "grok-cli-hurry-mode",  // ⚠️ NEVER change - breaks publishing
+  "publishConfig": {
+    "access": "public"            // ⚠️ Must NOT include registry override
+  }
+}
+```
+
+#### Workflow File (`.github/workflows/release.yml`)
+**⚠️ This took multiple attempts to get working - modify with extreme caution!**
+
+### 🔧 Manual Release (Emergency Only)
+
+If automation fails and you need to publish immediately:
+
+```bash
+# 1. Bump version locally
+npm version patch  # or minor/major
+
+# 2. Test build
+npm run build
+npm run local  # Test CLI locally
+
+# 3. Manual publish
+npm publish --access public
+
+# 4. Push changes
+git push origin main --follow-tags
+
+# 5. Fix automation before next release!
+```
+
+### 📊 Monitoring
+
+- **GitHub Actions**: https://github.com/hinetapora/grok-cli-hurry-mode/actions
+- **NPM Package**: https://www.npmjs.com/package/grok-cli-hurry-mode
+- **Release History**: Check git tags or NPM version history
+
+### 🛠️ Troubleshooting
+
+If automation fails:
+
+1. **Check GitHub Actions logs** for specific errors
+2. **Verify secrets** (`PAT_TOKEN`, `NPM_TOKEN`) haven't expired
+3. **Confirm package.json** name hasn't been modified
+4. **See documentation**: `.agent/sop/npm-publishing-troubleshooting.md`
+
+**Common Issues**:
+- **Build fails**: Usually Rollup dependency cache (auto-fixed with clean install)
+- **Publish fails**: Check NPM token is valid and from correct account
+- **Git push fails**: Verify PAT_TOKEN has repo permissions
+
+### 📚 Related Documentation
+
+- **📋 Release Management**: `.agent/sop/release-management.md`
+- **🚨 Incident History**: `.agent/incidents/incident-npm-publish-failure.md`  
+- **🔧 Troubleshooting**: `.agent/sop/npm-publishing-troubleshooting.md`
+
+---
+
 ## Architecture
 
 - **Agent**: Core command processing and execution logic
@@ -599,6 +700,54 @@ This project is based on [grok-cli](https://github.com/superagent-ai/grok-cli) b
 
 ## Troubleshooting
 
+### Installation Issues
+
+**🚨 "Command not found: grok"**
+```bash
+# Check if grok is installed
+npm list -g grok-cli-hurry-mode
+
+# If installed but not in PATH, add npm global bin to PATH:
+echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Verify it works
+grok --version
+```
+
+**🚨 "Permission denied" during installation**
+```bash
+# Option 1: Use npx (no installation needed)
+npx grok-cli-hurry-mode@latest
+
+# Option 2: Fix npm permissions (macOS/Linux)
+sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}
+
+# Option 3: Configure npm to use different directory
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
+source ~/.zshrc
+```
+
+**🚨 "Cannot find module" errors**
+```bash
+# Clear npm cache and reinstall
+npm cache clean --force
+npm uninstall -g grok-cli-hurry-mode
+npm install -g grok-cli-hurry-mode@latest
+```
+
+**🚨 Outdated version**
+```bash
+# Check current version
+grok --version
+npm view grok-cli-hurry-mode version
+
+# Update to latest
+npm update -g grok-cli-hurry-mode@latest
+```
+
 ### Tool Execution Errors
 
 If you encounter errors like `fs.readFile is not a function` or `fs.stat is not a function` when using file operations:
@@ -610,9 +759,34 @@ If you encounter errors like `fs.readFile is not a function` or `fs.stat is not 
 
 This issue is being tracked and the fallbacks ensure the CLI remains functional.
 
+### Runtime Issues
+
+**🚨 API Key errors**
+```bash
+# Set your API key (replace with your actual key)
+export GROK_API_KEY=your_actual_api_key_here
+
+# Or add to your shell profile permanently
+echo 'export GROK_API_KEY=your_actual_api_key_here' >> ~/.zshrc
+source ~/.zshrc
+
+# Verify it's set
+echo $GROK_API_KEY
+```
+
+**🚨 Network/connectivity issues**
+```bash
+# Test with verbose output
+grok --verbose "test message"
+
+# Check API endpoint connectivity
+curl -I https://api.x.ai/v1/models
+```
+
 ### Common Issues
 
 - **File operations fail**: Check that the file path exists and is accessible
 - **Bash commands fail**: Ensure you have the necessary permissions
 - **Tool timeouts**: Complex operations may take time; the spinner indicates progress
+- **Slow responses**: Try a different model with `grok --model grok-code-fast-1`
 

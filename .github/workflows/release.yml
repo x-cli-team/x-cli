@@ -1,3 +1,25 @@
+# 🚨 CRITICAL WARNING: AUTOMATED RELEASE WORKFLOW
+#
+# This workflow handles automated NPM publishing and version management.
+# It took multiple iterations to get working correctly.
+#
+# DO NOT MODIFY without understanding the full dependency chain:
+# - GitHub Secrets: PAT_TOKEN, NPM_TOKEN (required)
+# - Package name: "grok-cli-hurry-mode" (NEVER change)
+# - Git hooks: .husky/pre-commit + scripts/check-version.cjs
+# - NPM authentication: Direct .npmrc creation (not npm config)
+# - Dependency management: Clean install to avoid Rollup cache issues
+#
+# If this breaks, see troubleshooting docs:
+# - .agent/sop/npm-publishing-troubleshooting.md
+# - .agent/incidents/incident-npm-publish-failure.md
+# - .agent/sop/release-management.md
+#
+# Last working config verified: 2025-10-17
+# Working example: Successfully publishes version 1.0.87+
+#
+# ⚠️ TEST ALL CHANGES IN A FORK FIRST!
+
 name: Release
 on:
   push:

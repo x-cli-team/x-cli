@@ -7,6 +7,12 @@ src/
 # Development files
 .github/
 .githooks/
+.husky/
+apps/
+dev/
+lib/
+scripts/
+logs.zip
 sprints/
 node_modules/
 test-*
@@ -17,14 +23,23 @@ demo-*
 
 # Config files
 tsconfig.json
+tsconfig.tsbuildinfo
 eslint.config.mjs
+tsup.config.ts
+tsup.debug.config.ts
+tsup.node.config.ts
 bun.lock
+pnpm-workspace.yaml
 .env*
 
-# Documentation
+# Documentation & Development
 PUBLISHING.md
 TEST_ADVANCED_TOOLS.md
 CLAUDE.md
+page.tsx
+grok-smart.sh
+homebrew-formula.rb
+install.sh
 
 # Git
 .git*

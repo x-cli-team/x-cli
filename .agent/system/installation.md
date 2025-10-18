@@ -21,18 +21,26 @@ The script automatically:
 ### Manual Installation
 If automated installation fails, try manual methods:
 
-#### Standard NPM Install
+#### Standard NPM Install (Recommended)
 ```bash
-npm install -g grok-cli-hurry-mode
+npm install -g grok-cli-hurry-mode@latest
+```
+
+#### Try Without Installing
+```bash
+npx grok-cli-hurry-mode@latest
 ```
 
 #### Alternative Package Managers
 ```bash
 # Yarn
-yarn global add grok-cli-hurry-mode
+yarn global add grok-cli-hurry-mode@latest
 
 # pnpm
-pnpm add -g grok-cli-hurry-mode
+pnpm add -g grok-cli-hurry-mode@latest
+
+# Bun
+bun add -g grok-cli-hurry-mode@latest
 ```
 
 #### Force Installation (if needed)
@@ -52,8 +60,24 @@ grok --version
 # Environment variable (recommended)
 export GROK_API_KEY=your_api_key_here
 
-# Or save permanently
-grok --api-key your_api_key_here
+# Save permanently to shell profile
+echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc
+source ~/.zshrc
+
+# Or save permanently (bash users)
+echo 'export GROK_API_KEY=your_api_key_here' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### 3. PATH Setup (If "command not found")
+```bash
+# Add npm global bin to PATH (macOS/Linux)
+echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Verify it works
+which grok
+grok --version
 ```
 
 ### 3. Get Started

@@ -21,7 +21,22 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*
 .npmrc
+
+# Security - API keys and sensitive files
+**/*secret*
+**/*key*
+**/*token*
+**/*password*
+*.pem
+*.key
+*.p12
+*.pfx
+auth.json
+credentials.json
+secrets.json
+config.json
 
 # IDE and editor files
 .vscode/

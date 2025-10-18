@@ -5,14 +5,28 @@ This directory contains AI agent documentation for Grok CLI. This system helps A
 
 ## 🚨 Critical Configuration Warnings
 
+**🤖 AUTOMATED RELEASE SYSTEM IS NOW FULLY OPERATIONAL (2025-10-17)**
+
 **DO NOT MODIFY THESE SETTINGS UNLESS YOU KNOW WHAT YOU'RE DOING:**
 
+### 🔒 Protected NPM Publishing Settings
 - **`package.json` name**: Must remain `"grok-cli-hurry-mode"` (unscoped). Changing to scoped (e.g., `@username/grok-cli-hurry-mode`) will break NPM publishing unless you have token access for that scope.
 - **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
 - **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `grok-cli-hurry-mode`.
-- **Git Hooks**: Do not re-enable interactive pre-push hooks, as they block CI/CD pushes.
 
-**Why?** Previous changes to these broke the entire publishing flow. If you need to change the package name or scope, create a new package and update all references.
+### 🔒 Protected Automation Workflow  
+- **`.github/workflows/release.yml`**: Combined workflow handling version bump + NPM publish
+- **`.husky/pre-commit`**: Git hook for version synchronization
+- **`scripts/check-version.cjs`**: Automated version bumping and README updates
+- **GitHub Secrets**: `PAT_TOKEN` (git operations) + `NPM_TOKEN` (NPM publishing)
+
+### 🔒 Protected Git Operations
+- **Git Hooks**: Do not re-enable interactive pre-push hooks, as they block CI/CD pushes.
+- **Branch Protection**: Do not prevent GitHub Actions from pushing to main branch.
+
+**Why?** Previous changes to these broke the entire publishing flow. The current system took multiple iterations to get working.
+
+**📚 Full Protection Details**: See `sop/automation-protection.md`
 
 ## 📁 Directory Structure
 

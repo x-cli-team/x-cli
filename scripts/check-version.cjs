@@ -1,5 +1,25 @@
 #!/usr/bin/env node
 
+//
+// 🚨 CRITICAL WARNING: VERSION CHECK SCRIPT
+// 
+// This script is essential for automated NPM publishing workflow.
+// It handles version bumping and README synchronization.
+// 
+// DO NOT MODIFY unless you understand the full impact on:
+// - .github/workflows/release.yml (GitHub Actions automation)
+// - .husky/pre-commit hook (git commit automation)  
+// - package.json structure (NPM publishing)
+// - README.md version headers
+//
+// If automation breaks, see:
+// - .agent/sop/release-management.md
+// - .agent/sop/npm-publishing-troubleshooting.md
+// - .agent/incidents/incident-npm-publish-failure.md
+//
+// Last working config verified: 2025-10-17
+//
+
 const fs = require('fs');
 const { execSync } = require('child_process');
 
