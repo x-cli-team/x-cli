@@ -148,9 +148,9 @@ function syncAgentDocs() {
   const roadmapContent = generateRoadmap();
   fs.writeFileSync(path.join(DOCS_DIR, 'roadmap.md'), roadmapContent);
   
-  // Create sidebar config
+  // Create sidebar config for TypeScript
   const sidebarConfig = {
-    docs: [
+    tutorialSidebar: [
       'overview',
       {
         type: 'category',
@@ -181,9 +181,16 @@ function syncAgentDocs() {
     ],
   };
   
+  // Write TypeScript sidebar config
+  const sidebarContent = `import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+
+const sidebars: SidebarsConfig = ${JSON.stringify(sidebarConfig, null, 2)};
+
+export default sidebars;`;
+  
   fs.writeFileSync(
-    path.join(__dirname, '../sidebars.js'),
-    `module.exports = ${JSON.stringify(sidebarConfig, null, 2)};`
+    path.join(__dirname, '../sidebars.ts'),
+    sidebarContent
   );
   
   console.log('✅ Sync complete!');
