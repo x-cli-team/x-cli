@@ -61,26 +61,30 @@ function GrokCliHero() {
 
       {/* X.AI Style Hero Card */}
       <div className={styles.heroCardContainer}>
-        <div className="hero-card">
-          <div className="hero-card-background"></div>
-          <div className="hero-card-overlay"></div>
-          <div className="hero-card-content">
-            <div className="hero-card-text">
-              <h3>Grok CLI</h3>
-              <p>Experience Claude Code-level intelligence in your terminal. Built for developers who need powerful AI assistance without leaving their workflow.</p>
+        <div className={styles.heroCard}>
+          <div className={styles.heroCardBackground}>
+            <video className={styles.heroCardVideo} autoPlay muted loop playsInline>
+              <source src="/img/grok-hero-video.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div className={styles.heroCardOverlay}></div>
+          <div className={styles.heroCardContent}>
+            <div className={styles.heroCardText}>
+              <h3 className={styles.heroCardTitle}>Grok CLI</h3>
+              <p className={styles.heroCardDescription}>Experience Claude Code-level intelligence in your terminal. Built for developers who need powerful AI assistance without leaving their workflow.</p>
               
-              <div className="feature-grid">
-                <div className="feature-item">
-                  <strong>Modalities</strong>
-                  <span>🗣️ → 📝</span>
+              <div className={styles.featureGrid}>
+                <div className={styles.featureItem}>
+                  <strong className={styles.featureLabel}>Modalities</strong>
+                  <span className={styles.featureValue}>🗣️ → 📝</span>
                 </div>
-                <div className="feature-item">
-                  <strong>Tools Available</strong>
-                  <span>15+</span>
+                <div className={styles.featureItem}>
+                  <strong className={styles.featureLabel}>Tools Available</strong>
+                  <span className={styles.featureValue}>15+</span>
                 </div>
               </div>
 
-              <div className="feature-list">
+              <div className={styles.featureList}>
                 <ul>
                   <li>Advanced file operations</li>
                   <li>Code-aware editing</li>
@@ -91,9 +95,9 @@ function GrokCliHero() {
               </div>
             </div>
 
-            <div className="card-actions">
-              <a className="btn-primary" href="/docs/getting-started/installation">Get Started</a>
-              <a className="btn-secondary" href="/docs/getting-started/quickstart">View Quickstart</a>
+            <div className={styles.cardActions}>
+              <a className={styles.btnPrimary} href="/docs/getting-started/installation">Get Started</a>
+              <a className={styles.btnSecondary} href="/docs/getting-started/quickstart">View Quickstart</a>
             </div>
           </div>
         </div>

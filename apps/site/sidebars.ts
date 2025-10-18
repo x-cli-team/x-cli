@@ -5,13 +5,37 @@ const sidebars: SidebarsConfig = {
     // Overview
     "overview",
     
-    // Getting Started
-    "getting-started/introduction", 
-    "getting-started/installation",
+    // Getting Started  
     "getting-started/quickstart",
+    "getting-started/installation",
     
-    // What's New
-    "whats-new"
+    // Architecture
+    "architecture/overview", 
+    "architecture/current-state",
+    
+    // Build with Grok CLI
+    "build/tools",
+    "build/agents",
+    "build/troubleshooting",
+    
+    // Configuration
+    "config/settings",
+    
+    // Reference
+    "reference/cli-reference",
+    
+    // API
+    "api/schema",
+    
+    // Guides  
+    "guides/releases",
+    "guides/automation",
+    
+    // Troubleshooting
+    "troubleshooting/npm",
+    
+    // Resources
+    "roadmap"
   ]
 };
 

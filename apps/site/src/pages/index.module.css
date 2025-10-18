@@ -6,6 +6,165 @@
   padding: 0 2rem;
 }
 
+/* X.AI Hero Card Styles */
+.heroCard {
+  background: #000000;
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 2rem 0;
+  position: relative;
+  height: 576px; /* Increased by 20% again (480px -> 576px) */
+  border: none;
+}
+
+.heroCardBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.heroCardVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.heroCardOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(1px);
+}
+
+.heroCardContent {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 50%;
+}
+
+.heroCardText {
+  color: white;
+}
+
+.heroCardTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: white;
+}
+
+.heroCardDescription {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.featureItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.featureLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.featureValue {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+}
+
+.featureList {
+  margin-bottom: 2rem;
+}
+
+.featureList ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.featureList li {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.featureList li::before {
+  content: "✓";
+  color: #10b981;
+  font-weight: bold;
+}
+
+.cardActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btnPrimary, .btnSecondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: white;
+  color: black;
+}
+
+.btnPrimary:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  text-decoration: none;
+}
+
+.btnSecondary {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  text-decoration: none;
+}
+
 .hero {
   position: relative;
   min-height: 100vh;

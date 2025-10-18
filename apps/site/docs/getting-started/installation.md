@@ -1,8 +1,6 @@
 ---
 title: Installation & Setup Guide
----
-
-# Installation & Setup Guide
+---# Installation & Setup Guide
 
 ## Overview
 Grok CLI is installed globally via npm and includes automated installation scripts to handle common issues.

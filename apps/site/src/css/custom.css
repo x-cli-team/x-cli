@@ -246,6 +246,27 @@
   color: var(--ifm-color-content);
 }
 
+/* Clean bullet points */
+.markdown ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.markdown ul li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--ifm-color-content-secondary);
+}
+
+.markdown ul li::before {
+  content: "•";
+  color: var(--ifm-color-primary);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
 /* Clean tables */
 .markdown table {
   border: 1px solid var(--ifm-border-color);
@@ -270,15 +291,59 @@
 
 .footer__title {
   font-weight: 600;
-  color: var(--ifm-color-content);
+  color: #1a1a1a !important;
 }
 
 .footer__item {
-  color: var(--ifm-color-content-secondary);
+  color: #1a1a1a !important;
+  font-weight: 500;
 }
 
 .footer__item:hover {
-  color: var(--ifm-color-content);
+  color: var(--ifm-color-primary) !important;
+}
+
+.footer__link {
+  color: #1a1a1a !important;
+  font-weight: 500;
+}
+
+.footer__link:hover {
+  color: var(--ifm-color-primary) !important;
+}
+
+/* Force all footer text to be dark */
+.footer * {
+  color: #1a1a1a !important;
+}
+
+.footer a {
+  color: #1a1a1a !important;
+}
+
+.footer a:hover {
+  color: #000000 !important;
+}
+
+/* Dark mode footer */
+[data-theme='dark'] .footer__title {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .footer__item {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .footer__link {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .footer * {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .footer a {
+  color: #ffffff !important;
 }
 
 /* === Remove Visual Noise === */
@@ -320,7 +385,7 @@
   overflow: hidden;
   margin: 2rem 0;
   position: relative;
-  height: 400px;
+  height: 576px; /* Increased by 20% again (480px -> 576px) */
   border: none;
 }
 
@@ -330,10 +395,19 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('/img/grok-hero-bg.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.hero-card-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 1;
+  background: #1a1a1a; /* Fallback background */
 }
 
 .hero-card-overlay {
@@ -344,11 +418,12 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(1px);
+  z-index: 2;
 }
 
 .hero-card-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   padding: 2rem;
   height: 100%;
   display: flex;
@@ -404,6 +479,8 @@
 
 .feature-list {
   margin-bottom: 2rem;
+  position: relative;
+  z-index: 4;
 }
 
 .feature-list ul {
@@ -416,15 +493,18 @@
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  position: relative;
+  padding-left: 1.25rem;
 }
 
 .feature-list li::before {
-  content: "✓";
-  color: #10b981;
-  font-weight: bold;
+  content: "✅";
+  font-size: 0.75rem;
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  z-index: 10;
+  display: block;
 }
 
 .card-actions {
@@ -535,7 +615,7 @@
   
   /* X.AI Hero Card Mobile */
   .hero-card {
-    height: 500px;
+    height: 691px; /* 20% taller again (576px -> 691px) */
   }
   
   .hero-card-overlay {
@@ -573,4 +653,48 @@
   .jump-in-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* === Font Consistency === */
+/* Ensure all elements use the same font family */
+html, body, 
+.navbar__brand, .navbar__item, .navbar__link,
+.menu__link, .menu__list-item,
+.hero-card h3, .hero-card p, .hero-card,
+.feature-item strong, .feature-item span,
+.feature-list li,
+.btn-primary, .btn-secondary,
+.jump-card h4, .jump-card p, .jump-card a,
+.markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6,
+.markdown p, .markdown li, .markdown a,
+.footer__title, .footer__item, .footer__link,
+input, button, select, textarea {
+  font-family: var(--ifm-font-family-base) !important;
+}
+
+/* Code elements use monospace */
+code, pre, .prism-code, .token,
+.markdown code, .markdown pre {
+  font-family: var(--ifm-font-family-monospace) !important;
+}
+
+/* Ensure consistent line heights */
+.hero-card h3, .hero-card p,
+.feature-item strong, .feature-item span,
+.navbar__brand, .navbar__link,
+.menu__link,
+.jump-card h4, .jump-card p {
+  line-height: var(--ifm-line-height-base);
+}
+
+/* Fix any system font overrides */
+* {
+  font-family: inherit;
+}
+
+/* Ensure buttons use consistent fonts */
+.btn-primary, .btn-secondary,
+button, input[type="button"], input[type="submit"] {
+  font-family: var(--ifm-font-family-base) !important;
+  font-size: 0.875rem;
 }

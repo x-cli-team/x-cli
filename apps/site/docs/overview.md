@@ -6,16 +6,48 @@ title: Overview
 
 Grok CLI is a conversational AI tool that brings Claude Code-level intelligence directly into your terminal. Built with X.AI's Grok models, it provides advanced file operations, code analysis, and workflow automation through natural language interaction.
 
-## Quick Overview
-
-**Grok CLI v1.0.99** brings Claude Code-level intelligence to your terminal with advanced AI-powered development tools.
-
-### Key Capabilities
-
-- **15+ Specialized Tools** - File operations, code analysis, web integration
-- **Unlimited Context** - Full project understanding and conversation memory  
-- **MCP Integration** - Extensible via Model Context Protocol servers
-- **Terminal Native** - Lightning fast, no GUI required
+<div className="hero-card">
+  <div className="hero-card-background">
+    <video className="hero-card-video" autoPlay muted loop playsInline preload="auto">
+      <source src="/grok-video-93ef685c-b1de-4696-a757-359c20e0ca0f.mp4" type="video/mp4" />
+      <source src="/img/grok-hero-video.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+  <div className="hero-card-overlay"></div>
+  <div className="hero-card-content">
+    <div className="hero-card-text">
+      <h3>Grok CLI v1.0.96</h3>
+      <p>We're excited to release the latest advancement in terminal-based AI development tools with Claude Code-level capabilities.</p>
+      
+      <div className="feature-grid">
+        <div className="feature-item">
+          <strong>Tool System</strong>
+          <span>15+ specialized tools</span>
+        </div>
+        <div className="feature-item">
+          <strong>Context</strong>
+          <span>Unlimited project context</span>
+        </div>
+      </div>
+      
+      <div className="feature-list">
+        <ul>
+          <li>File operations</li>
+          <li>Code intelligence</li>
+          <li>Web integration</li>
+          <li>Lightning fast</li>
+          <li>Terminal native</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div className="card-actions">
+      <a href="getting-started/installation" className="btn-primary">Get Started</a>
+      <a href="architecture/overview" className="btn-secondary">View Architecture</a>
+    </div>
+  </div>
+</div>
 
 ## Jump right in
 
