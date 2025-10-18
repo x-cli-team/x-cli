@@ -10,7 +10,7 @@ const { glob } = require('glob');
  */
 
 const AGENT_DIR = path.resolve(__dirname, '../../../../.agent');
-const DOCS_DIR = path.resolve(__dirname, '../docs');
+const DOCS_DIR = path.resolve(__dirname, '../../docs');
 
 // Mapping of .agent files to public docs
 const SYNC_MAP = {
