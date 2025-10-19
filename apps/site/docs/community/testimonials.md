@@ -2,9 +2,9 @@
 
 The fastest path to becoming a Grok CLI collaborator is through our automated testimonial system. Share your experience and immediately gain commit access to this growing open-source project.
 
-![Contributors](https://contrib.rocks/image?repo=hinetapora/grok-cli-hurry-mode&max=14)
+![Contributors](/img/contributors.png)
 
-*Join our growing community of 97+ developers contributing to next-generation terminal AI tools.*
+*Join our community of 7 active contributors building next-generation terminal AI tools.*
 
 ## Professional Benefits for Developers
 
