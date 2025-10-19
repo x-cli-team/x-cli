@@ -2,7 +2,7 @@
 
 The fastest path to becoming a Grok CLI collaborator is through our automated testimonial system. Share your experience and immediately gain commit access to this growing open-source project.
 
-![Contributors](/img/contributors.png)
+<img src="/img/contributors.png" alt="Contributors" style={{width: '50%', height: 'auto'}} />
 
 *Join our community of 53 contributors building next-generation terminal AI tools.*
 
