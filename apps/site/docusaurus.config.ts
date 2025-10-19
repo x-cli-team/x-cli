@@ -180,7 +180,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Grok CLI. Built with Docusaurus. Original project by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a> at <a href="https://github.com/superagent-ai/grok-cli" target="_blank" rel="noopener noreferrer">Superagent.ai</a>.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Grok CLI. Built with Docusaurus. Forked from <a href="https://github.com/superagent-ai/grok-cli" target="_blank" rel="noopener noreferrer">Superagent.ai</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
     },
     prism: {
       theme: prismThemes.github,

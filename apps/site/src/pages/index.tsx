@@ -6,12 +6,19 @@ export default function Page() {
   return (
     <>
       <GrokCliHero />
+      <OpenSourceSection />
+      <FeaturesSection />
+      <CollaborationSection />
+      <RoadmapSection />
       <TestimonialsSection />
+      <Footer />
     </>
   );
 }
 
 function GrokCliHero() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   return (
     <div className={styles.hero}>
       {/* === LIGHT STACK =================================================== */}
@@ -36,7 +43,29 @@ function GrokCliHero() {
           <div className={styles.navRight}>
             <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
           </div>
+          <button 
+            className={styles.hamburger} 
+            aria-label="Menu"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <span className={styles.hamburgerLine}></span>
+            <span className={styles.hamburgerLine}></span>
+            <span className={styles.hamburgerLine}></span>
+          </button>
         </div>
+        
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div className={styles.mobileMenuOverlay} onClick={() => setMobileMenuOpen(false)}>
+            <div className={styles.mobileMenu}>
+              <NavLink href="/docs/overview">Docs</NavLink>
+              <NavLink href="/docs/roadmap">Roadmap</NavLink>
+              <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
+              <NavLink href="https://github.com/hinetapora/grok-cli-hurry-mode">GitHub</NavLink>
+              <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
+            </div>
+          </div>
+        )}
 
         {/* NPM Install button */}
         <div className={styles.installSection}>
@@ -92,16 +121,197 @@ function GrokCliHero() {
       {/* Bottom overlays aligned to main container width */}
       <div className={styles.bottomOverlay}>
         <div className={styles.bottomContent}>
-          <div className={styles.bottomIcon}>
+          <button 
+            className={styles.bottomIcon}
+            onClick={() => {
+              const nextSection = document.getElementById('opensource-section');
+              nextSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            aria-label="Scroll to next section"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={styles.arrowIcon}>
               <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v16.19l6.22-6.22a.75.75 0 111.06 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 111.06-1.06l6.22 6.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
             </svg>
-          </div>
+          </button>
           <ChipBtn variant="outline" label="Join as Collaborator" href="https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml" />
         </div>
       </div>
 
     </div>
+  );
+}
+
+function OpenSourceSection() {
+  return (
+    <section id="opensource-section" className={styles.section}>
+      <div className={styles.container}>
+        <h2 className={styles.sectionTitle}>Open Source</h2>
+        <p className={styles.sectionDescription}>
+          Built by developers, for developers. Grok CLI is completely open source and community-driven.
+        </p>
+        <div className={styles.featureGrid}>
+          <div className={styles.featureCard}>
+            <h3>MIT Licensed</h3>
+            <p>Free to use, modify, and distribute. Build on top of Grok CLI for your own projects.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>Community Driven</h3>
+            <p>Every feature request, bug report, and contribution shapes the future of the project.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>Transparent Development</h3>
+            <p>All development happens in the open. Track progress and contribute to the roadmap.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeaturesSection() {
+  return (
+    <section className={styles.section}>
+      <div className={styles.container}>
+        <h2 className={styles.sectionTitle}>Powerful Features</h2>
+        <p className={styles.sectionDescription}>
+          Everything you need for AI-powered terminal development workflows.
+        </p>
+        <div className={styles.featureGrid}>
+          <div className={styles.featureCard}>
+            <h3>Advanced File Operations</h3>
+            <p>Read, write, edit, and search files with intelligent AI assistance.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>Multi-File Transactions</h3>
+            <p>Atomic operations across multiple files with rollback capabilities.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>Web Integration</h3>
+            <p>Fetch and process web content with AI-powered analysis.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>MCP Protocol</h3>
+            <p>Extensible architecture supporting Model Context Protocol servers.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>Task Management</h3>
+            <p>Organize and track complex development workflows.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h3>Code-Aware Editing</h3>
+            <p>Intelligent code modifications with syntax understanding.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CollaborationSection() {
+  return (
+    <section className={styles.section}>
+      <div className={styles.container}>
+        <h2 className={styles.sectionTitle}>Join the Community</h2>
+        <p className={styles.sectionDescription}>
+          Become a collaborator and help shape the future of terminal AI tools.
+        </p>
+        <div className={styles.collaborationGrid}>
+          <div className={styles.collaborationCard}>
+            <h3>Submit a Testimonial</h3>
+            <p>Share your experience and automatically become a repository collaborator.</p>
+            <a href="https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml" className={styles.cardButton}>
+              Join as Collaborator
+            </a>
+          </div>
+          <div className={styles.collaborationCard}>
+            <h3>Professional Benefits</h3>
+            <p>Repository access, backlinks, GitHub profile enhancement, and networking opportunities.</p>
+          </div>
+          <div className={styles.collaborationCard}>
+            <h3>Technical Skills</h3>
+            <p>Gain experience with TypeScript, Node.js, AI integration, and open-source development.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RoadmapSection() {
+  return (
+    <section className={styles.section}>
+      <div className={styles.container}>
+        <h2 className={styles.sectionTitle}>Roadmap</h2>
+        <p className={styles.sectionDescription}>
+          Our journey to Claude Code-level intelligence and beyond.
+        </p>
+        <div className={styles.roadmapGrid}>
+          <div className={styles.roadmapCard}>
+            <div className={styles.roadmapStatus}>✅ Complete</div>
+            <h3>Core Tool System</h3>
+            <p>File operations, bash execution, search, and basic AI integration.</p>
+          </div>
+          <div className={styles.roadmapCard}>
+            <div className={styles.roadmapStatus}>🚀 In Progress</div>
+            <h3>Advanced Features</h3>
+            <p>Web integration, multi-file operations, and enhanced AI capabilities.</p>
+          </div>
+          <div className={styles.roadmapCard}>
+            <div className={styles.roadmapStatus}>📋 Planned</div>
+            <h3>IDE Integration</h3>
+            <p>VS Code extension, Vim plugins, and advanced editor support.</p>
+          </div>
+        </div>
+        <div className={styles.roadmapCta}>
+          <a href="/docs/roadmap" className={styles.roadmapButton}>View Full Roadmap</a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className={styles.footer}>
+      <div className={styles.container}>
+        <div className={styles.footerGrid}>
+          <div className={styles.footerSection}>
+            <h3>Docs</h3>
+            <ul>
+              <li><a href="/docs/overview">Overview</a></li>
+              <li><a href="/docs/getting-started/installation">Installation</a></li>
+              <li><a href="/docs/architecture/overview">Architecture</a></li>
+            </ul>
+          </div>
+          <div className={styles.footerSection}>
+            <h3>Community</h3>
+            <ul>
+              <li><a href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</a></li>
+              <li><a href="https://github.com/hinetapora/grok-cli-hurry-mode/issues">GitHub Issues</a></li>
+              <li><a href="https://www.npmjs.com/package/grok-cli-hurry-mode">NPM Package</a></li>
+            </ul>
+          </div>
+          <div className={styles.footerSection}>
+            <h3>More</h3>
+            <ul>
+              <li><a href="/docs/roadmap">Roadmap</a></li>
+              <li><a href="/docs/community/testimonials">Testimonials</a></li>
+              <li><a href="https://github.com/hinetapora/grok-cli-hurry-mode">GitHub</a></li>
+            </ul>
+          </div>
+          <div className={styles.footerSection}>
+            <h3>Credits</h3>
+            <ul>
+              <li><a href="https://github.com/superagent-ai/grok-cli">Forked from Superagent.ai</a></li>
+              <li><a href="https://github.com/homanp">Ismail Pelaseyed</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className={styles.footerBottom}>
+          <p>Copyright © 2024 Grok CLI. Forked from <a href="https://github.com/superagent-ai/grok-cli">Superagent.ai</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
+        </div>
+      </div>
+    </footer>
   );
 }
 

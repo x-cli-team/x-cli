@@ -292,7 +292,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
   .heroCenter {
     flex-direction: column;
     gap: 2rem;
@@ -304,6 +304,185 @@
   
   .heroVideo {
     max-width: 100%;
+  }
+  
+  /* Hero Card Mobile Styles */
+  .heroCard {
+    height: 480px !important; /* Even shorter for mobile to fit better */
+    margin: 0 !important; /* Remove any margins */
+    border-radius: 12px !important; /* Smaller border radius */
+    width: 100% !important;
+  }
+  
+  .heroCardOverlay {
+    width: 100% !important; /* Full width overlay on mobile */
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  
+  .heroCardContent {
+    width: 100% !important; /* Full width content on mobile */
+    text-align: left !important;
+    padding: 1.25rem !important; /* Reduce padding even more */
+  }
+  
+  .heroCardTitle {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .heroCardDescription {
+    font-size: 0.95rem !important;
+    margin-bottom: 1rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  .featureGrid {
+    grid-template-columns: 1fr 1fr !important; /* Keep 2 columns for Modalities and Tools */
+    gap: 0.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .featureList {
+    display: none !important; /* Hide feature list bullets on mobile */
+  }
+  
+  .cardActions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+  
+  .btnPrimary, 
+  .btnSecondary {
+    text-align: center !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 1rem 1.5rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .heroCardContainer {
+    padding: 0 0.75rem !important; /* Reduce side padding */
+    top: -10rem !important; /* Move card higher up on mobile */
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+  
+  /* Logo mobile fix */
+  .logoText {
+    font-size: 1rem !important;
+    white-space: nowrap !important;
+  }
+  
+  .logo {
+    gap: 0.25rem !important;
+  }
+  
+  .logoIcon {
+    height: 1.75rem !important;
+    width: 1.75rem !important;
+  }
+  
+  /* Navigation mobile fixes */
+  .topNav {
+    padding: 1rem 0 !important;
+  }
+  
+  .navLeft {
+    gap: 0.25rem !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  .navLink {
+    display: none !important; /* Hide nav links on mobile */
+  }
+  
+  .navRight {
+    display: none !important; /* Hide get started button on mobile */
+  }
+  
+  /* Hamburger menu styles */
+  .hamburger {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1000 !important;
+    position: relative !important;
+  }
+  
+  .hamburgerLine {
+    width: 24px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Mobile Menu Overlay */
+  .mobileMenuOverlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .mobileMenu {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+    align-items: center !important;
+    padding: 2rem !important;
+  }
+  
+  .mobileMenu .navLink {
+    display: block !important;
+    font-size: 1.25rem !important;
+    color: white !important;
+    text-decoration: none !important;
+    padding: 1rem !important;
+  }
+  
+  .mobileMenu .chipBtn {
+    margin-top: 1rem !important;
+  }
+  
+  /* Bottom overlay mobile fix */
+  .bottomOverlay {
+    padding: 0 0.75rem;
+  }
+  
+  .bottomContent {
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .chipBtnOutline {
+    font-size: 0.7rem;
+    padding: 0 0.75rem;
+    height: 36px;
+  }
+  
+  /* Install section mobile fix */
+  .installSection {
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+  }
+  
+  .chipBtnSolid {
+    font-size: 0.75rem;
+    padding: 0 1rem;
+    height: 40px;
   }
 }
 
@@ -506,4 +685,303 @@
 .arrowIcon {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+/* Hide hamburger on desktop */
+.hamburger {
+  display: none;
+}
+
+/* === New Landing Page Sections === */
+
+.section {
+  padding: 5rem 0;
+  background: #000000;
+  color: white;
+}
+
+.section:nth-child(even) {
+  background: #0a0a0a;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.sectionDescription {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.featureCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.featureCard:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.featureCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.featureCard p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.collaborationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.collaborationCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.collaborationCard:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.collaborationCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.collaborationCard p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.cardButton {
+  display: inline-block;
+  background: white;
+  color: black;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.cardButton:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  text-decoration: none;
+}
+
+.roadmapGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.roadmapCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.roadmapCard:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.roadmapStatus {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.roadmapCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.roadmapCard p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.roadmapCta {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.roadmapButton {
+  display: inline-block;
+  background: white;
+  color: black;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.roadmapButton:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  text-decoration: none;
+}
+
+.footer {
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3rem 0 2rem 0;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footerSection h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.footerSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footerSection li {
+  margin-bottom: 0.5rem;
+}
+
+.footerSection a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.footerSection a:hover {
+  color: white;
+}
+
+.footerBottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footerBottom p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.footerBottom a {
+  color: white;
+  text-decoration: none;
+}
+
+.footerBottom a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsive styles for new sections */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .section {
+    padding: 3rem 0;
+  }
+  
+  .sectionTitle {
+    font-size: 2rem;
+  }
+  
+  .sectionDescription {
+    font-size: 1.125rem;
+  }
+  
+  .section .featureGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .collaborationGrid,
+  .roadmapGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footerGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Mobile-specific styling for bottom button */
+  .bottomIcon {
+    padding: 0.75rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .bottomIcon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
 }
