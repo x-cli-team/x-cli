@@ -1,4 +1,4 @@
-## 1.1.13 – Stability Release
+## 1.1.14 – Stability Release
 
 This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
