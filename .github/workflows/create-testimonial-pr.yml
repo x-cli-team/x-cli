@@ -135,11 +135,7 @@ jobs:
           testimonials.push(testimonial);
           
           // Write back to file
-          const header = `# Grok CLI Community Testimonials
-# This file is automatically managed by GitHub Actions
-# Submit testimonials via: https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml
-
-`;
+          const header = '# Grok CLI Community Testimonials\\n# This file is automatically managed by GitHub Actions\\n# Submit testimonials via: https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml\\n\\n';
           
           fs.writeFileSync('data/testimonials.yml', header + yaml.dump(testimonials));
           
@@ -147,9 +143,8 @@ jobs:
           console.log(`BRANCH_NAME=testimonial-${issueNumber}`);
           
           // Output for GitHub Actions
-          const core = require('@actions/core');
-          core.setOutput('name', testimonial.name);
-          core.setOutput('quote', testimonial.quote.substring(0, 100) + '...');
+          console.log(`::set-output name=name::${testimonial.name}`);
+          console.log(`::set-output name=quote::${testimonial.quote.substring(0, 100)}...`);
           EOF
           
       - name: Create Pull Request
