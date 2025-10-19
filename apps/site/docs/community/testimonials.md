@@ -4,7 +4,7 @@ The fastest path to becoming a Grok CLI collaborator is through our automated te
 
 ![Contributors](/img/contributors.png)
 
-*Join our community of 7 active contributors building next-generation terminal AI tools.*
+*Join our community of 53 contributors building next-generation terminal AI tools.*
 
 ## Professional Benefits for Developers
 
