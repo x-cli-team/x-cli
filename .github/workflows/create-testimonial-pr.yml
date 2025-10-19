@@ -183,6 +183,15 @@ jobs:
             automated-pr
           assignees: ${{ github.event.issue.user.login }}
           
+      - name: Add submitter as repository collaborator
+        run: |
+          curl -X PUT \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/collaborators/${{ github.event.issue.user.login }}" \
+            -d '{"permission": "write"}'
+          echo "Added @${{ github.event.issue.user.login }} as collaborator"
+          
       - name: Close issue with success message
         uses: peter-evans/close-issue@v3
         with:
@@ -191,6 +200,16 @@ jobs:
             ## 🎉 Thank you for your testimonial, @${{ github.event.issue.user.login }}!
             
             I've automatically created **PR #${{ steps.create-pr.outputs.pull-request-number }}** with your submission.
+            
+            ### 🤝 Welcome to the Team!
+            
+            You've been **automatically added as a collaborator** to this repository! This means you can:
+            - 💻 Contribute code and improvements
+            - 🐛 Help fix issues and bugs  
+            - 📝 Improve documentation
+            - 🚀 Be part of the open-source community
+            
+            Check your email for the collaboration invitation!
             
             ### ⚡ What happens next:
             
