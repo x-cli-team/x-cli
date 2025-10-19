@@ -1,29 +1,35 @@
-name: 📝 Share Your Grok CLI Experience
-description: Submit a testimonial about your experience with Grok CLI
-title: "[Testimonial] Your Experience with Grok CLI"
+name: Join as Collaborator - Share Your Experience
+description: Submit your experience and automatically become a repository collaborator
+title: "[Collaboration] Developer Experience with Grok CLI"
 labels: ["testimonial", "community"]
 
 body:
   - type: markdown
     attributes:
       value: |
-        # 🎉 Thank you for using Grok CLI!
+        # Join as Collaborator Through Your Experience
         
-        We'd love to hear about your experience and showcase your story to help other developers discover Grok CLI.
+        Share your technical experience with Grok CLI and **automatically become a repository collaborator** with professional benefits.
         
-        **Your testimonial will be:**
-        - ✅ Reviewed automatically for content guidelines
-        - 🚀 Published to our website within 10 minutes
-        - 🌟 Featured in our community showcase
-        - 🔗 Linked back to your profile for attribution
+        **Professional Benefits You'll Receive:**
+        - **Repository collaborator status** with triage permissions for pull requests and issues
+        - **Permanent backlink** from our documentation site to your profile for SEO benefits
+        - **GitHub profile enhancement** as a contributor to an active open-source CLI tool
+        - **Technical skill development** through TypeScript, Node.js, and AI integration experience
+        - **Professional networking** opportunities within the developer tooling community
         
-        *All testimonials are added via automated pull requests that you can review before they're merged.*
+        **Your submission will be:**
+        - Automatically validated and published to our website within 10 minutes
+        - Featured with full professional attribution and link to your profile
+        - Used to generate your immediate collaboration invitation
+        
+        *All processing is automated - you'll receive repository access within minutes of submission.*
 
   - type: input
     id: name
     attributes:
-      label: 👤 Your Name
-      description: How would you like to be credited? (First and Last name)
+      label: Your Name
+      description: Professional name for attribution and collaboration invitation (First and Last name)
       placeholder: "Alex Chen"
     validations:
       required: true
@@ -31,8 +37,8 @@ body:
   - type: input
     id: title
     attributes:
-      label: 💼 Job Title
-      description: Your current role or position
+      label: Job Title
+      description: Your current role or position for professional credibility
       placeholder: "Senior Software Engineer"
     validations:
       required: true
@@ -40,8 +46,8 @@ body:
   - type: input
     id: company
     attributes:
-      label: 🏢 Company/Organization
-      description: Where you work or your professional affiliation
+      label: Company/Organization
+      description: Your professional affiliation or current project for networking context
       placeholder: "TechCorp"
     validations:
       required: true
@@ -49,36 +55,37 @@ body:
   - type: textarea
     id: quote
     attributes:
-      label: 💬 Your Experience with Grok CLI
+      label: Your Technical Experience with Grok CLI
       description: |
-        Share your experience with Grok CLI! What problem did it solve? How has it improved your workflow?
+        Describe how Grok CLI improved your development workflow and productivity. Focus on specific technical benefits.
         
-        **Guidelines:**
-        - Keep it under 480 characters (about 2-3 sentences)
-        - Focus on specific benefits or use cases
-        - Be authentic and honest about your experience
+        **Strategic Guidelines:**
+        - Highlight specific productivity gains or workflow improvements (aim for 2-3 sentences)
+        - Mention integration with your existing development stack
+        - Reference measurable outcomes (time savings, error reduction, efficiency)
+        - Connect to broader themes like AI tooling evolution or open-source values
         
-        **Examples:**
-        - "Grok CLI transformed my development workflow..."
-        - "Finally, an AI assistant that works in the terminal..."
-        - "The tool system is incredibly powerful for..."
-      placeholder: "Grok CLI transformed my development workflow. The AI assistance is incredible and it never leaves my terminal."
+        **Professional Examples:**
+        - "Grok CLI eliminated context switching in my development workflow, saving approximately 2 hours daily..."
+        - "The MCP integration architecture opened new possibilities for connecting AI assistance with my existing tools..."
+        - "Contributing to Grok CLI enhanced my understanding of AI tool integration and production TypeScript development..."
+      placeholder: "Grok CLI eliminated context switching in my development workflow. The AI assistance directly in my terminal improved my debugging accuracy and saved significant time daily."
     validations:
       required: true
 
   - type: input
     id: link
     attributes:
-      label: 🔗 Your Profile Link
+      label: Professional Profile URL
       description: |
-        Link to your professional profile for attribution
+        Your professional profile for backlink attribution and networking opportunities
         
-        **Accepted domains:**
-        - GitHub: https://github.com/username
-        - LinkedIn: https://linkedin.com/in/username  
-        - Personal website: https://yoursite.dev
-        - Dev.to: https://dev.to/username
-        - Twitter/X: https://x.com/username
+        **Preferred Platforms:**
+        - GitHub: https://github.com/username (recommended for developer networking)
+        - LinkedIn: https://linkedin.com/in/username (professional networking)
+        - Personal website/portfolio: https://yoursite.dev (showcase your work)
+        - Dev.to: https://dev.to/username (technical writing platform)
+        - Twitter/X: https://x.com/username (industry engagement)
       placeholder: "https://github.com/username"
     validations:
       required: true
@@ -86,8 +93,8 @@ body:
   - type: dropdown
     id: tags
     attributes:
-      label: 🏷️ What aspect of Grok CLI do you want to highlight?
-      description: Choose up to 3 tags that best describe your experience
+      label: Technical Focus Areas
+      description: Select up to 3 areas that best represent your expertise and contribution potential
       multiple: true
       options:
         - productivity
@@ -108,23 +115,25 @@ body:
   - type: checkboxes
     id: avatar_consent
     attributes:
-      label: 📸 Avatar Permission
-      description: We'll use your GitHub avatar if you provided a GitHub link, or a placeholder if not
+      label: Professional Attribution
+      description: Avatar usage for professional attribution in testimonials and contributor profiles
       options:
-        - label: I consent to using my profile avatar for the testimonial display
+        - label: I consent to using my profile avatar for testimonial display and contributor attribution
           required: true
 
   - type: checkboxes
     id: consent
     attributes:
-      label: ✅ Consent & Verification
-      description: Please confirm your agreement to share this testimonial
+      label: Collaboration Agreement
+      description: Confirm your agreement for testimonial publication and collaboration invitation
       options:
-        - label: I consent to having my testimonial featured on the Grok CLI website and documentation
+        - label: I consent to having my testimonial featured on the Grok CLI website with professional attribution
           required: true
-        - label: I confirm that this testimonial is truthful and based on my actual experience with Grok CLI
+        - label: I confirm this testimonial is truthful and based on my actual experience with Grok CLI
           required: true
-        - label: I understand that this testimonial will be publicly visible and attributed to me
+        - label: I understand I will receive a GitHub collaboration invitation with repository access
+          required: true
+        - label: I agree to contribute constructively to the project as a repository collaborator
           required: true
 
   - type: markdown
@@ -132,13 +141,20 @@ body:
       value: |
         ---
         
-        ### 🤖 What happens next?
+        ### Professional Onboarding Process
         
-        1. **Automated Processing**: A bot will create a pull request with your testimonial
-        2. **Validation**: Automatic checks ensure content meets guidelines
-        3. **Publication**: Your testimonial goes live on our website within 10 minutes
-        4. **Attribution**: Your profile link will be included for proper credit
+        **Immediate Next Steps:**
+        1. **Automated Processing** - System creates pull request with your testimonial and validates content
+        2. **Publication** - Your testimonial goes live on our website within 10 minutes with full attribution
+        3. **Collaboration Invitation** - You receive GitHub repository access with triage permissions
+        4. **Professional Benefits** - Permanent backlink, portfolio enhancement, and networking opportunities
         
-        **Questions?** Feel free to ask in our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064) or comment on the generated PR.
+        **After Submission:**
+        - Check your email for the GitHub collaboration invitation
+        - Explore the codebase and contribution guidelines
+        - Join technical discussions and start contributing improvements
+        - Connect with other developers in the community
         
-        Thank you for being part of the Grok CLI community! 🙏
+        **Questions?** Join our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064) or participate in repository discussions.
+        
+        **Welcome to the Grok CLI development community.**
