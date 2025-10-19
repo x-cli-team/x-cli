@@ -82,12 +82,20 @@ const config: Config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          to: '/docs/getting-started/quickstart',
+          label: 'For Users',
           position: 'left',
-          label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {
+          to: '/docs/community/testimonials',
+          label: 'Community',
+          position: 'left',
+        },
+        {
+          to: '/docs/architecture/overview',
+          label: 'For Developers',
+          position: 'left',
+        },
         {
           href: 'https://discord.com/channels/1315720379607679066/1315822328139223064',
           label: 'Discord',
