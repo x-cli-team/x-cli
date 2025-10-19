@@ -1,4 +1,4 @@
-## 1.1.4 – Stability Release
+## 1.1.5 – Stability Release
 
 This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
