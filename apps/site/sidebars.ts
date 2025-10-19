@@ -14,6 +14,11 @@ const sidebars: SidebarsConfig = {
     "roadmap",
     {
       type: "html",
+      value: '<div class="sidebar-divider">Community</div>',
+    },
+    "community/testimonials",
+    {
+      type: "html",
       value: '<div class="sidebar-divider">For Developers</div>',
     },
     "architecture/overview", 
