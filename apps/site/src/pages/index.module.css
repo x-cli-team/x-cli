@@ -306,12 +306,29 @@
     max-width: 100%;
   }
   
+  /* iOS Chrome specific fixes */
+  .hero {
+    min-height: 100vh !important;
+    min-height: 100dvh !important; /* Dynamic viewport height for iOS Chrome */
+    position: relative !important;
+  }
+  
+  .content {
+    min-height: 100vh !important;
+    min-height: 100dvh !important; /* Dynamic viewport height */
+  }
+  
   /* Hero Card Mobile Styles */
   .heroCard {
     height: 480px !important; /* Even shorter for mobile to fit better */
     margin: 0 !important; /* Remove any margins */
     border-radius: 12px !important; /* Smaller border radius */
     width: 100% !important;
+    position: relative !important; /* Ensure proper stacking context */
+    /* Mobile Safari fixes */
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    will-change: transform !important;
   }
   
   .heroCardOverlay {
@@ -339,7 +356,7 @@
   .featureGrid {
     grid-template-columns: 1fr 1fr !important; /* Keep 2 columns for Modalities and Tools */
     gap: 0.75rem !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.25rem !important; /* Reduce gap after 15+ text even more */
   }
   
   .featureList {
@@ -362,9 +379,17 @@
   
   .heroCardContainer {
     padding: 0 0.75rem !important; /* Reduce side padding */
-    top: -10rem !important; /* Move card higher up on mobile */
+    top: -8rem !important; /* Adjust for iOS Chrome viewport */
     max-width: 100% !important;
     margin: 0 auto !important;
+    position: relative !important; /* Ensure proper positioning context */
+    z-index: 10 !important; /* Ensure card is above background elements */
+    /* iOS Chrome fixes */
+    transform: translateZ(0) !important; /* Force hardware acceleration */
+    -webkit-transform: translateZ(0) !important;
+    /* Viewport height fixes for iOS Chrome */
+    min-height: auto !important;
+    height: auto !important;
   }
   
   /* Logo mobile fix */
@@ -459,12 +484,13 @@
   
   /* Bottom overlay mobile fix */
   .bottomOverlay {
-    padding: 0 0.75rem;
+    padding: 0 0.75rem !important;
   }
   
   .bottomContent {
-    justify-content: center;
-    gap: 1rem;
+    justify-content: space-between !important; /* Align left and right like nav */
+    gap: 1rem !important;
+    align-items: center !important;
   }
   
   .chipBtnOutline {
@@ -475,14 +501,14 @@
   
   /* Install section mobile fix */
   .installSection {
-    padding: 0.5rem 0;
-    margin-bottom: 1rem;
+    padding: 0.5rem 0 !important;
+    margin-bottom: 3rem !important; /* Force larger margin between npm chip and black card */
   }
   
   .chipBtnSolid {
-    font-size: 0.75rem;
-    padding: 0 1rem;
-    height: 40px;
+    font-size: 0.75rem !important;
+    padding: 0 1rem !important;
+    height: 40px !important;
   }
 }
 
