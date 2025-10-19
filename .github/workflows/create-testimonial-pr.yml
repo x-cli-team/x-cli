@@ -189,7 +189,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/collaborators/${{ github.event.issue.user.login }}" \
-            -d '{"permission": "write"}'
+            -d '{"permission": "triage"}'
           echo "Added @${{ github.event.issue.user.login }} as collaborator"
           
       - name: Close issue with success message
@@ -204,10 +204,12 @@ jobs:
             ### 🤝 Welcome to the Team!
             
             You've been **automatically added as a collaborator** to this repository! This means you can:
-            - 💻 Contribute code and improvements
-            - 🐛 Help fix issues and bugs  
-            - 📝 Improve documentation
+            - 💻 Submit pull requests with code improvements
+            - 🐛 Help triage and manage issues  
+            - 📝 Contribute to documentation via PRs
             - 🚀 Be part of the open-source community
+            
+            **Note**: You'll submit changes via pull requests for review before merging.
             
             Check your email for the collaboration invitation!
             
