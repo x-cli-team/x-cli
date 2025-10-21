@@ -379,17 +379,15 @@
   
   .heroCardContainer {
     padding: 0 0.75rem !important; /* Reduce side padding */
-    top: -8rem !important; /* Adjust for iOS Chrome viewport */
     max-width: 100% !important;
-    margin: 0 auto !important;
-    position: relative !important; /* Ensure proper positioning context */
+    margin: -15rem auto 0 auto !important; /* Bring card much higher up */
     z-index: 10 !important; /* Ensure card is above background elements */
-    /* iOS Chrome fixes */
-    transform: translateZ(0) !important; /* Force hardware acceleration */
-    -webkit-transform: translateZ(0) !important;
-    /* Viewport height fixes for iOS Chrome */
-    min-height: auto !important;
-    height: auto !important;
+    /* Try transform approach instead */
+    position: relative !important; /* Back to relative for transform */
+    transform: translateY(-7rem) translateZ(0) !important; /* Move up 7rem + hardware acceleration */
+    -webkit-transform: translateY(-7rem) translateZ(0) !important;
+    /* Debug styling */
+    border: 3px solid lime !important; /* Make container visible */
   }
   
   /* Logo mobile fix */
@@ -716,6 +714,37 @@
 /* Hide hamburger on desktop */
 .hamburger {
   display: none;
+}
+
+/* DEBUG: Grid overlay for layout debugging */
+.hero::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    linear-gradient(rgba(255, 0, 0, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.hero::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    linear-gradient(rgba(0, 255, 0, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 0, 0.5) 1px, transparent 1px);
+  background-size: 10px 10px;
+  pointer-events: none;
+  z-index: 9998;
 }
 
 /* === New Landing Page Sections === */
