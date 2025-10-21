@@ -380,12 +380,12 @@
   .heroCardContainer {
     padding: 0 0.75rem !important; /* Reduce side padding */
     max-width: 100% !important;
-    margin: -15rem auto 0 auto !important; /* Bring card much higher up */
+    margin: 0 auto !important; /* Remove negative margin - was stacking with transform */
     z-index: 10 !important; /* Ensure card is above background elements */
-    /* Try transform approach instead */
-    position: relative !important; /* Back to relative for transform */
-    transform: translateY(-7rem) translateZ(0) !important; /* Move up 7rem + hardware acceleration */
-    -webkit-transform: translateY(-7rem) translateZ(0) !important;
+    /* Use only transform for positioning */
+    position: relative !important; /* Needed for transform */
+    transform: translateY(-3rem) translateZ(0) !important; /* Smaller move up + hardware acceleration */
+    -webkit-transform: translateY(-3rem) translateZ(0) !important;
     /* Debug styling */
     border: 3px solid lime !important; /* Make container visible */
   }
