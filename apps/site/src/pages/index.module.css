@@ -292,7 +292,7 @@
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 768px), screen and (max-width: 900px) and (orientation: portrait) {
   .heroCenter {
     flex-direction: column;
     gap: 2rem;
@@ -320,7 +320,7 @@
   
   /* Hero Card Mobile Styles */
   .heroCard {
-    height: 480px !important; /* Even shorter for mobile to fit better */
+    height: 430px !important; /* Increased by 1 more red square (50px) */
     margin: 0 !important; /* Remove any margins */
     border-radius: 12px !important; /* Smaller border radius */
     width: 100% !important;
@@ -349,14 +349,14 @@
   
   .heroCardDescription {
     font-size: 0.95rem !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.5rem !important; /* Reduce space between description and modalities */
     line-height: 1.5 !important;
   }
   
   .featureGrid {
     grid-template-columns: 1fr 1fr !important; /* Keep 2 columns for Modalities and Tools */
     gap: 0.75rem !important;
-    margin-bottom: 0.25rem !important; /* Reduce gap after 15+ text even more */
+    margin-bottom: 0rem !important; /* Remove all margin below 15+ */
   }
   
   .featureList {
@@ -365,7 +365,9 @@
   
   .cardActions {
     flex-direction: column !important;
-    gap: 0.75rem !important;
+    gap: 1.25rem !important; /* Even more gap between buttons */
+    margin-top: -2rem !important; /* Pull buttons much closer to 15+ text */
+    padding-top: 0 !important;
   }
   
   .btnPrimary, 
@@ -380,7 +382,7 @@
   .heroCardContainer {
     /* TRY POSITION RELATIVE: Since margins aren't working */
     position: relative !important;      /* Enable top positioning */
-    top: -15rem !important;             /* Move up 15rem from natural position */
+    top: -5.5rem !important;            /* Move up by another half red square */
     transform: none !important;         /* No transforms */
     -webkit-transform: none !important;
     margin: 0 !important;                /* Remove auto centering */
@@ -388,8 +390,6 @@
     width: 100% !important;             /* Full width */
     max-width: none !important;         /* Remove width constraint */
     z-index: 10 !important;             /* Maintain layering */
-    /* Debug styling - can remove later */
-    border: 3px solid lime !important;  /* Make container visible */
   }
   
   /* Logo mobile fix */
@@ -718,36 +718,8 @@
   display: none;
 }
 
-/* DEBUG: Grid overlay for layout debugging */
-.hero::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: 
-    linear-gradient(rgba(255, 0, 0, 0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.3) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none;
-  z-index: 9999;
-}
 
-.hero::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: 
-    linear-gradient(rgba(0, 255, 0, 0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 0, 0.5) 1px, transparent 1px);
-  background-size: 10px 10px;
-  pointer-events: none;
-  z-index: 9998;
-}
+
 
 /* === New Landing Page Sections === */
 
