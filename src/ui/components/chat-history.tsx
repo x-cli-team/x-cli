@@ -55,11 +55,14 @@ const MemoizedChatEntry = React.memo(
 
     switch (entry.type) {
       case "user":
+        const displayText = entry.isPasteSummary ? entry.displayContent || entry.content : entry.content;
+        const textColor = entry.isPasteSummary ? "cyan" : "gray";
+        
         return (
           <Box key={index} flexDirection="column" marginTop={1}>
             <Box>
-              <Text color="gray">
-                {">"} {truncateContent(entry.content)}
+              <Text color={textColor}>
+                {">"} {truncateContent(displayText)}
               </Text>
             </Box>
           </Box>
@@ -73,10 +76,10 @@ const MemoizedChatEntry = React.memo(
               <Box flexDirection="column" flexGrow={1}>
                 {entry.toolCalls ? (
                   // If there are tool calls, just show plain text
-                  <Text color="white">{truncateContent(entry.content.trim())}</Text>
+                  <Text color="white">{entry.content.trim()}</Text>
                 ) : (
                   // If no tool calls, render as markdown
-                  <MarkdownRenderer content={truncateContent(entry.content.trim())} />
+                  <MarkdownRenderer content={entry.content.trim()} />
                 )}
                 {entry.isStreaming && <Text color="cyan">█</Text>}
               </Box>

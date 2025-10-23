@@ -39,6 +39,15 @@ export interface ChatEntry {
   toolCall?: GrokToolCall;
   toolResult?: { success: boolean; output?: string; error?: string };
   isStreaming?: boolean;
+  // Paste summary support
+  originalContent?: string; // Store full content when summarized
+  displayContent?: string;  // What to show in UI (summary or full content)
+  isPasteSummary?: boolean; // Flag for styling
+  pasteMetadata?: {
+    pasteNumber: number;
+    lineCount: number;
+    charCount: number;
+  };
 }
 
 export interface StreamingChunk {

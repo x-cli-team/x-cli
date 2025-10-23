@@ -1,4 +1,4 @@
-## 1.1.20 – Stability Release
+## 1.1.20 – Paste Text Summary Feature
 
 This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
@@ -82,6 +82,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **⚡ FsPort Abstraction**: Improved file system operations with Node built-ins externalization
 - **📦 Automated Installer**: Enhanced installation UX with one-click setup options
 - **🛡️ Tool Reliability Fixes**: Standardized imports, syntax error resolution, and fallback mechanisms
+- **📋 Paste Text Summary**: Claude Code-style paste detection with smart summarization (`[Pasted text #1 +12 lines]`)
 
 ## ✨ Features
 
@@ -107,6 +108,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **⚡ Bash Integration**: Execute shell commands through natural conversation
 - **🔌 MCP Extension**: Extend capabilities with Model Context Protocol servers (Linear, GitHub, etc.)
 - **💻 Beautiful Terminal UI**: Interactive interface built with Ink and Claude Code-style animations
+- **📋 Smart Paste Detection**: Large pasted content automatically summarizes as `[Pasted text #1 +12 lines]` for clean chat history
 
 ### 📚 **Documentation System**
 - **🏗️ Agent Documentation**: Complete `.agent/` system for AI context optimization

@@ -11,6 +11,7 @@ import {
   moveToNextWord,
 } from "../utils/text-utils.js";
 import { useInputHistory } from "./use-input-history.js";
+import { getPasteDetectionService, PasteEvent } from "../services/paste-detection.js";
 
 export interface Key {
   name?: string;
@@ -46,6 +47,7 @@ interface UseEnhancedInputProps {
   onSubmit?: (text: string) => void;
   onEscape?: () => void;
   onSpecialKey?: (key: Key) => boolean; // Return true to prevent default handling
+  onPasteDetected?: (pasteEvent: PasteEvent) => void; // Handle paste events
   disabled?: boolean;
   multiline?: boolean;
 }
@@ -54,6 +56,7 @@ export function useEnhancedInput({
   onSubmit,
   onEscape,
   onSpecialKey,
+  onPasteDetected,
   disabled = false,
   multiline = false,
 }: UseEnhancedInputProps = {}): EnhancedInputHook {
@@ -70,12 +73,22 @@ export function useEnhancedInput({
   } = useInputHistory();
 
   const setInput = useCallback((text: string) => {
+    const previousInput = input;
     setInputState(text);
     setCursorPositionState(Math.min(text.length, cursorPosition));
     if (!isNavigatingHistory()) {
       setOriginalInput(text);
     }
-  }, [cursorPosition, isNavigatingHistory, setOriginalInput]);
+
+    // Check for paste events
+    if (onPasteDetected && text !== previousInput) {
+      const pasteService = getPasteDetectionService();
+      const pasteEvent = pasteService.detectPaste(previousInput, text);
+      if (pasteEvent) {
+        onPasteDetected(pasteEvent);
+      }
+    }
+  }, [input, cursorPosition, isNavigatingHistory, setOriginalInput, onPasteDetected]);
 
   const setCursorPosition = useCallback((position: number) => {
     setCursorPositionState(Math.max(0, Math.min(input.length, position)));
@@ -277,10 +290,20 @@ export function useEnhancedInput({
 
     // Handle regular character input
     if (inputChar && !key.ctrl && !key.meta) {
+      const previousInput = input;
       const result = insertText(input, cursorPosition, inputChar);
       setInputState(result.text);
       setCursorPositionState(result.position);
       setOriginalInput(result.text);
+
+      // Check for paste events (large amounts of text input at once)
+      if (onPasteDetected && inputChar.length > 1) {
+        const pasteService = getPasteDetectionService();
+        const pasteEvent = pasteService.detectPaste(previousInput, result.text);
+        if (pasteEvent) {
+          onPasteDetected(pasteEvent);
+        }
+      }
     }
   }, [disabled, onSpecialKey, input, cursorPosition, multiline, handleSubmit, navigateHistory, setOriginalInput]);
 

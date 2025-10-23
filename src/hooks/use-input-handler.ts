@@ -6,6 +6,7 @@ import { ConfirmationService } from "../utils/confirmation-service.js";
 import { useEnhancedInput, Key } from "./use-enhanced-input.js";
 import { GrokToolCall } from "../grok/client.js";
 import { ToolResult } from "../types/index.js";
+import { PasteEvent } from "../services/paste-detection.js";
 
 import { filterCommandSuggestions } from "../ui/components/command-suggestions.js";
 import { loadModelConfig, updateCurrentModel } from "../utils/model-config.js";
@@ -196,6 +197,28 @@ export function useInputHandler({
     }
   };
 
+  const handlePasteDetected = (pasteEvent: PasteEvent) => {
+    // Create a user entry with paste summary for display
+    const userEntry: ChatEntry = {
+      type: "user",
+      content: pasteEvent.content,           // Full content for AI
+      displayContent: pasteEvent.summary,    // Summary for UI display
+      timestamp: new Date(),
+      isPasteSummary: true,
+      pasteMetadata: {
+        pasteNumber: pasteEvent.pasteNumber,
+        lineCount: pasteEvent.lineCount,
+        charCount: pasteEvent.charCount,
+      },
+    };
+
+    // Add the paste summary to chat history
+    setChatHistory((prev) => [...prev, userEntry]);
+
+    // Process the full pasted content with the AI
+    processUserMessage(pasteEvent.content);
+  };
+
   const handleInputChange = (newInput: string) => {
     // Update command suggestions based on input
     if (newInput.startsWith("/")) {
@@ -218,6 +241,7 @@ export function useInputHandler({
   } = useEnhancedInput({
     onSubmit: handleInputSubmit,
     onSpecialKey: handleSpecialKey,
+    onPasteDetected: handlePasteDetected,
     disabled: isConfirmationActive,
   });
 

@@ -369,7 +369,7 @@ function ChatInterfaceWithAgent({
 dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    `}
           </Text>
           
-          <Text color="green" bold marginTop={1}>
+          <Text color="green" bold marginTop={2}>
             🚀 Welcome to Grok CLI - Claude Code-level intelligence in your terminal!
           </Text>
           

@@ -53,7 +53,7 @@ export function ChatInput({
       >
         {lines.map((line, index) => {
           const isCurrentLine = index === currentLineIndex;
-          const promptChar = index === 0 ? "❯" : "│";
+          const promptChar = index === 0 ? "❯ " : "  "; // First line gets "❯ ", continuation lines get "  " to align
 
           if (isCurrentLine) {
             const beforeCursorInLine = line.slice(0, currentCharIndex);
@@ -63,7 +63,7 @@ export function ChatInput({
 
             return (
               <Box key={index}>
-                <Text color={promptColor}>{promptChar} </Text>
+                <Text color={promptColor}>{promptChar}</Text>
                 <Text>
                   {beforeCursorInLine}
                   {showCursor && (
@@ -79,7 +79,7 @@ export function ChatInput({
           } else {
             return (
               <Box key={index}>
-                <Text color={promptColor}>{promptChar} </Text>
+                <Text color={promptColor}>{promptChar}</Text>
                 <Text>{line}</Text>
               </Box>
             );
