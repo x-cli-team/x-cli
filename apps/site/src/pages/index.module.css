@@ -378,16 +378,18 @@
   }
   
   .heroCardContainer {
-    padding: 0 0.75rem !important; /* Reduce side padding */
-    max-width: 100% !important;
-    margin: 0 auto !important; /* No negative margin */
-    z-index: 10 !important; /* Ensure card is above background elements */
-    /* Use only transform for positioning */
-    position: relative !important; /* Needed for transform */
-    transform: translateY(2rem) translateZ(0) !important; /* Move DOWN to position below chip */
-    -webkit-transform: translateY(2rem) translateZ(0) !important;
-    /* Debug styling */
-    border: 3px solid lime !important; /* Make container visible */
+    /* TRY POSITION RELATIVE: Since margins aren't working */
+    position: relative !important;      /* Enable top positioning */
+    top: -15rem !important;             /* Move up 15rem from natural position */
+    transform: none !important;         /* No transforms */
+    -webkit-transform: none !important;
+    margin: 0 !important;                /* Remove auto centering */
+    padding: 0 !important;              /* Remove side padding */
+    width: 100% !important;             /* Full width */
+    max-width: none !important;         /* Remove width constraint */
+    z-index: 10 !important;             /* Maintain layering */
+    /* Debug styling - can remove later */
+    border: 3px solid lime !important;  /* Make container visible */
   }
   
   /* Logo mobile fix */
@@ -500,7 +502,7 @@
   /* Install section mobile fix */
   .installSection {
     padding: 0.5rem 0 !important;
-    margin-bottom: 3rem !important; /* Force larger margin between npm chip and black card */
+    margin-bottom: 1rem !important; /* Reduced since card now has its own top margin */
   }
   
   .chipBtnSolid {
