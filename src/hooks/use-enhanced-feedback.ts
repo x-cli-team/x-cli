@@ -179,7 +179,7 @@ export function useEnhancedFeedback() {
 export function useOperationSpinner() {
   const { startSpinner, updateSpinner, stopSpinner, spinner } = useEnhancedFeedback();
 
-  const startOperationSpinner = useCallback((operation: string, context?: any) => {
+  const startOperationSpinner = useCallback((operation: string, context?: { message?: string }) => {
     // Smart operation detection based on context
     let spinnerOperation: SpinnerEvent['operation'] = 'thinking';
     let message: string | undefined;

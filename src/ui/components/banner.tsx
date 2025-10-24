@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Text } from "ink";
 import pkg from '../../../package.json' with { type: 'json' };
 import { inkColors } from "../colors.js";
+import { ContextStatus } from "./context-status.js";
 
 // Enhanced GROK CLI ASCII art with color scheme
 export const grokBanner = `
@@ -58,18 +59,18 @@ export function Banner({
   const getContextStatus = () => {
     if (!showContext) return null;
     
-    const contextMode = workspaceFiles > 0 ? 'Dynamic' : 'On demand';
-    const indexStatus = workspaceFiles > 0 ? `${workspaceFiles} files` : 'Not indexed';
-    const sessionStatus = sessionRestored ? 'Restored' : 'Fresh';
-    
     return (
       <Box marginTop={1}>
-        <Text color={inkColors.muted}>
-          Context: <Text color={workspaceFiles > 0 ? inkColors.primary : inkColors.warning}>{contextMode}</Text> │ 
-          {' '}Files: <Text color={workspaceFiles > 0 ? inkColors.success : inkColors.muted}>{indexStatus}</Text> │ 
-          {' '}Index: <Text color={inkColors.success}>{indexSize}</Text> │ 
-          {' '}Session: <Text color={sessionRestored ? inkColors.accent : inkColors.info}>{sessionStatus}</Text>
-        </Text>
+        <Text color={inkColors.muted}>Context: </Text>
+        <ContextStatus
+          workspaceFiles={workspaceFiles}
+          indexSize={indexSize}
+          sessionRestored={sessionRestored}
+          showDetails={false}
+        />
+        <Text color={inkColors.muted}> · Press </Text>
+        <Text color={inkColors.accent} bold>Ctrl+I</Text>
+        <Text color={inkColors.muted}> for details</Text>
       </Box>
     );
   };

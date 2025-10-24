@@ -44,6 +44,7 @@ export const inkColors = {
   info: 'blue',
   muted: 'gray',
   accent: 'magenta',
+  text: 'white',
   
   // Bright variants
   primaryBright: 'cyanBright',

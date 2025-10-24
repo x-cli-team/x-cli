@@ -16,6 +16,7 @@ import { ChatInput } from "./chat-input.js";
 import { MCPStatus } from "./mcp-status.js";
 import ConfirmationDialog from "./confirmation-dialog.js";
 import { Banner } from "./banner.js";
+import { ContextTooltip } from "./context-tooltip.js";
 import {
   ConfirmationService,
   ConfirmationOptions,
@@ -42,9 +43,30 @@ function ChatInterfaceWithAgent({
   const [isStreaming, setIsStreaming] = useState(false);
   const [confirmationOptions, setConfirmationOptions] =
     useState<ConfirmationOptions | null>(null);
+  const [showContextTooltip, setShowContextTooltip] = useState(false);
   const scrollRef = useRef<DOMElement | null>(null);
   const processingStartTime = useRef<number>(0);
   const lastChatHistoryLength = useRef<number>(0);
+
+  // Handle global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (str: string, key: any) => {
+      if (key.ctrl && key.name === 'i') {
+        setShowContextTooltip(prev => !prev);
+      }
+    };
+
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+      process.stdin.on('keypress', handleKeyPress);
+      return () => {
+        if (process.stdin.isTTY) {
+          process.stdin.setRawMode(false);
+        }
+        process.stdin.off('keypress', handleKeyPress);
+      };
+    }
+  }, []);
 
 
   const confirmationService = ConfirmationService.getInstance();
@@ -358,6 +380,10 @@ function ChatInterfaceWithAgent({
     processingStartTime.current = 0;
   };
 
+  const toggleContextTooltip = () => {
+    setShowContextTooltip(prev => !prev);
+  };
+
   return (
     <Box flexDirection="column" paddingX={2}>
       {/* Show enhanced banner only when no chat history and no confirmation dialog */}
@@ -426,6 +452,12 @@ function ChatInterfaceWithAgent({
           isConfirmationActive={!!confirmationOptions}
         />
       </Box>
+
+      {/* Context Tooltip */}
+      <ContextTooltip
+        isVisible={showContextTooltip}
+        onToggle={toggleContextTooltip}
+      />
 
       {/* Show confirmation dialog if one is pending */}
       {confirmationOptions && (
