@@ -22,6 +22,7 @@ export interface PasteThresholds {
 export class PasteDetectionService {
   private pasteCounter = 0;
   private thresholds: PasteThresholds;
+  private debug = process.env.GROK_PASTE_DEBUG === 'true';
 
   constructor(thresholds?: Partial<PasteThresholds>) {
     this.thresholds = {
@@ -36,6 +37,15 @@ export class PasteDetectionService {
   detectPaste(oldValue: string, newValue: string): PasteEvent | null {
     // Calculate what was added
     const added = this.getAddedContent(oldValue, newValue);
+    
+    if (this.debug) {
+      console.log('🔍 Paste Detection Debug:', {
+        addedLength: added?.length || 0,
+        lineCount: added ? this.countLines(added) : 0,
+        thresholds: this.thresholds,
+        shouldSummarize: added ? this.shouldSummarize(added) : false
+      });
+    }
     
     if (!added || !this.shouldSummarize(added)) {
       return null;
@@ -136,7 +146,7 @@ export class PasteDetectionService {
         return parsed;
       }
     }
-    return 3; // Default: 3 lines
+    return 2; // Default: 2 lines (more sensitive like Claude Code)
   }
 
   /**
@@ -150,7 +160,7 @@ export class PasteDetectionService {
         return parsed;
       }
     }
-    return 200; // Default: 200 characters
+    return 50; // Default: 50 characters (more sensitive like Claude Code)
   }
 }
 
