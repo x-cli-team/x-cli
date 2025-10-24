@@ -45,6 +45,20 @@ Product requirement documents and feature specifications:
 - Reference related architecture and dependencies
 - Track implementation progress
 
+### 🎯 parity/
+**STRATEGIC PRIORITY**: Competitive analysis driving development roadmap:
+- **README.md** - Strategic overview and navigation
+- **claude-code-features.md** - Comprehensive Claude Code capability analysis
+- **cursor-features.md** - Cursor IDE AI-native editor capabilities
+- **codex-features.md** - OpenAI Codex autonomous coding agent analysis
+- **grok-cli-current-state.md** - Complete Grok CLI capability inventory
+- **gap-analysis.md** - Detailed feature gaps with P0/P1/P2 priorities
+- **implementation-roadmap.md** - Strategic development plan through Q4 2025
+- **competitive-matrix.md** - Side-by-side feature comparison matrix
+
+**Current Position**: 65/100 vs Claude Code 95/100  
+**Target**: 90%+ feature parity by Q4 2025
+
 ### 📖 sop/
 Standard operating procedures and workflows:
 - Development patterns and conventions

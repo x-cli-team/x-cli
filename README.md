@@ -55,6 +55,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 
 - **📦 [NPM Package](https://www.npmjs.com/package/grok-cli-hurry-mode)** - Install globally with `npm install -g grok-cli-hurry-mode`
 - **🐙 [GitHub Repository](https://github.com/hinetapora/grok-cli-hurry-mode)** - Source code, issues, and contributions
+- **🎯 [Competitive Parity Analysis](./.agent/parity/)** - Strategic analysis vs Claude Code, Cursor IDE, and OpenAI Codex
 - **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
 - **📚 [Releases](https://github.com/hinetapora/grok-cli-hurry-mode/releases)** - Version history and changelogs
 

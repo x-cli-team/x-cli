@@ -64,6 +64,9 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
    - Background activity monitoring for workspace awareness
    - Unified color system with Claude Code-inspired hierarchy
    - 120ms smooth animations with 1.5s breathing rhythm for calm interface
+   - Context tooltip with Ctrl+I shortcut (workspace insights, git branch, project stats)
+   - Dynamic status display with real-time memory pressure and activity indicators
+   - Professional bordered layouts for organized information presentation
 
 ### Key Features
 

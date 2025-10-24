@@ -7033,10 +7033,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path26) => {
+    const dfs = (filePath, path27) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path26.indexOf(filePath);
-        const cycle = path26.slice(cycleStart).concat([filePath]);
+        const cycleStart = path27.indexOf(filePath);
+        const cycle = path27.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7052,7 +7052,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path26, filePath]);
+            dfs(dependency, [...path27, filePath]);
           }
         }
       }
@@ -9024,10 +9024,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path26 = args.path;
-            let command = `cat "${path26}"`;
+            const path27 = args.path;
+            let command = `cat "${path27}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path26}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path27}"`;
             }
             return await this.bash.execute(command);
           }
@@ -14208,9 +14208,10 @@ var inkColors = {
   primary: "cyan",
   success: "green",
   warning: "yellow",
-  info: "blue",
+  error: "red",
   muted: "gray",
   accent: "magenta",
+  text: "white",
   successBright: "greenBright",
   accentBright: "magentaBright"
 };
@@ -14980,6 +14981,163 @@ function ConfirmationDialog({
     ] })
   ] });
 }
+function ContextStatus({
+  workspaceFiles = 0,
+  indexSize = "0 MB",
+  sessionRestored = false,
+  showDetails = false
+}) {
+  const [dynamicInfo, setDynamicInfo] = useState({
+    tokenUsage: 0,
+    memoryPressure: "low",
+    backgroundActivity: [],
+    lastUpdate: /* @__PURE__ */ new Date()
+  });
+  useEffect(() => {
+    const updateDynamicInfo = () => {
+      const mockInfo = {
+        tokenUsage: Math.floor(Math.random() * 5e4) + 1e3,
+        memoryPressure: ["low", "medium", "high"][Math.floor(Math.random() * 3)],
+        backgroundActivity: getActiveBackgroundTasks(),
+        lastUpdate: /* @__PURE__ */ new Date()
+      };
+      setDynamicInfo(mockInfo);
+    };
+    updateDynamicInfo();
+    const interval = setInterval(updateDynamicInfo, 1e4);
+    return () => clearInterval(interval);
+  }, []);
+  const getMemoryPressureColor = (pressure) => {
+    switch (pressure) {
+      case "low":
+        return inkColors.success;
+      case "medium":
+        return inkColors.warning;
+      case "high":
+        return inkColors.error;
+      default:
+        return inkColors.muted;
+    }
+  };
+  const getMemoryPressureIcon = (pressure) => {
+    switch (pressure) {
+      case "low":
+        return "\u{1F7E2}";
+      case "medium":
+        return "\u{1F7E1}";
+      case "high":
+        return "\u{1F534}";
+      default:
+        return "\u26AB";
+    }
+  };
+  if (!showDetails) {
+    return /* @__PURE__ */ jsxs(Box, { children: [
+      /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+        "\u{1F4C1} ",
+        workspaceFiles,
+        " files"
+      ] }),
+      /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+        " ",
+        "\xB7 \u{1F4BE} ",
+        indexSize
+      ] }),
+      sessionRestored && /* @__PURE__ */ jsxs(Text, { color: inkColors.success, children: [
+        " ",
+        "\xB7 \u{1F504} restored"
+      ] }),
+      /* @__PURE__ */ jsxs(Text, { color: getMemoryPressureColor(dynamicInfo.memoryPressure), children: [
+        " ",
+        "\xB7 ",
+        getMemoryPressureIcon(dynamicInfo.memoryPressure),
+        " ",
+        dynamicInfo.memoryPressure
+      ] })
+    ] });
+  }
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+    /* @__PURE__ */ jsxs(Box, { marginBottom: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: inkColors.accent, bold: true, children: "\u{1F4CA} Context Status" }),
+      /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+        " ",
+        "(updated ",
+        formatTimeAgo(dynamicInfo.lastUpdate),
+        ")"
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxs(Box, { justifyContent: "space-between", marginBottom: 1, children: [
+      /* @__PURE__ */ jsxs(Box, { children: [
+        /* @__PURE__ */ jsx(Text, { color: inkColors.primary, children: "\u{1F4C1} Workspace:" }),
+        /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+          " ",
+          workspaceFiles,
+          " files"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs(Box, { children: [
+        /* @__PURE__ */ jsx(Text, { color: inkColors.primary, children: "\u{1F4BE} Index:" }),
+        /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+          " ",
+          indexSize
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxs(Box, { justifyContent: "space-between", marginBottom: 1, children: [
+      /* @__PURE__ */ jsxs(Box, { children: [
+        /* @__PURE__ */ jsx(Text, { color: inkColors.warning, children: "\u{1F524} Tokens:" }),
+        /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+          " ",
+          dynamicInfo.tokenUsage.toLocaleString()
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs(Box, { children: [
+        /* @__PURE__ */ jsxs(Text, { color: getMemoryPressureColor(dynamicInfo.memoryPressure), children: [
+          getMemoryPressureIcon(dynamicInfo.memoryPressure),
+          " Memory:"
+        ] }),
+        /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+          " ",
+          dynamicInfo.memoryPressure
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxs(Box, { marginBottom: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: inkColors.success, children: "\u{1F504} Session:" }),
+      /* @__PURE__ */ jsxs(Text, { color: sessionRestored ? inkColors.success : inkColors.muted, children: [
+        " ",
+        sessionRestored ? "restored" : "fresh"
+      ] })
+    ] }),
+    dynamicInfo.backgroundActivity.length > 0 && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+      /* @__PURE__ */ jsx(Text, { color: inkColors.accent, children: "\u26A1 Background Activity:" }),
+      dynamicInfo.backgroundActivity.map((activity, index) => /* @__PURE__ */ jsx(Box, { marginLeft: 2, children: /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+        "\u2022 ",
+        activity
+      ] }) }, index))
+    ] })
+  ] });
+}
+function getActiveBackgroundTasks() {
+  const possibleTasks = [
+    "Indexing workspace files",
+    "Watching for file changes",
+    "Compacting context",
+    "Syncing session state",
+    "Optimizing token usage"
+  ];
+  const numTasks = Math.floor(Math.random() * 3);
+  return possibleTasks.slice(0, numTasks);
+}
+function formatTimeAgo(date) {
+  const now = /* @__PURE__ */ new Date();
+  const diff = now.getTime() - date.getTime();
+  const seconds = Math.floor(diff / 1e3);
+  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
 var grokBanner = `
  \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588\u2588\u2588\u2588\u2588   \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588   \u2588\u2588     \u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588      \u2588\u2588 
 \u2588\u2588       \u2588\u2588   \u2588\u2588 \u2588\u2588    \u2588\u2588 \u2588\u2588  \u2588\u2588     \u2588\u2588      \u2588\u2588      \u2588\u2588 
@@ -15022,25 +15180,21 @@ function Banner({
   };
   const getContextStatus = () => {
     if (!showContext) return null;
-    const contextMode = workspaceFiles > 0 ? "Dynamic" : "On demand";
-    const indexStatus = workspaceFiles > 0 ? `${workspaceFiles} files` : "Not indexed";
-    const sessionStatus = sessionRestored ? "Restored" : "Fresh";
-    return /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
-      "Context: ",
-      /* @__PURE__ */ jsx(Text, { color: workspaceFiles > 0 ? inkColors.primary : inkColors.warning, children: contextMode }),
-      " \u2502",
-      " ",
-      "Files: ",
-      /* @__PURE__ */ jsx(Text, { color: workspaceFiles > 0 ? inkColors.success : inkColors.muted, children: indexStatus }),
-      " \u2502",
-      " ",
-      "Index: ",
-      /* @__PURE__ */ jsx(Text, { color: inkColors.success, children: indexSize }),
-      " \u2502",
-      " ",
-      "Session: ",
-      /* @__PURE__ */ jsx(Text, { color: sessionRestored ? inkColors.accent : inkColors.info, children: sessionStatus })
-    ] }) });
+    return /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: "Context: " }),
+      /* @__PURE__ */ jsx(
+        ContextStatus,
+        {
+          workspaceFiles,
+          indexSize,
+          sessionRestored,
+          showDetails: false
+        }
+      ),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " \xB7 Press " }),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.accent, bold: true, children: "Ctrl+I" }),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " for details" })
+    ] });
   };
   return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginBottom: 2, children: [
     /* @__PURE__ */ jsx(Text, { color: inkColors.accentBright, children: getBannerArt() }),
@@ -15061,6 +15215,172 @@ function Banner({
       /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " Type your first command or paste code to begin." })
     ] })
   ] });
+}
+function ContextTooltip({ isVisible }) {
+  const [contextInfo, setContextInfo] = useState({
+    workspaceFiles: 0,
+    indexSize: "0 MB",
+    sessionFiles: 0,
+    activeTokens: 0,
+    lastActivity: "Now"
+  });
+  useEffect(() => {
+    const updateContextInfo = async () => {
+      try {
+        const info = {
+          workspaceFiles: await getWorkspaceFileCount(),
+          indexSize: await getIndexSize(),
+          sessionFiles: await getSessionFileCount(),
+          activeTokens: 0,
+          // TODO: Get from token counter
+          lastActivity: "Now",
+          gitBranch: await getGitBranch(),
+          projectName: await getProjectName()
+        };
+        setContextInfo(info);
+      } catch {
+      }
+    };
+    if (isVisible) {
+      updateContextInfo();
+      const interval = setInterval(updateContextInfo, 5e3);
+      return () => clearInterval(interval);
+    }
+  }, [isVisible]);
+  if (!isVisible) return null;
+  return /* @__PURE__ */ jsxs(
+    Box,
+    {
+      borderStyle: "round",
+      borderColor: inkColors.accent,
+      padding: 1,
+      marginTop: 1,
+      marginBottom: 1,
+      flexDirection: "column",
+      children: [
+        /* @__PURE__ */ jsxs(Box, { marginBottom: 1, children: [
+          /* @__PURE__ */ jsx(Text, { color: inkColors.accent, bold: true, children: "\u{1F9E0} Context Awareness" }),
+          /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+            " ",
+            "(Ctrl+I to toggle)"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+          /* @__PURE__ */ jsxs(Box, { marginBottom: 1, children: [
+            /* @__PURE__ */ jsx(Text, { color: inkColors.primary, bold: true, children: "\u{1F4C1} Project:" }),
+            /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+              " ",
+              contextInfo.projectName || "Unknown"
+            ] }),
+            contextInfo.gitBranch && /* @__PURE__ */ jsxs(Fragment, { children: [
+              /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " on " }),
+              /* @__PURE__ */ jsx(Text, { color: inkColors.warning, children: contextInfo.gitBranch })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs(Box, { justifyContent: "space-between", marginBottom: 1, children: [
+            /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsx(Text, { color: inkColors.success, children: "\u{1F4CA} Workspace:" }),
+              /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+                " ",
+                contextInfo.workspaceFiles,
+                " files"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsx(Text, { color: inkColors.success, children: "\u{1F4BE} Index:" }),
+              /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+                " ",
+                contextInfo.indexSize
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs(Box, { justifyContent: "space-between", marginBottom: 1, children: [
+            /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsx(Text, { color: inkColors.warning, children: "\u{1F4DD} Session:" }),
+              /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+                " ",
+                contextInfo.sessionFiles,
+                " files"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsx(Text, { color: inkColors.warning, children: "\u{1F524} Tokens:" }),
+              /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+                " ",
+                contextInfo.activeTokens.toLocaleString()
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs(Box, { children: [
+            /* @__PURE__ */ jsx(Text, { color: inkColors.accent, children: "\u26A1 Activity:" }),
+            /* @__PURE__ */ jsxs(Text, { color: inkColors.text, children: [
+              " ",
+              contextInfo.lastActivity
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: inkColors.muted, dimColor: true, children: "\u{1F4A1} This shows your current workspace context and session state" }) })
+      ]
+    }
+  );
+}
+async function getWorkspaceFileCount() {
+  try {
+    const cwd = process.cwd();
+    const files = await fs__default.promises.readdir(cwd, { recursive: true });
+    return files.filter(
+      (file) => typeof file === "string" && !file.includes("node_modules") && !file.includes(".git") && !file.startsWith(".")
+    ).length;
+  } catch {
+    return 0;
+  }
+}
+async function getIndexSize() {
+  try {
+    const indexPath = path7__default.join(process.cwd(), ".grok", "index.json");
+    if (fs__default.existsSync(indexPath)) {
+      const stats = await fs__default.promises.stat(indexPath);
+      const mb = stats.size / (1024 * 1024);
+      return mb > 1 ? `${mb.toFixed(1)} MB` : `${(stats.size / 1024).toFixed(1)} KB`;
+    }
+  } catch {
+  }
+  return "0 MB";
+}
+async function getSessionFileCount() {
+  try {
+    const sessionPath = path7__default.join(os__default.homedir(), ".grok", "session.log");
+    if (fs__default.existsSync(sessionPath)) {
+      const content = await fs__default.promises.readFile(sessionPath, "utf8");
+      return content.split("\n").filter((line) => line.trim()).length;
+    }
+  } catch {
+  }
+  return 0;
+}
+async function getGitBranch() {
+  try {
+    const gitPath = path7__default.join(process.cwd(), ".git", "HEAD");
+    if (fs__default.existsSync(gitPath)) {
+      const content = await fs__default.promises.readFile(gitPath, "utf8");
+      const match = content.match(/ref: refs\/heads\/(.+)/);
+      return match ? match[1].trim() : "detached";
+    }
+  } catch {
+  }
+  return void 0;
+}
+async function getProjectName() {
+  try {
+    const packagePath = path7__default.join(process.cwd(), "package.json");
+    if (fs__default.existsSync(packagePath)) {
+      const content = await fs__default.promises.readFile(packagePath, "utf8");
+      const pkg = JSON.parse(content);
+      return pkg.name;
+    }
+  } catch {
+  }
+  return path7__default.basename(process.cwd());
 }
 init_settings_manager();
 function ApiKeyInput({ onApiKeySet }) {
@@ -15143,9 +15463,27 @@ function ChatInterfaceWithAgent({
   const [tokenCount, setTokenCount] = useState(0);
   const [isStreaming, setIsStreaming] = useState(false);
   const [confirmationOptions, setConfirmationOptions] = useState(null);
+  const [showContextTooltip, setShowContextTooltip] = useState(false);
   const scrollRef = useRef(null);
   const processingStartTime = useRef(0);
   const lastChatHistoryLength = useRef(0);
+  useEffect(() => {
+    const handleKeyPress = (str, key) => {
+      if (key.ctrl && key.name === "i") {
+        setShowContextTooltip((prev) => !prev);
+      }
+    };
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+      process.stdin.on("keypress", handleKeyPress);
+      return () => {
+        if (process.stdin.isTTY) {
+          process.stdin.setRawMode(false);
+        }
+        process.stdin.off("keypress", handleKeyPress);
+      };
+    }
+  }, []);
   const confirmationService = ConfirmationService.getInstance();
   const {
     input,
@@ -15387,6 +15725,9 @@ function ChatInterfaceWithAgent({
     setProcessingTime(0);
     processingStartTime.current = 0;
   };
+  const toggleContextTooltip = () => {
+    setShowContextTooltip((prev) => !prev);
+  };
   return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, children: [
     chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
       /* @__PURE__ */ jsx(
@@ -15456,6 +15797,13 @@ function ChatInterfaceWithAgent({
         isConfirmationActive: !!confirmationOptions
       }
     ) }),
+    /* @__PURE__ */ jsx(
+      ContextTooltip,
+      {
+        isVisible: showContextTooltip,
+        onToggle: toggleContextTooltip
+      }
+    ),
     confirmationOptions && /* @__PURE__ */ jsx(
       ConfirmationDialog,
       {

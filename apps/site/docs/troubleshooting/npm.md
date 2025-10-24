@@ -39,7 +39,7 @@ fatal: could not read Username for 'https://github.com'
 **Fix**: Check PAT_TOKEN secret is set correctly
 ```bash
 # In GitHub repo Settings → Secrets → Actions
-PAT_TOKEN: ghp_your_personal_access_token_here
+PAT_TOKEN: <your-github-personal-access-token>
 ```
 
 ### 3. Git Push Fails
@@ -118,8 +118,8 @@ echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 
 ### Required GitHub Secrets
 ```
-PAT_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-NPM_TOKEN=npm_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+PAT_TOKEN=<your-github-pat-token>
+NPM_TOKEN=<your-npm-automation-token>
 ```
 
 ### Critical Workflow Steps

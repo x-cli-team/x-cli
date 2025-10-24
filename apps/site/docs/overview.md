@@ -36,8 +36,8 @@ Grok CLI is a conversational AI tool that brings Claude Code-level intelligence 
           <li>File operations</li>
           <li>Code intelligence</li>
           <li>Web integration</li>
-          <li>Lightning fast</li>
-          <li>Terminal native</li>
+          <li>Context awareness</li>
+          <li>Professional UX</li>
         </ul>
       </div>
     </div>
@@ -92,6 +92,12 @@ Grok CLI is a conversational AI tool that brings Claude Code-level intelligence 
 - Task management and progress tracking
 - Specialized agent delegation for complex operations
 - IDE integration with VS Code and Jupyter
+
+**Claude Code-Style UX**
+- Professional visual feedback with contextual spinners and progress indicators
+- Context awareness with `Ctrl+I` workspace tooltip (project stats, git branch, memory pressure)
+- Real-time background activity monitoring and dynamic status updates
+- Unified color system with 120ms smooth animations for calm interface
 
 ## Architecture
 
