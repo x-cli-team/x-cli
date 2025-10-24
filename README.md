@@ -1,4 +1,4 @@
-## 1.1.29 – Paste Text Summary Feature
+## 1.1.30 – Paste Text Summary Feature
 
 This release includes latest updates and automated publishing via GitHub Actions.
 - Fixes all Read/Update tool reliability issues
