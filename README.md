@@ -829,6 +829,8 @@ To add yourself as a contributor:
 
 - **[@unblock-everything](https://github.com/unblock-everything)** — [x.ai](https://x.ai) — Cold-ass honkey 😎
 - **[@Bucko89](https://github.com/Bucko89)** — [GMA](https://getmyagencies.com) — Grinding daily
+- **[@base-buzz](https://github.com/base-buzz)** — [Meta](team.meta.com)
+  
   
 *Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md) and submit a pull request!*
 
