@@ -9,7 +9,7 @@ Grok CLI is a conversational AI tool that brings Claude Code-level intelligence 
 <div className="hero-card">
   <div className="hero-card-background">
     <video className="hero-card-video" autoPlay muted loop playsInline preload="auto">
-      <source src="/grok-video-93ef685c-b1de-4696-a757-359c20e0ca0f.mp4" type="video/mp4" />
+      <source src="/img/grok-hero-video.mp4" type="video/mp4" />
       <source src="/img/grok-hero-video.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
