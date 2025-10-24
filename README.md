@@ -68,6 +68,9 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **🎛️ Background Activity**: Non-intrusive workspace awareness with file change monitoring
 - **🎯 UI State Management**: Centralized coordination for all visual feedback and notifications
 - **⚡ Motion Design**: 120ms smooth animations with 1.5s breathing rhythm for calm, responsive feel
+- **🧠 Context Tooltip**: Press `Ctrl+I` for instant workspace insights (project name, git branch, file count, session state)
+- **📈 Dynamic Status**: Real-time memory pressure, background activity, and workspace intelligence
+- **🎨 Context Awareness Surface**: Professional bordered layouts with organized information sections
 
 ### 🧠 **P3: Code Intelligence Tools**
 - **🔍 AST Parser**: Language-specific syntax tree analysis for TypeScript, JavaScript, Python
@@ -379,6 +382,14 @@ Or specify a working directory:
 ```bash
 grok -d /path/to/project
 ```
+
+#### ⌨️ Keyboard Shortcuts
+
+- **`Ctrl+I`** - Toggle context tooltip (workspace insights, git branch, project stats)
+- **`Shift+Tab`** - Toggle auto-edit mode (hands-free file editing)
+- **`Ctrl+C`** - Clear current input
+- **`Esc`** - Interrupt current operation
+- **`exit`** - Quit the application
 
 ### Headless Mode
 

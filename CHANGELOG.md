@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/ui/components/banner.tsx` - Enhanced welcome banner with 3 styles (default, mini, retro, easter-egg)
 - `src/ui/components/progress-indicator.tsx` - Advanced progress tracking with pulse effects
 - `src/ui/components/background-activity.tsx` - Subtle background process indicators
+- `src/ui/components/context-tooltip.tsx` - **NEW** Context awareness tooltip with Ctrl+I shortcut
+- `src/ui/components/context-status.tsx` - **NEW** Dynamic workspace status display
 - `src/ui/colors.ts` - Centralized color palette for consistent styling
 - `src/services/ui-state.ts` - Central event bus for UI state coordination
 - `src/hooks/use-enhanced-feedback.ts` - React hooks for easy component integration
@@ -30,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Real-time Feedback**: All operations now provide visual progress and state communication
 - **Reduced Anxiety**: Clear progress indicators eliminate "is it working?" uncertainty
 - **Professional Feel**: Interface now matches Claude Code's sophisticated visual language
+- **Context Tooltip**: Press `Ctrl+I` for instant workspace insights (project name, git branch, file count, session state)
+- **Dynamic Status Display**: Real-time memory pressure, background activity, and workspace intelligence
+- **Keyboard Shortcuts**: Global shortcuts for enhanced workflow efficiency
 
 #### Technical Infrastructure
 - Event-driven UI state management with 20+ UI event types
