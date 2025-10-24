@@ -46,6 +46,28 @@ Context: Dynamic │ Files: 47 indexed │ Index: 2.3 MB │ Session: Restored
 - **Indexing Pulse**: File progress indication during workspace analysis
 - **Context Syncing**: Operation-specific progress messages
 
+#### **Context Tooltip** (`context-tooltip.tsx`) - **NEW Phase 3**
+- **Ctrl+I Shortcut**: Instant workspace insights with global keyboard handling
+- **Professional Layout**: Bordered tooltip with organized information sections
+- **Real-time Data**: 5-second auto-refresh for dynamic workspace intelligence
+- **Project Intelligence**: Git branch detection, project name parsing, workspace stats
+- **Session Awareness**: Activity tracking, file count monitoring, memory state
+
+```typescript
+// Context information display
+📁 Project: grok-cli-hurry-mode on main
+📊 Workspace: 247 files    💾 Index: 3.2 MB
+📝 Session: 12 files       🔤 Tokens: 15,423
+⚡ Activity: Now
+```
+
+#### **Context Status** (`context-status.tsx`) - **NEW Phase 3**
+- **Compact Banner View**: Streamlined status for banner integration
+- **Detailed Tooltip View**: Comprehensive information for context tooltip
+- **Memory Pressure**: Visual indicators (🟢 low, 🟡 medium, 🔴 high)
+- **Dynamic Updates**: Real-time workspace and session state changes
+- **Background Activity**: Current operations and system state awareness
+
 ### 🎨 Design System (`src/ui/colors.ts`)
 
 #### **Color Hierarchy**
