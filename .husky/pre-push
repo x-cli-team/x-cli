@@ -11,6 +11,9 @@ url="$2"
 
 # Read stdin to get ref info
 while read local_ref local_sha remote_ref remote_sha; do
+  # Extract branch name from ref
+  branch_name=$(echo "$remote_ref" | sed 's/refs\/heads\///')
+  
   # Check if pushing to main branch
   if [ "$remote_ref" = "refs/heads/main" ]; then
     echo ""
@@ -28,6 +31,27 @@ while read local_ref local_sha remote_ref remote_sha; do
     echo ""
     exit 1
   fi
+  
+  # For other branches, run basic quality checks
+  echo "🔍 Running pre-push checks for branch: $branch_name"
+  
+  # Quick TypeScript check
+  echo "📝 Checking TypeScript..."
+  if ! npm run typecheck >/dev/null 2>&1; then
+    echo "❌ TypeScript check failed - please fix errors before pushing"
+    echo "💡 Run: npm run typecheck"
+    exit 1
+  fi
+  
+  # Quick lint check
+  echo "🧹 Running ESLint..."
+  if ! npm run lint >/dev/null 2>&1; then
+    echo "❌ ESLint check failed - please fix linting errors before pushing"
+    echo "💡 Run: npm run lint"
+    exit 1
+  fi
+  
+  echo "✅ Pre-push checks passed for $branch_name"
 done
 
 exit 0

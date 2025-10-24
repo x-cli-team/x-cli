@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { getCachedVersionInfo } from '../../utils/version-checker.js';
-import { colors } from '../colors.js';
+import { inkColors } from '../colors.js';
 
 interface VersionNotificationProps {
   isVisible?: boolean;
@@ -46,14 +46,14 @@ export function VersionNotification({ isVisible = true }: VersionNotificationPro
     <Box marginTop={1} marginBottom={1}>
       <Box 
         borderStyle="round" 
-        borderColor={colors.orange}
+        borderColor={inkColors.warning}
         paddingX={2}
         paddingY={0}
       >
-        <Text color={colors.orange}>
+        <Text color={inkColors.warning}>
           🔄 Update available: v{versionInfo.latest} (current: v{versionInfo.current})
         </Text>
-        <Text color={colors.gray}> - Use '/upgrade' to update</Text>
+        <Text color={inkColors.muted}> - Use '/upgrade' to update</Text>
       </Box>
     </Box>
   );
