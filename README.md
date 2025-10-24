@@ -60,23 +60,32 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 
 ## 🆕 What's New in v1.0+
 
-### 🧠 **P2: Code Intelligence Tools** (Latest)
+### 🎨 **P4: UX Refinement - Claude Code Feel** (Latest)
+- **🎭 Enhanced Welcome Banner**: Professional ASCII art with context-aware status display
+- **🌈 Unified Color System**: Consistent Claude Code-inspired visual hierarchy across all interfaces
+- **🔄 Contextual Spinners**: 8 operation-specific animated indicators (🧠 thinking, 🔍 search, 📂 indexing, 📝 write, etc.)
+- **📊 Progress Indicators**: Advanced progress bars with ETA calculations and breathing pulse effects
+- **🎛️ Background Activity**: Non-intrusive workspace awareness with file change monitoring
+- **🎯 UI State Management**: Centralized coordination for all visual feedback and notifications
+- **⚡ Motion Design**: 120ms smooth animations with 1.5s breathing rhythm for calm, responsive feel
+
+### 🧠 **P3: Code Intelligence Tools**
 - **🔍 AST Parser**: Language-specific syntax tree analysis for TypeScript, JavaScript, Python
 - **🔎 Symbol Search**: Fuzzy search across codebases with cross-references and usage analysis
 - **📊 Dependency Analyzer**: Circular dependency detection and dependency graph generation
 - **🎯 Code Context**: Semantic analysis with quality metrics and design pattern detection
 - **🔧 Refactoring Assistant**: Safe rename, extract, inline operations with preview and rollback
 
-### 🚀 **P1: Enhanced File Operations** 
+### 🚀 **P2: Enhanced File Operations** 
 - **⚡ Multi-File Editor**: Atomic operations with transaction support and rollback
 - **🔍 Advanced Search Tool**: Regex patterns with bulk replace and context-aware results
 - **🌳 File Tree Operations**: Visual trees, bulk operations, and intelligent file organization
 - **🧠 Code-Aware Editor**: Syntax-aware editing with smart refactoring capabilities
 - **📚 Operation History**: Comprehensive undo/redo system with persistent history
 
-**🎯 Result**: **Claude Code-level capabilities** in your terminal!
+**🎯 Result**: **Claude Code-level capabilities** with **Claude Code feel** in your terminal!
 
-### 🛠️ **P3: Reliability & Workflow Enhancements** (Latest)
+### 🛠️ **P1: Reliability & Workflow Enhancements**
 - **🤖 .agent System**: AI-powered task management and documentation system for efficient workflows
 - **🔧 Healer Script**: Automated issue detection and resolution for tool reliability
 - **⚡ FsPort Abstraction**: Improved file system operations with Node built-ins externalization
@@ -107,8 +116,16 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **🔧 Intelligent Tool Selection**: AI automatically chooses the right tools for your requests
 - **⚡ Bash Integration**: Execute shell commands through natural conversation
 - **🔌 MCP Extension**: Extend capabilities with Model Context Protocol servers (Linear, GitHub, etc.)
-- **💻 Beautiful Terminal UI**: Interactive interface built with Ink and Claude Code-style animations
+- **💻 Beautiful Terminal UI**: Interactive interface with Claude Code-style animations and feedback
 - **📋 Smart Paste Detection**: Large pasted content automatically summarizes as `[Pasted text #1 +12 lines]` for clean chat history
+
+### 🎨 **Enhanced User Experience**
+- **🎭 Professional Welcome Banner**: ASCII art with dynamic context status (`Context: Dynamic │ Files: indexed │ Session: Restored`)
+- **🔄 Contextual Visual Feedback**: 8 operation-specific spinners with smooth 120ms animations
+- **📊 Progress Transparency**: Real-time progress bars with ETA calculations for long operations
+- **🎛️ Background Awareness**: Subtle workspace indexing and file watching indicators
+- **🌈 Consistent Color Language**: Claude Code-inspired visual hierarchy (info=blue, success=green, warn=orange, error=red)
+- **⚡ Motion Design**: Breathing pulse effects and smooth transitions for calm, responsive interface
 
 ### 📚 **Documentation System**
 - **🏗️ Agent Documentation**: Complete `.agent/` system for AI context optimization

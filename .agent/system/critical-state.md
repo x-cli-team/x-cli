@@ -10,7 +10,8 @@
 ## Core Components
 - **Commands**: Slash-based in src/commands/ (limited - only MCP command currently)
 - **Tools**: Modular tools in src/tools/ (extensive tool system)
-- **UI**: Ink components in src/ui/
+- **UI**: Ink components in src/ui/ with Claude Code-style feedback system
+- **Services**: UI state management, paste detection, context coordination in src/services/
 - **Settings**: File-based .grok/settings.json + ~/.grok/user-settings.json
 - **Input**: Enhanced terminal input with history in src/hooks/
 
@@ -38,6 +39,10 @@
 - ✅ Complete documentation generation system (15+ commands)
 - ✅ Subagent framework for token optimization
 - ✅ Self-healing system with incident tracking
+- ✅ **Claude Code-style UX system** (Professional visual feedback)
+- ✅ **Enhanced visual experience** (ASCII banner, contextual spinners, progress bars)
+- ✅ **Real-time feedback** (Background activity monitoring, state coordination)
+- ✅ **Consistent design system** (Unified color palette, motion design)
 - ✅ Smart auto-update system with configurable triggers
 - ❌ No cloud storage integration
 - ❌ No built-in authentication system

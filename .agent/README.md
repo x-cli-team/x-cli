@@ -36,6 +36,8 @@ Core project information and architecture:
 - **api-schema.md** - API endpoints and data schemas
 - **critical-state.md** - Current system state snapshot
 - **installation.md** - Installation and setup guide
+- **ux-feedback-system.md** - Claude Code-style visual feedback architecture
+- **version-synchronization.md** - Automated version management system
 
 ### 📝 tasks/
 Product requirement documents and feature specifications:
@@ -48,6 +50,9 @@ Standard operating procedures and workflows:
 - Development patterns and conventions
 - Deployment and maintenance procedures
 - Code review and testing guidelines
+- **ux-feedback-system-maintenance.md** - UX system maintenance and extension guidelines
+- **automation-protection.md** - Critical automation system protection
+- **release-management.md** - Automated publishing workflow procedures
 
 ### 🚨 incidents/
 Documented failures with root cause analysis:

@@ -6,6 +6,7 @@ import os from 'os';
 
 import { Box, Text, DOMElement } from "ink";
 import { GrokAgent, ChatEntry } from "../../agent/grok-agent.js";
+import { GrokToolCall } from "../../grok/client.js";
 import { useInputHandler } from "../../hooks/use-input-handler.js";
 import { LoadingSpinner } from "./loading-spinner.js";
 import { CommandSuggestions } from "./command-suggestions.js";
@@ -14,6 +15,7 @@ import { ChatHistory } from "./chat-history.js";
 import { ChatInput } from "./chat-input.js";
 import { MCPStatus } from "./mcp-status.js";
 import ConfirmationDialog from "./confirmation-dialog.js";
+import { Banner } from "./banner.js";
 import {
   ConfirmationService,
   ConfirmationOptions,
@@ -91,7 +93,7 @@ function ChatInterfaceWithAgent({
     console.log(" ");
 
     // Generate welcome text with margin to match Ink paddingX={2}
-    const logoOutput = "HURRY MODE" + "\n" + pkg.version;
+    const logoOutput = "GROK CLI - HURRY MODE" + "\n" + pkg.version;
 
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line: string) => {
@@ -144,8 +146,8 @@ function ChatInterfaceWithAgent({
           let streamingEntry: ChatEntry | null = null;
           let accumulatedContent = "";
           let lastTokenCount = 0;
-          let pendingToolCalls: any[] | null = null;
-          let pendingToolResults: Array<{ toolCall: any; toolResult: any }> = [];
+          let pendingToolCalls: GrokToolCall[] | null = null;
+          let pendingToolResults: Array<{ toolCall: GrokToolCall; toolResult: any }> = [];
           let lastUpdateTime = Date.now();
 
           const flushUpdates = () => {
@@ -358,57 +360,55 @@ function ChatInterfaceWithAgent({
 
   return (
     <Box flexDirection="column" paddingX={2}>
-      {/* Show logo and tips only when no chat history and no confirmation dialog */}
+      {/* Show enhanced banner only when no chat history and no confirmation dialog */}
       {chatHistory.length === 0 && !confirmationOptions && (
-        <Box flexDirection="column" marginBottom={2}>
-          <Text color="cyan" bold>
-{`    dBBBBb dBBBBBb    dBBBBP  dBP dBP          dBBBP  dBP    dBP
-               dBP   dB'.BP  dBP.d8P                            
-  dBBBB    dBBBBK'  dB'.BP  dBBBBP'          dBP    dBP    dBP  
- dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
-dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    `}
-          </Text>
+        <Box flexDirection="column">
+          <Banner 
+            style="default"
+            showContext={true}
+            workspaceFiles={0} // TODO: Get from workspace indexer
+            indexSize="0 MB"   // TODO: Get from workspace indexer
+            sessionRestored={false} // TODO: Get from session memory
+          />
           
-          <Text>{" "}</Text>
-          
-          <Text color="green" bold marginTop={1}>
-            🚀 Welcome to Grok CLI - Claude Code-level intelligence in your terminal!
-          </Text>
-          
-          <Text color="cyan" bold marginTop={1}>
-            💡 Quick Start Tips:
-          </Text>
           <Box marginTop={1} flexDirection="column">
-            <Text color="gray">
-              • <Text color="yellow">Ask anything:</Text> "Create a React component" or "Debug this Python script"
+            <Text color="cyan" bold>
+              💡 Quick Start Tips:
             </Text>
-            <Text color="gray">
-              • <Text color="yellow">Edit files:</Text> "Add error handling to app.js" 
-            </Text>
-            <Text color="gray">
-              • <Text color="yellow">Run commands:</Text> "Set up a new Node.js project"
-            </Text>
-            <Text color="gray">
-              • <Text color="yellow">Get help:</Text> Type "/help" for all commands
-            </Text>
-          </Box>
-          
-          <Text color="cyan" bold marginTop={1}>
-            🛠️ Power Features:
-          </Text>
-          <Box marginTop={1} flexDirection="column">
-            <Text color="gray">
-              • <Text color="magenta">Auto-edit mode:</Text> Press Shift+Tab to toggle hands-free editing
-            </Text>
-            <Text color="gray">
-              • <Text color="magenta">Project memory:</Text> Create .grok/GROK.md to customize behavior
-            </Text>
-            <Text color="gray">
-              • <Text color="magenta">Documentation:</Text> Run "/init-agent" for .agent docs system
-            </Text>
-            <Text color="gray">
-              • <Text color="magenta">Error recovery:</Text> Run "/heal" after errors to add guardrails
-            </Text>
+            <Box marginTop={1} flexDirection="column">
+              <Text color="gray">
+                • <Text color="yellow">Ask anything:</Text> "Create a React component" or "Debug this Python script"
+              </Text>
+              <Text color="gray">
+                • <Text color="yellow">Edit files:</Text> "Add error handling to app.js" 
+              </Text>
+              <Text color="gray">
+                • <Text color="yellow">Run commands:</Text> "Set up a new Node.js project"
+              </Text>
+              <Text color="gray">
+                • <Text color="yellow">Get help:</Text> Type "/help" for all commands
+              </Text>
+            </Box>
+            
+            <Box marginTop={1}>
+              <Text color="cyan" bold>
+                🛠️ Power Features:
+              </Text>
+            </Box>
+            <Box marginTop={1} flexDirection="column">
+              <Text color="gray">
+                • <Text color="magenta">Auto-edit mode:</Text> Press Shift+Tab to toggle hands-free editing
+              </Text>
+              <Text color="gray">
+                • <Text color="magenta">Project memory:</Text> Create .grok/GROK.md to customize behavior
+              </Text>
+              <Text color="gray">
+                • <Text color="magenta">Documentation:</Text> Run "/init-agent" for .agent docs system
+              </Text>
+              <Text color="gray">
+                • <Text color="magenta">Error recovery:</Text> Run "/heal" after errors to add guardrails
+              </Text>
+            </Box>
           </Box>
         </Box>
       )}
@@ -445,6 +445,8 @@ dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    `}
             isActive={isProcessing || isStreaming}
             processingTime={processingTime}
             tokenCount={tokenCount}
+            operation={isStreaming ? 'thinking' : 'process'}
+            progress={undefined} // TODO: Add progress tracking for long operations
           />
 
           <ChatInput

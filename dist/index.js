@@ -5,7 +5,7 @@ import * as path7 from 'path';
 import path7__default from 'path';
 import * as os from 'os';
 import os__default from 'os';
-import React2, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import React3, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Box, Text, render, useApp, useInput } from 'ink';
 import { program, Command } from 'commander';
 import * as dotenv from 'dotenv';
@@ -9285,7 +9285,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.1.22"};
+  version: "1.1.24"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -14202,21 +14202,135 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
     autoEditEnabled
   };
 }
+
+// src/ui/colors.ts
+var inkColors = {
+  primary: "cyan",
+  success: "green",
+  warning: "yellow",
+  info: "blue",
+  muted: "gray",
+  accent: "magenta",
+  successBright: "greenBright",
+  accentBright: "magentaBright"
+};
+function getSpinnerColor(operation) {
+  switch (operation.toLowerCase()) {
+    case "search":
+    case "indexing":
+    case "scanning":
+      return "info";
+    case "process":
+    case "thinking":
+    case "analyzing":
+      return "warning";
+    case "write":
+    case "edit":
+    case "create":
+      return "success";
+    case "compact":
+    case "optimize":
+    case "memory":
+      return "accent";
+    default:
+      return "primary";
+  }
+}
+var operationConfig = {
+  thinking: {
+    icon: "\u{1F9E0}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Thinking...", "Processing...", "Analyzing...", "Computing...", "Reasoning..."]
+  },
+  search: {
+    icon: "\u{1F50D}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Searching...", "Scanning files...", "Finding matches...", "Indexing..."]
+  },
+  indexing: {
+    icon: "\u{1F4C2}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Indexing workspace...", "Building context...", "Mapping relationships..."]
+  },
+  write: {
+    icon: "\u{1F4DD}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Writing file...", "Saving changes...", "Updating content..."]
+  },
+  edit: {
+    icon: "\u270F\uFE0F",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Editing file...", "Applying changes...", "Modifying content..."]
+  },
+  compact: {
+    icon: "\u{1F504}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Compacting context...", "Optimizing memory...", "Refreshing session..."]
+  },
+  analyze: {
+    icon: "\u{1F52C}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Analyzing code...", "Understanding structure...", "Mapping dependencies..."]
+  },
+  process: {
+    icon: "\u26A1",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Processing...", "Working...", "Computing...", "Executing..."]
+  }
+};
 function LoadingSpinner({
   isActive,
   processingTime,
-  tokenCount
+  tokenCount,
+  operation = "thinking",
+  message,
+  progress
 }) {
+  const [spinnerIndex, setSpinnerIndex] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+  useEffect(() => {
+    if (!isActive) return;
+    const interval = setInterval(() => {
+      setSpinnerIndex((prev) => (prev + 1) % 10);
+      if (Date.now() % 3e3 < 200) {
+        const config3 = operationConfig[operation];
+        setMessageIndex((prev) => (prev + 1) % config3.messages.length);
+      }
+    }, 120);
+    return () => clearInterval(interval);
+  }, [isActive, operation]);
   if (!isActive) return null;
-  const staticSpinner = "\u280B";
-  const staticText = "Processing...";
-  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
-    /* @__PURE__ */ jsxs(Text, { color: "blue", children: [
-      staticSpinner,
+  const config2 = operationConfig[operation];
+  const spinnerChar = config2.spinner[spinnerIndex];
+  const operationMessage = message || config2.messages[messageIndex];
+  const color = getSpinnerColor(operation);
+  const renderProgressBar = () => {
+    if (progress === void 0) return null;
+    const barLength = 20;
+    const filled = Math.round(progress / 100 * barLength);
+    const empty = barLength - filled;
+    const progressBar = "\u2588".repeat(filled) + "\u2591".repeat(empty);
+    return /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
       " ",
-      staticText
+      "[",
+      /* @__PURE__ */ jsx(Text, { color, children: progressBar }),
+      "] ",
+      progress,
+      "%"
+    ] });
+  };
+  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
+    /* @__PURE__ */ jsxs(Box, { children: [
+      /* @__PURE__ */ jsxs(Text, { color, children: [
+        config2.icon,
+        " ",
+        spinnerChar,
+        " ",
+        operationMessage
+      ] }),
+      renderProgressBar()
     ] }),
-    /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+    /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
       " ",
       "(",
       processingTime,
@@ -14456,7 +14570,7 @@ var truncateContent = (content, maxLength = 100) => {
   if (process.env.COMPACT !== "1") return content;
   return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
 };
-var MemoizedChatEntry = React2.memo(
+var MemoizedChatEntry = React3.memo(
   ({ entry, index }) => {
     const renderDiff = (diffContent, filename) => {
       return /* @__PURE__ */ jsx(
@@ -14866,6 +14980,88 @@ function ConfirmationDialog({
     ] })
   ] });
 }
+var grokBanner = `
+ \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588\u2588\u2588\u2588\u2588   \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588   \u2588\u2588     \u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588      \u2588\u2588 
+\u2588\u2588       \u2588\u2588   \u2588\u2588 \u2588\u2588    \u2588\u2588 \u2588\u2588  \u2588\u2588     \u2588\u2588      \u2588\u2588      \u2588\u2588 
+\u2588\u2588   \u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588    \u2588\u2588 \u2588\u2588\u2588\u2588\u2588      \u2588\u2588      \u2588\u2588      \u2588\u2588 
+\u2588\u2588    \u2588\u2588 \u2588\u2588   \u2588\u2588 \u2588\u2588    \u2588\u2588 \u2588\u2588  \u2588\u2588     \u2588\u2588      \u2588\u2588      \u2588\u2588 
+ \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588   \u2588\u2588  \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588   \u2588\u2588     \u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588 
+`;
+var grokMini = `
+ \u2584\u2584\u2584\u2584\u2584\u2584\u2584 \u2584\u2584\u2584\u2584\u2584\u2584   \u2584\u2584\u2584\u2584\u2584\u2584  \u2584   \u2584
+\u2588\u2588       \u2588\u2588   \u2588\u2588 \u2588\u2588    \u2588\u2588 \u2588\u2588 \u2588\u2588 
+\u2588\u2588   \u2588\u2588\u2588 \u2588\u2588\u2584\u2584\u2584\u2588\u2588 \u2588\u2588    \u2588\u2588 \u2588\u2588\u2588\u2588  
+\u2588\u2588    \u2588\u2588 \u2588\u2588   \u2588\u2588 \u2588\u2588    \u2588\u2588 \u2588\u2588 \u2588\u2588 
+ \u2580\u2580\u2580\u2580\u2580\u2580\u2580 \u2580\u2580   \u2580\u2580  \u2580\u2580\u2580\u2580\u2580\u2580  \u2580\u2580  \u2580\u2580
+`;
+var grokRetro = `
+\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557
+\u2551  \u2584\u2584\u2584\u2584   \u2584\u2584\u2584\u2584\u2584   \u2584\u2584\u2584\u2584\u2584   \u2584   \u2584   \u2584\u2584\u2584\u2584\u2584   \u2584     \u2584      \u2551
+\u2551 \u2588\u2588      \u2588\u2588   \u2588 \u2588\u2588    \u2588 \u2588\u2588 \u2588\u2588  \u2588\u2588      \u2588\u2588    \u2588\u2588       \u2551
+\u2551 \u2588\u2588  \u2584\u2584\u2584 \u2588\u2588\u2584\u2584\u2584\u2588 \u2588\u2588    \u2588 \u2588\u2588\u2588\u2588   \u2588\u2588      \u2588\u2588    \u2588\u2588       \u2551
+\u2551 \u2588\u2588   \u2588\u2588 \u2588\u2588  \u2588\u2588 \u2588\u2588    \u2588 \u2588\u2588 \u2588\u2588  \u2588\u2588      \u2588\u2588    \u2588\u2588       \u2551
+\u2551  \u2580\u2580\u2580\u2580\u2580   \u2580\u2580  \u2580\u2580  \u2580\u2580\u2580\u2580\u2580\u2580  \u2580\u2580  \u2580\u2580  \u2580\u2580\u2580\u2580\u2580   \u2580\u2580\u2580\u2580\u2580 \u2580\u2580      \u2551
+\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D
+`;
+function Banner({
+  style = "default",
+  showContext = true,
+  workspaceFiles = 0,
+  indexSize = "0 MB",
+  sessionRestored = false
+}) {
+  const getBannerArt = () => {
+    switch (style) {
+      case "mini":
+        return grokMini;
+      case "retro":
+        return grokRetro;
+      default:
+        return grokBanner;
+    }
+  };
+  const getContextStatus = () => {
+    if (!showContext) return null;
+    const contextMode = workspaceFiles > 0 ? "Dynamic" : "On demand";
+    const indexStatus = workspaceFiles > 0 ? `${workspaceFiles} files` : "Not indexed";
+    const sessionStatus = sessionRestored ? "Restored" : "Fresh";
+    return /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+      "Context: ",
+      /* @__PURE__ */ jsx(Text, { color: workspaceFiles > 0 ? inkColors.primary : inkColors.warning, children: contextMode }),
+      " \u2502",
+      " ",
+      "Files: ",
+      /* @__PURE__ */ jsx(Text, { color: workspaceFiles > 0 ? inkColors.success : inkColors.muted, children: indexStatus }),
+      " \u2502",
+      " ",
+      "Index: ",
+      /* @__PURE__ */ jsx(Text, { color: inkColors.success, children: indexSize }),
+      " \u2502",
+      " ",
+      "Session: ",
+      /* @__PURE__ */ jsx(Text, { color: sessionRestored ? inkColors.accent : inkColors.info, children: sessionStatus })
+    ] }) });
+  };
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginBottom: 2, children: [
+    /* @__PURE__ */ jsx(Text, { color: inkColors.accentBright, children: getBannerArt() }),
+    /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: "Welcome to " }),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.primary, bold: true, children: "Grok CLI" }),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " " }),
+      /* @__PURE__ */ jsxs(Text, { color: inkColors.warning, children: [
+        "v",
+        package_default.version
+      ] }),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " \u26A1" })
+    ] }),
+    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: inkColors.success, bold: true, children: "\u{1F680} Claude Code-level intelligence in your terminal!" }) }),
+    getContextStatus(),
+    /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: inkColors.successBright, children: "\u2714 Ready." }),
+      /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " Type your first command or paste code to begin." })
+    ] })
+  ] });
+}
 init_settings_manager();
 function ApiKeyInput({ onApiKeySet }) {
   const [input, setInput] = useState("");
@@ -14982,7 +15178,7 @@ function ChatInterfaceWithAgent({
     }
     console.log("    ");
     console.log(" ");
-    const logoOutput = "HURRY MODE\n" + package_default.version;
+    const logoOutput = "GROK CLI - HURRY MODE\n" + package_default.version;
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line) => {
       if (line.trim()) {
@@ -15192,58 +15388,63 @@ function ChatInterfaceWithAgent({
     processingStartTime.current = 0;
   };
   return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, children: [
-    chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginBottom: 2, children: [
-      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: `    dBBBBb dBBBBBb    dBBBBP  dBP dBP          dBBBP  dBP    dBP
-               dBP   dB'.BP  dBP.d8P                            
-  dBBBB    dBBBBK'  dB'.BP  dBBBBP'          dBP    dBP    dBP  
- dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
-dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    ` }),
-      /* @__PURE__ */ jsx(Text, { children: " " }),
-      /* @__PURE__ */ jsx(Text, { color: "green", bold: true, marginTop: 1, children: "\u{1F680} Welcome to Grok CLI - Claude Code-level intelligence in your terminal!" }),
-      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, marginTop: 1, children: "\u{1F4A1} Quick Start Tips:" }),
+    chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+      /* @__PURE__ */ jsx(
+        Banner,
+        {
+          style: "default",
+          showContext: true,
+          workspaceFiles: 0,
+          indexSize: "0 MB",
+          sessionRestored: false
+        }
+      ),
       /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Ask anything:" }),
-          ' "Create a React component" or "Debug this Python script"'
+        /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "\u{1F4A1} Quick Start Tips:" }),
+        /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Ask anything:" }),
+            ' "Create a React component" or "Debug this Python script"'
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Edit files:" }),
+            ' "Add error handling to app.js"'
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Run commands:" }),
+            ' "Set up a new Node.js project"'
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Get help:" }),
+            ' Type "/help" for all commands'
+          ] })
         ] }),
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Edit files:" }),
-          ' "Add error handling to app.js"'
-        ] }),
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Run commands:" }),
-          ' "Set up a new Node.js project"'
-        ] }),
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "yellow", children: "Get help:" }),
-          ' Type "/help" for all commands'
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, marginTop: 1, children: "\u{1F6E0}\uFE0F Power Features:" }),
-      /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Auto-edit mode:" }),
-          " Press Shift+Tab to toggle hands-free editing"
-        ] }),
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Project memory:" }),
-          " Create .grok/GROK.md to customize behavior"
-        ] }),
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Documentation:" }),
-          ' Run "/init-agent" for .agent docs system'
-        ] }),
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u2022 ",
-          /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Error recovery:" }),
-          ' Run "/heal" after errors to add guardrails'
+        /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, children: "\u{1F6E0}\uFE0F Power Features:" }) }),
+        /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Auto-edit mode:" }),
+            " Press Shift+Tab to toggle hands-free editing"
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Project memory:" }),
+            " Create .grok/GROK.md to customize behavior"
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Documentation:" }),
+            ' Run "/init-agent" for .agent docs system'
+          ] }),
+          /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+            "\u2022 ",
+            /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Error recovery:" }),
+            ' Run "/heal" after errors to add guardrails'
+          ] })
         ] })
       ] })
     ] }),
@@ -15272,7 +15473,9 @@ dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    ` }),
         {
           isActive: isProcessing || isStreaming,
           processingTime,
-          tokenCount
+          tokenCount,
+          operation: isStreaming ? "thinking" : "process",
+          progress: void 0
         }
       ),
       /* @__PURE__ */ jsx(
@@ -15795,7 +15998,7 @@ program.name("grok").description(
     console.log("\u{1F916} Starting Grok CLI Conversational Assistant...\n");
     ensureUserSettingsDirectory();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
-    const app = render(React2.createElement(ChatInterface, { agent, initialMessage }));
+    const app = render(React3.createElement(ChatInterface, { agent, initialMessage }));
     const cleanup = () => {
       app.unmount();
       agent.abortCurrentOperation();
