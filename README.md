@@ -817,16 +817,18 @@ To add yourself as a contributor:
 
 ### Core Contributors
 
-- **[@hinetapora](https://github.com/hinetapora)** - Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system
-- **[@homanp](https://github.com/homanp)** - Original Grok CLI creator and foundation
+- **[@hinetapora](https://github.com/hinetapora)** — Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system  
+- **[@homanp](https://github.com/homanp)** — Original Grok CLI creator and foundation
 
 ### Community Contributors
 
 <!-- Add your entry here! -->
 <!-- Format:
-- **[@yourusername](https://github.com/yourusername)** - Brief description of your contributions
+- **[@yourusername](https://github.com/yourusername)** — (project link) — Brief description of your contributions
 -->
 
+- **[@unblock-everything](https://github.com/unblock-everything)** — [x.ai](https://x.ai) — Cold-ass honkey 😎
+  
 *Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md) and submit a pull request!*
 
 ### How to Contribute
