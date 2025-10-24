@@ -5,6 +5,11 @@ if [ "$SMART_PUSH_BYPASS" = "true" ]; then
   exit 0
 fi
 
+# Allow GitHub Actions to bypass this check
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  exit 0
+fi
+
 # Get the remote and branch being pushed to
 remote="$1"
 url="$2"
