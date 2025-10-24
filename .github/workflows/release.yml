@@ -58,7 +58,15 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           NEW_VER=$(npm version patch --no-git-tag-version)
-          git add package.json package-lock.json || true
+          
+          # Update README version to match package.json
+          if [ -f README.md ]; then
+            NEW_VER_NUMBER=${NEW_VER#v}
+            sed -i "s/^## [0-9]\+\.[0-9]\+\.[0-9]\+/## ${NEW_VER_NUMBER}/g" README.md
+            echo "Updated README.md to version ${NEW_VER_NUMBER}"
+          fi
+          
+          git add package.json package-lock.json README.md || true
           git commit -m "Bump version to ${NEW_VER#v}"
 
       - name: Create tag and push
