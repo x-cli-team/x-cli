@@ -804,3 +804,49 @@ This project is built upon the excellent foundation of the original [Grok CLI](h
 
 This "Hurry Mode" fork extends the original with advanced file operations, enhanced tool systems, and comprehensive automation while maintaining the core vision of bringing AI-powered terminal intelligence to developers.
 
+## 👥 Contributors
+
+We welcome contributions from the community! Add your details below when you contribute to the project.
+
+<!-- 
+To add yourself as a contributor:
+1. Fork the repository
+2. Add your entry below following the format
+3. Submit a pull request
+-->
+
+### Core Contributors
+
+- **[@hinetapora](https://github.com/hinetapora)** - Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system
+- **[@homanp](https://github.com/homanp)** - Original Grok CLI creator and foundation
+
+### Community Contributors
+
+<!-- Add your entry here! -->
+<!-- Format:
+- **[@yourusername](https://github.com/yourusername)** - Brief description of your contributions
+-->
+
+*Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md) and submit a pull request!*
+
+### How to Contribute
+
+1. **Fork** the repository on GitHub
+2. **Clone** your fork locally: `git clone https://github.com/yourusername/grok-cli-hurry-mode.git`
+3. **Create** a feature branch: `git checkout -b feature/your-feature-name`
+4. **Make** your changes and commit them: `git commit -m "feat: add awesome feature"`
+5. **Push** to your fork: `git push origin feature/your-feature-name`
+6. **Submit** a pull request with a clear description of your changes
+
+### Types of Contributions Welcome
+
+- 🐛 **Bug fixes** - Help us squash those pesky bugs
+- ⚡ **Performance improvements** - Make it faster and more efficient
+- 📖 **Documentation** - Improve our docs and examples
+- 🎨 **UX/UI enhancements** - Better terminal experience
+- 🔧 **New tools** - Add new capabilities to the tool system
+- 🧪 **Tests** - Help us improve our test coverage
+- 💡 **Feature requests** - Suggest new functionality
+
+Join our growing community of AI-powered terminal enthusiasts!
+
