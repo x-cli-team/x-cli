@@ -10,8 +10,8 @@ BRANCH=$(git branch --show-current)
 if git pull --rebase origin "$BRANCH"; then
     echo "✅ Successfully rebased local changes"
     
-    # Push to remote
-    if git push origin "$BRANCH"; then
+    # Push to remote (bypass pre-push hook for smart-push)
+    if SMART_PUSH_BYPASS=true git push origin "$BRANCH"; then
         echo "🚀 Successfully pushed to origin/$BRANCH"
     else
         echo "❌ Push failed"

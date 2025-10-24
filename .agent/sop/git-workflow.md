@@ -4,6 +4,19 @@
 
 **GitHub Actions automatically creates version bump commits, causing "fetch first" errors with regular `git push`. ALWAYS use smart push methods.**
 
+### 🛡️ **NEW: Automatic Protection**
+
+**Pre-push hook installed** - Blocks dangerous commands:
+```bash
+git push origin main  # ❌ BLOCKED by pre-push hook
+git push -u origin main  # ❌ BLOCKED by pre-push hook  
+```
+
+**Setup additional protection** (run once):
+```bash
+./scripts/setup-git-aliases.sh  # Adds helpful aliases
+```
+
 ## ✅ Correct Push Methods
 
 ### Method 1: Git Alias (Recommended)

@@ -9285,7 +9285,7 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.0.101"};
+  version: "1.1.22"};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -9438,11 +9438,140 @@ function useInputHistory() {
   };
 }
 
+// src/services/paste-detection.ts
+var PasteDetectionService = class {
+  constructor(thresholds) {
+    this.pasteCounter = 0;
+    this.debug = process.env.GROK_PASTE_DEBUG === "true";
+    this.thresholds = {
+      lineThreshold: thresholds?.lineThreshold ?? this.getDefaultLineThreshold(),
+      charThreshold: thresholds?.charThreshold ?? this.getDefaultCharThreshold()
+    };
+  }
+  /**
+   * Detects if new content represents a paste operation that should be summarized
+   */
+  detectPaste(oldValue, newValue) {
+    const added = this.getAddedContent(oldValue, newValue);
+    if (this.debug) {
+      console.log("\u{1F50D} Paste Detection Debug:", {
+        addedLength: added?.length || 0,
+        lineCount: added ? this.countLines(added) : 0,
+        thresholds: this.thresholds,
+        shouldSummarize: added ? this.shouldSummarize(added) : false
+      });
+    }
+    if (!added || !this.shouldSummarize(added)) {
+      return null;
+    }
+    this.pasteCounter++;
+    return {
+      content: added,
+      lineCount: this.countLines(added),
+      charCount: added.length,
+      pasteNumber: this.pasteCounter,
+      summary: this.createPasteSummary(added, this.pasteCounter)
+    };
+  }
+  /**
+   * Determines if content should be summarized based on thresholds
+   */
+  shouldSummarize(content) {
+    const lineCount = this.countLines(content);
+    return lineCount > this.thresholds.lineThreshold || content.length > this.thresholds.charThreshold;
+  }
+  /**
+   * Creates a paste summary in the format: [Pasted text #N +X lines]
+   */
+  createPasteSummary(content, pasteNumber) {
+    const lineCount = this.countLines(content);
+    const pluralLines = lineCount === 1 ? "line" : "lines";
+    return `[Pasted text #${pasteNumber} +${lineCount} ${pluralLines}]`;
+  }
+  /**
+   * Resets the paste counter (useful for new sessions)
+   */
+  resetCounter() {
+    this.pasteCounter = 0;
+  }
+  /**
+   * Updates thresholds for paste detection
+   */
+  updateThresholds(thresholds) {
+    this.thresholds = {
+      ...this.thresholds,
+      ...thresholds
+    };
+  }
+  /**
+   * Gets current paste counter value
+   */
+  getCurrentCounter() {
+    return this.pasteCounter;
+  }
+  /**
+   * Gets current thresholds
+   */
+  getThresholds() {
+    return { ...this.thresholds };
+  }
+  /**
+   * Extracts the content that was added between old and new values
+   */
+  getAddedContent(oldValue, newValue) {
+    if (newValue.startsWith(oldValue)) {
+      return newValue.slice(oldValue.length);
+    }
+    return "";
+  }
+  /**
+   * Counts the number of lines in content
+   */
+  countLines(content) {
+    if (!content) return 0;
+    return content.split("\n").length;
+  }
+  /**
+   * Gets default line threshold from environment or config
+   */
+  getDefaultLineThreshold() {
+    const envValue = process.env.GROK_PASTE_LINE_THRESHOLD;
+    if (envValue) {
+      const parsed = parseInt(envValue, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+    return 2;
+  }
+  /**
+   * Gets default character threshold from environment or config
+   */
+  getDefaultCharThreshold() {
+    const envValue = process.env.GROK_PASTE_CHAR_THRESHOLD;
+    if (envValue) {
+      const parsed = parseInt(envValue, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+    return 50;
+  }
+};
+var globalPasteService = null;
+function getPasteDetectionService() {
+  if (!globalPasteService) {
+    globalPasteService = new PasteDetectionService();
+  }
+  return globalPasteService;
+}
+
 // src/hooks/use-enhanced-input.ts
 function useEnhancedInput({
   onSubmit,
   onEscape,
   onSpecialKey,
+  onPasteDetected,
   disabled = false,
   multiline = false
 } = {}) {
@@ -9457,12 +9586,20 @@ function useEnhancedInput({
     isNavigatingHistory
   } = useInputHistory();
   const setInput = useCallback((text) => {
+    const previousInput = input;
     setInputState(text);
     setCursorPositionState(Math.min(text.length, cursorPosition));
     if (!isNavigatingHistory()) {
       setOriginalInput(text);
     }
-  }, [cursorPosition, isNavigatingHistory, setOriginalInput]);
+    if (onPasteDetected && text !== previousInput) {
+      const pasteService = getPasteDetectionService();
+      const pasteEvent = pasteService.detectPaste(previousInput, text);
+      if (pasteEvent) {
+        onPasteDetected(pasteEvent);
+      }
+    }
+  }, [input, cursorPosition, isNavigatingHistory, setOriginalInput, onPasteDetected]);
   const setCursorPosition = useCallback((position) => {
     setCursorPositionState(Math.max(0, Math.min(input.length, position)));
   }, [input.length]);
@@ -9612,10 +9749,18 @@ function useEnhancedInput({
       return;
     }
     if (inputChar && !key.ctrl && !key.meta) {
+      const previousInput = input;
       const result = insertText(input, cursorPosition, inputChar);
       setInputState(result.text);
       setCursorPositionState(result.position);
       setOriginalInput(result.text);
+      if (onPasteDetected && inputChar.length > 1) {
+        const pasteService = getPasteDetectionService();
+        const pasteEvent = pasteService.detectPaste(previousInput, result.text);
+        if (pasteEvent) {
+          onPasteDetected(pasteEvent);
+        }
+      }
     }
   }, [disabled, onSpecialKey, input, cursorPosition, multiline, handleSubmit, navigateHistory, setOriginalInput]);
   return {
@@ -12948,6 +13093,24 @@ function useInputHandler({
       }
     }
   };
+  const handlePasteDetected = (pasteEvent) => {
+    const userEntry = {
+      type: "user",
+      content: pasteEvent.content,
+      // Full content for AI
+      displayContent: pasteEvent.summary,
+      // Summary for UI display
+      timestamp: /* @__PURE__ */ new Date(),
+      isPasteSummary: true,
+      pasteMetadata: {
+        pasteNumber: pasteEvent.pasteNumber,
+        lineCount: pasteEvent.lineCount,
+        charCount: pasteEvent.charCount
+      }
+    };
+    setChatHistory((prev) => [...prev, userEntry]);
+    processUserMessage(pasteEvent.content);
+  };
   const handleInputChange = (newInput) => {
     if (newInput.startsWith("/")) {
       setShowCommandSuggestions(true);
@@ -12968,6 +13131,7 @@ function useInputHandler({
   } = useEnhancedInput({
     onSubmit: handleInputSubmit,
     onSpecialKey: handleSpecialKey,
+    onPasteDetected: handlePasteDetected,
     disabled: isConfirmationActive
   });
   useInput((inputChar, key) => {
@@ -14323,10 +14487,12 @@ var MemoizedChatEntry = React2.memo(
     };
     switch (entry.type) {
       case "user":
-        return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+        const displayText = entry.isPasteSummary ? entry.displayContent || entry.content : entry.content;
+        const textColor = entry.isPasteSummary ? "cyan" : "gray";
+        return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: textColor, children: [
           ">",
           " ",
-          truncateContent(entry.content)
+          truncateContent(displayText)
         ] }) }) }, index);
       case "assistant":
         return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
@@ -14334,10 +14500,10 @@ var MemoizedChatEntry = React2.memo(
           /* @__PURE__ */ jsxs(Box, { flexDirection: "column", flexGrow: 1, children: [
             entry.toolCalls ? (
               // If there are tool calls, just show plain text
-              /* @__PURE__ */ jsx(Text, { color: "white", children: truncateContent(entry.content.trim()) })
+              /* @__PURE__ */ jsx(Text, { color: "white", children: entry.content.trim() })
             ) : (
               // If no tool calls, render as markdown
-              /* @__PURE__ */ jsx(MarkdownRenderer, { content: truncateContent(entry.content.trim()) })
+              /* @__PURE__ */ jsx(MarkdownRenderer, { content: entry.content.trim() })
             ),
             entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" })
           ] })
@@ -14489,16 +14655,13 @@ function ChatInput({
         marginTop: 1,
         children: lines.map((line, index) => {
           const isCurrentLine = index === currentLineIndex;
-          const promptChar = index === 0 ? "\u276F" : "\u2502";
+          const promptChar = index === 0 ? "\u276F " : "  ";
           if (isCurrentLine) {
             const beforeCursorInLine = line.slice(0, currentCharIndex);
             const cursorChar2 = line.slice(currentCharIndex, currentCharIndex + 1) || " ";
             const afterCursorInLine = line.slice(currentCharIndex + 1);
             return /* @__PURE__ */ jsxs(Box, { children: [
-              /* @__PURE__ */ jsxs(Text, { color: promptColor, children: [
-                promptChar,
-                " "
-              ] }),
+              /* @__PURE__ */ jsx(Text, { color: promptColor, children: promptChar }),
               /* @__PURE__ */ jsxs(Text, { children: [
                 beforeCursorInLine,
                 showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar2 }),
@@ -14508,10 +14671,7 @@ function ChatInput({
             ] }, index);
           } else {
             return /* @__PURE__ */ jsxs(Box, { children: [
-              /* @__PURE__ */ jsxs(Text, { color: promptColor, children: [
-                promptChar,
-                " "
-              ] }),
+              /* @__PURE__ */ jsx(Text, { color: promptColor, children: promptChar }),
               /* @__PURE__ */ jsx(Text, { children: line })
             ] }, index);
           }
@@ -15038,6 +15198,7 @@ function ChatInterfaceWithAgent({
   dBBBB    dBBBBK'  dB'.BP  dBBBBP'          dBP    dBP    dBP  
  dB' BB   dBP  BB  dB'.BP  dBP BB  dBBBBBP  dBP    dBP    dBP   
 dBBBBBB  dBP  dB' dBBBBP  dBP dB'          dBBBBP dBBBBP dBP    ` }),
+      /* @__PURE__ */ jsx(Text, { children: " " }),
       /* @__PURE__ */ jsx(Text, { color: "green", bold: true, marginTop: 1, children: "\u{1F680} Welcome to Grok CLI - Claude Code-level intelligence in your terminal!" }),
       /* @__PURE__ */ jsx(Text, { color: "cyan", bold: true, marginTop: 1, children: "\u{1F4A1} Quick Start Tips:" }),
       /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
