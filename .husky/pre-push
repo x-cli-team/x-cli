@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 # Allow smart-push script to bypass this check
 if [ "$SMART_PUSH_BYPASS" = "true" ]; then

@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 # 🚨 CRITICAL WARNING: DO NOT MODIFY THIS PRE-COMMIT HOOK
 # This hook is essential for automated NPM publishing workflow.
