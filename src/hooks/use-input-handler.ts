@@ -19,6 +19,8 @@ import { ChangelogGenerator } from "../tools/documentation/changelog-generator.j
 import { UpdateAgentDocs } from "../tools/documentation/update-agent-docs.js";
 import { SubagentFramework } from "../subagents/subagent-framework.js";
 import { SelfHealingSystem } from "../tools/documentation/self-healing-system.js";
+import { checkForUpdates, autoUpgrade } from "../utils/version-checker.js";
+import pkg from "../../package.json" with { type: "json" };
 
 interface UseInputHandlerProps {
   agent: GrokAgent;
@@ -259,6 +261,9 @@ export function useInputHandler({
     { command: "/help", description: "Show help information" },
     { command: "/clear", description: "Clear chat history" },
     { command: "/models", description: "Switch Grok Model" },
+    { command: "/upgrade", description: "Check for updates and upgrade CLI" },
+    { command: "/version", description: "Show version information" },
+    { command: "/switch", description: "Switch to specific version" },
     { command: "/init-agent", description: "Initialize .agent documentation system" },
     { command: "/docs", description: "Documentation generation menu" },
     { command: "/readme", description: "Generate project README.md" },
@@ -310,6 +315,9 @@ Built-in Commands:
   /clear      - Clear chat history
   /help       - Show this help
   /models     - Switch between available models
+  /version    - Show version information and check for updates
+  /upgrade    - Check for updates and upgrade automatically
+  /switch     - Switch to specific version (/switch <version>)
   /exit       - Exit application
   exit, quit  - Exit application
 
@@ -403,6 +411,144 @@ Available models: ${modelNames.join(", ")}`,
       return true;
     }
 
+    // Version commands
+    if (trimmedInput === "/version") {
+      try {
+        const versionInfo = await checkForUpdates();
+        const versionEntry: ChatEntry = {
+          type: "assistant",
+          content: `📦 **Grok CLI Version Information**
+
+Current Version: **${versionInfo.current}**
+Latest Version: **${versionInfo.latest}**
+${versionInfo.isUpdateAvailable 
+  ? `🔄 **Update Available!**\n\nUse \`/upgrade\` to update automatically or run:\n\`${versionInfo.updateCommand}\``
+  : '✅ **You are up to date!**'
+}
+
+Package: ${pkg.name}
+GitHub: https://github.com/hinetapora/grok-cli-hurry-mode
+NPM: https://www.npmjs.com/package/${pkg.name}`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, versionEntry]);
+      } catch (error) {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ Error checking version: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
+
+    if (trimmedInput === "/upgrade") {
+      try {
+        const versionInfo = await checkForUpdates();
+        
+        if (!versionInfo.isUpdateAvailable) {
+          const upToDateEntry: ChatEntry = {
+            type: "assistant",
+            content: `✅ **Already up to date!**\n\nCurrent version: **${versionInfo.current}**\nLatest version: **${versionInfo.latest}**`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, upToDateEntry]);
+          clearInput();
+          return true;
+        }
+
+        const confirmUpgradeEntry: ChatEntry = {
+          type: "assistant",
+          content: `🔄 **Update Available!**
+
+Current: **${versionInfo.current}**
+Latest: **${versionInfo.latest}**
+
+Upgrading now... This may take a moment.`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, confirmUpgradeEntry]);
+        
+        const success = await autoUpgrade();
+        
+        const resultEntry: ChatEntry = {
+          type: "assistant",
+          content: success 
+            ? `✅ **Upgrade Complete!**\n\nSuccessfully upgraded to version **${versionInfo.latest}**.\n\n**Please restart Grok CLI** to use the new version:\n- Exit with \`/exit\` or Ctrl+C\n- Run \`grok\` again`
+            : `❌ **Upgrade Failed**\n\nPlease try upgrading manually:\n\`${versionInfo.updateCommand}\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, resultEntry]);
+      } catch (error) {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ Error during upgrade: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
+
+    if (trimmedInput.startsWith("/switch ")) {
+      const versionArg = trimmedInput.split(" ")[1];
+      
+      if (!versionArg) {
+        const helpEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ **Missing version argument**
+
+Usage: \`/switch <version>\`
+
+Examples:
+- \`/switch latest\` - Switch to latest version
+- \`/switch 1.0.50\` - Switch to specific version
+
+Command: \`npm install -g ${pkg.name}@<version>\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, helpEntry]);
+        clearInput();
+        return true;
+      }
+
+      try {
+        const switchingEntry: ChatEntry = {
+          type: "assistant",
+          content: `🔄 **Switching to version ${versionArg}...**\n\nThis may take a moment.`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, switchingEntry]);
+
+        // Import exec for version switching
+        const { exec } = await import("child_process");
+        const { promisify } = await import("util");
+        const execAsync = promisify(exec);
+        
+        await execAsync(`npm install -g ${pkg.name}@${versionArg}`, {
+          timeout: 30000,
+        });
+        
+        const successEntry: ChatEntry = {
+          type: "assistant",
+          content: `✅ **Version Switch Complete!**\n\nSuccessfully installed version **${versionArg}**.\n\n**Please restart Grok CLI** to use the new version:\n- Exit with \`/exit\` or Ctrl+C\n- Run \`grok\` again`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, successEntry]);
+      } catch (error) {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ **Version switch failed**\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease try manually:\n\`npm install -g ${pkg.name}@${versionArg}\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
 
     if (trimmedInput === "/commit-and-push") {
       const userEntry: ChatEntry = {

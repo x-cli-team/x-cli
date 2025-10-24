@@ -17,6 +17,7 @@ import { MCPStatus } from "./mcp-status.js";
 import ConfirmationDialog from "./confirmation-dialog.js";
 import { Banner } from "./banner.js";
 import { ContextTooltip } from "./context-tooltip.js";
+import { VersionNotification } from "./version-notification.js";
 import {
   ConfirmationService,
   ConfirmationOptions,
@@ -481,6 +482,8 @@ function ChatInterfaceWithAgent({
             progress={undefined} // TODO: Add progress tracking for long operations
           />
 
+          <VersionNotification isVisible={!isProcessing && !isStreaming} />
+          
           <ChatInput
             input={input}
             cursorPosition={cursorPosition}

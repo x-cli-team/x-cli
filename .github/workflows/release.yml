@@ -27,6 +27,8 @@ on:
 
 permissions:
   contents: write
+  packages: write
+  id-token: write
 
 jobs:
   release:
@@ -94,3 +96,44 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # ---------- Publish to GitHub Packages ----------
+      - name: Create scoped package.json for GitHub Packages
+        run: |
+          # Create a temporary package.json with scoped name for GitHub Packages
+          cp package.json package.json.backup
+          
+          # Update package name to be scoped (required for GitHub Packages)
+          sed -i 's/"name": "grok-cli-hurry-mode"/"name": "@hinetapora\/grok-cli-hurry-mode"/' package.json
+          
+          echo "Created scoped package.json for GitHub Packages:"
+          grep '"name":' package.json
+
+      - name: Configure GitHub Packages registry
+        run: |
+          # Configure npm to publish scoped packages to GitHub Packages
+          echo "@hinetapora:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        run: |
+          echo "Publishing scoped package to GitHub Packages..."
+          npm publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore original package.json
+        run: |
+          # Restore original package.json to avoid affecting future operations
+          mv package.json.backup package.json
+          rm -f .npmrc
+          echo "Restored original package.json"
+
+      - name: Publish summary
+        run: |
+          NEW_VER=$(node -p "require('./package.json').version")
+          echo "✅ Published grok-cli-hurry-mode v${NEW_VER} to:"
+          echo "  📦 NPM: https://www.npmjs.com/package/grok-cli-hurry-mode"
+          echo "  📦 GitHub Packages: https://github.com/hinetapora/grok-cli-hurry-mode/pkgs/npm/grok-cli-hurry-mode"

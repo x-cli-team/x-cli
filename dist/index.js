@@ -9285,7 +9285,131 @@ EOF`;
 
 // package.json
 var package_default = {
-  version: "1.1.24"};
+  type: "module",
+  name: "grok-cli-hurry-mode",
+  version: "1.1.24",
+  description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
+  main: "dist/index.js",
+  module: "dist/index.js",
+  types: "dist/index.d.ts",
+  exports: {
+    ".": {
+      types: "./dist/index.d.ts",
+      import: "./dist/index.js"
+    }
+  },
+  bin: {
+    grok: "dist/index.js"
+  },
+  scripts: {
+    build: "tsup",
+    "build:tsc": "tsc",
+    dev: "npm run build && node dist/index.js",
+    "dev:node": "tsx src/index.ts",
+    "dev:watch": "npm run build && node --watch dist/index.js",
+    start: "node dist/index.js",
+    local: "npm run build && npm link && node dist/index.js",
+    "start:bun": "bun run dist/index.js",
+    lint: "eslint . --ext .js,.jsx,.ts,.tsx",
+    typecheck: "tsc --noEmit",
+    "install:bun": "bun install",
+    preinstall: "echo '\u{1F916} Installing Grok CLI...'",
+    postinstall: `echo '==================================================' && echo '\u2705 Grok CLI installed successfully!' && echo '==================================================' && echo '\u{1F680} Try: grok --help' && echo '\u{1F4A1} If "command not found", add to PATH:' && node -e "const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shell=isMac?'zshrc':'bashrc';console.log((isMac?'\u{1F34E} Mac':'\u{1F427} Linux')+': echo \\'export PATH=\\"$(npm config get prefix)/bin:$PATH\\"\\' >> ~/.'+shell+' && source ~/.'+shell);}" && echo '\u{1F4D6} Docs: https://github.com/hinetapora/grok-cli-hurry-mode#installation' && echo '\u{1F511} Set API key: export GROK_API_KEY=your_key_here' && echo '==================================================' && echo '\u{1F527} Auto-setup PATH? Press Enter to add (or Ctrl+C to skip)' && read -t 10 && node -e "const fs=require('fs');const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shellFile=isMac?'.zshrc':'.bashrc';const rcPath=process.env.HOME+'/'+shellFile;const pathCmd='export PATH=\\"$(npm config get prefix)/bin:$PATH\\"';try{const content=fs.readFileSync(rcPath,'utf8');if(!content.includes(pathCmd)){fs.appendFileSync(rcPath,'\\n'+pathCmd+'\\n');console.log('\u2705 Added to ~/'+shellFile+' - restart terminal');}else{console.log('\u2139\uFE0F Already in ~/'+shellFile);}}catch(e){console.log('\u26A0\uFE0F Could not modify ~/'+shellFile+' - add manually');}}" && echo '\u{1F50D} Verifying: ' && grok --version 2>/dev/null || echo '\u26A0\uFE0F grok not in PATH yet - follow above steps'`,
+    prepare: "husky install",
+    "dev:site": "cd apps/site && npm run start",
+    "build:site": "cd apps/site && npm run build",
+    "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
+    "smart-push": "./scripts/smart-push.sh"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  keywords: [
+    "cli",
+    "agent",
+    "text-editor",
+    "grok",
+    "ai"
+  ],
+  author: "grok_cli",
+  license: "MIT",
+  dependencies: {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "@types/marked-terminal": "^6.1.1",
+    "@typescript-eslint/typescript-estree": "^8.46.0",
+    axios: "^1.7.0",
+    cfonts: "^3.3.0",
+    chalk: "^5.3.0",
+    chokidar: "^4.0.3",
+    "cli-highlight": "^2.1.11",
+    commander: "^12.0.0",
+    dotenv: "^16.4.0",
+    enquirer: "^2.4.1",
+    "fs-extra": "^11.2.0",
+    "fuse.js": "^7.1.0",
+    glob: "^11.0.3",
+    ink: "^4.4.1",
+    marked: "^15.0.12",
+    "marked-terminal": "^7.3.0",
+    openai: "^5.10.1",
+    react: "^18.3.1",
+    "ripgrep-node": "^1.0.0",
+    "terminal-image": "^4.0.0",
+    tiktoken: "^1.0.21"
+  },
+  devDependencies: {
+    "@eslint/js": "^9.37.0",
+    "@types/fs-extra": "^11.0.2",
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
+    "@typescript-eslint/parser": "^8.37.0",
+    esbuild: "^0.25.10",
+    eslint: "^9.31.0",
+    husky: "^9.1.7",
+    "lint-staged": "^16.2.4",
+    tsup: "^8.5.0",
+    tsx: "^4.0.0"
+  },
+  engines: {
+    node: ">=18.0.0"
+  },
+  preferGlobal: true,
+  repository: {
+    type: "git",
+    url: "https://github.com/hinetapora/grok-cli-hurry-mode.git"
+  },
+  bugs: {
+    url: "https://github.com/hinetapora/grok-cli-hurry-mode/issues"
+  },
+  homepage: "https://grokcli.dev",
+  files: [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  publishConfig: {
+    access: "public"
+  },
+  installConfig: {
+    hoisting: false
+  },
+  optionalDependencies: {
+    "tree-sitter": "^0.21.1",
+    "tree-sitter-javascript": "^0.21.2",
+    "tree-sitter-python": "^0.21.0",
+    "tree-sitter-typescript": "^0.21.2"
+  },
+  trustedDependencies: [
+    "esbuild",
+    "tree-sitter",
+    "tree-sitter-javascript",
+    "tree-sitter-python",
+    "tree-sitter-typescript"
+  ]
+};
 
 // src/utils/text-utils.ts
 function isWordBoundary(char) {
@@ -12955,6 +13079,70 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
     return { ...this.config };
   }
 };
+var execAsync3 = promisify(exec);
+async function checkForUpdates() {
+  try {
+    const { stdout } = await execAsync3(`npm view ${package_default.name} version`, {
+      timeout: 5e3
+    });
+    const latestVersion = stdout.trim();
+    const currentVersion = package_default.version;
+    const isUpdateAvailable = latestVersion !== currentVersion && isNewerVersion(latestVersion, currentVersion);
+    return {
+      current: currentVersion,
+      latest: latestVersion,
+      isUpdateAvailable,
+      updateCommand: `npm update -g ${package_default.name}@latest`
+    };
+  } catch (error) {
+    return {
+      current: package_default.version,
+      latest: package_default.version,
+      isUpdateAvailable: false,
+      updateCommand: `npm update -g ${package_default.name}@latest`
+    };
+  }
+}
+function isNewerVersion(version1, version2) {
+  const v1Parts = version1.split(".").map(Number);
+  const v2Parts = version2.split(".").map(Number);
+  for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
+    const v1Part = v1Parts[i] || 0;
+    const v2Part = v2Parts[i] || 0;
+    if (v1Part > v2Part) return true;
+    if (v1Part < v2Part) return false;
+  }
+  return false;
+}
+async function autoUpgrade() {
+  try {
+    console.log("\u{1F504} Upgrading Grok CLI...");
+    await execAsync3(`npm update -g ${package_default.name}@latest`, {
+      timeout: 3e4
+    });
+    console.log("\u2705 Upgrade completed! Please restart the CLI.");
+    return true;
+  } catch (error) {
+    console.error("\u274C Auto-upgrade failed:", error);
+    return false;
+  }
+}
+var cachedVersionInfo = null;
+var lastCheckTime = 0;
+var CHECK_INTERVAL = 6 * 60 * 60 * 1e3;
+async function getCachedVersionInfo() {
+  const now = Date.now();
+  if (cachedVersionInfo && now - lastCheckTime < CHECK_INTERVAL) {
+    return cachedVersionInfo;
+  }
+  try {
+    cachedVersionInfo = await checkForUpdates();
+    lastCheckTime = now;
+    return cachedVersionInfo;
+  } catch {
+    return null;
+  }
+}
 
 // src/hooks/use-input-handler.ts
 function useInputHandler({
@@ -13144,6 +13332,9 @@ function useInputHandler({
     { command: "/help", description: "Show help information" },
     { command: "/clear", description: "Clear chat history" },
     { command: "/models", description: "Switch Grok Model" },
+    { command: "/upgrade", description: "Check for updates and upgrade CLI" },
+    { command: "/version", description: "Show version information" },
+    { command: "/switch", description: "Switch to specific version" },
     { command: "/init-agent", description: "Initialize .agent documentation system" },
     { command: "/docs", description: "Documentation generation menu" },
     { command: "/readme", description: "Generate project README.md" },
@@ -13184,6 +13375,9 @@ Built-in Commands:
   /clear      - Clear chat history
   /help       - Show this help
   /models     - Switch between available models
+  /version    - Show version information and check for updates
+  /upgrade    - Check for updates and upgrade automatically
+  /switch     - Switch to specific version (/switch <version>)
   /exit       - Exit application
   exit, quit  - Exit application
 
@@ -13264,6 +13458,154 @@ Examples:
           content: `Invalid model: ${modelArg}
 
 Available models: ${modelNames.join(", ")}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
+    if (trimmedInput === "/version") {
+      try {
+        const versionInfo = await checkForUpdates();
+        const versionEntry = {
+          type: "assistant",
+          content: `\u{1F4E6} **Grok CLI Version Information**
+
+Current Version: **${versionInfo.current}**
+Latest Version: **${versionInfo.latest}**
+${versionInfo.isUpdateAvailable ? `\u{1F504} **Update Available!**
+
+Use \`/upgrade\` to update automatically or run:
+\`${versionInfo.updateCommand}\`` : "\u2705 **You are up to date!**"}
+
+Package: ${package_default.name}
+GitHub: https://github.com/hinetapora/grok-cli-hurry-mode
+NPM: https://www.npmjs.com/package/${package_default.name}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, versionEntry]);
+      } catch (error) {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C Error checking version: ${error instanceof Error ? error.message : "Unknown error"}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
+    if (trimmedInput === "/upgrade") {
+      try {
+        const versionInfo = await checkForUpdates();
+        if (!versionInfo.isUpdateAvailable) {
+          const upToDateEntry = {
+            type: "assistant",
+            content: `\u2705 **Already up to date!**
+
+Current version: **${versionInfo.current}**
+Latest version: **${versionInfo.latest}**`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, upToDateEntry]);
+          clearInput();
+          return true;
+        }
+        const confirmUpgradeEntry = {
+          type: "assistant",
+          content: `\u{1F504} **Update Available!**
+
+Current: **${versionInfo.current}**
+Latest: **${versionInfo.latest}**
+
+Upgrading now... This may take a moment.`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, confirmUpgradeEntry]);
+        const success = await autoUpgrade();
+        const resultEntry = {
+          type: "assistant",
+          content: success ? `\u2705 **Upgrade Complete!**
+
+Successfully upgraded to version **${versionInfo.latest}**.
+
+**Please restart Grok CLI** to use the new version:
+- Exit with \`/exit\` or Ctrl+C
+- Run \`grok\` again` : `\u274C **Upgrade Failed**
+
+Please try upgrading manually:
+\`${versionInfo.updateCommand}\``,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, resultEntry]);
+      } catch (error) {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C Error during upgrade: ${error instanceof Error ? error.message : "Unknown error"}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
+    if (trimmedInput.startsWith("/switch ")) {
+      const versionArg = trimmedInput.split(" ")[1];
+      if (!versionArg) {
+        const helpEntry = {
+          type: "assistant",
+          content: `\u274C **Missing version argument**
+
+Usage: \`/switch <version>\`
+
+Examples:
+- \`/switch latest\` - Switch to latest version
+- \`/switch 1.0.50\` - Switch to specific version
+
+Command: \`npm install -g ${package_default.name}@<version>\``,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, helpEntry]);
+        clearInput();
+        return true;
+      }
+      try {
+        const switchingEntry = {
+          type: "assistant",
+          content: `\u{1F504} **Switching to version ${versionArg}...**
+
+This may take a moment.`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, switchingEntry]);
+        const { exec: exec4 } = await import('child_process');
+        const { promisify: promisify4 } = await import('util');
+        const execAsync4 = promisify4(exec4);
+        await execAsync4(`npm install -g ${package_default.name}@${versionArg}`, {
+          timeout: 3e4
+        });
+        const successEntry = {
+          type: "assistant",
+          content: `\u2705 **Version Switch Complete!**
+
+Successfully installed version **${versionArg}**.
+
+**Please restart Grok CLI** to use the new version:
+- Exit with \`/exit\` or Ctrl+C
+- Run \`grok\` again`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, successEntry]);
+      } catch (error) {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C **Version switch failed**
+
+Error: ${error instanceof Error ? error.message : "Unknown error"}
+
+Please try manually:
+\`npm install -g ${package_default.name}@${versionArg}\``,
           timestamp: /* @__PURE__ */ new Date()
         };
         setChatHistory((prev) => [...prev, errorEntry]);
@@ -14204,6 +14546,8 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
 }
 
 // src/ui/colors.ts
+var colors = {
+  };
 var inkColors = {
   primary: "cyan",
   success: "green",
@@ -15382,6 +15726,49 @@ async function getProjectName() {
   }
   return path7__default.basename(process.cwd());
 }
+function VersionNotification({ isVisible = true }) {
+  const [versionInfo, setVersionInfo] = useState(null);
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const info = await getCachedVersionInfo();
+        if (info?.isUpdateAvailable) {
+          setVersionInfo({
+            isUpdateAvailable: info.isUpdateAvailable,
+            current: info.current,
+            latest: info.latest
+          });
+        }
+      } catch {
+      }
+    };
+    checkVersion();
+    const interval = setInterval(checkVersion, 6 * 60 * 60 * 1e3);
+    return () => clearInterval(interval);
+  }, []);
+  if (!isVisible || !versionInfo?.isUpdateAvailable) {
+    return null;
+  }
+  return /* @__PURE__ */ jsx(Box, { marginTop: 1, marginBottom: 1, children: /* @__PURE__ */ jsxs(
+    Box,
+    {
+      borderStyle: "round",
+      borderColor: colors.orange,
+      paddingX: 2,
+      paddingY: 0,
+      children: [
+        /* @__PURE__ */ jsxs(Text, { color: colors.orange, children: [
+          "\u{1F504} Update available: v",
+          versionInfo.latest,
+          " (current: v",
+          versionInfo.current,
+          ")"
+        ] }),
+        /* @__PURE__ */ jsx(Text, { color: colors.gray, children: " - Use '/upgrade' to update" })
+      ]
+    }
+  ) });
+}
 init_settings_manager();
 function ApiKeyInput({ onApiKeySet }) {
   const [input, setInput] = useState("");
@@ -15826,6 +16213,7 @@ function ChatInterfaceWithAgent({
           progress: void 0
         }
       ),
+      /* @__PURE__ */ jsx(VersionNotification, { isVisible: !isProcessing && !isStreaming }),
       /* @__PURE__ */ jsx(
         ChatInput,
         {
@@ -16117,6 +16505,18 @@ function ensureUserSettingsDirectory() {
   } catch {
   }
 }
+async function checkStartupUpdates() {
+  try {
+    const versionInfo = await checkForUpdates();
+    if (versionInfo.isUpdateAvailable) {
+      console.log(`
+\u{1F504} Update available: v${versionInfo.latest} (current: v${versionInfo.current})`);
+      console.log(`   Use '/upgrade' command or run: ${versionInfo.updateCommand}
+`);
+    }
+  } catch {
+  }
+}
 function loadApiKey() {
   const manager = getSettingsManager();
   return manager.getApiKey();
@@ -16345,6 +16745,7 @@ program.name("grok").description(
     const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
     console.log("\u{1F916} Starting Grok CLI Conversational Assistant...\n");
     ensureUserSettingsDirectory();
+    checkStartupUpdates();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
     const app = render(React3.createElement(ChatInterface, { agent, initialMessage }));
     const cleanup = () => {

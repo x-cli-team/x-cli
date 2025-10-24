@@ -9,6 +9,7 @@ import { ConfirmationService } from "./utils/confirmation-service.js";
 import { createMCPCommand } from "./commands/mcp.js";
 import type { ChatCompletionMessageParam } from "openai/resources/chat";
 import pkg from "../package.json" with { type: "json" };
+import { checkForUpdates } from "./utils/version-checker.js";
 
 // Load environment variables
 dotenv.config();
@@ -48,6 +49,19 @@ function ensureUserSettingsDirectory(): void {
     manager.loadUserSettings();
   } catch {
     // Silently ignore errors during setup
+  }
+}
+
+// Check for updates at startup (non-blocking)
+async function checkStartupUpdates(): Promise<void> {
+  try {
+    const versionInfo = await checkForUpdates();
+    if (versionInfo.isUpdateAvailable) {
+      console.log(`\n🔄 Update available: v${versionInfo.latest} (current: v${versionInfo.current})`);
+      console.log(`   Use '/upgrade' command or run: ${versionInfo.updateCommand}\n`);
+    }
+  } catch {
+    // Silently ignore network errors during startup
   }
 }
 
@@ -386,6 +400,9 @@ program
       console.log("🤖 Starting Grok CLI Conversational Assistant...\n");
 
       ensureUserSettingsDirectory();
+      
+      // Check for updates (non-blocking)
+      checkStartupUpdates();
 
       // Support variadic positional arguments for multi-word initial message
       const initialMessage = Array.isArray(message)
