@@ -392,12 +392,12 @@ program
 
       // Interactive mode: launch UI
       if (!process.stdin.isTTY) {
-        console.error("❌ Error: Grok CLI requires an interactive terminal. Please run in a TTY environment.");
+        console.error("❌ Error: X CLI requires an interactive terminal. Please run in a TTY environment.");
         process.exit(1);
       }
 
       const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
-      console.log("🤖 Starting Grok CLI Conversational Assistant...\n");
+      console.log("🤖 Starting X CLI Conversational Assistant...\n");
 
       ensureUserSettingsDirectory();
       
@@ -428,7 +428,7 @@ program
       });
       process.on('SIGTERM', cleanup);
     } catch (error: any) {
-      console.error("❌ Error initializing Grok CLI:", error.message);
+      console.error("❌ Error initializing X CLI:", error.message);
       process.exit(1);
     }
   });

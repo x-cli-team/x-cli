@@ -4,22 +4,21 @@ import pkg from '../../../package.json' with { type: 'json' };
 import { inkColors } from "../colors.js";
 import { ContextStatus } from "./context-status.js";
 
-// Enhanced GROK CLI ASCII art with color scheme
+// Enhanced X CLI ASCII art with color scheme
 export const grokBanner = `
- ██████  ██████   ██████  ██   ██     ██████ ██      ██ 
-██       ██   ██ ██    ██ ██  ██     ██      ██      ██ 
-██   ███ ██████  ██    ██ █████      ██      ██      ██ 
-██    ██ ██   ██ ██    ██ ██  ██     ██      ██      ██ 
- ██████  ██   ██  ██████  ██   ██     ██████ ███████ ██ 
+██   ██      ██████ ██      ██ 
+ ██ ██      ██      ██      ██ 
+  ███       ██      ██      ██ 
+ ██ ██      ██      ██      ██ 
+██   ██      ██████ ███████ ██ 
 `;
 
 // Alternative minimal banner for --quiet mode
 export const grokMini = `
- ▄▄▄▄▄▄▄ ▄▄▄▄▄▄   ▄▄▄▄▄▄  ▄   ▄
-██       ██   ██ ██    ██ ██ ██ 
-██   ███ ██▄▄▄██ ██    ██ ████  
-██    ██ ██   ██ ██    ██ ██ ██ 
- ▀▀▀▀▀▀▀ ▀▀   ▀▀  ▀▀▀▀▀▀  ▀▀  ▀▀
+▄   ▄     ▄▄▄▄▄▄  ▄     ▄
+██ ██    ██      ██    ██ 
+ ███     ██      ██    ██ 
+██ ██    ██████  ██    ██ 
 `;
 
 // Retro style banner
@@ -85,7 +84,7 @@ export function Banner({
       {/* Welcome Message */}
       <Box marginTop={1}>
         <Text color={inkColors.muted}>Welcome to </Text>
-        <Text color={inkColors.primary} bold>Grok CLI</Text>
+        <Text color={inkColors.primary} bold>X CLI</Text>
         <Text color={inkColors.muted}> </Text>
         <Text color={inkColors.warning}>v{pkg.version}</Text>
         <Text color={inkColors.muted}> ⚡</Text>
@@ -123,7 +122,7 @@ export function showBanner(options?: {
   if (quiet) {
     return (
       <Box>
-        <Text color={inkColors.primary} bold>Grok CLI</Text>
+        <Text color={inkColors.primary} bold>X CLI</Text>
         <Text color={inkColors.muted}> v{pkg.version} ready ⚡</Text>
       </Box>
     );

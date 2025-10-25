@@ -1,6 +1,7 @@
 ## 1.1.34 – Paste Text Summary Feature
 
 This release includes latest updates and automated publishing via GitHub Actions.
+
 - Fixes all Read/Update tool reliability issues
 - Ensures consistent FS imports (`node:` namespace)
 - Adds proper Node shebang for global installs
@@ -8,40 +9,42 @@ This release includes latest updates and automated publishing via GitHub Actions
 
 ---
 
-# Grok CLI
+# X CLI
 
-[![NPM Version](https://img.shields.io/npm/v/grok-cli-hurry-mode?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/grok-cli-hurry-mode)
-[![GitHub Release](https://img.shields.io/github/v/release/hinetapora/grok-cli-hurry-mode?style=for-the-badge&logo=github&color=181717)](https://github.com/hinetapora/grok-cli-hurry-mode/releases)
-[![Downloads](https://img.shields.io/npm/dm/grok-cli-hurry-mode?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/grok-cli-hurry-mode)
-[![License](https://img.shields.io/github/license/hinetapora/grok-cli-hurry-mode?style=for-the-badge&color=green)](https://github.com/hinetapora/grok-cli-hurry-mode/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
+[![GitHub Release](https://img.shields.io/github/v/release/hinetapora/x-cli-hurry-mode?style=for-the-badge&logo=github&color=181717)](https://github.com/hinetapora/x-cli-hurry-mode/releases)
+[![Downloads](https://img.shields.io/npm/dm/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
+[![License](https://img.shields.io/github/license/hinetapora/x-cli-hurry-mode?style=for-the-badge&color=green)](https://github.com/hinetapora/x-cli-hurry-mode/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-xAI_Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/channels/1315720379607679066/1315822328139223064)
 
 A conversational AI CLI tool powered by Grok with **Claude Code-level intelligence** and advanced tool capabilities.
 
 <div align="center">
-  <img src="docs/grok-welcome.png" alt="Grok CLI" width="600" />
+  <img src="docs/grok-welcome.png" alt="X CLI" width="600" />
 </div>
 
 ## 🔗 Quick Links
 
-- **📦 [NPM Package](https://www.npmjs.com/package/grok-cli-hurry-mode)** - Install globally with `npm install -g grok-cli-hurry-mode`
-- **🐙 [GitHub Repository](https://github.com/hinetapora/grok-cli-hurry-mode)** - Source code, issues, and contributions
+- **📦 [NPM Package](https://www.npmjs.com/package/@xagent/x-cli)** - Install globally with `npm install -g @xagent/x-cli`
+- **🐙 [GitHub Repository](https://github.com/hinetapora/x-cli-hurry-mode)** - Source code, issues, and contributions
 - **🎯 [Competitive Parity Analysis](./.agent/parity/)** - Strategic analysis vs Claude Code, Cursor IDE, and OpenAI Codex
 - **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
-- **📚 [Releases](https://github.com/hinetapora/grok-cli-hurry-mode/releases)** - Version history and changelogs
+- **📚 [Releases](https://github.com/hinetapora/x-cli-hurry-mode/releases)** - Version history and changelogs
 
 ## 🆕 What's New in v1.0+
 
 ### 🎯 **P0: Plan Mode - Claude Code Parity** (Latest)
+
 - **🎯 Shift+Tab Twice Activation**: Exact Claude Code Plan Mode with read-only exploration
 - **🔍 Comprehensive Codebase Analysis**: Project structure, dependencies, complexity metrics, and architecture patterns
 - **🧠 AI-Powered Implementation Planning**: Strategic plan generation using Grok models with risk assessment
 - **🛡️ Read-Only Tool Execution**: Safe exploration with destructive operation blocking and simulation
-- **📊 Progress Visualization**: Real-time exploration and planning progress with phase-specific guidance  
+- **📊 Progress Visualization**: Real-time exploration and planning progress with phase-specific guidance
 - **📋 User Approval Workflow**: Complete plan review and confirmation before execution
 - **⚡ Performance Optimized**: Fast exploration (1-15 seconds) with intelligent caching and filtering
 
 ### 🎨 **P4: UX Refinement - Claude Code Feel**
+
 - **🎭 Enhanced Welcome Banner**: Professional ASCII art with context-aware status display
 - **🌈 Unified Color System**: Consistent Claude Code-inspired visual hierarchy across all interfaces
 - **🔄 Contextual Spinners**: 8 operation-specific animated indicators (🧠 thinking, 🔍 search, 📂 indexing, 📝 write, etc.)
@@ -54,13 +57,15 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **🎨 Context Awareness Surface**: Professional bordered layouts with organized information sections
 
 ### 🧠 **P3: Code Intelligence Tools**
+
 - **🔍 AST Parser**: Language-specific syntax tree analysis for TypeScript, JavaScript, Python
 - **🔎 Symbol Search**: Fuzzy search across codebases with cross-references and usage analysis
 - **📊 Dependency Analyzer**: Circular dependency detection and dependency graph generation
 - **🎯 Code Context**: Semantic analysis with quality metrics and design pattern detection
 - **🔧 Refactoring Assistant**: Safe rename, extract, inline operations with preview and rollback
 
-### 🚀 **P2: Enhanced File Operations** 
+### 🚀 **P2: Enhanced File Operations**
+
 - **⚡ Multi-File Editor**: Atomic operations with transaction support and rollback
 - **🔍 Advanced Search Tool**: Regex patterns with bulk replace and context-aware results
 - **🌳 File Tree Operations**: Visual trees, bulk operations, and intelligent file organization
@@ -70,6 +75,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 **🎯 Result**: **Claude Code-level capabilities** with **Claude Code feel** in your terminal!
 
 ### 🛠️ **P1: Reliability & Workflow Enhancements**
+
 - **🤖 .agent System**: AI-powered task management and documentation system for efficient workflows
 - **🔧 Healer Script**: Automated issue detection and resolution for tool reliability
 - **⚡ FsPort Abstraction**: Improved file system operations with Node built-ins externalization
@@ -80,6 +86,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 ## ✨ Features
 
 ### 🎯 **Plan Mode - Claude Code's Signature Feature**
+
 - **🎯 Shift+Tab Twice**: Activate read-only exploration mode (exact Claude Code parity)
 - **🔍 Codebase Analysis**: Comprehensive project structure, dependencies, and complexity analysis
 - **🧠 AI-Powered Planning**: Strategic implementation plans generated by Grok models
@@ -88,22 +95,25 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **📋 Plan Approval**: Review and approve implementation plans before execution
 
 ### 🧠 **Claude Code-Level Intelligence**
+
 - **🔍 AST Code Analysis**: Parse TypeScript, JavaScript, Python files to extract symbols, imports, and structure
 - **🔎 Symbol Search**: Fuzzy search for functions, classes, variables across entire codebases
 - **📊 Dependency Analysis**: Detect circular dependencies and generate dependency graphs
 - **🎯 Code Context**: Intelligent relationship mapping with semantic analysis and quality metrics
 - **🔧 Safe Refactoring**: Rename, extract, inline operations with preview and rollback support
 
-### 🚀 **Advanced File Operations** 
+### 🚀 **Advanced File Operations**
+
 - **⚡ MultiEdit**: Atomic operations across multiple files with transaction support
 - **🔍 Grep/Glob**: Advanced search with regex patterns and file discovery
 - **🌐 WebFetch/WebSearch**: Real-time web content retrieval and search capabilities
 - **📚 Task/TodoWrite**: Specialized agent delegation and comprehensive task management
 - **🚀 Read/Write/Edit**: Claude Code-standard file operations at high speed
 
-🌐 **Visit [grokcli.dev](https://grokcli.dev)** for complete documentation and guides.
+🌐 **Visit [xclicli.dev](https://xclicli.dev)** for complete documentation and guides.
 
 ### 🤖 **Core AI Capabilities**
+
 - **💬 Conversational Interface**: Natural language powered by Grok models
 - **🔧 Intelligent Tool Selection**: AI automatically chooses the right tools for your requests
 - **⚡ Bash Integration**: Execute shell commands through natural conversation
@@ -112,6 +122,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **📋 Smart Paste Detection**: Large pasted content automatically summarizes as `[Pasted text #1 +12 lines]` for clean chat history
 
 ### 🎨 **Enhanced User Experience**
+
 - **🎭 Professional Welcome Banner**: ASCII art with dynamic context status (`Context: Dynamic │ Files: indexed │ Session: Restored`)
 - **🔄 Contextual Visual Feedback**: 8 operation-specific spinners with smooth 120ms animations
 - **📊 Progress Transparency**: Real-time progress bars with ETA calculations for long operations
@@ -120,6 +131,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **⚡ Motion Design**: Breathing pulse effects and smooth transitions for calm, responsive interface
 
 ### 📚 **Documentation System**
+
 - **🏗️ Agent Documentation**: Complete `.agent/` system for AI context optimization
 - **📖 Interactive Commands**: `/docs` menu, `/readme` generation, `/api-docs`, `/changelog`
 - **🔄 Smart Updates**: `/update-agent-docs` with configurable auto-triggers
@@ -128,45 +140,52 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **📝 Code Comments**: `/comments` command for automatic code documentation
 
 ### 🌍 **Installation & Setup**
-- **📦 Global Installation**: Install anywhere with `npm install -g grok-cli-hurry-mode`
+
+- **📦 Global Installation**: Install anywhere with `npm install -g @xagent/x-cli`
 - **⚙️ Flexible Configuration**: Environment variables, user settings, or project-specific configs
 - **🔄 CI/CD Ready**: Headless mode perfect for automation and scripting
 
 ## Installation
 
 ### Prerequisites
+
 - Node.js 18+ (Node.js 20+ recommended)
 
 ### 🚀 Quick Start
 
 **Option 1: Run without installing (Recommended)**
+
 ```bash
-npx -y grok-cli-hurry-mode@latest
+npx -y @xagent/x-cli@latest
 ```
-*Always gets the latest version, no local installation needed*
+
+_Always gets the latest version, no local installation needed_
 
 **Option 2: Global installation**
+
 ```bash
-npm install -g grok-cli-hurry-mode@latest
+npm install -g @xagent/x-cli@latest
 ```
 
 **Option 3: Alternative package managers**
+
 ```bash
 # Using Yarn
-yarn global add grok-cli-hurry-mode@latest
+yarn global add @xagent/x-cli@latest
 
-# Using pnpm  
-pnpm add -g grok-cli-hurry-mode@latest
+# Using pnpm
+pnpm add -g @xagent/x-cli@latest
 
 # Using bun
-bun add -g grok-cli-hurry-mode@latest
+bun add -g @xagent/x-cli@latest
 ```
 
-### 🛠️ PATH Setup (If `grok` command not found)
+### 🛠️ PATH Setup (If `xcli` command not found)
 
 After installation, if you get "command not found", add npm's global bin to your PATH:
 
 **macOS/Linux:**
+
 ```bash
 # Add to ~/.zshrc (macOS) or ~/.bashrc (Linux)
 echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
@@ -178,6 +197,7 @@ source ~/.bashrc
 ```
 
 **Windows:**
+
 ```bash
 # PowerShell
 $npmPath = npm config get prefix
@@ -185,30 +205,34 @@ $env:PATH += ";$npmPath"
 ```
 
 **Verify installation:**
+
 ```bash
-grok --version  # Should show current version
-which grok      # Should show installation path
+xcli --version  # Should show current version
+which xcli      # Should show installation path
 ```
 
 ### ⚡ Quick Start (One-liner)
 
 **Try without installing:**
+
 ```bash
-GROK_API_KEY=your_api_key_here npx -y grok-cli-hurry-mode@latest --help
+GROK_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest --help
 ```
 
 **Or install globally:**
+
 ```bash
-npm install -g grok-cli-hurry-mode@latest && \
+npm install -g @xagent/x-cli@latest && \
 echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc && \
 source ~/.zshrc && \
-grok --help
+xcli --help
 ```
 
 ### Local Development
+
 ```bash
 git clone <repository>
-cd grok-cli
+cd xcli-cli
 npm install
 npm run build
 npm link
@@ -221,23 +245,27 @@ npm link
 2. Set up your API key (choose one method):
 
 **Method 1: Environment Variable**
+
 ```bash
 export GROK_API_KEY=your_api_key_here
 ```
 
 **Method 2: .env File**
+
 ```bash
 cp .env.example .env
 # Edit .env and add your API key
 ```
 
 **Method 3: Command Line Flag**
+
 ```bash
-grok --api-key your_api_key_here
+xcli --api-key your_api_key_here
 ```
 
 **Method 4: User Settings File**
-Create `~/.grok/user-settings.json`:
+Create `~/.xcli/user-settings.json`:
+
 ```json
 {
   "apiKey": "your_api_key_here"
@@ -249,11 +277,13 @@ Create `~/.grok/user-settings.json`:
 4. Set up your Morph API key for Fast Apply editing (choose one method):
 
 **Method 1: Environment Variable**
+
 ```bash
 export MORPH_API_KEY=your_morph_api_key_here
 ```
 
 **Method 2: .env File**
+
 ```bash
 # Add to your .env file
 MORPH_API_KEY=your_morph_api_key_here
@@ -264,17 +294,20 @@ MORPH_API_KEY=your_morph_api_key_here
 By default, the CLI uses `https://api.x.ai/v1` as the Grok API endpoint. You can configure a custom endpoint if needed (choose one method):
 
 **Method 1: Environment Variable**
+
 ```bash
 export GROK_BASE_URL=https://your-custom-endpoint.com/v1
 ```
 
 **Method 2: Command Line Flag**
+
 ```bash
-grok --api-key your_api_key_here --base-url https://your-custom-endpoint.com/v1
+xcli --api-key your_api_key_here --base-url https://your-custom-endpoint.com/v1
 ```
 
 **Method 3: User Settings File**
-Add to `~/.grok/user-settings.json`:
+Add to `~/.xcli/user-settings.json`:
+
 ```json
 {
   "apiKey": "your_api_key_here",
@@ -284,7 +317,7 @@ Add to `~/.grok/user-settings.json`:
 
 ## Configuration Files
 
-Grok CLI uses two types of configuration files to manage settings:
+X CLI uses two types of configuration files to manage settings:
 
 ### User-Level Settings (`~/.grok/user-settings.json`)
 
@@ -296,6 +329,7 @@ This file stores **global settings** that apply across all projects. These setti
 - **Available Models**: List of models you can use
 
 **Example:**
+
 ```json
 {
   "apiKey": "your_api_key_here",
@@ -319,6 +353,7 @@ This file stores **project-specific settings** in your current working directory
 - **MCP Servers**: Model Context Protocol server configurations
 
 **Example:**
+
 ```json
 {
   "model": "grok-3-fast",
@@ -347,12 +382,14 @@ This means you can have different models for different projects while maintainin
 **Important**: Grok CLI uses **OpenAI-compatible APIs**. You can use any provider that implements the OpenAI chat completions standard.
 
 **Popular Providers**:
+
 - **X.AI (Grok)**: `https://api.x.ai/v1` (default)
 - **OpenAI**: `https://api.openai.com/v1`
 - **OpenRouter**: `https://openrouter.ai/api/v1`
 - **Groq**: `https://api.groq.com/openai/v1`
 
 **Example with OpenRouter**:
+
 ```json
 {
   "apiKey": "your_openrouter_key",
@@ -371,13 +408,15 @@ This means you can have different models for different projects while maintainin
 ### Interactive Mode
 
 Start the conversational AI assistant:
+
 ```bash
-grok
+xcli
 ```
 
 Or specify a working directory:
+
 ```bash
-grok -d /path/to/project
+xcli -d /path/to/project
 ```
 
 #### ⌨️ Keyboard Shortcuts
@@ -391,14 +430,16 @@ grok -d /path/to/project
 ### Headless Mode
 
 Process a single prompt and exit (useful for scripting and automation):
+
 ```bash
-grok --prompt "show me the package.json file"
-grok -p "create a new file called example.js with a hello world function"
-grok --prompt "run bun test and show me the results" --directory /path/to/project
-grok --prompt "complex task" --max-tool-rounds 50  # Limit tool usage for faster execution
+xcli --prompt "show me the package.json file"
+xcli -p "create a new file called example.js with a hello world function"
+xcli --prompt "run bun test and show me the results" --directory /path/to/project
+xcli --prompt "complex task" --max-tool-rounds 50  # Limit tool usage for faster execution
 ```
 
 This mode is particularly useful for:
+
 - **CI/CD pipelines**: Automate code analysis and file operations
 - **Scripting**: Integrate AI assistance into shell scripts
 - **Terminal benchmarks**: Perfect for tools like Terminal Bench that need non-interactive execution
@@ -410,17 +451,18 @@ By default, Grok CLI allows up to 400 tool execution rounds to handle complex mu
 
 ```bash
 # Limit tool rounds for faster execution on simple tasks
-grok --max-tool-rounds 10 --prompt "show me the current directory"
+xcli --max-tool-rounds 10 --prompt "show me the current directory"
 
 # Increase limit for very complex tasks (use with caution)
-grok --max-tool-rounds 1000 --prompt "comprehensive code refactoring"
+xcli --max-tool-rounds 1000 --prompt "comprehensive code refactoring"
 
 # Works with all modes
-grok --max-tool-rounds 20  # Interactive mode
-grok git commit-and-push --max-tool-rounds 30  # Git commands
+xcli --max-tool-rounds 20  # Interactive mode
+xcli git commit-and-push --max-tool-rounds 30  # Git commands
 ```
 
 **Use Cases**:
+
 - **Fast responses**: Lower limits (10-50) for simple queries
 - **Complex automation**: Higher limits (500+) for comprehensive tasks
 - **Resource control**: Prevent runaway executions in automated environments
@@ -430,26 +472,29 @@ grok git commit-and-push --max-tool-rounds 30  # Git commands
 You can specify which AI model to use with the `--model` parameter or `GROK_MODEL` environment variable:
 
 **Method 1: Command Line Flag**
+
 ```bash
 # Use Grok models
-grok --model grok-code-fast-1
-grok --model grok-4-latest
-grok --model grok-3-latest
-grok --model grok-3-fast
+xcli --model grok-code-fast-1
+xcli --model grok-4-latest
+xcli --model grok-3-latest
+xcli --model grok-3-fast
 
 # Use other models (with appropriate API endpoint)
-grok --model gemini-2.5-pro --base-url https://api-endpoint.com/v1
-grok --model claude-sonnet-4-20250514 --base-url https://api-endpoint.com/v1
+xcli --model gemini-2.5-pro --base-url https://api-endpoint.com/v1
+xcli --model claude-sonnet-4-20250514 --base-url https://api-endpoint.com/v1
 ```
 
 **Method 2: Environment Variable**
+
 ```bash
 export GROK_MODEL=grok-code-fast-1
-grok
+xcli
 ```
 
 **Method 3: User Settings File**
-Add to `~/.grok/user-settings.json`:
+Add to `~/.xcli/user-settings.json`:
+
 ```json
 {
   "apiKey": "your_api_key_here",
@@ -462,7 +507,7 @@ Add to `~/.grok/user-settings.json`:
 ### Command Line Options
 
 ```bash
-grok [options]
+xcli [options]
 
 Options:
   -V, --version          output the version number
@@ -484,8 +529,9 @@ mkdir .grok
 ```
 
 Create `.grok/GROK.md` with your custom instructions:
+
 ```markdown
-# Custom Instructions for Grok CLI
+# Custom Instructions for X CLI
 
 Always use TypeScript for any new code files.
 When creating React components, use functional components with hooks.
@@ -505,12 +551,14 @@ Grok CLI supports Morph's Fast Apply model for high-speed code editing at **4,50
 ### How It Works
 
 When `MORPH_API_KEY` is configured:
+
 - **`edit_file` tool becomes available** alongside the standard `str_replace_editor`
 - **Optimized for complex edits**: Use for multi-line changes, refactoring, and large modifications
 - **Intelligent editing**: Uses abbreviated edit format with `// ... existing code ...` comments
 - **Fallback support**: Standard tools remain available if Morph is unavailable
 
 **When to use each tool:**
+
 - **`edit_file`** (Morph): Complex edits, refactoring, multi-line changes
 - **`str_replace_editor`**: Simple text replacements, single-line edits
 
@@ -519,8 +567,8 @@ When `MORPH_API_KEY` is configured:
 With Morph Fast Apply configured, you can request complex code changes:
 
 ```bash
-grok --prompt "refactor this function to use async/await and add error handling"
-grok -p "convert this class to TypeScript and add proper type annotations"
+xcli --prompt "refactor this function to use async/await and add error handling"
+xcli -p "convert this class to TypeScript and add proper type annotations"
 ```
 
 The AI will automatically choose between `edit_file` (Morph) for complex changes or `str_replace_editor` for simple replacements.
@@ -532,20 +580,22 @@ Grok CLI supports MCP (Model Context Protocol) servers, allowing you to extend t
 ### Adding MCP Tools
 
 #### Add a custom MCP server:
+
 ```bash
 # Add an stdio-based MCP server
-grok mcp add my-server --transport stdio --command "bun" --args server.js
+xcli mcp add my-server --transport stdio --command "bun" --args server.js
 
 # Add an HTTP-based MCP server
-grok mcp add my-server --transport http --url "http://localhost:3000"
+xcli mcp add my-server --transport http --url "http://localhost:3000"
 
 # Add with environment variables
-grok mcp add my-server --transport stdio --command "python" --args "-m" "my_mcp_server" --env "API_KEY=your_key"
+xcli mcp add my-server --transport stdio --command "python" --args "-m" "my_mcp_server" --env "API_KEY=your_key"
 ```
 
 #### Add from JSON configuration:
+
 ```bash
-grok mcp add-json my-server '{"command": "bun", "args": ["server.js"], "env": {"API_KEY": "your_key"}}'
+xcli mcp add-json my-server '{"command": "bun", "args": ["server.js"], "env": {"API_KEY": "your_key"}}'
 ```
 
 ### Linear Integration Example
@@ -554,10 +604,11 @@ To add Linear MCP tools for project management:
 
 ```bash
 # Add Linear MCP server
-grok mcp add linear --transport sse --url "https://mcp.linear.app/sse"
+xcli mcp add linear --transport sse --url "https://mcp.linear.app/sse"
 ```
 
 This enables Linear tools like:
+
 - Create and manage Linear issues
 - Search and filter issues
 - Update issue status and assignees
@@ -567,13 +618,13 @@ This enables Linear tools like:
 
 ```bash
 # List all configured servers
-grok mcp list
+xcli mcp list
 
 # Test server connection
-grok mcp test server-name
+xcli mcp test server-name
 
 # Remove a server
-grok mcp remove server-name
+xcli mcp remove server-name
 ```
 
 ### Available Transport Types
@@ -610,6 +661,7 @@ This project uses [Husky](https://typicode.github.com/husky/) and [lint-staged](
 - **Staged files only**: Only checks files that are staged for commit
 
 The pre-commit hook runs `npx lint-staged`, which processes `*.{ts,tsx}` files with:
+
 1. `eslint --fix` - Auto-fix linting issues where possible
 2. `tsc --noEmit` - Type check without emitting files
 
@@ -626,7 +678,7 @@ Every push to the `main` branch automatically:
 1. **🔄 Bumps version** (patch increment: 1.0.X → 1.0.X+1)
 2. **📝 Updates README** with new version number
 3. **🏗️ Builds the project** with fresh dependencies
-4. **📦 Publishes to NPM** at https://www.npmjs.com/package/grok-cli-hurry-mode
+4. **📦 Publishes to NPM** at https://www.npmjs.com/package/@xagent/x-cli
 5. **🏷️ Creates git tag** (e.g., `v1.0.87`)
 
 **⏱️ Timeline**: ~3-5 minutes from push to NPM availability
@@ -647,20 +699,23 @@ git push origin main
 **⚠️ DO NOT MODIFY without understanding the full impact:**
 
 #### GitHub Secrets (Required)
+
 - **`PAT_TOKEN`**: Personal Access Token with repo permissions (for git operations)
-- **`NPM_TOKEN`**: NPM Automation token from `grok_cli` account (for publishing)
+- **`NPM_TOKEN`**: NPM Automation token from `xcli_cli` account (for publishing)
 
 #### Package Configuration (Sacred Settings)
+
 ```json
 {
-  "name": "grok-cli-hurry-mode",  // ⚠️ NEVER change - breaks publishing
+  "name": "@xagent/x-cli", // ⚠️ NEVER change - breaks publishing
   "publishConfig": {
-    "access": "public"            // ⚠️ Must NOT include registry override
+    "access": "public" // ⚠️ Must NOT include registry override
   }
 }
 ```
 
 #### Workflow File (`.github/workflows/release.yml`)
+
 **⚠️ This took multiple attempts to get working - modify with extreme caution!**
 
 ### 🔧 Manual Release (Emergency Only)
@@ -686,8 +741,8 @@ git push origin main --follow-tags
 
 ### 📊 Monitoring
 
-- **GitHub Actions**: https://github.com/hinetapora/grok-cli-hurry-mode/actions
-- **NPM Package**: https://www.npmjs.com/package/grok-cli-hurry-mode
+- **GitHub Actions**: https://github.com/hinetapora/x-cli-hurry-mode/actions
+- **NPM Package**: https://www.npmjs.com/package/@xagent/x-cli
 - **Release History**: Check git tags or NPM version history
 
 ### 🛠️ Troubleshooting
@@ -700,6 +755,7 @@ If automation fails:
 4. **See documentation**: `.agent/sop/npm-publishing-troubleshooting.md`
 
 **Common Issues**:
+
 - **Build fails**: Usually Rollup dependency cache (auto-fixed with clean install)
 - **Publish fails**: Check NPM token is valid and from correct account
 - **Git push fails**: Verify PAT_TOKEN has repo permissions
@@ -707,7 +763,7 @@ If automation fails:
 ### 📚 Related Documentation
 
 - **📋 Release Management**: `.agent/sop/release-management.md`
-- **🚨 Incident History**: `.agent/incidents/incident-npm-publish-failure.md`  
+- **🚨 Incident History**: `.agent/incidents/incident-npm-publish-failure.md`
 - **🔧 Troubleshooting**: `.agent/sop/npm-publishing-troubleshooting.md`
 
 ---
@@ -725,29 +781,31 @@ MIT
 
 ## Credits
 
-This project is based on [grok-cli](https://github.com/superagent-ai/grok-cli) by [@pelaseyed](https://x.com/pelaseyed).
+This project is based on [xcli-cli](https://github.com/superagent-ai/xcli-cli) by [@pelaseyed](https://x.com/pelaseyed).
 
 ## Troubleshooting
 
 ### Installation Issues
 
-**🚨 "Command not found: grok"**
+**🚨 "Command not found: xcli"**
+
 ```bash
-# Check if grok is installed
-npm list -g grok-cli-hurry-mode
+# Check if xcli is installed
+npm list -g @xagent/x-cli
 
 # If installed but not in PATH, add npm global bin to PATH:
 echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # Verify it works
-grok --version
+xcli --version
 ```
 
 **🚨 "Permission denied" during installation**
+
 ```bash
 # Option 1: Use npx (no installation needed)
-npx grok-cli-hurry-mode@latest
+npx @xagent/x-cli@latest
 
 # Option 2: Fix npm permissions (macOS/Linux)
 sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}
@@ -760,21 +818,23 @@ source ~/.zshrc
 ```
 
 **🚨 "Cannot find module" errors**
+
 ```bash
 # Clear npm cache and reinstall
 npm cache clean --force
-npm uninstall -g grok-cli-hurry-mode
-npm install -g grok-cli-hurry-mode@latest
+npm uninstall -g @xagent/x-cli
+npm install -g @xagent/x-cli@latest
 ```
 
 **🚨 Outdated version**
+
 ```bash
 # Check current version
-grok --version
-npm view grok-cli-hurry-mode version
+xcli --version
+npm view @xagent/x-cli version
 
 # Update to latest
-npm update -g grok-cli-hurry-mode@latest
+npm update -g @xagent/x-cli@latest
 ```
 
 ### Tool Execution Errors
@@ -791,6 +851,7 @@ This issue is being tracked and the fallbacks ensure the CLI remains functional.
 ### Runtime Issues
 
 **🚨 API Key errors**
+
 ```bash
 # Set your API key (replace with your actual key)
 export GROK_API_KEY=your_actual_api_key_here
@@ -804,9 +865,10 @@ echo $GROK_API_KEY
 ```
 
 **🚨 Network/connectivity issues**
+
 ```bash
 # Test with verbose output
-grok --verbose "test message"
+xcli --verbose "test message"
 
 # Check API endpoint connectivity
 curl -I https://api.x.ai/v1/models
@@ -817,13 +879,13 @@ curl -I https://api.x.ai/v1/models
 - **File operations fail**: Check that the file path exists and is accessible
 - **Bash commands fail**: Ensure you have the necessary permissions
 - **Tool timeouts**: Complex operations may take time; the spinner indicates progress
-- **Slow responses**: Try a different model with `grok --model grok-code-fast-1`
+- **Slow responses**: Try a different model with `xcli --model grok-code-fast-1`
 
 ## 🙏 Credits
 
-This project is built upon the excellent foundation of the original [Grok CLI](https://github.com/superagent-ai/grok-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
+This project is built upon the excellent foundation of the original [Grok CLI](https://github.com/superagent-ai/xcli-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
 
-**Original Project**: [superagent-ai/grok-cli](https://github.com/superagent-ai/grok-cli)  
+**Original Project**: [superagent-ai/xcli-cli](https://github.com/superagent-ai/xcli-cli)  
 **Founder**: [Ismail Pelaseyed](https://github.com/homanp)  
 **Organization**: [Superagent.ai](https://github.com/superagent-ai)
 
@@ -833,7 +895,7 @@ This "Hurry Mode" fork extends the original with advanced file operations, enhan
 
 We welcome contributions from the community! Add your details below when you contribute to the project.
 
-<!-- 
+<!--
 To add yourself as a contributor:
 1. Fork the repository
 2. Add your entry below following the format
@@ -842,7 +904,7 @@ To add yourself as a contributor:
 
 ### Core Contributors
 
-- **[@hinetapora](https://github.com/hinetapora)** — Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system  
+- **[@hinetapora](https://github.com/hinetapora)** — Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system
 - **[@homanp](https://github.com/homanp)** — Original Grok CLI creator and foundation
 
 ### Community Contributors
@@ -855,14 +917,13 @@ To add yourself as a contributor:
 - **[@unblock-everything](https://github.com/unblock-everything)** — [x.ai](https://x.ai) — Cold-ass honkey 😎
 - **[@Bucko89](https://github.com/Bucko89)** — [GMA](https://getmyagencies.com) — Grinding daily
 - **[@base-buzz](https://github.com/base-buzz)** — [Meta](team.meta.com)
-  
-  
-*Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md) and submit a pull request!*
+
+_Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md) and submit a pull request!_
 
 ### How to Contribute
 
 1. **Fork** the repository on GitHub
-2. **Clone** your fork locally: `git clone https://github.com/yourusername/grok-cli-hurry-mode.git`
+2. **Clone** your fork locally: `git clone https://github.com/yourusername/x-cli-hurry-mode.git`
 3. **Create** a feature branch: `git checkout -b feature/your-feature-name`
 4. **Make** your changes and commit them: `git commit -m "feat: add awesome feature"`
 5. **Push** to your fork: `git push origin feature/your-feature-name`
@@ -879,4 +940,3 @@ To add yourself as a contributor:
 - 💡 **Feature requests** - Suggest new functionality
 
 Join our growing community of AI-powered terminal enthusiasts!
-
