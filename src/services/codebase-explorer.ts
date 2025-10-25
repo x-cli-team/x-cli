@@ -579,7 +579,7 @@ export class CodebaseExplorer {
   }
 
   // Placeholder implementations for complex analysis methods
-  private async analyzeComponent(_file: FileInfo): Promise<ComponentInfo | null> {
+  private async analyzeComponent(file: FileInfo): Promise<ComponentInfo | null> {
     // TODO: Implement AST-based component analysis
     return {
       name: path.basename(file.name, file.extension),
