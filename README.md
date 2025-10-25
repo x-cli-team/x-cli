@@ -1,4 +1,4 @@
-## 1.1.35 – Repository Migration Complete
+## 1.1.36 – Repository Migration Complete
 
 This release includes latest updates and automated publishing via GitHub Actions.
 
