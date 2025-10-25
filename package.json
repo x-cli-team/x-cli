@@ -38,6 +38,15 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"
+    ],
+    "*.{js,jsx,mjs}": [
+      "eslint --fix"
+    ],
+    "*.{md,mdx}": [
+      "prettier --write"
+    ],
+    "*.{json,yml,yaml}": [
+      "prettier --write"
     ]
   },
   "keywords": [
@@ -87,6 +96,7 @@
     "eslint": "^9.31.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4",
+    "prettier": "^3.6.2",
     "tsup": "^8.5.0",
     "tsx": "^4.0.0"
   },
