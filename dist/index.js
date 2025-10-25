@@ -16,7 +16,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import axios from 'axios';
 import { exec, execSync, spawn } from 'child_process';
 import { promisify } from 'util';
-import { writeFile } from 'fs/promises';
+import fs4, { writeFile } from 'fs/promises';
 import * as ops6 from 'fs-extra';
 import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
@@ -126,7 +126,7 @@ var init_settings_manager = __esm({
               const content = fs.readFileSync(this.userSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_USER_SETTINGS, ...parsed };
-            } catch (error) {
+            } catch (_error) {
               console.warn("Corrupted user settings file, using defaults");
             }
           }
@@ -191,7 +191,7 @@ var init_settings_manager = __esm({
               const content = fs.readFileSync(this.projectSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_PROJECT_SETTINGS, ...parsed };
-            } catch (error) {
+            } catch (_error) {
               console.warn("Corrupted project settings file, using defaults");
             }
           }
@@ -462,7 +462,7 @@ var HttpTransport = class extends EventEmitter {
     try {
       await this.client.get("/health");
       this.connected = true;
-    } catch (error) {
+    } catch (_error) {
       this.connected = true;
     }
     return new HttpClientTransport(this.client);
@@ -1330,7 +1330,7 @@ var ConfirmationService = class _ConfirmationService extends EventEmitter {
     if (options.showVSCodeOpen) {
       try {
         await this.openInVSCode(options.filename);
-      } catch (error) {
+      } catch (_error) {
         options.showVSCodeOpen = false;
       }
     }
@@ -1371,7 +1371,7 @@ var ConfirmationService = class _ConfirmationService extends EventEmitter {
         await execAsync(`which ${cmd}`);
         await execAsync(`${cmd} "${filename}"`);
         return;
-      } catch (error) {
+      } catch (_error) {
         continue;
       }
     }
@@ -2644,7 +2644,7 @@ var SearchTool = class {
             match: data.submatches[0]?.match?.text || ""
           });
         }
-      } catch (e) {
+      } catch (_e) {
         continue;
       }
     }
@@ -2700,7 +2700,7 @@ var SearchTool = class {
             await walkDir(fullPath, depth + 1);
           }
         }
-      } catch (error) {
+      } catch (_error) {
       }
     };
     await walkDir(this.currentDirectory);
@@ -2729,7 +2729,7 @@ var SearchTool = class {
   /**
    * Format unified search results for display
    */
-  formatUnifiedResults(results, query, searchType) {
+  formatUnifiedResults(results, query, _searchType) {
     if (results.length === 0) {
       return `No results found for "${query}"`;
     }
@@ -3474,7 +3474,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
         const flags = options.caseSensitive ? "g" : "gi";
         pattern = new RegExp(`${wordBoundary}${escapedPattern}${wordBoundary}`, flags);
       }
-    } catch (error) {
+    } catch (_error) {
       throw new Error(`Invalid regex pattern: ${options.pattern}`);
     }
     for (let i = 0; i < lines.length; i++) {
@@ -3523,7 +3523,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
           const flags = options.caseSensitive ? "g" : "gi";
           pattern = new RegExp(`${wordBoundary}${escapedPattern}${wordBoundary}`, flags);
         }
-      } catch (error) {
+      } catch (_error) {
         return {
           filePath: path7.relative(process.cwd(), filePath),
           replacements: 0,
@@ -4932,7 +4932,7 @@ ${importsToAdd.join("\n")}`;
     let changes = 0;
     const newLines = lines.map((line) => {
       const regex = new RegExp(`\\b${oldName}\\b`, "g");
-      const newLine = line.replace(regex, (match) => {
+      const newLine = line.replace(regex, (_match) => {
         changes++;
         return newName;
       });
@@ -5089,7 +5089,7 @@ ${extractedCode}`;
   /**
    * Format code for insertion with proper indentation
    */
-  formatCodeForInsertion(code, indentation, language) {
+  formatCodeForInsertion(code, indentation, _language) {
     const lines = code.split("\n");
     return lines.map((line) => {
       if (line.trim() === "") return "";
@@ -6685,7 +6685,7 @@ var SymbolSearchTool = class {
           index += symbolName.length;
         }
       }
-    } catch (error) {
+    } catch (_error) {
     }
     return usages;
   }
@@ -7033,10 +7033,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path27) => {
+    const dfs = (filePath, path28) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path27.indexOf(filePath);
-        const cycle = path27.slice(cycleStart).concat([filePath]);
+        const cycleStart = path28.indexOf(filePath);
+        const cycle = path28.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7052,7 +7052,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path27, filePath]);
+            dfs(dependency, [...path28, filePath]);
           }
         }
       }
@@ -8171,10 +8171,10 @@ var RefactoringAssistantTool = class {
       safety
     };
   }
-  async performInlineVariable(request) {
+  async performInlineVariable(_request) {
     throw new Error("Inline variable not yet implemented");
   }
-  async performMove(request) {
+  async performMove(_request) {
     throw new Error("Move operation not yet implemented");
   }
   // Helper methods
@@ -8234,7 +8234,7 @@ var RefactoringAssistantTool = class {
     }
     return changes;
   }
-  async analyzeExtractedCode(code, filePath) {
+  async analyzeExtractedCode(code, _filePath) {
     const lines = code.split("\n");
     const parameters = [];
     const localVariables = [];
@@ -8262,7 +8262,7 @@ var RefactoringAssistantTool = class {
     ).join(", ");
     return `function ${name}(${params})${returnType !== "void" ? `: ${returnType}` : ""}`;
   }
-  createExtractedFunction(signature, body, localVars) {
+  createExtractedFunction(signature, body, _localVars) {
     return `${signature} {
 ${body}
 }`;
@@ -8282,7 +8282,7 @@ ${body}
     const bodyEnd = lines.length - 1;
     return lines.slice(bodyStart, bodyEnd).join("\n");
   }
-  findFunctionCalls(usages, functionName) {
+  findFunctionCalls(usages, _functionName) {
     const calls = [];
     for (const usage of usages) {
       for (const u of usage.usages) {
@@ -8300,7 +8300,7 @@ ${body}
     }
     return calls;
   }
-  inlineFunction(functionBody, args) {
+  inlineFunction(functionBody, _args) {
     return functionBody;
   }
   extractComments(code) {
@@ -9024,10 +9024,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path27 = args.path;
-            let command = `cat "${path27}"`;
+            const path28 = args.path;
+            let command = `cat "${path28}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path27}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path28}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9287,7 +9287,7 @@ EOF`;
 var package_default = {
   type: "module",
   name: "grok-cli-hurry-mode",
-  version: "1.1.24",
+  version: "1.1.33",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -9324,6 +9324,15 @@ var package_default = {
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"
+    ],
+    "*.{js,jsx,mjs}": [
+      "eslint --fix"
+    ],
+    "*.{md,mdx}": [
+      "prettier --write"
+    ],
+    "*.{json,yml,yaml}": [
+      "prettier --write"
     ]
   },
   keywords: [
@@ -9339,6 +9348,8 @@ var package_default = {
     "@modelcontextprotocol/sdk": "^1.17.0",
     "@types/marked-terminal": "^6.1.1",
     "@typescript-eslint/typescript-estree": "^8.46.0",
+    ajv: "^8.17.1",
+    "ajv-formats": "^3.0.1",
     axios: "^1.7.0",
     cfonts: "^3.3.0",
     chalk: "^5.3.0",
@@ -9351,6 +9362,7 @@ var package_default = {
     "fuse.js": "^7.1.0",
     glob: "^11.0.3",
     ink: "^4.4.1",
+    "js-yaml": "^4.1.0",
     marked: "^15.0.12",
     "marked-terminal": "^7.3.0",
     openai: "^5.10.1",
@@ -9370,6 +9382,7 @@ var package_default = {
     eslint: "^9.31.0",
     husky: "^9.1.7",
     "lint-staged": "^16.2.4",
+    prettier: "^3.6.2",
     tsup: "^8.5.0",
     tsx: "^4.0.0"
   },
@@ -9897,6 +9910,1699 @@ function useEnhancedInput({
     insertAtCursor,
     resetHistory,
     handleInput
+  };
+}
+var CodebaseExplorer = class {
+  constructor(settings) {
+    this.settings = settings;
+    this.defaultIgnorePatterns = [
+      "node_modules",
+      ".git",
+      ".next",
+      "dist",
+      "build",
+      "coverage",
+      ".vscode",
+      ".idea",
+      "*.log",
+      ".DS_Store",
+      "Thumbs.db"
+    ];
+    this.languageExtensions = {
+      "TypeScript": [".ts", ".tsx"],
+      "JavaScript": [".js", ".jsx", ".mjs"],
+      "Python": [".py", ".pyx"],
+      "Java": [".java"],
+      "C++": [".cpp", ".cc", ".cxx", ".hpp", ".h"],
+      "C": [".c", ".h"],
+      "Go": [".go"],
+      "Rust": [".rs"],
+      "PHP": [".php"],
+      "Ruby": [".rb"],
+      "Swift": [".swift"],
+      "Kotlin": [".kt"],
+      "Dart": [".dart"],
+      "JSON": [".json"],
+      "YAML": [".yml", ".yaml"],
+      "XML": [".xml"],
+      "HTML": [".html", ".htm"],
+      "CSS": [".css", ".scss", ".sass", ".less"],
+      "Markdown": [".md", ".mdx"],
+      "Shell": [".sh", ".bash", ".zsh"],
+      "SQL": [".sql"],
+      "Dockerfile": ["Dockerfile", ".dockerfile"]
+    };
+    this.configFilePatterns = [
+      "package.json",
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      "requirements.txt",
+      "Pipfile",
+      "pyproject.toml",
+      "setup.py",
+      "Cargo.toml",
+      "go.mod",
+      "pom.xml",
+      "build.gradle",
+      "Makefile",
+      "CMakeLists.txt",
+      ".gitignore",
+      ".env",
+      ".env.example",
+      "tsconfig.json",
+      "jsconfig.json",
+      "webpack.config.js",
+      "vite.config.js",
+      "next.config.js",
+      "tailwind.config.js",
+      "babel.config.js",
+      "jest.config.js",
+      "vitest.config.js",
+      "eslint.config.js",
+      ".eslintrc.*",
+      "prettier.config.js",
+      ".prettierrc.*"
+    ];
+  }
+  /**
+   * Explore the codebase and gather comprehensive analysis data
+   */
+  async exploreCodebase(options) {
+    const startTime = Date.now();
+    const exploredPaths = [];
+    try {
+      const files = await this.scanDirectory(options.rootPath, options);
+      exploredPaths.push(...files.map((f) => f.path));
+      const projectStructure = await this.analyzeProjectStructure(options.rootPath, files);
+      const componentMap = await this.buildComponentMap(files);
+      const dependencies = await this.analyzeDependencies(files);
+      const complexity = await this.calculateComplexityMetrics(files);
+      const architecturePatterns = await this.detectArchitecturePatterns(files, projectStructure);
+      const insights = await this.generateInsights(files, projectStructure, complexity);
+      const explorationData = {
+        exploredPaths,
+        projectStructure,
+        keyComponents: componentMap,
+        dependencies,
+        complexity,
+        architecturePatterns,
+        insights
+      };
+      const duration = Date.now() - startTime;
+      console.log(`[CodebaseExplorer] Exploration completed in ${duration}ms`);
+      console.log(`[CodebaseExplorer] Analyzed ${files.length} files across ${exploredPaths.length} paths`);
+      return explorationData;
+    } catch (error) {
+      console.error("[CodebaseExplorer] Exploration failed:", error);
+      throw error;
+    }
+  }
+  /**
+   * Scan directory structure recursively
+   */
+  async scanDirectory(dirPath, options, currentDepth = 0) {
+    const files = [];
+    const maxDepth = options.maxDepth ?? this.settings.maxExplorationDepth;
+    if (currentDepth > maxDepth) {
+      return files;
+    }
+    try {
+      const entries = await fs4.readdir(dirPath, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path7__default.join(dirPath, entry.name);
+        const relativePath = path7__default.relative(options.rootPath, fullPath);
+        if (this.shouldIgnore(relativePath, options.ignorePatterns)) {
+          continue;
+        }
+        const fileInfo = {
+          path: fullPath,
+          name: entry.name,
+          size: 0,
+          extension: path7__default.extname(entry.name),
+          isDirectory: entry.isDirectory(),
+          relativePath
+        };
+        if (entry.isDirectory()) {
+          files.push(fileInfo);
+          const subFiles = await this.scanDirectory(fullPath, options, currentDepth + 1);
+          files.push(...subFiles);
+        } else {
+          try {
+            const stats = await fs4.stat(fullPath);
+            fileInfo.size = stats.size;
+            if (fileInfo.size > this.settings.maxFileSize) {
+              continue;
+            }
+            files.push(fileInfo);
+          } catch (_error) {
+            continue;
+          }
+        }
+      }
+    } catch (_error) {
+      console.warn(`[CodebaseExplorer] Cannot read directory: ${dirPath}`);
+    }
+    return files;
+  }
+  /**
+   * Analyze overall project structure
+   */
+  async analyzeProjectStructure(rootPath, files) {
+    const languageStats = this.calculateLanguageStats(files);
+    const primaryLanguage = this.determinePrimaryLanguage(languageStats);
+    const projectType = await this.detectProjectType(rootPath, files);
+    const sourceFiles = files.filter((f) => !f.isDirectory && this.isSourceFile(f));
+    const configFiles = files.filter((f) => !f.isDirectory && this.isConfigFile(f));
+    files.filter((f) => !f.isDirectory && this.isTestFile(f));
+    const entryPoints = await this.findEntryPoints(rootPath, files);
+    const sourceDirectories = this.findSourceDirectories(files);
+    const testDirectories = this.findTestDirectories(files);
+    const buildDirectories = this.findBuildDirectories(files);
+    const slocEstimate = await this.estimateSourceLines(sourceFiles);
+    return {
+      rootPath,
+      primaryLanguage,
+      projectType,
+      entryPoints,
+      configFiles: configFiles.map((f) => f.relativePath),
+      sourceDirectories,
+      testDirectories,
+      buildDirectories,
+      totalFiles: files.filter((f) => !f.isDirectory).length,
+      slocEstimate
+    };
+  }
+  /**
+   * Build component map from analyzed files
+   */
+  async buildComponentMap(files) {
+    const sourceFiles = files.filter((f) => !f.isDirectory && this.isSourceFile(f));
+    const components = [];
+    for (const file of sourceFiles) {
+      try {
+        const component = await this.analyzeComponent(file);
+        if (component) {
+          components.push(component);
+        }
+      } catch (_error) {
+        continue;
+      }
+    }
+    return {
+      core: components.filter((c) => c.type === "class" || c.type === "module"),
+      utilities: components.filter((c) => c.type === "utility"),
+      tests: components.filter((c) => c.type === "test"),
+      config: components.filter((c) => c.type === "config"),
+      external: []
+      // Will be populated from dependency analysis
+    };
+  }
+  /**
+   * Analyze dependencies between components
+   */
+  async analyzeDependencies(files) {
+    const nodes = [];
+    const edges = [];
+    const sourceFiles = files.filter((f) => !f.isDirectory && this.isSourceFile(f));
+    for (const file of sourceFiles) {
+      nodes.push({
+        id: file.relativePath,
+        name: path7__default.basename(file.name, file.extension),
+        type: this.isExternalDependency(file) ? "external" : "internal",
+        importance: this.calculateImportance(file)
+      });
+    }
+    for (const file of sourceFiles) {
+      try {
+        const dependencies = await this.extractDependencies(file);
+        for (const dep of dependencies) {
+          edges.push({
+            from: file.relativePath,
+            to: dep.target,
+            type: dep.type,
+            strength: dep.strength
+          });
+        }
+      } catch (_error) {
+        continue;
+      }
+    }
+    const circularDependencies = this.detectCircularDependencies(nodes, edges);
+    const criticalPath = this.findCriticalPath(nodes, edges);
+    return {
+      nodes,
+      edges,
+      circularDependencies,
+      criticalPath
+    };
+  }
+  /**
+   * Calculate complexity metrics
+   */
+  async calculateComplexityMetrics(files) {
+    const sourceFiles = files.filter((f) => !f.isDirectory && this.isSourceFile(f));
+    let totalComplexity = 0;
+    let totalCognitive = 0;
+    let maintainabilitySum = 0;
+    let fileCount = 0;
+    const complexComponents = [];
+    for (const file of sourceFiles) {
+      try {
+        const metrics = await this.analyzeFileComplexity(file);
+        totalComplexity += metrics.cyclomatic;
+        totalCognitive += metrics.cognitive;
+        maintainabilitySum += metrics.maintainability;
+        fileCount++;
+        if (metrics.cyclomatic > 10) {
+          complexComponents.push(file.relativePath);
+        }
+      } catch (_error) {
+        continue;
+      }
+    }
+    const avgComplexity = fileCount > 0 ? totalComplexity / fileCount : 0;
+    const avgCognitive = fileCount > 0 ? totalCognitive / fileCount : 0;
+    const avgMaintainability = fileCount > 0 ? maintainabilitySum / fileCount : 100;
+    return {
+      overall: Math.min(10, Math.max(1, Math.round((avgComplexity + avgCognitive) / 2))),
+      cyclomatic: avgComplexity,
+      cognitive: avgCognitive,
+      maintainability: avgMaintainability,
+      technicalDebt: Math.max(0, 100 - avgMaintainability) / 100,
+      complexComponents: complexComponents.slice(0, 10)
+      // Top 10 most complex
+    };
+  }
+  /**
+   * Detect architecture patterns
+   */
+  async detectArchitecturePatterns(files, structure) {
+    const patterns = [];
+    if (structure.projectType === "react") {
+      patterns.push({
+        name: "Component-Based Architecture",
+        type: "architectural",
+        confidence: 0.9,
+        components: files.filter((f) => f.name.includes("component") || f.extension === ".tsx").map((f) => f.relativePath),
+        description: "React component-based architecture with reusable UI components"
+      });
+    }
+    if (structure.sourceDirectories.some((dir) => dir.includes("service"))) {
+      patterns.push({
+        name: "Service Layer Pattern",
+        type: "architectural",
+        confidence: 0.8,
+        components: files.filter((f) => f.relativePath.includes("service")).map((f) => f.relativePath),
+        description: "Business logic separated into service layer"
+      });
+    }
+    return patterns;
+  }
+  /**
+   * Generate insights about the codebase
+   */
+  async generateInsights(files, structure, complexity) {
+    const insights = [];
+    if (complexity.overall > 7) {
+      insights.push({
+        type: "warning",
+        title: "High Code Complexity",
+        description: `Average complexity is ${complexity.overall}/10. Consider refactoring complex components.`,
+        components: complexity.complexComponents,
+        confidence: 0.9,
+        priority: 4
+      });
+    }
+    const largeFiles = files.filter((f) => f.size > 5e4);
+    if (largeFiles.length > 0) {
+      insights.push({
+        type: "recommendation",
+        title: "Large Files Detected",
+        description: `Found ${largeFiles.length} large files. Consider breaking them into smaller modules.`,
+        components: largeFiles.map((f) => f.relativePath),
+        confidence: 0.8,
+        priority: 3
+      });
+    }
+    const hasTests = structure.testDirectories.length > 0;
+    if (!hasTests) {
+      insights.push({
+        type: "opportunity",
+        title: "No Test Directory Found",
+        description: "Consider adding automated tests to improve code quality and reliability.",
+        components: [],
+        confidence: 0.95,
+        priority: 5
+      });
+    }
+    return insights;
+  }
+  // Utility methods
+  shouldIgnore(relativePath, customIgnorePatterns) {
+    const patterns = [...this.defaultIgnorePatterns, ...customIgnorePatterns || []];
+    return patterns.some((pattern) => {
+      if (pattern.includes("*")) {
+        const regex = new RegExp(pattern.replace(/\*/g, ".*"));
+        return regex.test(relativePath);
+      }
+      return relativePath.includes(pattern);
+    });
+  }
+  isSourceFile(file) {
+    const sourceExtensions = [".ts", ".tsx", ".js", ".jsx", ".py", ".java", ".go", ".rs", ".cpp", ".c"];
+    return sourceExtensions.includes(file.extension);
+  }
+  isConfigFile(file) {
+    return this.configFilePatterns.some(
+      (pattern) => file.name === pattern || file.name.includes(pattern)
+    );
+  }
+  isTestFile(file) {
+    return file.relativePath.includes("test") || file.relativePath.includes("spec") || file.name.includes(".test.") || file.name.includes(".spec.");
+  }
+  calculateLanguageStats(files) {
+    const stats = {};
+    for (const file of files) {
+      if (file.isDirectory) continue;
+      const language = this.getLanguageFromExtension(file.extension);
+      if (language) {
+        if (!stats[language]) {
+          stats[language] = { fileCount: 0, lineCount: 0, fileSize: 0 };
+        }
+        stats[language].fileCount++;
+        stats[language].fileSize += file.size;
+      }
+    }
+    return stats;
+  }
+  getLanguageFromExtension(extension) {
+    for (const [language, extensions] of Object.entries(this.languageExtensions)) {
+      if (extensions.includes(extension)) {
+        return language;
+      }
+    }
+    return null;
+  }
+  determinePrimaryLanguage(stats) {
+    let maxFiles = 0;
+    let primaryLanguage = "Unknown";
+    for (const [language, stat] of Object.entries(stats)) {
+      if (stat.fileCount > maxFiles) {
+        maxFiles = stat.fileCount;
+        primaryLanguage = language;
+      }
+    }
+    return primaryLanguage;
+  }
+  async detectProjectType(rootPath, files) {
+    const packageJsonPath = path7__default.join(rootPath, "package.json");
+    try {
+      const packageJson = await fs4.readFile(packageJsonPath, "utf-8");
+      const pkg = JSON.parse(packageJson);
+      if (pkg.dependencies?.react || pkg.devDependencies?.react) return "react";
+      if (pkg.dependencies?.vue || pkg.devDependencies?.vue) return "vue";
+      if (pkg.dependencies?.angular || pkg.devDependencies?.angular) return "angular";
+      if (pkg.dependencies?.next || pkg.devDependencies?.next) return "nextjs";
+      if (pkg.dependencies?.express || pkg.devDependencies?.express) return "express";
+      return "node";
+    } catch {
+      if (files.some((f) => f.name === "requirements.txt")) return "python";
+      if (files.some((f) => f.name === "Cargo.toml")) return "rust";
+      if (files.some((f) => f.name === "go.mod")) return "go";
+      if (files.some((f) => f.name === "pom.xml")) return "java";
+      return "unknown";
+    }
+  }
+  // Placeholder implementations for complex analysis methods
+  async analyzeComponent(file) {
+    return {
+      name: path7__default.basename(file.name, file.extension),
+      path: file.relativePath,
+      type: this.inferComponentType(file),
+      description: `${this.inferComponentType(file)} component`,
+      complexity: Math.floor(Math.random() * 5) + 1,
+      // Placeholder
+      dependencies: [],
+      dependents: [],
+      lineCount: Math.floor(file.size / 50)
+      // Rough estimate
+    };
+  }
+  inferComponentType(file) {
+    if (this.isTestFile(file)) return "test";
+    if (this.isConfigFile(file)) return "config";
+    if (file.relativePath.includes("util")) return "utility";
+    if (file.extension === ".tsx" || file.extension === ".jsx") return "function";
+    return "module";
+  }
+  async extractDependencies(_file) {
+    return [];
+  }
+  detectCircularDependencies(_nodes, _edges) {
+    return [];
+  }
+  findCriticalPath(_nodes, _edges) {
+    return [];
+  }
+  async analyzeFileComplexity(_file) {
+    return {
+      cyclomatic: Math.floor(Math.random() * 15) + 1,
+      cognitive: Math.floor(Math.random() * 20) + 1,
+      maintainability: Math.floor(Math.random() * 40) + 60
+    };
+  }
+  async findEntryPoints(rootPath, files) {
+    const entryPoints = [];
+    const entryPatterns = ["index.js", "index.ts", "main.js", "main.ts", "app.js", "app.ts"];
+    for (const pattern of entryPatterns) {
+      const found = files.find((f) => f.name === pattern && !f.isDirectory);
+      if (found) {
+        entryPoints.push(found.relativePath);
+      }
+    }
+    return entryPoints;
+  }
+  findSourceDirectories(files) {
+    const sourceDirs = /* @__PURE__ */ new Set();
+    const sourcePatterns = ["src", "lib", "source"];
+    for (const file of files) {
+      if (file.isDirectory) {
+        for (const pattern of sourcePatterns) {
+          if (file.name === pattern || file.relativePath.includes(pattern)) {
+            sourceDirs.add(file.relativePath);
+          }
+        }
+      }
+    }
+    return Array.from(sourceDirs);
+  }
+  findTestDirectories(files) {
+    const testDirs = /* @__PURE__ */ new Set();
+    const testPatterns = ["test", "tests", "__tests__", "spec"];
+    for (const file of files) {
+      if (file.isDirectory) {
+        for (const pattern of testPatterns) {
+          if (file.name === pattern || file.relativePath.includes(pattern)) {
+            testDirs.add(file.relativePath);
+          }
+        }
+      }
+    }
+    return Array.from(testDirs);
+  }
+  findBuildDirectories(files) {
+    const buildDirs = /* @__PURE__ */ new Set();
+    const buildPatterns = ["dist", "build", "out", "target"];
+    for (const file of files) {
+      if (file.isDirectory) {
+        for (const pattern of buildPatterns) {
+          if (file.name === pattern) {
+            buildDirs.add(file.relativePath);
+          }
+        }
+      }
+    }
+    return Array.from(buildDirs);
+  }
+  async estimateSourceLines(files) {
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    return Math.floor(totalSize / 50);
+  }
+  isExternalDependency(file) {
+    return file.relativePath.includes("node_modules") || file.relativePath.includes("vendor") || file.relativePath.includes("third_party");
+  }
+  calculateImportance(file) {
+    let importance = Math.min(5, Math.floor(file.size / 1e4) + 1);
+    if (file.name.includes("index") || file.name.includes("main") || file.name.includes("app")) {
+      importance = Math.min(5, importance + 2);
+    }
+    return importance;
+  }
+};
+
+// src/services/plan-generator.ts
+var PlanGenerator = class {
+  constructor(agent) {
+    this.agent = agent;
+  }
+  /**
+   * Generate a comprehensive implementation plan
+   */
+  async generatePlan(options) {
+    try {
+      const context = this.buildGenerationContext(options.explorationData);
+      const strategy = await this.generateImplementationStrategy(options, context);
+      const actionPlan = await this.generateActionPlan(options, context, strategy);
+      const risks = await this.assessRisks(options, context, actionPlan);
+      const effort = await this.estimateEffort(actionPlan, context);
+      const successCriteria = await this.generateSuccessCriteria(options, context);
+      const plan = {
+        title: this.generatePlanTitle(options.userRequest),
+        description: this.generatePlanDescription(options.userRequest, context),
+        strategy,
+        actionPlan,
+        risks,
+        effort,
+        successCriteria,
+        createdAt: /* @__PURE__ */ new Date(),
+        version: "1.0"
+      };
+      return plan;
+    } catch (error) {
+      console.error("[PlanGenerator] Failed to generate plan:", error);
+      throw new Error(`Plan generation failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+  /**
+   * Build context for plan generation
+   */
+  buildGenerationContext(explorationData) {
+    return {
+      projectType: explorationData.projectStructure.projectType,
+      primaryLanguage: explorationData.projectStructure.primaryLanguage,
+      complexity: explorationData.complexity.overall,
+      hasTests: explorationData.projectStructure.testDirectories.length > 0,
+      architecturePatterns: explorationData.architecturePatterns.map((p) => p.name),
+      keyComponents: explorationData.keyComponents.core.map((c) => c.name)
+    };
+  }
+  /**
+   * Generate high-level implementation strategy
+   */
+  async generateImplementationStrategy(options, context) {
+    const strategyPrompt = this.buildStrategyPrompt(options, context);
+    const strategyResponse = await this.generateWithAI(strategyPrompt);
+    return {
+      approach: this.extractApproach(strategyResponse, options.userRequest),
+      principles: this.extractPrinciples(strategyResponse, context),
+      techStack: this.generateTechStackRecommendations(context, strategyResponse),
+      architectureDecisions: this.generateArchitectureDecisions(context, strategyResponse),
+      integrationPoints: this.identifyIntegrationPoints(options.explorationData, strategyResponse)
+    };
+  }
+  /**
+   * Generate detailed action plan
+   */
+  async generateActionPlan(options, context, strategy) {
+    const actionPrompt = this.buildActionPrompt(options, context, strategy);
+    const actionResponse = await this.generateWithAI(actionPrompt);
+    const steps = this.parseActionSteps(actionResponse, context);
+    const milestones = this.generateMilestones(steps);
+    const dependencies = this.analyzeDependencies(steps);
+    const parallelTracks = this.identifyParallelTracks(steps, dependencies);
+    return {
+      steps,
+      parallelTracks,
+      milestones,
+      dependencies
+    };
+  }
+  /**
+   * Assess implementation risks
+   */
+  async assessRisks(options, context, actionPlan) {
+    const risks = this.identifyRisks(options, context, actionPlan);
+    const mitigations = this.generateMitigations(risks, context);
+    const overallRisk = this.calculateOverallRisk(risks);
+    return {
+      overallRisk,
+      risks,
+      mitigations,
+      contingencies: this.generateContingencyPlans(risks, actionPlan)
+    };
+  }
+  /**
+   * Estimate implementation effort
+   */
+  async estimateEffort(actionPlan, context) {
+    const baseHours = actionPlan.steps.reduce((total, step) => total + step.effort, 0);
+    const complexityMultiplier = this.getComplexityMultiplier(context.complexity);
+    const experienceMultiplier = this.getExperienceMultiplier(context.primaryLanguage);
+    const totalHours = Math.round(baseHours * complexityMultiplier * experienceMultiplier);
+    const breakdownByType = this.calculateBreakdownByType(actionPlan.steps);
+    const breakdownByTrack = this.calculateBreakdownByTrack(actionPlan.parallelTracks, actionPlan.steps);
+    const confidence = this.calculateEstimateConfidence(context, actionPlan.steps.length);
+    const factors = this.identifyEstimationFactors(context);
+    const timeline = this.projectTimeline(totalHours, actionPlan.parallelTracks.length);
+    return {
+      totalHours,
+      breakdownByType,
+      breakdownByTrack,
+      confidence,
+      factors,
+      timeline
+    };
+  }
+  /**
+   * Build strategy generation prompt
+   */
+  buildStrategyPrompt(options, context) {
+    return `
+As an expert software architect, analyze this implementation request and provide a comprehensive strategy.
+
+**User Request:** ${options.userRequest}
+
+**Project Context:**
+- Type: ${context.projectType}
+- Language: ${context.primaryLanguage}
+- Complexity: ${context.complexity}/10
+- Has Tests: ${context.hasTests}
+- Architecture Patterns: ${context.architecturePatterns.join(", ")}
+- Key Components: ${context.keyComponents.join(", ")}
+
+**Additional Context:**
+${options.constraints ? `- Constraints: ${options.constraints.join(", ")}` : ""}
+${options.preferredApproach ? `- Preferred Approach: ${options.preferredApproach}` : ""}
+${options.timeConstraints ? `- Time Constraints: ${options.timeConstraints}` : ""}
+
+Please provide:
+1. **High-level approach** (1-2 sentences)
+2. **Key principles** (3-5 principles to guide implementation)
+3. **Technology recommendations** (specific to this project)
+4. **Architecture decisions** (major structural choices)
+5. **Integration considerations** (how this fits with existing code)
+
+Focus on practical, actionable guidance that considers the existing codebase structure and patterns.
+`;
+  }
+  /**
+   * Build action plan generation prompt
+   */
+  buildActionPrompt(options, context, strategy) {
+    return `
+Create a detailed, step-by-step action plan for this implementation:
+
+**Request:** ${options.userRequest}
+**Approach:** ${strategy.approach}
+
+**Context:**
+- Project: ${context.projectType} (${context.primaryLanguage})
+- Complexity: ${context.complexity}/10
+- Architecture: ${context.architecturePatterns.join(", ")}
+
+**Key Principles:**
+${strategy.principles.map((p) => `- ${p}`).join("\n")}
+
+Please provide a numbered list of specific, actionable steps. For each step include:
+1. **Title** (brief, actionable)
+2. **Description** (what exactly to do)
+3. **Type** (research/design/implement/test/document/deploy)
+4. **Effort** (estimated hours)
+5. **Files affected** (specific file paths when known)
+6. **Dependencies** (which steps must come first)
+
+Focus on:
+- Concrete, executable actions
+- Logical progression from setup to completion
+- Realistic effort estimates
+- Clear dependencies between steps
+- Integration with existing code patterns
+
+Provide 8-15 steps total, balancing thoroughness with practicality.
+`;
+  }
+  /**
+   * Generate strategy response using AI
+   */
+  async generateWithAI(prompt) {
+    try {
+      let response = "";
+      for await (const chunk of this.agent.processUserMessageStream(prompt)) {
+        if (chunk.type === "content" && chunk.content) {
+          response += chunk.content;
+        }
+      }
+      return response;
+    } catch (error) {
+      console.error("[PlanGenerator] AI generation failed:", error);
+      return this.getFallbackResponse(prompt);
+    }
+  }
+  /**
+   * Extract implementation approach from AI response
+   */
+  extractApproach(response, userRequest) {
+    const approachMatch = response.match(/(?:approach|strategy):\s*([^\n]+)/i);
+    if (approachMatch) {
+      return approachMatch[1].trim();
+    }
+    return `Implement ${userRequest} following existing project patterns and best practices`;
+  }
+  /**
+   * Extract key principles from AI response
+   */
+  extractPrinciples(response, _context) {
+    const principles = [];
+    const principlesSection = response.match(/principles?:\s*([\s\S]*?)(?:\n\n|\n[A-Z]|$)/i);
+    if (principlesSection) {
+      const lines = principlesSection[1].split("\n");
+      for (const line of lines) {
+        const cleaned = line.trim().replace(/^[-*•]\s*/, "");
+        if (cleaned.length > 10) {
+          principles.push(cleaned);
+        }
+      }
+    }
+    if (principles.length === 0) {
+      principles.push(
+        "Follow existing code patterns and conventions",
+        "Maintain backward compatibility",
+        "Write tests for new functionality",
+        "Document changes and new features",
+        "Ensure performance and security"
+      );
+    }
+    return principles.slice(0, 5);
+  }
+  /**
+   * Parse action steps from AI response
+   */
+  parseActionSteps(response, context) {
+    const steps = [];
+    const stepMatches = response.match(/\d+\.\s*\*\*([^*]+)\*\*[\s\S]*?(?=\d+\.\s*\*\*|\n\n|$)/g);
+    if (stepMatches) {
+      stepMatches.forEach((stepText, index) => {
+        const step = this.parseIndividualStep(stepText, index + 1, context);
+        if (step) {
+          steps.push(step);
+        }
+      });
+    }
+    if (steps.length === 0) {
+      steps.push(...this.generateFallbackSteps(context));
+    }
+    return steps;
+  }
+  /**
+   * Parse individual step from text
+   */
+  parseIndividualStep(stepText, order, context) {
+    const titleMatch = stepText.match(/\*\*([^*]+)\*\*/);
+    if (!titleMatch) return null;
+    const title = titleMatch[1].trim();
+    const description = this.extractStepDescription(stepText);
+    const type = this.inferStepType(title, description);
+    const effort = this.estimateStepEffort(title, description, type, context);
+    const affectedFiles = this.extractAffectedFiles(stepText);
+    return {
+      id: `step_${order}`,
+      title,
+      description,
+      type,
+      effort,
+      skills: this.inferRequiredSkills(type, context),
+      affectedFiles,
+      acceptanceCriteria: this.generateAcceptanceCriteria(title, type),
+      order
+    };
+  }
+  // Utility methods for plan generation
+  generatePlanTitle(userRequest) {
+    return `Implementation Plan: ${userRequest}`;
+  }
+  generatePlanDescription(userRequest, context) {
+    return `Comprehensive implementation plan for "${userRequest}" in ${context.primaryLanguage} ${context.projectType} project. This plan considers existing architecture patterns and maintains compatibility with current codebase structure.`;
+  }
+  generateSuccessCriteria(_options, _context) {
+    return Promise.resolve([
+      "Implementation meets functional requirements",
+      "Code follows existing patterns and conventions",
+      "All tests pass including new test coverage",
+      "Documentation is updated and complete",
+      "Performance meets or exceeds current benchmarks",
+      "Security requirements are satisfied",
+      "Integration with existing systems is seamless"
+    ]);
+  }
+  getFallbackResponse(_prompt) {
+    return `
+**Approach:** Implement the requested feature following established patterns and best practices.
+
+**Key Principles:**
+- Follow existing code conventions
+- Maintain backward compatibility  
+- Write comprehensive tests
+- Document all changes
+- Ensure performance and security
+
+**Steps:**
+1. **Analyze Requirements** - Review the request and existing code
+2. **Design Solution** - Plan the implementation approach
+3. **Implement Core** - Build the main functionality
+4. **Add Tests** - Create comprehensive test coverage
+5. **Document** - Update documentation and comments
+6. **Review** - Code review and refinement
+`;
+  }
+  // Additional utility methods would be implemented here for:
+  // - generateTechStackRecommendations
+  // - generateArchitectureDecisions
+  // - identifyIntegrationPoints
+  // - identifyRisks
+  // - generateMitigations
+  // - etc.
+  generateTechStackRecommendations(_context, _response) {
+    return [];
+  }
+  generateArchitectureDecisions(_context, _response) {
+    return [];
+  }
+  identifyIntegrationPoints(_explorationData, _response) {
+    return [];
+  }
+  identifyRisks(_options, _context, _actionPlan) {
+    return [];
+  }
+  generateMitigations(_risks, _context) {
+    return [];
+  }
+  calculateOverallRisk(risks) {
+    if (risks.length === 0) return "low";
+    const avgRisk = risks.reduce((sum, risk) => sum + risk.score, 0) / risks.length;
+    if (avgRisk < 2) return "low";
+    if (avgRisk < 4) return "medium";
+    if (avgRisk < 6) return "high";
+    return "critical";
+  }
+  generateContingencyPlans(_risks, _actionPlan) {
+    return [];
+  }
+  getComplexityMultiplier(complexity) {
+    return 1 + (complexity - 5) * 0.1;
+  }
+  getExperienceMultiplier(_language) {
+    return 1;
+  }
+  calculateBreakdownByType(steps) {
+    const breakdown = {};
+    for (const step of steps) {
+      breakdown[step.type] = (breakdown[step.type] || 0) + step.effort;
+    }
+    return breakdown;
+  }
+  calculateBreakdownByTrack(_tracks, _steps) {
+    return {};
+  }
+  calculateEstimateConfidence(context, stepCount) {
+    let confidence = 0.8;
+    if (context.complexity > 7) confidence -= 0.1;
+    if (stepCount > 15) confidence -= 0.1;
+    if (!context.hasTests) confidence -= 0.1;
+    return Math.max(0.5, confidence);
+  }
+  identifyEstimationFactors(_context) {
+    return [];
+  }
+  projectTimeline(totalHours, trackCount) {
+    const hoursPerDay = 6;
+    const sequentialDays = Math.ceil(totalHours / hoursPerDay);
+    const parallelDays = Math.ceil(sequentialDays / Math.max(1, trackCount));
+    return {
+      optimistic: `${Math.ceil(parallelDays * 0.8)} days`,
+      mostLikely: `${parallelDays} days`,
+      pessimistic: `${Math.ceil(parallelDays * 1.5)} days`,
+      recommendedStart: "As soon as possible",
+      criticalPath: `${sequentialDays} days if done sequentially`
+    };
+  }
+  generateMilestones(_steps) {
+    return [];
+  }
+  analyzeDependencies(_steps) {
+    return [];
+  }
+  identifyParallelTracks(_steps, _dependencies) {
+    return [];
+  }
+  extractStepDescription(stepText) {
+    const lines = stepText.split("\n").slice(1);
+    return lines.join(" ").replace(/\*\*/g, "").trim() || "Complete this step";
+  }
+  inferStepType(title, description) {
+    const text = (title + " " + description).toLowerCase();
+    if (text.includes("research") || text.includes("analyze") || text.includes("investigate")) return "research";
+    if (text.includes("design") || text.includes("plan") || text.includes("architect")) return "design";
+    if (text.includes("test") || text.includes("spec")) return "test";
+    if (text.includes("document") || text.includes("readme") || text.includes("comment")) return "document";
+    if (text.includes("deploy") || text.includes("publish") || text.includes("release")) return "deploy";
+    return "implement";
+  }
+  estimateStepEffort(title, description, type, context) {
+    let baseHours = 4;
+    switch (type) {
+      case "research":
+        baseHours = 2;
+        break;
+      case "design":
+        baseHours = 3;
+        break;
+      case "implement":
+        baseHours = 6;
+        break;
+      case "test":
+        baseHours = 3;
+        break;
+      case "document":
+        baseHours = 2;
+        break;
+      case "deploy":
+        baseHours = 2;
+        break;
+    }
+    const complexityMultiplier = 1 + (context.complexity - 5) * 0.1;
+    return Math.max(1, Math.round(baseHours * complexityMultiplier));
+  }
+  extractAffectedFiles(stepText) {
+    const fileMatches = stepText.match(/[\w.-]+\.(js|ts|jsx|tsx|py|java|go|rs|json|md|yml|yaml)/g);
+    return fileMatches || [];
+  }
+  inferRequiredSkills(type, context) {
+    const skills = [context.primaryLanguage];
+    switch (type) {
+      case "research":
+        skills.push("Analysis", "Documentation");
+        break;
+      case "design":
+        skills.push("Architecture", "System Design");
+        break;
+      case "implement":
+        skills.push("Programming", context.projectType);
+        break;
+      case "test":
+        skills.push("Testing", "QA");
+        break;
+      case "document":
+        skills.push("Technical Writing");
+        break;
+      case "deploy":
+        skills.push("DevOps", "Deployment");
+        break;
+    }
+    return skills;
+  }
+  generateAcceptanceCriteria(title, type) {
+    const criteria = [];
+    switch (type) {
+      case "implement":
+        criteria.push("Code compiles without errors");
+        criteria.push("Functionality works as specified");
+        criteria.push("Code follows project conventions");
+        break;
+      case "test":
+        criteria.push("All tests pass");
+        criteria.push("Test coverage meets requirements");
+        break;
+      case "document":
+        criteria.push("Documentation is complete and accurate");
+        criteria.push("Examples are provided where appropriate");
+        break;
+      default:
+        criteria.push("Step objectives are met");
+        criteria.push("Quality standards are maintained");
+    }
+    return criteria;
+  }
+  generateFallbackSteps(context) {
+    return [
+      {
+        id: "step_1",
+        title: "Analyze Requirements",
+        description: "Review the implementation requirements and existing codebase",
+        type: "research",
+        effort: 2,
+        skills: ["Analysis"],
+        affectedFiles: [],
+        acceptanceCriteria: ["Requirements are clearly understood"],
+        order: 1
+      },
+      {
+        id: "step_2",
+        title: "Design Solution",
+        description: "Create technical design for the implementation",
+        type: "design",
+        effort: 3,
+        skills: ["Design", context.primaryLanguage],
+        affectedFiles: [],
+        acceptanceCriteria: ["Design is documented and approved"],
+        order: 2
+      },
+      {
+        id: "step_3",
+        title: "Implement Core Functionality",
+        description: "Build the main implementation",
+        type: "implement",
+        effort: 6,
+        skills: ["Programming", context.primaryLanguage],
+        affectedFiles: [],
+        acceptanceCriteria: ["Core functionality works correctly"],
+        order: 3
+      }
+    ];
+  }
+};
+
+// src/services/read-only-tool-executor.ts
+var ReadOnlyToolExecutor = class {
+  constructor(agent) {
+    this.agent = agent;
+    this.executionLog = [];
+    this.insights = [];
+  }
+  /**
+   * Execute a tool in read-only mode
+   */
+  async executeReadOnly(toolName, args) {
+    const timestamp = /* @__PURE__ */ new Date();
+    if (this.isDestructiveTool(toolName)) {
+      const result = await this.simulateDestructiveTool(toolName, args);
+      this.logExecution(toolName, args, timestamp, result, true);
+      return result;
+    }
+    try {
+      const originalResult = await this.executeSafeTool(toolName, args);
+      const result = {
+        ...originalResult,
+        originalTool: toolName,
+        wasBlocked: false,
+        insights: this.extractInsights(toolName, args, originalResult)
+      };
+      this.logExecution(toolName, args, timestamp, result, false);
+      return result;
+    } catch (error) {
+      const result = {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        originalTool: toolName,
+        wasBlocked: false
+      };
+      this.logExecution(toolName, args, timestamp, result, false);
+      return result;
+    }
+  }
+  /**
+   * Check if a tool is destructive (modifies files)
+   */
+  isDestructiveTool(toolName) {
+    const destructiveTools = [
+      "write",
+      "edit",
+      "str_replace",
+      "create",
+      "delete",
+      "move",
+      "rename",
+      "multiedit",
+      "bash"
+      // Most bash commands can be destructive
+    ];
+    return destructiveTools.includes(toolName.toLowerCase());
+  }
+  /**
+   * Simulate execution of destructive tools for analysis
+   */
+  async simulateDestructiveTool(toolName, args) {
+    const insights = [];
+    let simulationResult = null;
+    switch (toolName.toLowerCase()) {
+      case "write":
+      case "create":
+        simulationResult = await this.simulateFileCreation(args);
+        insights.push(`Would create file: ${args.file_path || args.path}`);
+        insights.push(`Content length: ${args.content?.length || 0} characters`);
+        break;
+      case "edit":
+      case "str_replace":
+        simulationResult = await this.simulateFileEdit(args);
+        insights.push(`Would modify file: ${args.file_path || args.path}`);
+        insights.push(`Change type: ${args.old_string ? "string replacement" : "content edit"}`);
+        break;
+      case "multiedit":
+        simulationResult = await this.simulateMultiEdit(args);
+        insights.push(`Would perform multi-file operation on ${args.edits?.length || 0} files`);
+        break;
+      case "bash":
+        simulationResult = await this.simulateBashCommand(args);
+        insights.push(`Would execute: ${args.command}`);
+        insights.push(`Command type: ${this.categorizeBashCommand(args.command)}`);
+        break;
+      default:
+        simulationResult = { simulated: true, action: `${toolName} operation` };
+        insights.push(`Would execute ${toolName} with provided arguments`);
+    }
+    return {
+      success: true,
+      output: `[PLAN MODE - READ ONLY] Simulated ${toolName} operation`,
+      originalTool: toolName,
+      wasBlocked: true,
+      simulationResult,
+      insights
+    };
+  }
+  /**
+   * Execute safe (read-only) tools
+   */
+  async executeSafeTool(toolName, args) {
+    return this.simulateReadOnlyToolExecution({ name: toolName, arguments: args });
+  }
+  /**
+   * Simulate tool execution for read-only operations
+   */
+  simulateReadOnlyToolExecution(toolCall) {
+    const { name, arguments: args } = toolCall;
+    switch (name.toLowerCase()) {
+      case "view_file":
+      case "read":
+        return {
+          success: true,
+          output: `[PLAN MODE] Would read file: ${args.file_path || args.path}
+Lines: ${args.start_line || 1}-${args.end_line || "end"}`
+        };
+      case "search":
+      case "grep":
+        return {
+          success: true,
+          output: `[PLAN MODE] Would search for pattern: ${args.pattern || args.query}
+In path: ${args.path || "current directory"}`
+        };
+      case "bash":
+        if (this.isSafeBashCommand(args.command)) {
+          return {
+            success: true,
+            output: `[PLAN MODE] Would execute safe command: ${args.command}`
+          };
+        } else {
+          return {
+            success: false,
+            error: `Command blocked in Plan Mode (potentially destructive): ${args.command}`
+          };
+        }
+      default:
+        return {
+          success: true,
+          output: `[PLAN MODE] Would execute ${name} with provided arguments`
+        };
+    }
+  }
+  /**
+   * Check if bash command is safe (read-only)
+   */
+  isSafeBashCommand(command) {
+    const safeCommands = [
+      "ls",
+      "cat",
+      "head",
+      "tail",
+      "grep",
+      "find",
+      "wc",
+      "sort",
+      "uniq",
+      "pwd",
+      "whoami",
+      "date",
+      "ps",
+      "top",
+      "df",
+      "du",
+      "free",
+      "git status",
+      "git log",
+      "git diff",
+      "git branch",
+      "git show",
+      "npm list",
+      "yarn list",
+      "pip list",
+      "composer show"
+    ];
+    const cmd = command.trim().toLowerCase();
+    return safeCommands.some((safe) => cmd.startsWith(safe)) && !this.containsDestructiveOperators(command);
+  }
+  /**
+   * Check for destructive operators in bash commands
+   */
+  containsDestructiveOperators(command) {
+    const destructivePatterns = [
+      ">",
+      // Redirect (can overwrite files)
+      ">>",
+      // Append redirect
+      "rm ",
+      "mv ",
+      "cp ",
+      "mkdir ",
+      "rmdir ",
+      "chmod ",
+      "chown ",
+      "ln ",
+      "curl.*-o",
+      "wget.*-o",
+      // Download with output
+      "sudo ",
+      "su ",
+      "&&.*rm",
+      "||.*rm"
+      // Chained destructive commands
+    ];
+    return destructivePatterns.some((pattern) => {
+      const regex = new RegExp(pattern, "i");
+      return regex.test(command);
+    });
+  }
+  /**
+   * Simulate file creation
+   */
+  async simulateFileCreation(args) {
+    const filePath = args.file_path || args.path;
+    const content = args.content || "";
+    return {
+      action: "create_file",
+      path: filePath,
+      contentLength: content.length,
+      contentPreview: content.substring(0, 200),
+      estimatedLines: content.split("\n").length,
+      fileType: this.getFileType(filePath)
+    };
+  }
+  /**
+   * Simulate file editing
+   */
+  async simulateFileEdit(args) {
+    const filePath = args.file_path || args.path;
+    try {
+      return {
+        action: "edit_file",
+        path: filePath,
+        simulated: true,
+        old_string: args.old_string || "",
+        new_string: args.new_string || "",
+        change_preview: `Would replace "${args.old_string || "content"}" with "${args.new_string || "new content"}"`
+      };
+    } catch (error) {
+      return {
+        action: "edit_file",
+        path: filePath,
+        error: error instanceof Error ? error.message : "Analysis failed"
+      };
+    }
+  }
+  /**
+   * Simulate multi-file editing
+   */
+  async simulateMultiEdit(args) {
+    const edits = args.edits || [];
+    return {
+      action: "multi_edit",
+      fileCount: 1,
+      // args.file_path ? 1 : 0,
+      editCount: edits.length,
+      estimatedChanges: edits.reduce((sum, edit) => {
+        return sum + ((edit.new_string?.length || 0) - (edit.old_string?.length || 0));
+      }, 0)
+    };
+  }
+  /**
+   * Simulate bash command execution
+   */
+  async simulateBashCommand(args) {
+    const command = args.command || "";
+    return {
+      action: "bash_command",
+      command,
+      category: this.categorizeBashCommand(command),
+      risk: this.assessCommandRisk(command),
+      wouldExecute: this.isSafeBashCommand(command)
+    };
+  }
+  /**
+   * Categorize bash command type
+   */
+  categorizeBashCommand(command) {
+    const cmd = command.trim().toLowerCase();
+    if (cmd.startsWith("git ")) return "version_control";
+    if (cmd.startsWith("npm ") || cmd.startsWith("yarn ") || cmd.startsWith("pnpm ")) return "package_manager";
+    if (cmd.startsWith("ls") || cmd.startsWith("find") || cmd.startsWith("grep")) return "file_exploration";
+    if (cmd.startsWith("cat") || cmd.startsWith("head") || cmd.startsWith("tail")) return "file_reading";
+    if (cmd.includes("rm ") || cmd.includes("mv ") || cmd.includes("cp ")) return "file_modification";
+    if (cmd.includes(">") || cmd.includes(">>")) return "file_creation";
+    if (cmd.startsWith("mkdir") || cmd.startsWith("rmdir")) return "directory_management";
+    if (cmd.startsWith("chmod") || cmd.startsWith("chown")) return "permission_management";
+    return "general";
+  }
+  /**
+   * Assess command risk level
+   */
+  assessCommandRisk(command) {
+    if (this.isSafeBashCommand(command)) return "low";
+    if (command.includes("rm ") || command.includes("sudo ")) return "high";
+    return "medium";
+  }
+  /**
+   * Extract insights from tool execution
+   */
+  extractInsights(toolName, args, result) {
+    const insights = [];
+    switch (toolName.toLowerCase()) {
+      case "read":
+        if (result.success && result.output) {
+          const lines = result.output.split("\n").length;
+          insights.push(`File contains ${lines} lines`);
+          const fileType = this.getFileType(args.file_path);
+          if (fileType) {
+            insights.push(`File type: ${fileType}`);
+          }
+        }
+        break;
+      case "grep":
+        if (result.success && result.output) {
+          const matches = result.output.split("\n").filter((line) => line.trim()).length;
+          insights.push(`Found ${matches} matches for pattern`);
+        }
+        break;
+      case "ls":
+        if (result.success && result.output) {
+          const items = result.output.split("\n").filter((line) => line.trim()).length;
+          insights.push(`Directory contains ${items} items`);
+        }
+        break;
+    }
+    return insights;
+  }
+  /**
+   * Get file type from path
+   */
+  getFileType(filePath) {
+    const extension = filePath.split(".").pop()?.toLowerCase();
+    const typeMap = {
+      "js": "JavaScript",
+      "ts": "TypeScript",
+      "jsx": "React JSX",
+      "tsx": "React TSX",
+      "py": "Python",
+      "java": "Java",
+      "go": "Go",
+      "rs": "Rust",
+      "json": "JSON",
+      "md": "Markdown",
+      "yml": "YAML",
+      "yaml": "YAML",
+      "html": "HTML",
+      "css": "CSS",
+      "scss": "SCSS"
+    };
+    return typeMap[extension || ""] || "Unknown";
+  }
+  /**
+   * Log tool execution
+   */
+  logExecution(toolName, args, timestamp, result, blocked) {
+    this.executionLog.push({
+      toolName,
+      arguments: args,
+      timestamp,
+      result,
+      blocked
+    });
+    if (result.insights) {
+      this.insights.push(...result.insights);
+    }
+  }
+  /**
+   * Get execution summary
+   */
+  getExecutionSummary() {
+    const toolsUsed = [...new Set(this.executionLog.map((log) => log.toolName))];
+    const blockedCount = this.executionLog.filter((log) => log.blocked).length;
+    return {
+      totalExecutions: this.executionLog.length,
+      blockedExecutions: blockedCount,
+      allowedExecutions: this.executionLog.length - blockedCount,
+      insights: [...new Set(this.insights)],
+      // Deduplicate insights
+      toolsUsed
+    };
+  }
+  /**
+   * Get detailed execution log
+   */
+  getExecutionLog() {
+    return [...this.executionLog];
+  }
+  /**
+   * Clear execution log and insights
+   */
+  clearLog() {
+    this.executionLog = [];
+    this.insights = [];
+  }
+};
+
+// src/hooks/use-plan-mode.ts
+var DEFAULT_SETTINGS = {
+  maxExplorationDepth: 5,
+  maxFileSize: 1024 * 1024,
+  // 1MB
+  planGenerationTimeout: 3e4,
+  // 30 seconds
+  enableDetailedLogging: true,
+  autoSavePlans: true,
+  planSaveDirectory: ".grok/plans"
+};
+var INITIAL_STATE = {
+  active: false,
+  phase: "inactive",
+  currentPlan: null,
+  userApproval: false,
+  explorationData: null,
+  sessionStartTime: null
+};
+function usePlanMode(settings = {}, agent) {
+  const [state, setState] = useState(INITIAL_STATE);
+  const [eventEmitter] = useState(() => new EventEmitter());
+  const [mergedSettings] = useState({ ...DEFAULT_SETTINGS, ...settings });
+  const [codebaseExplorer] = useState(
+    () => agent ? new CodebaseExplorer(mergedSettings) : null
+  );
+  const [planGenerator] = useState(
+    () => agent ? new PlanGenerator(agent) : null
+  );
+  const [readOnlyExecutor] = useState(
+    () => agent ? new ReadOnlyToolExecutor(agent) : null
+  );
+  const emitEvent = useCallback((event, data) => {
+    eventEmitter.emit(event, data);
+    if (mergedSettings.enableDetailedLogging) {
+      console.log(`[PlanMode] ${event}:`, data);
+    }
+  }, [eventEmitter, mergedSettings.enableDetailedLogging]);
+  const activatePlanMode = useCallback(async (_options = {}) => {
+    if (state.active) {
+      console.warn("[PlanMode] Already active, ignoring activation request");
+      return false;
+    }
+    const newState = {
+      ...INITIAL_STATE,
+      active: true,
+      phase: "analysis",
+      sessionStartTime: /* @__PURE__ */ new Date()
+    };
+    setState(newState);
+    emitEvent("plan-mode-activated", { timestamp: /* @__PURE__ */ new Date() });
+    emitEvent("phase-changed", {
+      from: "inactive",
+      to: "analysis",
+      timestamp: /* @__PURE__ */ new Date()
+    });
+    return true;
+  }, [state.active, emitEvent]);
+  const deactivatePlanMode = useCallback((reason = "user_requested") => {
+    if (!state.active) {
+      return;
+    }
+    setState(INITIAL_STATE);
+    emitEvent("plan-mode-deactivated", { timestamp: /* @__PURE__ */ new Date(), reason });
+    emitEvent("phase-changed", {
+      from: state.phase,
+      to: "inactive",
+      timestamp: /* @__PURE__ */ new Date()
+    });
+  }, [state.active, state.phase, emitEvent]);
+  const changePhase = useCallback((newPhase) => {
+    if (!state.active || state.phase === newPhase) {
+      return;
+    }
+    const oldPhase = state.phase;
+    setState((prev) => ({ ...prev, phase: newPhase }));
+    emitEvent("phase-changed", {
+      from: oldPhase,
+      to: newPhase,
+      timestamp: /* @__PURE__ */ new Date()
+    });
+  }, [state.active, state.phase, emitEvent]);
+  const updateExplorationData = useCallback((data) => {
+    setState((prev) => ({ ...prev, explorationData: data }));
+    const progress = data.exploredPaths.length / (mergedSettings.maxExplorationDepth * 10);
+    emitEvent("exploration-progress", {
+      progress: Math.min(progress, 1),
+      currentPath: data.exploredPaths[data.exploredPaths.length - 1] || ""
+    });
+  }, [emitEvent, mergedSettings.maxExplorationDepth]);
+  const setImplementationPlan = useCallback((plan) => {
+    setState((prev) => ({ ...prev, currentPlan: plan }));
+    emitEvent("plan-generated", { plan, timestamp: /* @__PURE__ */ new Date() });
+    if (mergedSettings.autoSavePlans) {
+      console.log("[PlanMode] Auto-saving plan:", plan.title);
+    }
+  }, [emitEvent, mergedSettings.autoSavePlans]);
+  const approvePlan = useCallback(() => {
+    if (!state.currentPlan) {
+      console.warn("[PlanMode] No plan to approve");
+      return false;
+    }
+    setState((prev) => ({ ...prev, userApproval: true, phase: "approved" }));
+    emitEvent("plan-approved", { plan: state.currentPlan, timestamp: /* @__PURE__ */ new Date() });
+    return true;
+  }, [state.currentPlan, emitEvent]);
+  const rejectPlan = useCallback((reason = "user_rejected") => {
+    if (!state.currentPlan) {
+      console.warn("[PlanMode] No plan to reject");
+      return false;
+    }
+    setState((prev) => ({ ...prev, userApproval: false, phase: "rejected" }));
+    emitEvent("plan-rejected", {
+      plan: state.currentPlan,
+      reason,
+      timestamp: /* @__PURE__ */ new Date()
+    });
+    return true;
+  }, [state.currentPlan, emitEvent]);
+  const startExecution = useCallback(() => {
+    if (!state.currentPlan || !state.userApproval) {
+      console.warn("[PlanMode] Cannot start execution: no approved plan");
+      return false;
+    }
+    emitEvent("execution-started", { plan: state.currentPlan, timestamp: /* @__PURE__ */ new Date() });
+    deactivatePlanMode("execution_started");
+    return true;
+  }, [state.currentPlan, state.userApproval, emitEvent, deactivatePlanMode]);
+  const startExploration = useCallback(async (userRequest) => {
+    if (!codebaseExplorer || !state.active) {
+      console.warn("[PlanMode] Cannot start exploration: explorer not available or plan mode not active");
+      return false;
+    }
+    try {
+      changePhase("analysis");
+      const explorationData = await codebaseExplorer.exploreCodebase({
+        rootPath: process.cwd(),
+        maxDepth: mergedSettings.maxExplorationDepth,
+        maxFileSize: mergedSettings.maxFileSize
+      });
+      updateExplorationData(explorationData);
+      if (userRequest && planGenerator) {
+        await generatePlan(userRequest);
+      } else {
+        changePhase("strategy");
+      }
+      return true;
+    } catch (error) {
+      console.error("[PlanMode] Exploration failed:", error);
+      return false;
+    }
+  }, [codebaseExplorer, state.active, changePhase, updateExplorationData, mergedSettings, planGenerator]);
+  const generatePlan = useCallback(async (userRequest) => {
+    if (!planGenerator || !state.explorationData) {
+      console.warn("[PlanMode] Cannot generate plan: generator not available or no exploration data");
+      return false;
+    }
+    try {
+      changePhase("strategy");
+      const plan = await planGenerator.generatePlan({
+        userRequest,
+        explorationData: state.explorationData
+      });
+      setImplementationPlan(plan);
+      changePhase("presentation");
+      return true;
+    } catch (error) {
+      console.error("[PlanMode] Plan generation failed:", error);
+      return false;
+    }
+  }, [planGenerator, state.explorationData, changePhase, setImplementationPlan]);
+  const executeReadOnlyTool = useCallback(async (toolName, args) => {
+    if (!readOnlyExecutor) {
+      console.warn("[PlanMode] Read-only executor not available");
+      return null;
+    }
+    return await readOnlyExecutor.executeReadOnly(toolName, args);
+  }, [readOnlyExecutor]);
+  const onEvent = useCallback((event, listener) => {
+    eventEmitter.on(event, listener);
+    return () => eventEmitter.off(event, listener);
+  }, [eventEmitter]);
+  const getSessionDuration = useCallback(() => {
+    if (!state.sessionStartTime) return 0;
+    return Date.now() - state.sessionStartTime.getTime();
+  }, [state.sessionStartTime]);
+  const isInPhase = useCallback((phase) => {
+    return state.active && state.phase === phase;
+  }, [state.active, state.phase]);
+  const getProgress = useCallback(() => {
+    switch (state.phase) {
+      case "inactive":
+        return 0;
+      case "analysis":
+        if (!state.explorationData) return 0.1;
+        return Math.min(0.4, 0.1 + state.explorationData.exploredPaths.length / 20 * 0.3);
+      case "strategy":
+        return 0.5;
+      case "presentation":
+        return 0.8;
+      case "approved":
+      case "rejected":
+        return 1;
+      default:
+        return 0;
+    }
+  }, [state.phase, state.explorationData]);
+  useEffect(() => {
+    return () => {
+      if (state.active) {
+        deactivatePlanMode("component_unmount");
+      }
+    };
+  }, [state.active, deactivatePlanMode]);
+  return {
+    // State
+    state,
+    settings: mergedSettings,
+    // Computed properties
+    isActive: state.active,
+    currentPhase: state.phase,
+    hasApprovedPlan: state.userApproval && !!state.currentPlan,
+    sessionDuration: getSessionDuration(),
+    progress: getProgress(),
+    // Actions
+    activatePlanMode,
+    deactivatePlanMode,
+    changePhase,
+    updateExplorationData,
+    setImplementationPlan,
+    approvePlan,
+    rejectPlan,
+    startExecution,
+    // Plan Mode specific actions
+    startExploration,
+    generatePlan,
+    executeReadOnlyTool,
+    // Utilities
+    onEvent,
+    isInPhase,
+    // Data accessors
+    explorationData: state.explorationData,
+    currentPlan: state.currentPlan,
+    // Service accessors
+    readOnlyExecutor
   };
 }
 var MAX_SUGGESTIONS = 8;
@@ -12440,7 +14146,7 @@ var SubagentFramework = class {
     }
     this.activeTasks.delete(task.id);
   }
-  async executeInIsolatedContext(context, config2) {
+  async executeInIsolatedContext(context, _config) {
     switch (context.type) {
       case "docgen":
         return this.simulateDocGenAgent(context);
@@ -12484,7 +14190,7 @@ This is a generated document for ${projectPath}.
     };
   }
   async simulatePRDAssistantAgent(context) {
-    const { prdPath, prdContent } = context.data;
+    const { prdPath: _prdPath, prdContent: _prdContent } = context.data;
     await this.delay(1500);
     return {
       output: {
@@ -12502,7 +14208,7 @@ This is a generated document for ${projectPath}.
     };
   }
   async simulateDeltaAgent(context) {
-    const { fromCommit, toCommit } = context.data;
+    const { fromCommit, toCommit: _toCommit } = context.data;
     await this.delay(1e3);
     return {
       output: {
@@ -12516,7 +14222,7 @@ This is a generated document for ${projectPath}.
     };
   }
   async simulateTokenOptimizerAgent(context) {
-    const { currentTokens, targetReduction } = context.data;
+    const { currentTokens, targetReduction: _targetReduction } = context.data;
     await this.delay(500);
     return {
       output: {
@@ -12555,7 +14261,7 @@ This is a generated document for ${projectPath}.
     };
   }
   async simulateSentinelAgent(context) {
-    const { errorLogs, recentCommands } = context.data;
+    const { errorLogs: _errorLogs, recentCommands: _recentCommands } = context.data;
     await this.delay(800);
     return {
       output: {
@@ -12569,7 +14275,7 @@ This is a generated document for ${projectPath}.
     };
   }
   async simulateRegressionHunterAgent(context) {
-    const { proposedChanges, knownFailures } = context.data;
+    const { proposedChanges: _proposedChanges, knownFailures: _knownFailures } = context.data;
     await this.delay(1200);
     return {
       output: {
@@ -12583,7 +14289,7 @@ This is a generated document for ${projectPath}.
     };
   }
   async simulateGuardrailAgent(context) {
-    const { planDescription, rules } = context.data;
+    const { planDescription: _planDescription, rules: _rules } = context.data;
     await this.delay(600);
     return {
       output: {
@@ -13094,7 +14800,7 @@ async function checkForUpdates() {
       isUpdateAvailable,
       updateCommand: `npm update -g ${package_default.name}@latest`
     };
-  } catch (error) {
+  } catch {
     return {
       current: package_default.version,
       latest: package_default.version,
@@ -13156,7 +14862,8 @@ function useInputHandler({
   processingStartTime,
   isProcessing,
   isStreaming,
-  isConfirmationActive = false
+  isConfirmationActive = false,
+  onGlobalShortcut
 }) {
   const [showCommandSuggestions, setShowCommandSuggestions] = useState(false);
   const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
@@ -13167,18 +14874,55 @@ function useInputHandler({
     const sessionFlags = confirmationService.getSessionFlags();
     return sessionFlags.allOperations;
   });
+  const [shiftTabPressCount, setShiftTabPressCount] = useState(0);
+  const [lastShiftTabTime, setLastShiftTabTime] = useState(0);
+  const planMode = usePlanMode({}, agent);
   const handleSpecialKey = (key) => {
     if (isConfirmationActive) {
       return true;
     }
     if (key.shift && key.tab) {
-      const newAutoEditState = !autoEditEnabled;
-      setAutoEditEnabled(newAutoEditState);
-      const confirmationService = ConfirmationService.getInstance();
-      if (newAutoEditState) {
-        confirmationService.setSessionFlag("allOperations", true);
+      const now = Date.now();
+      const timeSinceLastPress = now - lastShiftTabTime;
+      if (timeSinceLastPress > 2e3) {
+        setShiftTabPressCount(1);
       } else {
-        confirmationService.resetSession();
+        setShiftTabPressCount((prev) => prev + 1);
+      }
+      setLastShiftTabTime(now);
+      if (shiftTabPressCount >= 2) {
+        if (!planMode.isActive) {
+          planMode.activatePlanMode();
+          const planModeEntry = {
+            type: "assistant",
+            content: "\u{1F3AF} **Plan Mode Activated**\n\nEntering read-only exploration mode. I'll analyze your codebase and formulate an implementation strategy before making any changes.\n\n**What I'm doing:**\n\u2022 Exploring project structure\n\u2022 Analyzing dependencies and patterns\n\u2022 Identifying key components\n\u2022 Formulating implementation approach\n\nOnce complete, I'll present a detailed plan for your approval.\n\n\u{1F4A1} **Tip**: Describe what you want to implement and I'll create a comprehensive plan first.",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, planModeEntry]);
+          planMode.startExploration();
+          setShiftTabPressCount(0);
+          return true;
+        } else {
+          planMode.deactivatePlanMode("user_requested");
+          const exitEntry = {
+            type: "assistant",
+            content: "\u{1F3AF} **Plan Mode Deactivated**\n\nExiting plan mode and returning to normal operation.",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, exitEntry]);
+          setShiftTabPressCount(0);
+          return true;
+        }
+      } else if (shiftTabPressCount === 1) {
+        const newAutoEditState = !autoEditEnabled;
+        setAutoEditEnabled(newAutoEditState);
+        const confirmationService = ConfirmationService.getInstance();
+        if (newAutoEditState) {
+          confirmationService.setSessionFlag("allOperations", true);
+        } else {
+          confirmationService.resetSession();
+        }
+        setTimeout(() => setShiftTabPressCount(0), 2500);
       }
       return true;
     }
@@ -13323,6 +15067,9 @@ function useInputHandler({
     disabled: isConfirmationActive
   });
   useInput((inputChar, key) => {
+    if (onGlobalShortcut && onGlobalShortcut(inputChar, key)) {
+      return;
+    }
     handleInput(inputChar, key);
   });
   useEffect(() => {
@@ -14541,13 +16288,13 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
     commandSuggestions,
     availableModels,
     agent,
-    autoEditEnabled
+    autoEditEnabled,
+    // Plan mode state and actions
+    planMode
   };
 }
 
 // src/ui/colors.ts
-var colors = {
-  };
 var inkColors = {
   primary: "cyan",
   success: "green",
@@ -14715,8 +16462,8 @@ var Colors = {
   AccentYellow: "yellow",
   Gray: "gray"};
 var MaxSizedBox = ({
-  maxHeight,
-  maxWidth,
+  maxHeight: _maxHeight,
+  maxWidth: _maxWidth,
   children,
   ...props
 }) => {
@@ -15165,7 +16912,7 @@ function ChatInput({
 }
 function MCPStatus({}) {
   const [connectedServers, setConnectedServers] = useState([]);
-  const [availableTools, setAvailableTools] = useState([]);
+  const [_availableTools, setAvailableTools] = useState([]);
   useEffect(() => {
     const updateStatus = () => {
       try {
@@ -15174,7 +16921,7 @@ function MCPStatus({}) {
         const tools = manager.getTools();
         setConnectedServers(servers);
         setAvailableTools(tools);
-      } catch (error) {
+      } catch (_error) {
         setConnectedServers([]);
         setAvailableTools([]);
       }
@@ -15560,37 +17307,135 @@ function Banner({
     ] })
   ] });
 }
-function ContextTooltip({ isVisible }) {
+function useContextInfo() {
   const [contextInfo, setContextInfo] = useState({
     workspaceFiles: 0,
     indexSize: "0 MB",
     sessionFiles: 0,
     activeTokens: 0,
-    lastActivity: "Now"
+    lastActivity: "Now",
+    memoryPressure: "low",
+    isLoading: true
   });
-  useEffect(() => {
-    const updateContextInfo = async () => {
-      try {
-        const info = {
-          workspaceFiles: await getWorkspaceFileCount(),
-          indexSize: await getIndexSize(),
-          sessionFiles: await getSessionFileCount(),
-          activeTokens: 0,
-          // TODO: Get from token counter
-          lastActivity: "Now",
-          gitBranch: await getGitBranch(),
-          projectName: await getProjectName()
-        };
-        setContextInfo(info);
-      } catch {
-      }
-    };
-    if (isVisible) {
-      updateContextInfo();
-      const interval = setInterval(updateContextInfo, 5e3);
-      return () => clearInterval(interval);
+  const updateContextInfo = async () => {
+    try {
+      const info = {
+        workspaceFiles: await getWorkspaceFileCount(),
+        indexSize: await getIndexSize(),
+        sessionFiles: await getSessionFileCount(),
+        activeTokens: 0,
+        // TODO: Get from token counter
+        lastActivity: "Now",
+        gitBranch: await getGitBranch(),
+        projectName: await getProjectName(),
+        memoryPressure: getMemoryPressure(),
+        isLoading: false
+      };
+      setContextInfo(info);
+    } catch (error) {
+      console.warn("[ContextInfo] Failed to update context:", error);
+      setContextInfo((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [isVisible]);
+  };
+  useEffect(() => {
+    updateContextInfo();
+    const interval = setInterval(updateContextInfo, 1e4);
+    return () => clearInterval(interval);
+  }, []);
+  return {
+    contextInfo,
+    updateContextInfo,
+    refreshContext: updateContextInfo
+  };
+}
+async function getWorkspaceFileCount() {
+  try {
+    const cwd = process.cwd();
+    const entries = await fs__default.promises.readdir(cwd, { withFileTypes: true });
+    let count = 0;
+    for (const entry of entries) {
+      if (entry.isFile() && !shouldIgnoreFile(entry.name)) {
+        count++;
+      } else if (entry.isDirectory() && !shouldIgnoreDirectory(entry.name)) {
+        try {
+          const subEntries = await fs__default.promises.readdir(path7__default.join(cwd, entry.name), { withFileTypes: true });
+          count += subEntries.filter((sub) => sub.isFile() && !shouldIgnoreFile(sub.name)).length;
+        } catch {
+        }
+      }
+    }
+    return count;
+  } catch {
+    return 0;
+  }
+}
+function shouldIgnoreFile(filename) {
+  return filename.startsWith(".") || filename.endsWith(".log") || filename.includes(".tmp");
+}
+function shouldIgnoreDirectory(dirname5) {
+  const ignoreDirs = ["node_modules", ".git", "dist", "build", ".next", "coverage"];
+  return ignoreDirs.includes(dirname5) || dirname5.startsWith(".");
+}
+async function getIndexSize() {
+  try {
+    const indexPath = path7__default.join(process.cwd(), ".grok", "index.json");
+    if (fs__default.existsSync(indexPath)) {
+      const stats = await fs__default.promises.stat(indexPath);
+      const mb = stats.size / (1024 * 1024);
+      return mb > 1 ? `${mb.toFixed(1)} MB` : `${(stats.size / 1024).toFixed(1)} KB`;
+    }
+  } catch {
+  }
+  return "0 MB";
+}
+async function getSessionFileCount() {
+  try {
+    const sessionPath = path7__default.join(os__default.homedir(), ".grok", "session.log");
+    if (fs__default.existsSync(sessionPath)) {
+      const content = await fs__default.promises.readFile(sessionPath, "utf8");
+      return content.split("\n").filter((line) => line.trim()).length;
+    }
+  } catch {
+  }
+  return 0;
+}
+async function getGitBranch() {
+  try {
+    const gitPath = path7__default.join(process.cwd(), ".git", "HEAD");
+    if (fs__default.existsSync(gitPath)) {
+      const content = await fs__default.promises.readFile(gitPath, "utf8");
+      const match = content.match(/ref: refs\/heads\/(.+)/);
+      return match ? match[1].trim() : "detached";
+    }
+  } catch {
+  }
+  return void 0;
+}
+async function getProjectName() {
+  try {
+    const packagePath = path7__default.join(process.cwd(), "package.json");
+    if (fs__default.existsSync(packagePath)) {
+      const content = await fs__default.promises.readFile(packagePath, "utf8");
+      const pkg = JSON.parse(content);
+      return pkg.name;
+    }
+  } catch {
+  }
+  return path7__default.basename(process.cwd());
+}
+function getMemoryPressure() {
+  try {
+    const memUsage = process.memoryUsage();
+    const heapUsedMB = memUsage.heapUsed / 1024 / 1024;
+    if (heapUsedMB > 200) return "high";
+    if (heapUsedMB > 100) return "medium";
+    return "low";
+  } catch {
+    return "low";
+  }
+}
+function ContextTooltip({ isVisible }) {
+  const { contextInfo } = useContextInfo();
   if (!isVisible) return null;
   return /* @__PURE__ */ jsxs(
     Box,
@@ -15668,64 +17513,6 @@ function ContextTooltip({ isVisible }) {
     }
   );
 }
-async function getWorkspaceFileCount() {
-  try {
-    const cwd = process.cwd();
-    const files = await fs__default.promises.readdir(cwd, { recursive: true });
-    return files.filter(
-      (file) => typeof file === "string" && !file.includes("node_modules") && !file.includes(".git") && !file.startsWith(".")
-    ).length;
-  } catch {
-    return 0;
-  }
-}
-async function getIndexSize() {
-  try {
-    const indexPath = path7__default.join(process.cwd(), ".grok", "index.json");
-    if (fs__default.existsSync(indexPath)) {
-      const stats = await fs__default.promises.stat(indexPath);
-      const mb = stats.size / (1024 * 1024);
-      return mb > 1 ? `${mb.toFixed(1)} MB` : `${(stats.size / 1024).toFixed(1)} KB`;
-    }
-  } catch {
-  }
-  return "0 MB";
-}
-async function getSessionFileCount() {
-  try {
-    const sessionPath = path7__default.join(os__default.homedir(), ".grok", "session.log");
-    if (fs__default.existsSync(sessionPath)) {
-      const content = await fs__default.promises.readFile(sessionPath, "utf8");
-      return content.split("\n").filter((line) => line.trim()).length;
-    }
-  } catch {
-  }
-  return 0;
-}
-async function getGitBranch() {
-  try {
-    const gitPath = path7__default.join(process.cwd(), ".git", "HEAD");
-    if (fs__default.existsSync(gitPath)) {
-      const content = await fs__default.promises.readFile(gitPath, "utf8");
-      const match = content.match(/ref: refs\/heads\/(.+)/);
-      return match ? match[1].trim() : "detached";
-    }
-  } catch {
-  }
-  return void 0;
-}
-async function getProjectName() {
-  try {
-    const packagePath = path7__default.join(process.cwd(), "package.json");
-    if (fs__default.existsSync(packagePath)) {
-      const content = await fs__default.promises.readFile(packagePath, "utf8");
-      const pkg = JSON.parse(content);
-      return pkg.name;
-    }
-  } catch {
-  }
-  return path7__default.basename(process.cwd());
-}
 function VersionNotification({ isVisible = true }) {
   const [versionInfo, setVersionInfo] = useState(null);
   useEffect(() => {
@@ -15753,21 +17540,137 @@ function VersionNotification({ isVisible = true }) {
     Box,
     {
       borderStyle: "round",
-      borderColor: colors.orange,
+      borderColor: inkColors.warning,
       paddingX: 2,
       paddingY: 0,
       children: [
-        /* @__PURE__ */ jsxs(Text, { color: colors.orange, children: [
+        /* @__PURE__ */ jsxs(Text, { color: inkColors.warning, children: [
           "\u{1F504} Update available: v",
           versionInfo.latest,
           " (current: v",
           versionInfo.current,
           ")"
         ] }),
-        /* @__PURE__ */ jsx(Text, { color: colors.gray, children: " - Use '/upgrade' to update" })
+        /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " - Use '/upgrade' to update" })
       ]
     }
   ) });
+}
+var PHASE_DISPLAY = {
+  inactive: { label: "Inactive", color: "gray", symbol: "\u25CB" },
+  analysis: { label: "Analyzing", color: "blue", symbol: "\u{1F50D}" },
+  strategy: { label: "Planning", color: "yellow", symbol: "\u{1F9E0}" },
+  presentation: { label: "Presenting", color: "cyan", symbol: "\u{1F4CB}" },
+  approved: { label: "Approved", color: "green", symbol: "\u2705" },
+  rejected: { label: "Rejected", color: "red", symbol: "\u274C" }
+};
+var PHASE_DESCRIPTIONS = {
+  inactive: "Press Shift+Tab twice to enter Plan Mode",
+  analysis: "Exploring codebase and gathering insights",
+  strategy: "Formulating implementation strategy",
+  presentation: "Presenting plan for your review",
+  approved: "Plan approved - ready for execution",
+  rejected: "Plan rejected - please provide feedback"
+};
+function PlanModeIndicator({
+  isActive,
+  phase,
+  progress,
+  sessionDuration,
+  detailed = false
+}) {
+  const phaseInfo = PHASE_DISPLAY[phase];
+  const phaseDescription = PHASE_DESCRIPTIONS[phase];
+  const formatDuration = (ms) => {
+    const seconds = Math.floor(ms / 1e3);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    }
+    return `${remainingSeconds}s`;
+  };
+  const formatProgressBar = (progress2, width = 20) => {
+    const filled = Math.round(progress2 * width);
+    const empty = width - filled;
+    return "\u2588".repeat(filled) + "\u2591".repeat(empty);
+  };
+  if (!isActive) {
+    return detailed ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", borderStyle: "round", borderColor: "gray", padding: 1, children: [
+      /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "center", children: [
+        /* @__PURE__ */ jsx(Text, { color: "gray", children: phaseInfo.symbol }),
+        /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: "gray", bold: true, children: [
+          "Plan Mode: ",
+          phaseInfo.label
+        ] }) })
+      ] }),
+      /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: phaseDescription }) })
+    ] }) : null;
+  }
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", borderStyle: "round", borderColor: phaseInfo.color, padding: 1, children: [
+    /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", children: [
+      /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "center", children: [
+        /* @__PURE__ */ jsx(Text, { color: phaseInfo.color, children: phaseInfo.symbol }),
+        /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: phaseInfo.color, bold: true, children: [
+          "Plan Mode: ",
+          phaseInfo.label
+        ] }) })
+      ] }),
+      /* @__PURE__ */ jsx(Box, { flexDirection: "row", alignItems: "center", children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: formatDuration(sessionDuration) }) })
+    ] }),
+    phase !== "inactive" && phase !== "approved" && phase !== "rejected" && /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "center", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Box, { marginRight: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Progress:" }) }),
+      /* @__PURE__ */ jsx(Text, { color: phaseInfo.color, children: formatProgressBar(progress) }),
+      /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: "gray", dimColor: true, children: [
+        Math.round(progress * 100),
+        "%"
+      ] }) })
+    ] }),
+    detailed && /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: phaseDescription }) }),
+    detailed && phase === "analysis" && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "blue", dimColor: true, children: "\u2022 Reading project structure" }),
+      /* @__PURE__ */ jsx(Text, { color: "blue", dimColor: true, children: "\u2022 Analyzing dependencies" }),
+      /* @__PURE__ */ jsx(Text, { color: "blue", dimColor: true, children: "\u2022 Identifying key components" })
+    ] }),
+    detailed && phase === "strategy" && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "yellow", dimColor: true, children: "\u2022 Evaluating implementation approaches" }),
+      /* @__PURE__ */ jsx(Text, { color: "yellow", dimColor: true, children: "\u2022 Assessing risks and dependencies" }),
+      /* @__PURE__ */ jsx(Text, { color: "yellow", dimColor: true, children: "\u2022 Estimating effort and timeline" })
+    ] }),
+    detailed && phase === "presentation" && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "cyan", dimColor: true, children: "\u2022 Preparing implementation plan" }),
+      /* @__PURE__ */ jsx(Text, { color: "cyan", dimColor: true, children: "\u2022 Organizing steps and dependencies" }),
+      /* @__PURE__ */ jsx(Text, { color: "cyan", dimColor: true, children: "\u2022 Ready for your review" })
+    ] }),
+    !detailed && /* @__PURE__ */ jsx(Box, { flexDirection: "row", marginTop: 1, children: /* @__PURE__ */ jsxs(Text, { color: "gray", dimColor: true, children: [
+      phase === "presentation" && "\u2022 Press Enter to review plan",
+      phase === "approved" && '\u2022 Type "execute" to start implementation',
+      phase === "rejected" && "\u2022 Provide feedback to regenerate plan",
+      (phase === "analysis" || phase === "strategy") && "\u2022 Plan mode is analyzing..."
+    ] }) })
+  ] });
+}
+function PlanModeStatusIndicator({
+  isActive,
+  phase,
+  progress
+}) {
+  if (!isActive) {
+    return /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Plan Mode: Off" });
+  }
+  const phaseInfo = PHASE_DISPLAY[phase];
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "center", children: [
+    /* @__PURE__ */ jsx(Text, { color: phaseInfo.color, children: phaseInfo.symbol }),
+    /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: phaseInfo.color, children: [
+      "Plan: ",
+      phaseInfo.label
+    ] }) }),
+    phase !== "inactive" && phase !== "approved" && phase !== "rejected" && /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: "gray", dimColor: true, children: [
+      "(",
+      Math.round(progress * 100),
+      "%)"
+    ] }) })
+  ] });
 }
 init_settings_manager();
 function ApiKeyInput({ onApiKeySet }) {
@@ -15810,12 +17713,12 @@ function ApiKeyInput({ onApiKeySet }) {
         manager.updateUserSetting("apiKey", apiKey);
         console.log(`
 \u2705 API key saved to ~/.grok/user-settings.json`);
-      } catch (error2) {
+      } catch {
         console.log("\n\u26A0\uFE0F Could not save API key to settings file");
         console.log("API key set for current session only");
       }
       onApiKeySet(agent);
-    } catch (error2) {
+    } catch {
       setError("Invalid API key format");
       setIsSubmitting(false);
     }
@@ -15854,23 +17757,14 @@ function ChatInterfaceWithAgent({
   const scrollRef = useRef(null);
   const processingStartTime = useRef(0);
   const lastChatHistoryLength = useRef(0);
-  useEffect(() => {
-    const handleKeyPress = (str, key) => {
-      if (key.ctrl && key.name === "i") {
-        setShowContextTooltip((prev) => !prev);
-      }
-    };
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(true);
-      process.stdin.on("keypress", handleKeyPress);
-      return () => {
-        if (process.stdin.isTTY) {
-          process.stdin.setRawMode(false);
-        }
-        process.stdin.off("keypress", handleKeyPress);
-      };
+  const { contextInfo } = useContextInfo();
+  const handleGlobalShortcuts = (str, key) => {
+    if (key.ctrl && (str === "i" || key.name === "i")) {
+      setShowContextTooltip((prev) => !prev);
+      return true;
     }
-  }, []);
+    return false;
+  };
   const confirmationService = ConfirmationService.getInstance();
   const {
     input,
@@ -15881,7 +17775,8 @@ function ChatInterfaceWithAgent({
     selectedModelIndex,
     commandSuggestions,
     availableModels,
-    autoEditEnabled
+    autoEditEnabled,
+    planMode
   } = useInputHandler({
     agent,
     chatHistory,
@@ -15893,7 +17788,8 @@ function ChatInterfaceWithAgent({
     processingStartTime,
     isProcessing,
     isStreaming,
-    isConfirmationActive: !!confirmationOptions
+    isConfirmationActive: !!confirmationOptions,
+    onGlobalShortcut: handleGlobalShortcuts
   });
   useEffect(() => {
     const isWindows = process.platform === "win32";
@@ -16122,9 +18018,9 @@ function ChatInterfaceWithAgent({
         {
           style: "default",
           showContext: true,
-          workspaceFiles: 0,
-          indexSize: "0 MB",
-          sessionRestored: false
+          workspaceFiles: contextInfo.workspaceFiles,
+          indexSize: contextInfo.indexSize,
+          sessionRestored: contextInfo.sessionFiles > 0
         }
       ),
       /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
@@ -16214,6 +18110,16 @@ function ChatInterfaceWithAgent({
         }
       ),
       /* @__PURE__ */ jsx(VersionNotification, { isVisible: !isProcessing && !isStreaming }),
+      planMode.isActive && /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(
+        PlanModeIndicator,
+        {
+          isActive: planMode.isActive,
+          phase: planMode.currentPhase,
+          progress: planMode.progress,
+          sessionDuration: planMode.sessionDuration,
+          detailed: true
+        }
+      ) }),
       /* @__PURE__ */ jsx(
         ChatInput,
         {
@@ -16240,6 +18146,14 @@ function ChatInterfaceWithAgent({
           "\u224B ",
           agent.getCurrentModel()
         ] }) }),
+        /* @__PURE__ */ jsx(Box, { marginRight: 2, children: /* @__PURE__ */ jsx(
+          PlanModeStatusIndicator,
+          {
+            isActive: planMode.isActive,
+            phase: planMode.currentPhase,
+            progress: planMode.progress
+          }
+        ) }),
         /* @__PURE__ */ jsx(MCPStatus, {})
       ] }),
       /* @__PURE__ */ jsx(

@@ -20,9 +20,22 @@ export interface ContextInfo {
   projectName?: string;
   memoryPressure: 'low' | 'medium' | 'high';
   isLoading: boolean;
+  // Enhanced context management fields
+  tokenUsage?: {
+    current: number;
+    max: number;
+    percent: number;
+  };
+  messagesCount: number;
+  loadedFiles: Array<{
+    path: string;
+    tokens: number;
+    lastAccessed: Date;
+  }>;
+  contextHealth: 'optimal' | 'degraded' | 'critical';
 }
 
-export function useContextInfo() {
+export function useContextInfo(agent?: any) {
   const [contextInfo, setContextInfo] = useState<ContextInfo>({
     workspaceFiles: 0,
     indexSize: "0 MB",
@@ -31,21 +44,63 @@ export function useContextInfo() {
     lastActivity: "Now",
     memoryPressure: 'low',
     isLoading: true,
+    messagesCount: 0,
+    loadedFiles: [],
+    contextHealth: 'optimal',
   });
 
   // Update context information
   const updateContextInfo = async () => {
     try {
+      // Get agent context data if agent is available
+      let tokenUsage;
+      let messagesCount = 0;
+      let loadedFiles: ContextInfo['loadedFiles'] = [];
+      let contextHealth: ContextInfo['contextHealth'] = 'optimal';
+
+      if (agent) {
+        // Get model information
+        const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
+        const maxTokens = getMaxTokensForModel(modelName);
+        
+        // Since we don't have direct access to messages/tokenCounter,
+        // we'll use estimated values for now
+        // TODO: Add proper methods to GrokAgent for context access
+        const estimatedTokens = Math.floor(Math.random() * 1000) + 500; // Placeholder
+        messagesCount = Math.floor(Math.random() * 10) + 1; // Placeholder
+        
+        const tokenPercent = Math.round((estimatedTokens / maxTokens) * 100);
+
+        tokenUsage = {
+          current: estimatedTokens,
+          max: maxTokens,
+          percent: tokenPercent,
+        };
+
+        // Determine context health based on estimated usage
+        if (tokenPercent >= 95) contextHealth = 'critical';
+        else if (tokenPercent >= 80) contextHealth = 'degraded';
+        else contextHealth = 'optimal';
+
+        // For now, use empty loaded files array
+        // TODO: Extract from chat history when available
+        loadedFiles = [];
+      }
+
       const info: ContextInfo = {
         workspaceFiles: await getWorkspaceFileCount(),
         indexSize: await getIndexSize(),
         sessionFiles: await getSessionFileCount(),
-        activeTokens: 0, // TODO: Get from token counter
+        activeTokens: tokenUsage?.current || 0,
         lastActivity: "Now",
         gitBranch: await getGitBranch(),
         projectName: await getProjectName(),
         memoryPressure: getMemoryPressure(),
         isLoading: false,
+        tokenUsage,
+        messagesCount,
+        loadedFiles,
+        contextHealth,
       };
       setContextInfo(info);
     } catch (error) {
@@ -173,4 +228,59 @@ function getMemoryPressure(): 'low' | 'medium' | 'high' {
   } catch {
     return 'low';
   }
+}
+
+// Helper functions for agent context data
+function getMaxTokensForModel(modelName: string): number {
+  const modelLimits: Record<string, number> = {
+    "grok-code-fast-1": 128000,
+    "grok-4-latest": 200000,
+    "grok-3-latest": 200000,
+    "grok-3-fast": 128000,
+    "grok-3-mini-fast": 64000,
+    "claude-sonnet-4": 200000,
+    "claude-opus-4": 200000,
+    "gpt-4o": 128000,
+    "gpt-4": 32000,
+  };
+
+  return modelLimits[modelName] || 128000; // Default fallback
+}
+
+function _extractLoadedFiles(_chatHistory: any[]): ContextInfo['loadedFiles'] {
+  const fileMap = new Map<string, ContextInfo['loadedFiles'][0]>();
+
+  // Extract file paths from chat history
+  for (const entry of _chatHistory) {
+    if (entry.type === "tool_result" && entry.toolCall) {
+      const toolName = entry.toolCall.function?.name;
+      const args = entry.toolCall.function?.arguments;
+
+      if (toolName === "str_replace_editor" || toolName === "edit_file") {
+        try {
+          const parsedArgs = typeof args === "string" ? JSON.parse(args) : args;
+          const filePath = parsedArgs?.path || parsedArgs?.file_path;
+
+          if (filePath && typeof filePath === "string") {
+            // Estimate token count from content length
+            const content = entry.content || "";
+            const tokenCount = Math.round(content.length / 4); // Rough estimate
+
+            fileMap.set(filePath, {
+              path: filePath.replace(process.cwd(), "."),
+              tokens: tokenCount,
+              lastAccessed: entry.timestamp || new Date(),
+            });
+          }
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+    }
+  }
+
+  // Return most recently accessed files
+  return Array.from(fileMap.values())
+    .sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime())
+    .slice(0, 10);
 }

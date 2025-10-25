@@ -19,6 +19,7 @@ import { Banner } from "./banner.js";
 import { ContextTooltip } from "./context-tooltip.js";
 import { VersionNotification } from "./version-notification.js";
 import { PlanModeIndicator, PlanModeStatusIndicator } from "./plan-mode-indicator.js";
+import ContextIndicator from "./context-indicator.js";
 import {
   ConfirmationService,
   ConfirmationOptions,
@@ -51,8 +52,8 @@ function ChatInterfaceWithAgent({
   const processingStartTime = useRef<number>(0);
   const lastChatHistoryLength = useRef<number>(0);
   
-  // Get context information for banner and tooltip
-  const { contextInfo } = useContextInfo();
+  // Get context information for banner, tooltip, and context indicator
+  const { contextInfo } = useContextInfo(agent);
 
   // Handle global keyboard shortcuts via input handler
   const handleGlobalShortcuts = (str: string, key: any) => {
@@ -523,6 +524,23 @@ function ChatInterfaceWithAgent({
             </Box>
             <MCPStatus />
           </Box>
+
+          {/* Context Memory Indicator */}
+          {contextInfo.tokenUsage && (
+            <Box marginTop={1}>
+              <ContextIndicator
+                state={{
+                  tokenUsage: contextInfo.tokenUsage,
+                  memoryPressure: contextInfo.memoryPressure,
+                  loadedFiles: contextInfo.loadedFiles,
+                  messagesCount: contextInfo.messagesCount,
+                  contextHealth: contextInfo.contextHealth,
+                  fileCount: contextInfo.loadedFiles.length,
+                }}
+                compact={true}
+              />
+            </Box>
+          )}
 
           <CommandSuggestions
             suggestions={commandSuggestions}
