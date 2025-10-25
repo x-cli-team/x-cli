@@ -137,16 +137,17 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 ### Prerequisites
 - Node.js 18+ (Node.js 20+ recommended)
 
-### 🚀 Quick Install
+### 🚀 Quick Start
 
-**Option 1: Latest version with npm (Recommended)**
+**Option 1: Run without installing (Recommended)**
+```bash
+npx -y grok-cli-hurry-mode@latest
+```
+*Always gets the latest version, no local installation needed*
+
+**Option 2: Global installation**
 ```bash
 npm install -g grok-cli-hurry-mode@latest
-```
-
-**Option 2: Try without installing (using npx)**
-```bash
-npx grok-cli-hurry-mode@latest
 ```
 
 **Option 3: Alternative package managers**
@@ -190,6 +191,13 @@ which grok      # Should show installation path
 ```
 
 ### ⚡ Quick Start (One-liner)
+
+**Try without installing:**
+```bash
+GROK_API_KEY=your_api_key_here npx -y grok-cli-hurry-mode@latest --help
+```
+
+**Or install globally:**
 ```bash
 npm install -g grok-cli-hurry-mode@latest && \
 echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc && \

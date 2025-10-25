@@ -7,7 +7,32 @@ Grok CLI is installed globally via npm and includes automated installation scrip
 
 ## Installation Methods
 
-### Automated Installation (Recommended)
+### Option 1: Run Without Installing (Recommended)
+
+```bash
+npx -y grok-cli-hurry-mode@latest
+```
+
+**Benefits:**
+- ✅ Always gets latest version
+- ✅ No local installation needed  
+- ✅ No PATH configuration required
+- ✅ No permission issues
+- ✅ Works immediately
+
+**Usage with API key:**
+```bash
+GROK_API_KEY=your_key npx -y grok-cli-hurry-mode@latest
+```
+
+### Option 2: Global Installation
+
+#### Standard NPM Install
+```bash
+npm install -g grok-cli-hurry-mode@latest
+```
+
+#### Automated Installation Script
 Use the provided `install.sh` script for automatic handling of installation issues:
 
 ```bash
@@ -19,19 +44,6 @@ The script automatically:
 - Tries multiple installation methods (npm, yarn, pnpm)
 - Handles common npm cache and permission issues
 - Cleans up failed installations
-
-### Manual Installation
-If automated installation fails, try manual methods:
-
-#### Standard NPM Install (Recommended)
-```bash
-npm install -g grok-cli-hurry-mode@latest
-```
-
-#### Try Without Installing
-```bash
-npx grok-cli-hurry-mode@latest
-```
 
 #### Alternative Package Managers
 ```bash

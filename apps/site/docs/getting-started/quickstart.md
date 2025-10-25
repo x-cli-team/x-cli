@@ -6,16 +6,32 @@ title: Quickstart
 
 Get started with Grok CLI in under 5 minutes.
 
-## Installation
+## Quick Start (No Installation)
 
 ```bash
-npm install -g grok-cli-hurry-mode
+# Run immediately with API key
+GROK_API_KEY=your_api_key_here npx -y grok-cli-hurry-mode@latest
+```
+
+Or install globally:
+
+```bash
+npm install -g grok-cli-hurry-mode@latest
 ```
 
 ## Configuration
 
+Set your API key (choose one method):
+
 ```bash
-grok config set apiKey <your-api-key>
+# Method 1: Environment variable
+export GROK_API_KEY=your_api_key_here
+
+# Method 2: Pass inline with npx
+GROK_API_KEY=your_api_key_here npx -y grok-cli-hurry-mode@latest
+
+# Method 3: Command flag (if installed globally)  
+grok --api-key your_api_key_here
 ```
 
 ## First Command
@@ -41,7 +57,8 @@ Experience Claude Code's signature feature:
 
 ```bash
 # 1. Start Grok CLI
-grok
+GROK_API_KEY=your_key npx -y grok-cli-hurry-mode@latest
+# Or if installed globally: grok
 
 # 2. Press Shift+Tab twice quickly
 # 3. Ask for a complex feature
