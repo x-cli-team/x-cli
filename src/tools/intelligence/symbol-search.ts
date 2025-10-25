@@ -1,9 +1,9 @@
 import { ToolResult } from "../../types/index.js";
-import { ASTParserTool, SymbolInfo, ImportInfo, ExportInfo } from "./ast-parser.js";
+import { ASTParserTool, SymbolInfo } from "./ast-parser.js";
 import Fuse from "fuse.js";
 import * as ops from "fs";
 
-const pathExists = async (filePath: string): Promise<boolean> => {
+const _pathExists = async (filePath: string): Promise<boolean> => {
   try {
     await ops.promises.access(filePath, ops.constants.F_OK);
     return true;
@@ -14,7 +14,7 @@ const pathExists = async (filePath: string): Promise<boolean> => {
 
 
 
-import path from "path";
+import _path from "path";
 import { glob } from "glob";
 
 export interface SymbolReference {
@@ -294,7 +294,7 @@ export class SymbolSearchTool {
           index += symbolName.length;
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Skip if file can't be read
     }
 

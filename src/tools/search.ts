@@ -3,16 +3,6 @@ import { ToolResult } from "../types/index.js";
 import { ConfirmationService } from "../utils/confirmation-service.js";
 import * as ops from "fs";
 
-const pathExists = async (filePath: string): Promise<boolean> => {
-  try {
-    await ops.promises.access(filePath, ops.constants.F_OK);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-
 
 import * as path from "path";
 
@@ -265,7 +255,7 @@ export class SearchTool {
             match: data.submatches[0]?.match?.text || "",
           });
         }
-      } catch (e) {
+      } catch (_e) {
         // Skip invalid JSON lines
         continue;
       }
@@ -348,7 +338,7 @@ export class SearchTool {
             await walkDir(fullPath, depth + 1);
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip directories we can't read
       }
     };
@@ -403,7 +393,7 @@ export class SearchTool {
   private formatUnifiedResults(
     results: UnifiedSearchResult[],
     query: string,
-    searchType: string
+    _searchType: string
   ): string {
     if (results.length === 0) {
       return `No results found for "${query}"`;

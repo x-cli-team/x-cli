@@ -77,7 +77,7 @@ function GrokCliHero() {
           <div className={styles.heroCard}>
             <div className={styles.heroCardBackground}>
               <video className={styles.heroCardVideo} autoPlay muted loop playsInline>
-                <source src="/grok-video-93ef685c-b1de-4696-a757-359c20e0ca0f.mp4" type="video/mp4" />
+                <source src="/grok-hero-demo-video.mp4" type="video/mp4" />
                 <source src="/img/grok-hero-video.mp4" type="video/mp4" />
               </video>
             </div>
@@ -85,7 +85,7 @@ function GrokCliHero() {
             <div className={styles.heroCardContent}>
               <div className={styles.heroCardText}>
                 <h3 className={styles.heroCardTitle}>Grok CLI</h3>
-                <p className={styles.heroCardDescription}>Open source terminal AI assistant reaching for Claude Code-level intelligence. Community-driven project built by developers, for developers who need powerful AI assistance without leaving their workflow.</p>
+                <p className={styles.heroCardDescription}>Open source terminal AI assistant with Claude Code's signature Plan Mode. Shift+Tab twice for read-only exploration and AI-powered implementation planning. Community-driven project built by developers, for developers.</p>
                 
                 <div className={styles.featureGrid}>
                   <div className={styles.featureItem}>
@@ -178,6 +178,10 @@ function FeaturesSection() {
         </p>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
+            <h3>🎯 Plan Mode</h3>
+            <p>Claude Code's signature read-only exploration with Shift+Tab twice activation. Safe codebase analysis and AI-powered implementation planning.</p>
+          </div>
+          <div className={styles.featureCard}>
             <h3>Advanced File Operations</h3>
             <p>Read, write, edit, and search files with intelligent AI assistance.</p>
           </div>
@@ -248,11 +252,16 @@ function RoadmapSection() {
         <div className={styles.roadmapGrid}>
           <div className={styles.roadmapCard}>
             <div className={styles.roadmapStatus}>✅ Complete</div>
+            <h3>🎯 Plan Mode</h3>
+            <p>Claude Code's signature read-only exploration with Shift+Tab twice activation and AI-powered planning.</p>
+          </div>
+          <div className={styles.roadmapCard}>
+            <div className={styles.roadmapStatus}>✅ Complete</div>
             <h3>Core Tool System</h3>
             <p>File operations, bash execution, search, and basic AI integration.</p>
           </div>
           <div className={styles.roadmapCard}>
-            <div className={styles.roadmapStatus}>🚀 In Progress</div>
+            <div className={styles.roadmapStatus}>✅ Complete</div>
             <h3>Advanced Features</h3>
             <p>Web integration, multi-file operations, and enhanced AI capabilities.</p>
           </div>

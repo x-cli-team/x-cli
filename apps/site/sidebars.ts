@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
     },
     "getting-started/quickstart",
     "getting-started/installation",
+    "guides/plan-mode",
     "tools/overview",
     "troubleshooting/npm",
     "roadmap",

@@ -802,7 +802,7 @@ export class CodeAwareEditorTool {
     let changes = 0;
     const newLines = lines.map(line => {
       const regex = new RegExp(`\\b${oldName}\\b`, 'g');
-      const newLine = line.replace(regex, (match) => {
+      const newLine = line.replace(regex, (_match) => {
         changes++;
         return newName;
       });
@@ -1005,7 +1005,7 @@ export class CodeAwareEditorTool {
   /**
    * Format code for insertion with proper indentation
    */
-  private formatCodeForInsertion(code: string, indentation: string, language: string): string {
+  private formatCodeForInsertion(code: string, indentation: string, _language: string): string {
     const lines = code.split('\n');
     return lines.map(line => {
       if (line.trim() === '') return '';
@@ -1142,7 +1142,7 @@ export class CodeAwareEditorTool {
    * Generate preview for insertion
    */
   private generateInsertionPreview(oldContent: string, newContent: string, insertLine: number): string {
-    const oldLines = oldContent.split('\n');
+    const _oldLines = oldContent.split('\n');
     const newLines = newContent.split('\n');
     
     let preview = `Code Insertion Preview:\n`;

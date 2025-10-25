@@ -174,7 +174,7 @@ export class SubagentFramework {
 
   private async executeInIsolatedContext(
     context: SubagentContext, 
-    config: SubagentConfig
+    _config: SubagentConfig
   ): Promise<{ output: any; tokensUsed: number; summary: string }> {
     
     // This is where we would integrate with the actual AI model
@@ -224,7 +224,7 @@ export class SubagentFramework {
   }
 
   private async simulatePRDAssistantAgent(context: SubagentContext): Promise<{ output: any; tokensUsed: number; summary: string }> {
-    const { prdPath, prdContent } = context.data;
+    const { prdPath: _prdPath, prdContent: _prdContent } = context.data;
     
     await this.delay(1500);
     
@@ -245,7 +245,7 @@ export class SubagentFramework {
   }
 
   private async simulateDeltaAgent(context: SubagentContext): Promise<{ output: any; tokensUsed: number; summary: string }> {
-    const { fromCommit, toCommit } = context.data;
+    const { fromCommit, toCommit: _toCommit } = context.data;
     
     await this.delay(1000);
     
@@ -262,7 +262,7 @@ export class SubagentFramework {
   }
 
   private async simulateTokenOptimizerAgent(context: SubagentContext): Promise<{ output: any; tokensUsed: number; summary: string }> {
-    const { currentTokens, targetReduction } = context.data;
+    const { currentTokens, targetReduction: _targetReduction } = context.data;
     
     await this.delay(500);
     
@@ -308,7 +308,7 @@ export class SubagentFramework {
   }
 
   private async simulateSentinelAgent(context: SubagentContext): Promise<{ output: any; tokensUsed: number; summary: string }> {
-    const { errorLogs, recentCommands } = context.data;
+    const { errorLogs: _errorLogs, recentCommands: _recentCommands } = context.data;
     
     await this.delay(800);
     
@@ -325,7 +325,7 @@ export class SubagentFramework {
   }
 
   private async simulateRegressionHunterAgent(context: SubagentContext): Promise<{ output: any; tokensUsed: number; summary: string }> {
-    const { proposedChanges, knownFailures } = context.data;
+    const { proposedChanges: _proposedChanges, knownFailures: _knownFailures } = context.data;
     
     await this.delay(1200);
     
@@ -342,7 +342,7 @@ export class SubagentFramework {
   }
 
   private async simulateGuardrailAgent(context: SubagentContext): Promise<{ output: any; tokensUsed: number; summary: string }> {
-    const { planDescription, rules } = context.data;
+    const { planDescription: _planDescription, rules: _rules } = context.data;
     
     await this.delay(600);
     

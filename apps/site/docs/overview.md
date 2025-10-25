@@ -93,6 +93,12 @@ Grok CLI is a conversational AI tool that brings Claude Code-level intelligence 
 - Specialized agent delegation for complex operations
 - IDE integration with VS Code and Jupyter
 
+**🎯 Plan Mode (Claude Code Parity)**
+- **Shift+Tab twice activation** - Exact Claude Code keyboard shortcut
+- **Read-only exploration** - Safe codebase analysis with destructive operation blocking
+- **AI-powered planning** - Strategic implementation planning with Grok models
+- **Real-time progress** - Multi-phase exploration and planning indicators
+
 **Claude Code-Style UX**
 - Professional visual feedback with contextual spinners and progress indicators
 - Context awareness with `Ctrl+I` workspace tooltip (project stats, git branch, memory pressure)
@@ -114,7 +120,7 @@ Grok CLI is built on a modular architecture with:
 - Read, Write, Edit, Bash, Grep, Glob, LS
 
 **Advanced Tools**
-- MultiEdit, WebFetch, WebSearch, Task, TodoWrite
+- MultiEdit, WebFetch, WebSearch, Task, TodoWrite, **Plan Mode**
 
 **IDE Integration**
 - NotebookEdit, BashOutput, KillBash

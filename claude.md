@@ -56,8 +56,19 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
     - Multi-step task breakdown and organization
     - Persistent task history and completion tracking
 
+#### 🎯 Plan Mode System (NEW - P0 Critical Complete!)
+13. **Plan Mode** - ✅ Claude Code's signature read-only exploration feature (IMPLEMENTED!)
+    - **Shift+Tab twice activation** - ✅ Exact Claude Code parity achieved
+    - **Comprehensive codebase analysis** - ✅ Project structure, dependencies, complexity metrics
+    - **AI-powered plan generation** - ✅ Strategic implementation planning with Grok models
+    - **Read-only tool execution** - ✅ Safe exploration with destructive operation blocking
+    - **Progress visualization** - ✅ Real-time exploration and planning progress
+    - **Risk assessment** - ✅ Automated risk identification and mitigation strategies
+    - **Effort estimation** - ✅ Detailed timeline and resource planning
+    - **User approval workflow** - ✅ Plan review and confirmation before execution
+
 #### UX Enhancement System (NEW - P4 Complete!)
-13. **Enhanced Visual Feedback** - Claude Code-style interface improvements
+14. **Enhanced Visual Feedback** - Claude Code-style interface improvements
    - Professional ASCII welcome banner with dynamic context status
    - 8 contextual operation spinners (🧠 thinking, 🔍 search, 📂 indexing, 📝 write, etc.)
    - Advanced progress indicators with ETA calculations and pulse effects
@@ -70,6 +81,7 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
 
 ### Key Features
 
+- **🎯 Plan Mode**: Claude Code's signature read-only exploration with Shift+Tab twice activation
 - **Conversational Interface**: Natural language interaction with Grok models
 - **Smart Tool Selection**: AI automatically chooses appropriate tools
 - **Claude Code-Style UX**: Professional visual feedback with contextual spinners and progress indicators

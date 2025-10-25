@@ -18,11 +18,13 @@ import ConfirmationDialog from "./confirmation-dialog.js";
 import { Banner } from "./banner.js";
 import { ContextTooltip } from "./context-tooltip.js";
 import { VersionNotification } from "./version-notification.js";
+import { PlanModeIndicator, PlanModeStatusIndicator } from "./plan-mode-indicator.js";
 import {
   ConfirmationService,
   ConfirmationOptions,
 } from "../../utils/confirmation-service.js";
 import ApiKeyInput from "./api-key-input.js";
+import { useContextInfo } from "../../hooks/use-context-info.js";
 
 interface ChatInterfaceProps {
   agent?: GrokAgent;
@@ -48,26 +50,18 @@ function ChatInterfaceWithAgent({
   const scrollRef = useRef<DOMElement | null>(null);
   const processingStartTime = useRef<number>(0);
   const lastChatHistoryLength = useRef<number>(0);
+  
+  // Get context information for banner and tooltip
+  const { contextInfo } = useContextInfo();
 
-  // Handle global keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (str: string, key: any) => {
-      if (key.ctrl && key.name === 'i') {
-        setShowContextTooltip(prev => !prev);
-      }
-    };
-
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(true);
-      process.stdin.on('keypress', handleKeyPress);
-      return () => {
-        if (process.stdin.isTTY) {
-          process.stdin.setRawMode(false);
-        }
-        process.stdin.off('keypress', handleKeyPress);
-      };
+  // Handle global keyboard shortcuts via input handler
+  const handleGlobalShortcuts = (str: string, key: any) => {
+    if (key.ctrl && (str === 'i' || key.name === 'i')) {
+      setShowContextTooltip(prev => !prev);
+      return true;
     }
-  }, []);
+    return false;
+  };
 
 
   const confirmationService = ConfirmationService.getInstance();
@@ -82,6 +76,7 @@ function ChatInterfaceWithAgent({
     commandSuggestions,
     availableModels,
     autoEditEnabled,
+    planMode,
   } = useInputHandler({
     agent,
     chatHistory,
@@ -94,6 +89,7 @@ function ChatInterfaceWithAgent({
     isProcessing,
     isStreaming,
     isConfirmationActive: !!confirmationOptions,
+    onGlobalShortcut: handleGlobalShortcuts,
   });
 
   useEffect(() => {
@@ -393,9 +389,9 @@ function ChatInterfaceWithAgent({
           <Banner 
             style="default"
             showContext={true}
-            workspaceFiles={0} // TODO: Get from workspace indexer
-            indexSize="0 MB"   // TODO: Get from workspace indexer
-            sessionRestored={false} // TODO: Get from session memory
+            workspaceFiles={contextInfo.workspaceFiles}
+            indexSize={contextInfo.indexSize}
+            sessionRestored={contextInfo.sessionFiles > 0}
           />
           
           <Box marginTop={1} flexDirection="column">
@@ -484,6 +480,19 @@ function ChatInterfaceWithAgent({
 
           <VersionNotification isVisible={!isProcessing && !isStreaming} />
           
+          {/* Plan Mode Detailed Indicator */}
+          {planMode.isActive && (
+            <Box marginBottom={1}>
+              <PlanModeIndicator
+                isActive={planMode.isActive}
+                phase={planMode.currentPhase}
+                progress={planMode.progress}
+                sessionDuration={planMode.sessionDuration}
+                detailed={true}
+              />
+            </Box>
+          )}
+          
           <ChatInput
             input={input}
             cursorPosition={cursorPosition}
@@ -504,6 +513,13 @@ function ChatInterfaceWithAgent({
             </Box>
             <Box marginRight={2}>
               <Text color="yellow">≋ {agent.getCurrentModel()}</Text>
+            </Box>
+            <Box marginRight={2}>
+              <PlanModeStatusIndicator
+                isActive={planMode.isActive}
+                phase={planMode.currentPhase}
+                progress={planMode.progress}
+              />
             </Box>
             <MCPStatus />
           </Box>

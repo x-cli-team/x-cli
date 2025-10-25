@@ -267,7 +267,7 @@ export class AdvancedSearchTool {
         const flags = options.caseSensitive ? 'g' : 'gi';
         pattern = new RegExp(`${wordBoundary}${escapedPattern}${wordBoundary}`, flags);
       }
-    } catch (error) {
+    } catch (_error) {
       throw new Error(`Invalid regex pattern: ${options.pattern}`);
     }
 
@@ -327,7 +327,7 @@ export class AdvancedSearchTool {
           const flags = options.caseSensitive ? 'g' : 'gi';
           pattern = new RegExp(`${wordBoundary}${escapedPattern}${wordBoundary}`, flags);
         }
-      } catch (error) {
+      } catch (_error) {
         return {
           filePath: path.relative(process.cwd(), filePath),
           replacements: 0,

@@ -521,12 +521,12 @@ export class RefactoringAssistantTool {
     };
   }
 
-  private async performInlineVariable(request: InlineRequest): Promise<RefactoringOperation> {
+  private async performInlineVariable(_request: InlineRequest): Promise<RefactoringOperation> {
     // Similar to inline function but for variables
     throw new Error("Inline variable not yet implemented");
   }
 
-  private async performMove(request: MoveRequest): Promise<RefactoringOperation> {
+  private async performMove(_request: MoveRequest): Promise<RefactoringOperation> {
     // Move function or class to different file
     throw new Error("Move operation not yet implemented");
   }
@@ -612,7 +612,7 @@ export class RefactoringAssistantTool {
     return changes;
   }
 
-  private async analyzeExtractedCode(code: string, filePath: string): Promise<any> {
+  private async analyzeExtractedCode(code: string, _filePath: string): Promise<any> {
     // Analyze variables, return statements, etc.
     const lines = code.split('\n');
     const parameters: ExtractedParameter[] = [];
@@ -654,7 +654,7 @@ export class RefactoringAssistantTool {
   private createExtractedFunction(
     signature: string,
     body: string,
-    localVars: string[]
+    _localVars: string[]
   ): string {
     return `${signature} {\n${body}\n}`;
   }
@@ -684,7 +684,7 @@ export class RefactoringAssistantTool {
     return lines.slice(bodyStart, bodyEnd).join('\n');
   }
 
-  private findFunctionCalls(usages: SymbolReference[], functionName: string): any[] {
+  private findFunctionCalls(usages: SymbolReference[], _functionName: string): any[] {
     // Find actual function calls vs just references
     const calls: any[] = [];
     
@@ -705,7 +705,7 @@ export class RefactoringAssistantTool {
     return calls;
   }
 
-  private inlineFunction(functionBody: string, args: string[]): string {
+  private inlineFunction(functionBody: string, _args: string[]): string {
     // Replace parameters with arguments in function body
     // This is a simplified implementation
     return functionBody;

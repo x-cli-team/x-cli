@@ -7,6 +7,7 @@ import { useEnhancedInput, Key } from "./use-enhanced-input.js";
 import { GrokToolCall } from "../grok/client.js";
 import { ToolResult } from "../types/index.js";
 import { PasteEvent } from "../services/paste-detection.js";
+import { usePlanMode } from "./use-plan-mode.js";
 
 import { filterCommandSuggestions } from "../ui/components/command-suggestions.js";
 import { loadModelConfig, updateCurrentModel } from "../utils/model-config.js";
@@ -34,6 +35,7 @@ interface UseInputHandlerProps {
   isProcessing: boolean;
   isStreaming: boolean;
   isConfirmationActive?: boolean;
+  onGlobalShortcut?: (str: string, key: Key) => boolean;
 }
 
 interface CommandSuggestion {
@@ -57,6 +59,7 @@ export function useInputHandler({
   isProcessing,
   isStreaming,
   isConfirmationActive = false,
+  onGlobalShortcut,
 }: UseInputHandlerProps) {
   const [showCommandSuggestions, setShowCommandSuggestions] = useState(false);
   const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
@@ -67,6 +70,11 @@ export function useInputHandler({
     const sessionFlags = confirmationService.getSessionFlags();
     return sessionFlags.allOperations;
   });
+  const [shiftTabPressCount, setShiftTabPressCount] = useState(0);
+  const [lastShiftTabTime, setLastShiftTabTime] = useState(0);
+
+  // Initialize plan mode hook
+  const planMode = usePlanMode({}, agent);
 
   const handleSpecialKey = (key: Key): boolean => {
     // Don't handle input if confirmation dialog is active
@@ -74,19 +82,71 @@ export function useInputHandler({
       return true; // Prevent default handling
     }
 
-    // Handle shift+tab to toggle auto-edit mode
-    if (key.shift && key.tab) {
-      const newAutoEditState = !autoEditEnabled;
-      setAutoEditEnabled(newAutoEditState);
 
-      const confirmationService = ConfirmationService.getInstance();
-      if (newAutoEditState) {
-        // Enable auto-edit: set all operations to be accepted
-        confirmationService.setSessionFlag("allOperations", true);
+    // Handle shift+tab for both auto-edit and plan mode activation
+    if (key.shift && key.tab) {
+      const now = Date.now();
+      const timeSinceLastPress = now - lastShiftTabTime;
+      
+      // Reset count if more than 2 seconds have passed
+      if (timeSinceLastPress > 2000) {
+        setShiftTabPressCount(1);
       } else {
-        // Disable auto-edit: reset session flags
-        confirmationService.resetSession();
+        setShiftTabPressCount(prev => prev + 1);
       }
+      
+      setLastShiftTabTime(now);
+      
+      // Check for plan mode activation (shift+tab twice within 2 seconds)
+      if (shiftTabPressCount >= 2) {
+        // Second shift+tab press - activate plan mode
+        if (!planMode.isActive) {
+          planMode.activatePlanMode();
+          
+          const planModeEntry: ChatEntry = {
+            type: "assistant",
+            content: "🎯 **Plan Mode Activated**\n\nEntering read-only exploration mode. I'll analyze your codebase and formulate an implementation strategy before making any changes.\n\n**What I'm doing:**\n• Exploring project structure\n• Analyzing dependencies and patterns\n• Identifying key components\n• Formulating implementation approach\n\nOnce complete, I'll present a detailed plan for your approval.\n\n💡 **Tip**: Describe what you want to implement and I'll create a comprehensive plan first.",
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, planModeEntry]);
+          
+          // Start exploration automatically
+          planMode.startExploration();
+          
+          setShiftTabPressCount(0); // Reset counter
+          return true;
+        } else {
+          // Already in plan mode - exit plan mode
+          planMode.deactivatePlanMode('user_requested');
+          
+          const exitEntry: ChatEntry = {
+            type: "assistant", 
+            content: "🎯 **Plan Mode Deactivated**\n\nExiting plan mode and returning to normal operation.",
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, exitEntry]);
+          
+          setShiftTabPressCount(0); // Reset counter
+          return true;
+        }
+      } else if (shiftTabPressCount === 1) {
+        // First shift+tab press - toggle auto-edit mode
+        const newAutoEditState = !autoEditEnabled;
+        setAutoEditEnabled(newAutoEditState);
+
+        const confirmationService = ConfirmationService.getInstance();
+        if (newAutoEditState) {
+          // Enable auto-edit: set all operations to be accepted
+          confirmationService.setSessionFlag("allOperations", true);
+        } else {
+          // Disable auto-edit: reset session flags
+          confirmationService.resetSession();
+        }
+        
+        // Reset plan mode counter if we're handling auto-edit
+        setTimeout(() => setShiftTabPressCount(0), 2500);
+      }
+      
       return true; // Handled
     }
 
@@ -249,6 +309,11 @@ export function useInputHandler({
 
   // Hook up the actual input handling
   useInput((inputChar: string, key: Key) => {
+    // Check global shortcuts before normal input handling
+    if (onGlobalShortcut && onGlobalShortcut(inputChar, key)) {
+      return; // Handled by global shortcut
+    }
+    
     handleInput(inputChar, key);
   });
 
@@ -1639,5 +1704,7 @@ ${incidents.slice(0, 3).map(i => `- ${i.title} (${i.impact} impact)`).join('\n')
     availableModels,
     agent,
     autoEditEnabled,
+    // Plan mode state and actions
+    planMode,
   };
 }

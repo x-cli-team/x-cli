@@ -36,6 +36,7 @@ Comprehensive inventory of Grok CLI's implemented features as of October 2024, s
 - **Code Analysis**: AST parsing and syntax understanding  
 - **Context Retention**: Session memory and conversation continuity
 - **Task Decomposition**: Breaking complex requests into actionable steps
+- **🎯 Plan Mode**: Claude Code's signature read-only exploration and planning feature
 
 ## 🛠️ Tool System (15+ Tools)
 
