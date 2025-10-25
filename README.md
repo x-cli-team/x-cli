@@ -12,9 +12,9 @@ This release includes latest updates and automated publishing via GitHub Actions
 # X CLI
 
 [![NPM Version](https://img.shields.io/npm/v/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
-[![GitHub Release](https://img.shields.io/github/v/release/hinetapora/x-cli-hurry-mode?style=for-the-badge&logo=github&color=181717)](https://github.com/hinetapora/x-cli-hurry-mode/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/hinetapora/x-cli-hurry-mode?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/x-cli/releases)
 [![Downloads](https://img.shields.io/npm/dm/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
-[![License](https://img.shields.io/github/license/hinetapora/x-cli-hurry-mode?style=for-the-badge&color=green)](https://github.com/hinetapora/x-cli-hurry-mode/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/hinetapora/x-cli-hurry-mode?style=for-the-badge&color=green)](https://github.com/x-cli-team/x-cli/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-xAI_Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/channels/1315720379607679066/1315822328139223064)
 
 A conversational AI CLI tool powered by Grok with **Claude Code-level intelligence** and advanced tool capabilities.
@@ -26,10 +26,10 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 ## 🔗 Quick Links
 
 - **📦 [NPM Package](https://www.npmjs.com/package/@xagent/x-cli)** - Install globally with `npm install -g @xagent/x-cli`
-- **🐙 [GitHub Repository](https://github.com/hinetapora/x-cli-hurry-mode)** - Source code, issues, and contributions
+- **🐙 [GitHub Repository](https://github.com/x-cli-team/x-cli)** - Source code, issues, and contributions
 - **🎯 [Competitive Parity Analysis](./.agent/parity/)** - Strategic analysis vs Claude Code, Cursor IDE, and OpenAI Codex
 - **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
-- **📚 [Releases](https://github.com/hinetapora/x-cli-hurry-mode/releases)** - Version history and changelogs
+- **📚 [Releases](https://github.com/x-cli-team/x-cli/releases)** - Version history and changelogs
 
 ## 🆕 What's New in v1.0+
 
@@ -741,7 +741,7 @@ git push origin main --follow-tags
 
 ### 📊 Monitoring
 
-- **GitHub Actions**: https://github.com/hinetapora/x-cli-hurry-mode/actions
+- **GitHub Actions**: https://github.com/x-cli-team/x-cli/actions
 - **NPM Package**: https://www.npmjs.com/package/@xagent/x-cli
 - **Release History**: Check git tags or NPM version history
 

@@ -106,10 +106,10 @@
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/hinetapora/x-cli-hurry-mode.git"
+    "url": "https://github.com/x-cli-team/x-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/hinetapora/x-cli-hurry-mode/issues"
+    "url": "https://github.com/x-cli-team/x-cli/issues"
   },
   "homepage": "https://grokcli.dev",
   "files": [
