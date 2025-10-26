@@ -1,12 +1,11 @@
 import * as ops from 'fs-extra';
 import path from 'path';
-import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import { claudeMdParser } from './claude-md-parser.js';
 
 export interface AgentSystemConfig {
   projectName: string;
-  projectType: 'grok-cli' | 'external';
+  projectType: 'x-cli' | 'external';
   rootPath: string;
 }
 
