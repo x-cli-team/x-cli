@@ -58,6 +58,7 @@ Thumbs.db
 # Logs
 logs/
 *.log
+logs.zip
 
 # Runtime data
 pids/
@@ -163,12 +164,14 @@ dev.sh
 grok-dev*
 dev-workflow.md
 
-# Coding agents
+# Coding agents and development directories
 .claude/
 .grok/
-
-# Agent documentation system (track this)
-!.agent/
+.agent/
+.archive/
+.x/
+.husky/
+.githooks/
 
 # Additional common ignores
 .DS_Store
@@ -181,3 +184,25 @@ dev-workflow.md
 .ionide/
 .nyc_output/
 .turbo/
+
+# Additional development directories
+.vercel/
+.local/
+.next/
+.nuxt/
+.output/
+.dist/
+.build/
+.changelog/
+
+# Development artifacts
+claude.md
+homebrew-formula.rb
+page.tsx
+src/image.png
+
+# Large assets and site-specific files
+apps/site/.agent/
+apps/site/.grok/
+apps/site/*.mp4
+apps/site/grok-video-*.mp4
