@@ -65,7 +65,7 @@ export default function TestimonialsSection() {
         <div className={styles.ctaSection}>
           <p className={styles.ctaText}>Have your own success story?</p>
           <a 
-            href="https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml" 
+            href="https://github.com/hinetapora/@xagent/x-cli/issues/new?template=testimonial.yml" 
             className={styles.ctaButton}
             target="_blank"
             rel="noopener noreferrer"

@@ -11,6 +11,11 @@ export interface UserSettings {
   baseURL?: string; // API base URL
   defaultModel?: string; // User's preferred default model
   models?: string[]; // Available models list
+  autoCompact?: boolean; // Enable automatic compact mode for long conversations
+  compactThreshold?: {
+    lines?: number; // Auto-compact when session exceeds this many lines (default: 800)
+    bytes?: number; // Auto-compact when session exceeds this many bytes (default: 200000)
+  };
 }
 
 /**

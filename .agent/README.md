@@ -12,9 +12,9 @@ This directory contains AI agent documentation for X CLI. This system helps AI a
 
 ### 🔒 Protected NPM Publishing Settings
 
-- **`package.json` name**: Must remain `"grok-cli-hurry-mode"` (unscoped). Changing to scoped (e.g., `@username/grok-cli-hurry-mode`) will break NPM publishing unless you have token access for that scope.
+- **`package.json` name**: Must remain `"@xagent/x-cli"` (scoped package). This is owned by the @xagent organization.
 - **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
-- **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `grok-cli-hurry-mode`.
+- **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `@xagent/x-cli`.
 
 ### 🔒 Protected Automation Workflow
 
@@ -61,7 +61,7 @@ Product requirement documents and feature specifications:
 - **claude-code-features.md** - Comprehensive Claude Code capability analysis
 - **cursor-features.md** - Cursor IDE AI-native editor capabilities
 - **codex-features.md** - OpenAI Codex autonomous coding agent analysis
-- **grok-cli-current-state.md** - Complete Grok CLI capability inventory
+- **X CLI-current-state.md** - Complete Grok CLI capability inventory
 - **gap-analysis.md** - Detailed feature gaps with P0/P1/P2 priorities
 - **implementation-roadmap.md** - Strategic development plan through Q4 2025
 - **competitive-matrix.md** - Side-by-side feature comparison matrix

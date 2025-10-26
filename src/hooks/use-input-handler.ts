@@ -21,6 +21,7 @@ import { UpdateAgentDocs } from "../tools/documentation/update-agent-docs.js";
 import { SubagentFramework } from "../subagents/subagent-framework.js";
 import { SelfHealingSystem } from "../tools/documentation/self-healing-system.js";
 import { checkForUpdates, autoUpgrade } from "../utils/version-checker.js";
+import { getSettingsManager } from "../utils/settings-manager.js";
 import pkg from "../../package.json" with { type: "json" };
 
 interface UseInputHandlerProps {
@@ -1451,6 +1452,147 @@ ${incidents.slice(0, 3).map(i => `- ${i.title} (${i.impact} impact)`).join('\n')
         const errorEntry: ChatEntry = {
           type: "assistant",
           content: `Failed to manage guardrails: ${error.message}`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+
+      setIsProcessing(false);
+      clearInput();
+      return true;
+    }
+
+    if (trimmedInput === "/switch" || trimmedInput.startsWith("/switch ")) {
+      const userEntry: ChatEntry = {
+        type: "user",
+        content: trimmedInput,
+        timestamp: new Date(),
+      };
+      setChatHistory((prev) => [...prev, userEntry]);
+
+      setIsProcessing(true);
+
+      try {
+        const args = trimmedInput.split(' ').slice(1);
+        const settingsManager = getSettingsManager();
+
+        if (args.length === 0) {
+          // Show current auto-compact settings
+          const settings = settingsManager.loadUserSettings();
+          const autoCompact = settings.autoCompact ?? false;
+          const thresholds = settings.compactThreshold || { lines: 800, bytes: 200000 };
+
+          const statusEntry: ChatEntry = {
+            type: "assistant",
+            content: `🔄 **Auto-Compact Status**
+
+**Current Settings:**
+- Auto-compact: ${autoCompact ? '✅ ENABLED' : '❌ DISABLED'}
+- Line threshold: ${thresholds.lines || 800} lines
+- Size threshold: ${Math.round((thresholds.bytes || 200000) / 1024)}KB
+
+**Commands:**
+- \`/switch compact on\` - Enable auto-compact
+- \`/switch compact off\` - Disable auto-compact
+- \`/switch compact lines 500\` - Set line threshold
+- \`/switch compact bytes 100000\` - Set size threshold (in bytes)
+
+**How it works:**
+Auto-compact automatically enables compact mode when conversations exceed thresholds, similar to Claude Code's context management.`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, statusEntry]);
+        } else if (args[0] === 'compact') {
+          if (args[1] === 'on') {
+            settingsManager.updateUserSetting('autoCompact', true);
+            const successEntry: ChatEntry = {
+              type: "assistant",
+              content: "✅ **Auto-compact enabled!**\n\nCompact mode will automatically activate for long conversations to maintain performance.",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, successEntry]);
+          } else if (args[1] === 'off') {
+            settingsManager.updateUserSetting('autoCompact', false);
+            const successEntry: ChatEntry = {
+              type: "assistant",
+              content: "❌ **Auto-compact disabled**\n\nNormal conversation mode will be used.",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, successEntry]);
+          } else if (args[1] === 'lines' && args[2]) {
+            const lines = parseInt(args[2]);
+            if (isNaN(lines) || lines < 100) {
+              const errorEntry: ChatEntry = {
+                type: "assistant",
+                content: "❌ Invalid line threshold. Must be a number >= 100.",
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, errorEntry]);
+            } else {
+              const currentThresholds = settingsManager.getUserSetting('compactThreshold') || {};
+              settingsManager.updateUserSetting('compactThreshold', {
+                ...currentThresholds,
+                lines
+              });
+              const successEntry: ChatEntry = {
+                type: "assistant",
+                content: `✅ **Line threshold updated to ${lines} lines**`,
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, successEntry]);
+            }
+          } else if (args[1] === 'bytes' && args[2]) {
+            const bytes = parseInt(args[2]);
+            if (isNaN(bytes) || bytes < 10000) {
+              const errorEntry: ChatEntry = {
+                type: "assistant",
+                content: "❌ Invalid size threshold. Must be a number >= 10000 bytes.",
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, errorEntry]);
+            } else {
+              const currentThresholds = settingsManager.getUserSetting('compactThreshold') || {};
+              settingsManager.updateUserSetting('compactThreshold', {
+                ...currentThresholds,
+                bytes
+              });
+              const successEntry: ChatEntry = {
+                type: "assistant",
+                content: `✅ **Size threshold updated to ${Math.round(bytes / 1024)}KB**`,
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, successEntry]);
+            }
+          } else {
+            const helpEntry: ChatEntry = {
+              type: "assistant",
+              content: `❓ **Invalid compact command**
+
+**Usage:**
+- \`/switch compact on\` - Enable auto-compact
+- \`/switch compact off\` - Disable auto-compact
+- \`/switch compact lines <number>\` - Set line threshold
+- \`/switch compact bytes <number>\` - Set size threshold`,
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, helpEntry]);
+          }
+        } else {
+          const helpEntry: ChatEntry = {
+            type: "assistant",
+            content: `❓ **Unknown switch command**
+
+**Available switches:**
+- \`/switch compact\` - Manage auto-compact settings
+- \`/switch\` - Show current status`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, helpEntry]);
+        }
+      } catch (error: any) {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `Failed to manage switches: ${error.message}`,
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, errorEntry]);

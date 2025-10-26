@@ -113,7 +113,7 @@ function ChatInterfaceWithAgent({
     console.log(" ");
 
     // Generate welcome text with margin to match Ink paddingX={2}
-    const logoOutput = "GROK CLI - HURRY MODE" + "\n" + pkg.version;
+    const logoOutput = "X-CLI" + "\n" + pkg.version;
 
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line: string) => {

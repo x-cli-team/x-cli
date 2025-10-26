@@ -43,7 +43,7 @@ var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-function getSettingsManager() {
+function getSettingsManager2() {
   return SettingsManager.getInstance();
 }
 var DEFAULT_USER_SETTINGS, DEFAULT_PROJECT_SETTINGS, SettingsManager;
@@ -288,13 +288,13 @@ __export(config_exports, {
   saveMCPConfig: () => saveMCPConfig
 });
 function loadMCPConfig() {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   const projectSettings = manager.loadProjectSettings();
   const servers = projectSettings.mcpServers ? Object.values(projectSettings.mcpServers) : [];
   return { servers };
 }
 function saveMCPConfig(config2) {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   const mcpServers = {};
   for (const server of config2.servers) {
     mcpServers[server.name] = server;
@@ -302,14 +302,14 @@ function saveMCPConfig(config2) {
   manager.updateProjectSetting("mcpServers", mcpServers);
 }
 function addMCPServer(config2) {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   const projectSettings = manager.loadProjectSettings();
   const mcpServers = projectSettings.mcpServers || {};
   mcpServers[config2.name] = config2;
   manager.updateProjectSetting("mcpServers", mcpServers);
 }
 function removeMCPServer(serverName) {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   const projectSettings = manager.loadProjectSettings();
   const mcpServers = projectSettings.mcpServers;
   if (mcpServers) {
@@ -318,7 +318,7 @@ function removeMCPServer(serverName) {
   }
 }
 function getMCPServer(serverName) {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   const projectSettings = manager.loadProjectSettings();
   return projectSettings.mcpServers?.[serverName];
 }
@@ -7033,10 +7033,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path28) => {
+    const dfs = (filePath, path29) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path28.indexOf(filePath);
-        const cycle = path28.slice(cycleStart).concat([filePath]);
+        const cycleStart = path29.indexOf(filePath);
+        const cycle = path29.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7052,7 +7052,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path28, filePath]);
+            dfs(dependency, [...path29, filePath]);
           }
         }
       }
@@ -8524,7 +8524,7 @@ var GrokAgent = class extends EventEmitter {
     this.minRequestInterval = 500;
     // ms
     this.lastRequestTime = 0;
-    const manager = getSettingsManager();
+    const manager = getSettingsManager2();
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
     this.maxToolRounds = maxToolRounds || 400;
@@ -9024,10 +9024,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path28 = args.path;
-            let command = `cat "${path28}"`;
+            const path29 = args.path;
+            let command = `cat "${path29}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path28}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path29}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9287,7 +9287,7 @@ EOF`;
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.41",
+  version: "1.1.42",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -11642,14 +11642,14 @@ function CommandSuggestions({
 // src/utils/model-config.ts
 init_settings_manager();
 function loadModelConfig() {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   const models = manager.getAvailableModels();
   return models.map((model) => ({
     model: model.trim()
   }));
 }
 function updateCurrentModel(modelName) {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   manager.setCurrentModel(modelName);
 }
 var ClaudeMdParserImpl = class {
@@ -11882,7 +11882,7 @@ Documentation for documentation system commands:
   async generateSystemDocs(agentPath) {
     const systemPath = path7__default.join(agentPath, "system");
     const files = [];
-    const archContent = this.config.projectType === "grok-cli" ? this.generateGrokArchitecture() : this.generateExternalArchitecture();
+    const archContent = this.config.projectType === "x-cli" ? this.generateGrokArchitecture() : this.generateExternalArchitecture();
     await ops6.promises.writeFile(path7__default.join(systemPath, "architecture.md"), archContent);
     files.push(".agent/system/architecture.md");
     const criticalStateContent = this.generateCriticalState();
@@ -11997,7 +11997,7 @@ External project documented using Grok CLI's .agent system.
   }
   generateCriticalState() {
     const timestamp = (/* @__PURE__ */ new Date()).toISOString();
-    if (this.config.projectType === "grok-cli") {
+    if (this.config.projectType === "x-cli") {
       return `# \u{1F527} Current System State
 
 ## Architecture Overview
@@ -12083,7 +12083,7 @@ Updated By: Agent System Generator during /init-agent
     }
   }
   generateApiSchema() {
-    if (this.config.projectType === "grok-cli") {
+    if (this.config.projectType === "x-cli") {
       return `# \u{1F50C} API Schema
 
 ## Grok API Integration
@@ -12248,7 +12248,7 @@ interface Tool {
 `;
     await ops6.promises.writeFile(path7__default.join(sopPath, "documentation-workflow.md"), docWorkflowContent);
     files.push(".agent/sop/documentation-workflow.md");
-    if (this.config.projectType === "grok-cli") {
+    if (this.config.projectType === "x-cli") {
       const newCommandContent = `# \u2699\uFE0F Adding New Commands SOP
 
 ## Command System Architecture
@@ -12329,7 +12329,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
   async generateExampleTask(agentPath) {
     const tasksPath = path7__default.join(agentPath, "tasks");
     const files = [];
-    const exampleContent = this.config.projectType === "grok-cli" ? this.generateGrokExampleTask() : this.generateExternalExampleTask();
+    const exampleContent = this.config.projectType === "x-cli" ? this.generateGrokExampleTask() : this.generateExternalExampleTask();
     await ops6.promises.writeFile(path7__default.join(tasksPath, "example-prd.md"), exampleContent);
     files.push(".agent/tasks/example-prd.md");
     return files;
@@ -16090,6 +16090,140 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
       clearInput();
       return true;
     }
+    if (trimmedInput === "/switch" || trimmedInput.startsWith("/switch ")) {
+      const userEntry = {
+        type: "user",
+        content: trimmedInput,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory((prev) => [...prev, userEntry]);
+      setIsProcessing(true);
+      try {
+        const args = trimmedInput.split(" ").slice(1);
+        const settingsManager = getSettingsManager();
+        if (args.length === 0) {
+          const settings = settingsManager.loadUserSettings();
+          const autoCompact = settings.autoCompact ?? false;
+          const thresholds = settings.compactThreshold || { lines: 800, bytes: 2e5 };
+          const statusEntry = {
+            type: "assistant",
+            content: `\u{1F504} **Auto-Compact Status**
+
+**Current Settings:**
+- Auto-compact: ${autoCompact ? "\u2705 ENABLED" : "\u274C DISABLED"}
+- Line threshold: ${thresholds.lines || 800} lines
+- Size threshold: ${Math.round((thresholds.bytes || 2e5) / 1024)}KB
+
+**Commands:**
+- \`/switch compact on\` - Enable auto-compact
+- \`/switch compact off\` - Disable auto-compact
+- \`/switch compact lines 500\` - Set line threshold
+- \`/switch compact bytes 100000\` - Set size threshold (in bytes)
+
+**How it works:**
+Auto-compact automatically enables compact mode when conversations exceed thresholds, similar to Claude Code's context management.`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, statusEntry]);
+        } else if (args[0] === "compact") {
+          if (args[1] === "on") {
+            settingsManager.updateUserSetting("autoCompact", true);
+            const successEntry = {
+              type: "assistant",
+              content: "\u2705 **Auto-compact enabled!**\n\nCompact mode will automatically activate for long conversations to maintain performance.",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, successEntry]);
+          } else if (args[1] === "off") {
+            settingsManager.updateUserSetting("autoCompact", false);
+            const successEntry = {
+              type: "assistant",
+              content: "\u274C **Auto-compact disabled**\n\nNormal conversation mode will be used.",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, successEntry]);
+          } else if (args[1] === "lines" && args[2]) {
+            const lines = parseInt(args[2]);
+            if (isNaN(lines) || lines < 100) {
+              const errorEntry = {
+                type: "assistant",
+                content: "\u274C Invalid line threshold. Must be a number >= 100.",
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, errorEntry]);
+            } else {
+              const currentThresholds = settingsManager.getUserSetting("compactThreshold") || {};
+              settingsManager.updateUserSetting("compactThreshold", {
+                ...currentThresholds,
+                lines
+              });
+              const successEntry = {
+                type: "assistant",
+                content: `\u2705 **Line threshold updated to ${lines} lines**`,
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, successEntry]);
+            }
+          } else if (args[1] === "bytes" && args[2]) {
+            const bytes = parseInt(args[2]);
+            if (isNaN(bytes) || bytes < 1e4) {
+              const errorEntry = {
+                type: "assistant",
+                content: "\u274C Invalid size threshold. Must be a number >= 10000 bytes.",
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, errorEntry]);
+            } else {
+              const currentThresholds = settingsManager.getUserSetting("compactThreshold") || {};
+              settingsManager.updateUserSetting("compactThreshold", {
+                ...currentThresholds,
+                bytes
+              });
+              const successEntry = {
+                type: "assistant",
+                content: `\u2705 **Size threshold updated to ${Math.round(bytes / 1024)}KB**`,
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, successEntry]);
+            }
+          } else {
+            const helpEntry = {
+              type: "assistant",
+              content: `\u2753 **Invalid compact command**
+
+**Usage:**
+- \`/switch compact on\` - Enable auto-compact
+- \`/switch compact off\` - Disable auto-compact
+- \`/switch compact lines <number>\` - Set line threshold
+- \`/switch compact bytes <number>\` - Set size threshold`,
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, helpEntry]);
+          }
+        } else {
+          const helpEntry = {
+            type: "assistant",
+            content: `\u2753 **Unknown switch command**
+
+**Available switches:**
+- \`/switch compact\` - Manage auto-compact settings
+- \`/switch\` - Show current status`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, helpEntry]);
+        }
+      } catch (error) {
+        const errorEntry = {
+          type: "assistant",
+          content: `Failed to manage switches: ${error.message}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      setIsProcessing(false);
+      clearInput();
+      return true;
+    }
     const directBashCommands = [
       "ls",
       "pwd",
@@ -17907,7 +18041,7 @@ function ApiKeyInput({ onApiKeySet }) {
       const agent = new GrokAgent(apiKey);
       process.env.GROK_API_KEY = apiKey;
       try {
-        const manager = getSettingsManager();
+        const manager = getSettingsManager2();
         manager.updateUserSetting("apiKey", apiKey);
         console.log(`
 \u2705 API key saved to ~/.grok/user-settings.json`);
@@ -17997,7 +18131,7 @@ function ChatInterfaceWithAgent({
     }
     console.log("    ");
     console.log(" ");
-    const logoOutput = "GROK CLI - HURRY MODE\n" + package_default.version;
+    const logoOutput = "X-CLI\n" + package_default.version;
     const logoLines = logoOutput.split("\n");
     logoLines.forEach((line) => {
       if (line.trim()) {
@@ -18626,8 +18760,28 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 function ensureUserSettingsDirectory() {
   try {
-    const manager = getSettingsManager();
+    const manager = getSettingsManager2();
     manager.loadUserSettings();
+  } catch {
+  }
+}
+function checkAutoCompact() {
+  try {
+    const manager = getSettingsManager2();
+    const settings = manager.loadUserSettings();
+    if (!settings.autoCompact) {
+      return;
+    }
+    const sessionLogPath = path7__default.join(__require("os").homedir(), ".grok", "session.log");
+    const thresholds = settings.compactThreshold || { lines: 800, bytes: 2e5 };
+    if (__require("fs").existsSync(sessionLogPath)) {
+      const stats = __require("fs").statSync(sessionLogPath);
+      const lines = parseInt(__require("child_process").execSync(`wc -l < "${sessionLogPath}"`, { encoding: "utf8" }).trim()) || 0;
+      if (lines >= (thresholds.lines || 800) || stats.size >= (thresholds.bytes || 2e5)) {
+        process.env.COMPACT = "1";
+        console.log(`\u{1F504} Auto-compact enabled (${lines} lines, ${Math.round(stats.size / 1024)}KB)`);
+      }
+    }
   } catch {
   }
 }
@@ -18644,16 +18798,16 @@ async function checkStartupUpdates() {
   }
 }
 function loadApiKey() {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   return manager.getApiKey();
 }
 function loadBaseURL() {
-  const manager = getSettingsManager();
+  const manager = getSettingsManager2();
   return manager.getBaseURL();
 }
 async function saveCommandLineSettings(apiKey, baseURL) {
   try {
-    const manager = getSettingsManager();
+    const manager = getSettingsManager2();
     if (apiKey) {
       manager.updateUserSetting("apiKey", apiKey);
       console.log("\u2705 API key saved to ~/.grok/user-settings.json");
@@ -18673,7 +18827,7 @@ function loadModel() {
   let model = process.env.GROK_MODEL;
   if (!model) {
     try {
-      const manager = getSettingsManager();
+      const manager = getSettingsManager2();
       model = manager.getCurrentModel();
     } catch {
     }
@@ -18871,6 +19025,7 @@ program.name("grok").description(
     const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
     console.log("\u{1F916} Starting X CLI Conversational Assistant...\n");
     ensureUserSettingsDirectory();
+    checkAutoCompact();
     checkStartupUpdates();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
     const app = render(React3.createElement(ChatInterface, { agent, initialMessage }));

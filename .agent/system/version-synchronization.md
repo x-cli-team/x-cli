@@ -24,8 +24,9 @@ Dynamic version imports automatically reflect new version
 ## ✅ Current Implementation Status
 
 ### **Synchronized Components**
+
 - ✅ **package.json** - Source of truth
-- ✅ **README.md** - Auto-updated by GitHub Action  
+- ✅ **README.md** - Auto-updated by GitHub Action
 - ✅ **NPM Registry** - Published by GitHub Action
 - ✅ **Welcome Screen** - Dynamic import from package.json
 - ✅ **Git Tags** - Created by GitHub Action
@@ -35,20 +36,21 @@ Dynamic version imports automatically reflect new version
 Location: `.github/workflows/release.yml`
 
 Key synchronization step:
+
 ```yaml
 - name: Bump patch version (no tag yet)
   run: |
     git config --global user.email "action@github.com"
     git config --global user.name "GitHub Action"
     NEW_VER=$(npm version patch --no-git-tag-version)
-    
+
     # Update README version to match package.json
     if [ -f README.md ]; then
       NEW_VER_NUMBER=${NEW_VER#v}
       sed -i "s/^## [0-9]\+\.[0-9]\+\.[0-9]\+/## ${NEW_VER_NUMBER}/g" README.md
       echo "Updated README.md to version ${NEW_VER_NUMBER}"
     fi
-    
+
     git add package.json package-lock.json README.md || true
     git commit -m "Bump version to ${NEW_VER#v}"
 ```
@@ -61,7 +63,7 @@ Key synchronization step:
 
 ```typescript
 // ✅ CORRECT - Dynamic import from package.json
-import pkg from '../../../package.json' with { type: 'json' };
+import pkg from "../../../package.json" with { type: "json" };
 
 const versionDisplay = pkg.version;
 // or
@@ -69,6 +71,7 @@ const logoOutput = "HURRY MODE\n" + pkg.version;
 ```
 
 **Example Implementation** (`src/ui/components/chat-interface.tsx:94`):
+
 ```typescript
 const logoOutput = "HURRY MODE" + "\n" + pkg.version;
 ```
@@ -86,6 +89,7 @@ const logoOutput = "HURRY MODE\n1.1.22";
 ### 🔍 **Pattern Detection**
 
 Use this grep command to find hardcoded versions:
+
 ```bash
 grep -r "1\.[0-9]\+\.[0-9]\+" src/ --exclude="*.json"
 ```
@@ -95,11 +99,13 @@ grep -r "1\.[0-9]\+\.[0-9]\+" src/ --exclude="*.json"
 ### Adding New Version Displays
 
 1. **Import package.json dynamically**:
+
    ```typescript
-   import pkg from '../../../package.json' with { type: 'json' };
+   import pkg from "../../../package.json" with { type: "json" };
    ```
 
 2. **Use the version property**:
+
    ```typescript
    const displayVersion = pkg.version;
    ```
@@ -124,11 +130,11 @@ If versions become out of sync:
 
 1. **Check GitHub Action logs** for failed executions
 2. **Verify package.json** is the correct version
-3. **Check NPM registry**: `npm view grok-cli-hurry-mode version`
+3. **Check NPM registry**: `npm view @xagent/x-cli version`
 4. **Manual sync** (emergency only):
    ```bash
    # Update README to match NPM
-   npm view grok-cli-hurry-mode version  # Get NPM version
+   npm view @xagent/x-cli version  # Get NPM version
    # Edit README.md header manually
    git commit -m "Sync README to NPM version"
    git push origin main
@@ -137,8 +143,9 @@ If versions become out of sync:
 ### GitHub Action Failures
 
 Common issues:
+
 - **Git permissions**: Check `PAT_TOKEN` secret
-- **NPM publishing**: Check `NPM_TOKEN` secret  
+- **NPM publishing**: Check `NPM_TOKEN` secret
 - **README regex**: Verify version format matches pattern
 
 ## 📚 Related Documentation
@@ -150,16 +157,18 @@ Common issues:
 ## 🚨 Breaking Changes Warning
 
 **NEVER modify these without coordination:**
+
 - GitHub Action version regex pattern
 - package.json version format
 - README version header format
 - Dynamic import patterns
 
 Changes to version synchronization patterns require:
+
 1. **Full testing** in development branch
-2. **Documentation updates** 
+2. **Documentation updates**
 3. **Team coordination** for rollout
 
 ---
 
-*This system eliminates manual version management and ensures consistency across all user-facing version displays.*
+_This system eliminates manual version management and ensures consistency across all user-facing version displays._

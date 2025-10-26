@@ -4,19 +4,19 @@ title: Quickstart
 
 # Quickstart
 
-Get started with Grok CLI in under 5 minutes.
+Get started with X CLI in under 5 minutes.
 
 ## Quick Start (No Installation)
 
 ```bash
 # Run immediately with API key
-GROK_API_KEY=your_api_key_here npx -y grok-cli-hurry-mode@latest
+GROK_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest
 ```
 
 Or install globally:
 
 ```bash
-npm install -g grok-cli-hurry-mode@latest
+npm install -g @xagent/x-cli@latest
 ```
 
 ## Configuration
@@ -28,16 +28,16 @@ Set your API key (choose one method):
 export GROK_API_KEY=your_api_key_here
 
 # Method 2: Pass inline with npx
-GROK_API_KEY=your_api_key_here npx -y grok-cli-hurry-mode@latest
+GROK_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest
 
-# Method 3: Command flag (if installed globally)  
-grok --api-key your_api_key_here
+# Method 3: Command flag (if installed globally)
+xcli --api-key your_api_key_here
 ```
 
 ## First Command
 
 ```bash
-grok "Help me understand this project"
+xcli "Help me understand this project"
 ```
 
 ## Interactive Mode Features
@@ -56,9 +56,9 @@ Once in interactive mode, these keyboard shortcuts enhance your workflow:
 Experience Claude Code's signature feature:
 
 ```bash
-# 1. Start Grok CLI
-GROK_API_KEY=your_key npx -y grok-cli-hurry-mode@latest
-# Or if installed globally: grok
+# 1. Start X CLI
+GROK_API_KEY=your_key npx -y @xagent/x-cli@latest
+# Or if installed globally: xcli
 
 # 2. Press Shift+Tab twice quickly
 # 3. Ask for a complex feature
@@ -73,7 +73,7 @@ Plan Mode provides safe, read-only exploration with AI-powered implementation pl
 
 ## Professional UX Experience
 
-Grok CLI provides Claude Code-level visual feedback:
+X CLI provides Claude Code-level visual feedback:
 
 - **Contextual Spinners**: 8 operation-specific animated indicators
 - **Progress Indicators**: Real-time progress with ETA calculations

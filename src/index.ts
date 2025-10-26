@@ -2,6 +2,7 @@ import React from "react";
 import { render } from "ink";
 import { program } from "commander";
 import * as dotenv from "dotenv";
+import path from "path";
 import { GrokAgent } from "./agent/grok-agent.js";
 import ChatInterface from "./ui/components/chat-interface.js";
 import { getSettingsManager } from "./utils/settings-manager.js";
@@ -49,6 +50,35 @@ function ensureUserSettingsDirectory(): void {
     manager.loadUserSettings();
   } catch {
     // Silently ignore errors during setup
+  }
+}
+
+// Check if auto-compact should be enabled based on session size
+function checkAutoCompact(): void {
+  try {
+    const manager = getSettingsManager();
+    const settings = manager.loadUserSettings();
+
+    // Only check if auto-compact is enabled in settings
+    if (!settings.autoCompact) {
+      return;
+    }
+
+    const sessionLogPath = path.join(require('os').homedir(), '.grok', 'session.log');
+    const thresholds = settings.compactThreshold || { lines: 800, bytes: 200000 };
+
+    if (require('fs').existsSync(sessionLogPath)) {
+      const stats = require('fs').statSync(sessionLogPath);
+      const lines = parseInt(require('child_process').execSync(`wc -l < "${sessionLogPath}"`, { encoding: 'utf8' }).trim()) || 0;
+
+      // Check if thresholds are exceeded
+      if (lines >= (thresholds.lines || 800) || stats.size >= (thresholds.bytes || 200000)) {
+        process.env.COMPACT = '1';
+        console.log(`🔄 Auto-compact enabled (${lines} lines, ${Math.round(stats.size / 1024)}KB)`);
+      }
+    }
+  } catch {
+    // Silently ignore errors during auto-compact check
   }
 }
 
@@ -400,7 +430,10 @@ program
       console.log("🤖 Starting X CLI Conversational Assistant...\n");
 
       ensureUserSettingsDirectory();
-      
+
+      // Check if auto-compact should be enabled
+      checkAutoCompact();
+
       // Check for updates (non-blocking)
       checkStartupUpdates();
 

@@ -12,6 +12,7 @@ We believe in open development and transparent project management. This page pro
 ## 🏃‍♂️ Active Sprints
 
 ### Current Development Focus
+
 Our development is organized into focused sprints that deliver specific value to users. Each sprint has clear objectives, deliverables, and success criteria.
 
 ---
@@ -20,14 +21,16 @@ Our development is organized into focused sprints that deliver specific value to
 
 ### ✅ **Completed Sprints**
 
-#### **Sprint: Documentation Website with Vercel Deployment** 
-*October 18, 2025 - COMPLETED*
+#### **Sprint: Documentation Website with Vercel Deployment**
+
+_October 18, 2025 - COMPLETED_
 
 **Objective**: Create comprehensive public documentation + landing site for grok-cli using Docusaurus
 
 **Delivered Features:**
+
 - ✅ Comprehensive documentation website with Docusaurus
-- ✅ Copy-to-clipboard functionality for install commands  
+- ✅ Copy-to-clipboard functionality for install commands
 - ✅ Detailed tools documentation (12 core/advanced tools)
 - ✅ Enhanced roadmap with Claude Code parity goals
 - ✅ Fixed external navigation links (Discord/GitHub)
@@ -39,11 +42,13 @@ Our development is organized into focused sprints that deliver specific value to
 ---
 
 #### **Sprint: Hotfix Repaint Storm & CPU Spikes**
-*October 17, 2025 - COMPLETED*
+
+_October 17, 2025 - COMPLETED_
 
 **Objective**: Stop excessive screen repaints causing CPU spikes during conversations
 
 **Key Fixes:**
+
 - ✅ Render throttle implemented (150ms batch updates)
 - ✅ Batched chat history updates into single setState call
 - ✅ Reduced CPU usage from 100% to normal levels
@@ -55,11 +60,13 @@ Our development is organized into focused sprints that deliver specific value to
 ### 🔶 **In Progress Sprints**
 
 #### **Sprint: Enhanced Installation UX with Smart Setup**
-*October 18, 2025 - IN PROGRESS*
+
+_October 18, 2025 - IN PROGRESS_
 
 **Objective**: Streamline installation with automated setup scripts and better error handling
 
 **Progress:**
+
 - 🔶 Automated installation script development
 - 🔶 Enhanced error detection and recovery
 - 🔶 Cross-platform compatibility improvements
@@ -69,11 +76,13 @@ Our development is organized into focused sprints that deliver specific value to
 ---
 
 #### **Sprint: Auto-Compact Mode for Long Conversations**
-*October 17, 2025 - IN PROGRESS*
+
+_October 17, 2025 - IN PROGRESS_
 
 **Objective**: Implement automatic context compression for long conversation sessions
 
 **Progress:**
+
 - 🔶 Context compression algorithm design
 - 🔶 Memory management optimization
 - 🔶 Performance testing framework
@@ -85,13 +94,15 @@ Our development is organized into focused sprints that deliver specific value to
 ### 📅 **Planned Sprints**
 
 #### **Sprint: Fix Faulty Tools**
-*Planned for October 2025*
+
+_Planned for October 2025_
 
 **Objective**: Address tool reliability issues and improve error handling
 
 **Scope:**
+
 - Tool validation framework
-- Error recovery mechanisms  
+- Error recovery mechanisms
 - Comprehensive testing suite
 - Performance optimization
 
@@ -100,11 +111,13 @@ Our development is organized into focused sprints that deliver specific value to
 ---
 
 #### **Sprint: Automate Version Sync and Git Hooks**
-*Planned for October 2025*
+
+_Planned for October 2025_
 
 **Objective**: Implement automated version management and git workflow improvements
 
 **Scope:**
+
 - Automated version bumping
 - Pre-commit hook optimization
 - Release automation
@@ -115,11 +128,13 @@ Our development is organized into focused sprints that deliver specific value to
 ---
 
 #### **Sprint: Stop Screen Glitch & CPU Spikes (Mini-Sprint)**
-*Planned for October 2025*
+
+_Planned for October 2025_
 
 **Objective**: KISS approach to eliminate remaining display issues
 
 **Scope:**
+
 - Minimal code changes approach
 - Focus on core rendering stability
 - Performance monitoring
@@ -134,11 +149,13 @@ Our development is organized into focused sprints that deliver specific value to
 ### **Completed PRDs**
 
 #### **PRD: Tool Inventory & Assessment**
-*October 16, 2025*
+
+_October 16, 2025_
 
 **Purpose**: Comprehensive analysis of current tool system capabilities and gaps
 
 **Key Findings:**
+
 - 12 core tools implemented with high reliability
 - Advanced features like MultiEdit and WebSearch operational
 - Identified optimization opportunities for performance
@@ -151,11 +168,13 @@ Our development is organized into focused sprints that deliver specific value to
 ### **Reference PRDs**
 
 #### **PRD Example Template**
-*October 16, 2025*
+
+_October 16, 2025_
 
 **Purpose**: Standard template for product requirements documentation
 
 **Contents:**
+
 - Problem statement framework
 - Success criteria definition
 - Technical specification guidelines
@@ -168,13 +187,15 @@ Our development is organized into focused sprints that deliver specific value to
 ## 🗺️ Strategic Planning
 
 ### **Roadmap: Claude Code Parity**
-*October 18, 2025 - ONGOING*
+
+_October 18, 2025 - ONGOING_
 
 **Mission**: Transform Grok CLI into a terminal-based development assistant that matches Claude Code capabilities
 
 **Current Phase**: Enhanced Developer Experience (Q1 2025)
 
 **Progress Tracking:**
+
 - ✅ Core tool system complete (12/12 tools)
 - ✅ File operations and multi-file editing
 - ✅ Web integration and real-time search
@@ -182,8 +203,9 @@ Our development is organized into focused sprints that deliver specific value to
 - 🔶 IDE integration framework (in planning)
 
 **Next Milestones:**
+
 - Q1 2025: Git Integration 2.0 and Testing Framework
-- Q2 2025: Visual Interface and IDE Extensions  
+- Q2 2025: Visual Interface and IDE Extensions
 - Q3 2025: Enterprise Features and Cloud Integration
 - Q4 2025: Collaboration and Advanced AI Capabilities
 
@@ -192,18 +214,21 @@ Our development is organized into focused sprints that deliver specific value to
 ## 📊 Development Metrics
 
 ### **Sprint Velocity**
+
 - **Average Sprint Duration**: 1-3 days
 - **Completion Rate**: 85% on-time delivery
 - **Quality Gate**: All sprints include automated testing
 - **User Impact**: High-impact features prioritized
 
 ### **Code Quality**
+
 - **Test Coverage**: Maintained across all tool implementations
 - **Performance Standards**: Sub-2 second response times
 - **Reliability Target**: 99.9% uptime for core operations
 - **User Satisfaction**: Continuous feedback integration
 
 ### **Community Engagement**
+
 - **GitHub Issues**: Active community issue reporting
 - **Discord Participation**: Growing developer community
 - **Feature Requests**: Community-driven roadmap input
@@ -214,6 +239,7 @@ Our development is organized into focused sprints that deliver specific value to
 ## 🔍 Planning Process
 
 ### **Sprint Planning**
+
 1. **Problem Identification**: User feedback and internal assessment
 2. **Requirements Definition**: Detailed PRD creation
 3. **Technical Design**: Architecture and implementation planning
@@ -221,12 +247,14 @@ Our development is organized into focused sprints that deliver specific value to
 5. **Timeline Estimation**: Realistic effort and resource allocation
 
 ### **Quality Assurance**
+
 - **Acceptance Criteria**: Every sprint has measurable outcomes
 - **Testing Requirements**: Automated and manual testing protocols
 - **Performance Standards**: Benchmarks for all new features
 - **User Validation**: Community feedback integration
 
 ### **Continuous Improvement**
+
 - **Sprint Retrospectives**: Learn from completed work
 - **Process Optimization**: Streamline development workflow
 - **Technology Upgrades**: Stay current with best practices
@@ -237,12 +265,14 @@ Our development is organized into focused sprints that deliver specific value to
 ## 🤝 Community Involvement
 
 ### **How to Follow Development**
-- **GitHub Repository**: [Watch releases and issues](https://github.com/hinetapora/grok-cli-hurry-mode)
+
+- **GitHub Repository**: [Watch releases and issues](https://github.com/hinetapora/@xagent/x-cli)
 - **Discord Community**: [Join development discussions](https://discord.com/channels/1315720379607679066/1315822328139223064)
 - **Sprint Updates**: Regular progress reports in Discord
 - **Release Notes**: Detailed changelog for each version
 
 ### **How to Contribute**
+
 - **Feature Requests**: Submit issues with enhancement labels
 - **Bug Reports**: Help us identify and fix problems
 - **Code Contributions**: Submit PRs for review
@@ -250,6 +280,7 @@ Our development is organized into focused sprints that deliver specific value to
 - **Testing**: Help validate new features and fixes
 
 ### **Feedback Channels**
+
 - **GitHub Issues**: Technical problems and feature requests
 - **Discord Chat**: Real-time community discussion
 - **Email**: Direct contact for sensitive issues
@@ -260,18 +291,21 @@ Our development is organized into focused sprints that deliver specific value to
 ## 📈 Success Metrics
 
 ### **Development Velocity**
+
 - **Features Delivered**: Tracking major capabilities added
 - **Bug Resolution Time**: Average time to fix reported issues
 - **Release Frequency**: Regular, predictable release cycles
 - **Quality Metrics**: Defect rates and user satisfaction
 
 ### **User Adoption**
+
 - **Monthly Active Users**: Growth in user base
 - **Feature Utilization**: Most valuable capabilities tracking
 - **Community Engagement**: Discord and GitHub activity
 - **Enterprise Adoption**: Business user acquisition
 
 ### **Technical Excellence**
+
 - **Performance Benchmarks**: Response time and reliability
 - **Code Quality**: Test coverage and maintainability
 - **Security Standards**: Vulnerability management
@@ -279,6 +313,6 @@ Our development is organized into focused sprints that deliver specific value to
 
 ---
 
-*This transparency page is updated regularly to reflect current development status. Last updated: October 18, 2025*
+_This transparency page is updated regularly to reflect current development status. Last updated: October 18, 2025_
 
-**Questions or feedback?** Join our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064) or [create a GitHub issue](https://github.com/hinetapora/grok-cli-hurry-mode/issues).
+**Questions or feedback?** Join our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064) or [create a GitHub issue](https://github.com/hinetapora/@xagent/x-cli/issues).

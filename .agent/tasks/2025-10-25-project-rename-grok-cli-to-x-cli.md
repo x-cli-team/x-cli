@@ -1,4 +1,4 @@
-# Project Rename: grok-cli → x-cli
+# Project Rename: X CLI → x-cli
 
 **Priority**: P0 (High Risk - Automated Publishing System)  
 **Duration**: 2-3 days  
@@ -11,7 +11,7 @@ This rename involves the **AUTOMATED NPM PUBLISHING SYSTEM** that is fully opera
 
 **PROTECTED SETTINGS (DO NOT BREAK):**
 
-- `package.json` name: `"grok-cli-hurry-mode"`
+- `package.json` name: `"@xagent/x-cli"`
 - GitHub Secrets: `NPM_TOKEN` for `grok_cli` account
 - Publishing to npmjs.com (not GitHub Packages)
 - Automated version bumping on main branch
@@ -20,7 +20,7 @@ This rename involves the **AUTOMATED NPM PUBLISHING SYSTEM** that is fully opera
 
 ### 1. NPM Package Name Change
 
-**Current**: `grok-cli-hurry-mode`  
+**Current**: `@xagent/x-cli`  
 **Target**: `x-cli-hurry-mode` or `x-cli`
 
 **CRITICAL DECISION NEEDED:**
@@ -36,7 +36,7 @@ This rename involves the **AUTOMATED NPM PUBLISHING SYSTEM** that is fully opera
 
 ### 3. Repository & URLs
 
-**Current**: `grok-cli-hurry-mode`  
+**Current**: `@xagent/x-cli`  
 **Target**: `x-cli-hurry-mode` or `x-cli`
 
 ### 4. Configuration & Branding
@@ -168,7 +168,7 @@ GROK.md → X.md
 npm publish x-cli-hurry-mode
 
 # 2. Add deprecation notice to old package
-npm deprecate grok-cli-hurry-mode "⚠️ Renamed to x-cli-hurry-mode. Install: npm install -g x-cli-hurry-mode"
+npm deprecate @xagent/x-cli "⚠️ Renamed to x-cli-hurry-mode. Install: npm install -g x-cli-hurry-mode"
 
 # 3. Update old package to show migration notice
 ```
@@ -332,14 +332,14 @@ x migrate-from-grok
 
 ### Breaking Changes
 
-- **Package name**: `grok-cli-hurry-mode` → `x-cli-hurry-mode`
+- **Package name**: `@xagent/x-cli` → `x-cli-hurry-mode`
 - **Command name**: `grok` → `x`
 - **Config directories**: `.grok/` → `.x/`
 - **Environment variables**: `GROK_*` → `X_*`
 
 ### User Migration Required
 
-- Uninstall old package: `npm uninstall -g grok-cli-hurry-mode`
+- Uninstall old package: `npm uninstall -g @xagent/x-cli`
 - Install new package: `npm install -g x-cli-hurry-mode`
 - Migrate configs: `x migrate-from-grok` (automatic)
 - Update scripts/aliases that use `grok` command

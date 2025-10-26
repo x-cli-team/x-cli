@@ -95,7 +95,7 @@ Areas where collaborators frequently make significant contributions:
 
 Transform your user experience into professional contribution access:
 
-[**Submit Testimonial and Join as Collaborator**](https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml)
+[**Submit Testimonial and Join as Collaborator**](https://github.com/hinetapora/@xagent/x-cli/issues/new?template=testimonial.yml)
 
 ### Immediate Next Steps
 
