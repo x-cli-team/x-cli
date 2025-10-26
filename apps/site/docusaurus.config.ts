@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'Grok CLI',
+  title: 'X CLI',
   tagline: 'Claude Code-level intelligence in your terminal',
   favicon: 'img/favicon.ico',
 
@@ -15,15 +15,15 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://grokcli.dev',
+  url: 'https://xclicli.dev',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'hinetapora', // Usually your GitHub org/user name.
-  projectName: 'grok-cli-hurry-mode', // Usually your repo name.
+  organizationName: 'x-cli-team', // Usually your GitHub org/user name.
+  projectName: 'x-cli', // Usually your repo name.
 
   onBrokenLinks: 'warn',
 

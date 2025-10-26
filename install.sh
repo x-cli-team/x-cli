@@ -1,30 +1,39 @@
 #!/bin/bash
 
-# Grok CLI Installer
+# X CLI Installer
 # Handles common npm installation issues automatically
 
 set -e
 
-echo "🤖 Installing Grok CLI..."
+echo "🤖 Installing X CLI..."
 
 # Function to clean install
 clean_install() {
     echo "🧹 Cleaning previous installation..."
     
-    # Kill any running grok processes
-    pkill -f grok 2>/dev/null || true
+    # Kill any running xcli processes
+    pkill -f xcli 2>/dev/null || true
+    pkill -f grok 2>/dev/null || true  # Clean up old installations
     
-    # Remove existing installation
+    # Remove existing installations (both old and new)
+    npm uninstall -g @xagent/x-cli 2>/dev/null || true
     npm uninstall -g grok-cli-hurry-mode 2>/dev/null || true
     
     # Force remove directories if they exist
     if command -v node >/dev/null 2>&1; then
         NODE_PATH=$(dirname $(dirname $(which node)))
+        # Clean up old installations
         if [ -d "$NODE_PATH/lib/node_modules/grok-cli-hurry-mode" ]; then
-            echo "🗑️ Removing stuck installation..."
+            echo "🗑️ Removing old grok-cli installation..."
             rm -rf "$NODE_PATH/lib/node_modules/grok-cli-hurry-mode" 2>/dev/null || true
             rm -rf "$NODE_PATH/lib/node_modules/.grok-cli-hurry-mode"* 2>/dev/null || true
             rm -f "$NODE_PATH/bin/grok" 2>/dev/null || true
+        fi
+        # Clean up new installations
+        if [ -d "$NODE_PATH/lib/node_modules/@xagent/x-cli" ]; then
+            echo "🗑️ Removing previous X CLI installation..."
+            rm -rf "$NODE_PATH/lib/node_modules/@xagent/x-cli" 2>/dev/null || true
+            rm -f "$NODE_PATH/bin/xcli" 2>/dev/null || true
         fi
     fi
     
@@ -34,29 +43,29 @@ clean_install() {
 
 # Function to try different installation methods
 try_install() {
-    echo "📦 Installing Grok CLI..."
+    echo "📦 Installing X CLI..."
     
     # Method 1: Standard install
-    if npm install -g grok-cli-hurry-mode 2>/dev/null; then
+    if npm install -g @xagent/x-cli@latest 2>/dev/null; then
         return 0
     fi
     
     echo "⚠️ Standard install failed, trying alternative methods..."
     
     # Method 2: Force install
-    if npm install -g grok-cli-hurry-mode --force 2>/dev/null; then
+    if npm install -g @xagent/x-cli@latest --force 2>/dev/null; then
         return 0
     fi
     
     # Method 3: With explicit registry
-    if npm install -g grok-cli-hurry-mode --registry https://registry.npmjs.org/ 2>/dev/null; then
+    if npm install -g @xagent/x-cli@latest --registry https://registry.npmjs.org/ 2>/dev/null; then
         return 0
     fi
     
     # Method 4: Try yarn if available
     if command -v yarn >/dev/null 2>&1; then
         echo "🧶 Trying with Yarn..."
-        if yarn global add grok-cli-hurry-mode 2>/dev/null; then
+        if yarn global add @xagent/x-cli@latest 2>/dev/null; then
             return 0
         fi
     fi
@@ -64,7 +73,7 @@ try_install() {
     # Method 5: Try pnpm if available
     if command -v pnpm >/dev/null 2>&1; then
         echo "📦 Trying with pnpm..."
-        if pnpm add -g grok-cli-hurry-mode 2>/dev/null; then
+        if pnpm add -g @xagent/x-cli@latest 2>/dev/null; then
             return 0
         fi
     fi
@@ -92,29 +101,29 @@ main() {
     
     # Try installation
     if try_install; then
-        echo "✅ Grok CLI installed successfully!"
+        echo "✅ X CLI installed successfully!"
         echo ""
         echo "🚀 Get started:"
-        echo "   grok --help"
+        echo "   xcli --help"
         echo ""
         echo "💡 Set your API key:"
         echo "   export GROK_API_KEY=your_api_key_here"
         echo ""
         
         # Verify installation
-        if command -v grok >/dev/null 2>&1; then
-            echo "📋 Installed version: $(grok --version 2>/dev/null || echo 'unknown')"
+        if command -v xcli >/dev/null 2>&1; then
+            echo "📋 Installed version: $(xcli --version 2>/dev/null || echo 'unknown')"
         fi
     else
         echo "❌ Installation failed with all methods."
         echo ""
         echo "🛠️ Manual installation options:"
-        echo "1. Try downloading from: https://github.com/hinetapora/grok-cli-hurry-mode/releases"
+        echo "1. Try downloading from: https://github.com/x-cli-team/x-cli/releases"
         echo "2. Or install alternative package managers:"
-        echo "   • Yarn: npm install -g yarn && yarn global add grok-cli-hurry-mode"
-        echo "   • pnpm: npm install -g pnpm && pnpm add -g grok-cli-hurry-mode"
+        echo "   • Yarn: npm install -g yarn && yarn global add @xagent/x-cli@latest"
+        echo "   • pnpm: npm install -g pnpm && pnpm add -g @xagent/x-cli@latest"
         echo ""
-        echo "🐛 Report issues: https://github.com/hinetapora/grok-cli-hurry-mode/issues"
+        echo "🐛 Report issues: https://github.com/x-cli-team/x-cli/issues"
         exit 1
     fi
 }

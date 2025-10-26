@@ -11,7 +11,7 @@
 #
 # Dependencies: 
 # - scripts/check-version.cjs (version bumping logic)
-# - package.json version field (must remain "grok-cli-hurry-mode")
+# - package.json version field (must remain "@xagent/x-cli")
 # - GitHub Actions automation
 #
 # Last working config verified: 2025-10-17
