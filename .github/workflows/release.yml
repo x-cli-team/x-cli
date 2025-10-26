@@ -74,6 +74,7 @@ jobs:
       - name: Create tag and push
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
+          echo "NEW_VER=${NEW_VER}" >> $GITHUB_ENV
           git tag "v${NEW_VER}"
           git push origin HEAD:main
           git push origin "v${NEW_VER}"
@@ -128,6 +129,34 @@ jobs:
         run: |
           # Restore original package.json to avoid affecting future operations
           mv package.json.backup package.json
+
+      # ---------- Create GitHub Release ----------
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.NEW_VER }}
+          release_name: Release v${{ env.NEW_VER }}
+          body: |
+            ## 🚀 X-CLI v${{ env.NEW_VER }}
+
+            ### Changes
+            Automated release triggered by push to main branch.
+
+            ### Installation
+            ```bash
+            npm install -g @xagent/x-cli@v${{ env.NEW_VER }}
+            ```
+
+            ### What's New
+            - See [CHANGELOG.md](https://github.com/x-cli-team/x-cli/blob/main/CHANGELOG.md) for details
+            - Full release notes available in commit history
+          draft: false
+          prerelease: false
+
+      - name: Cleanup
+        run: |
           rm -f .npmrc
           echo "Restored original package.json"
 
