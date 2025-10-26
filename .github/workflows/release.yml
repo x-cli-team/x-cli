@@ -5,7 +5,7 @@
 #
 # DO NOT MODIFY without understanding the full dependency chain:
 # - GitHub Secrets: PAT_TOKEN, NPM_TOKEN (required)
-# - Package name: "grok-cli-hurry-mode" (NEVER change)
+# - Package name: "@xagent/x-cli" (NEVER change)
 # - Git hooks: .husky/pre-commit + scripts/check-version.cjs
 # - NPM authentication: Direct .npmrc creation (not npm config)
 # - Dependency management: Clean install to avoid Rollup cache issues
@@ -23,7 +23,7 @@
 name: Release
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: write
@@ -60,14 +60,14 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           NEW_VER=$(npm version patch --no-git-tag-version)
-          
+
           # Update README version to match package.json
           if [ -f README.md ]; then
             NEW_VER_NUMBER=${NEW_VER#v}
             sed -i "s/^## [0-9]\+\.[0-9]\+\.[0-9]\+/## ${NEW_VER_NUMBER}/g" README.md
             echo "Updated README.md to version ${NEW_VER_NUMBER}"
           fi
-          
+
           git add package.json package-lock.json README.md || true
           git commit -m "Bump version to ${NEW_VER#v}"
 
@@ -102,17 +102,17 @@ jobs:
         run: |
           # Create a temporary package.json with scoped name for GitHub Packages
           cp package.json package.json.backup
-          
+
           # Update package name to be scoped (required for GitHub Packages)
-          sed -i 's/"name": "grok-cli-hurry-mode"/"name": "@hinetapora\/grok-cli-hurry-mode"/' package.json
-          
+          sed -i 's/"name": "@xagent\/x-cli"/"name": "@x-cli-team\/x-cli"/' package.json
+
           echo "Created scoped package.json for GitHub Packages:"
           grep '"name":' package.json
 
       - name: Configure GitHub Packages registry
         run: |
           # Configure npm to publish scoped packages to GitHub Packages
-          echo "@hinetapora:registry=https://npm.pkg.github.com" > .npmrc
+          echo "@x-cli-team:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -134,6 +134,6 @@ jobs:
       - name: Publish summary
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
-          echo "✅ Published grok-cli-hurry-mode v${NEW_VER} to:"
-          echo "  📦 NPM: https://www.npmjs.com/package/grok-cli-hurry-mode"
-          echo "  📦 GitHub Packages: https://github.com/hinetapora/grok-cli-hurry-mode/pkgs/npm/grok-cli-hurry-mode"
+          echo "✅ Published @xagent/x-cli v${NEW_VER} to:"
+          echo "  📦 NPM: https://www.npmjs.com/package/@xagent/x-cli"
+          echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"

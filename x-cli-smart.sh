@@ -30,5 +30,5 @@ fi
 if [[ -f "src/index.ts" ]]; then
   exec npx --yes tsx src/index.ts "$@"
 else
-  exec npx --yes grok-cli-hurry-mode@latest "$@"
+  exec npx --yes @xagent/x-cli@latest "$@"
 fi

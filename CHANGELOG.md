@@ -98,4 +98,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-_Note: This changelog was initiated with v1.1.24. For earlier versions, see [GitHub Releases](https://github.com/hinetapora/grok-cli-hurry-mode/releases)._
+_Note: This changelog was initiated with v1.1.24. For earlier versions, see [GitHub Releases](https://github.com/x-cli-team/x-cli/releases)._
