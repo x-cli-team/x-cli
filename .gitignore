@@ -21,6 +21,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 .env.*
 .npmrc
 
@@ -92,6 +93,22 @@ coverage/
 # Output of 'npm pack' and 'bun pack'
 *.tgz
 
+# Local Netlify folder
+.netlify/
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
 # Yarn Integrity file
 .yarn-integrity
 
@@ -108,6 +125,9 @@ fix.awk
 sed_cmd.sh
 temp.txt
 *.backup
+*.orig
+*.rej
+*.patch
 
 # Editor directories and files
 .vscode/*
@@ -149,3 +169,15 @@ dev-workflow.md
 
 # Agent documentation system (track this)
 !.agent/
+
+# Additional common ignores
+.DS_Store
+*.tmp
+*.temp
+.cache/
+.vscode/settings.json
+.vscode/launch.json
+.history/
+.ionide/
+.nyc_output/
+.turbo/
