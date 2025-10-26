@@ -2,7 +2,7 @@
 
 ## Overview
 
-Plan Mode is Grok CLI's implementation of Claude Code's signature read-only exploration feature. It enables safe codebase analysis and strategy formulation before code execution, addressing the **#1 P0 Critical Gap** in competitive positioning.
+Plan Mode is X-CLI's implementation of Claude Code's signature read-only exploration feature. It enables safe codebase analysis and strategy formulation before code execution, addressing the **#1 P0 Critical Gap** in competitive positioning.
 
 ## Architecture Components
 

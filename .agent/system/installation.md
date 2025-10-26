@@ -2,7 +2,7 @@
 
 ## Overview
 
-Grok CLI is installed globally via npm and includes automated installation scripts to handle common issues.
+X-CLI is installed globally via npm and includes automated installation scripts to handle common issues.
 
 ## Installation Methods
 
@@ -68,14 +68,14 @@ grok --version
 
 ```bash
 # Environment variable (recommended)
-export GROK_API_KEY=your_api_key_here
+export X_API_KEY=your_api_key_here
 
 # Save permanently to shell profile
-echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc
+echo 'export X_API_KEY=your_api_key_here' >> ~/.zshrc
 source ~/.zshrc
 
 # Or save permanently (bash users)
-echo 'export GROK_API_KEY=your_api_key_here' >> ~/.bashrc
+echo 'export X_API_KEY=your_api_key_here' >> ~/.bashrc
 source ~/.bashrc
 ```
 

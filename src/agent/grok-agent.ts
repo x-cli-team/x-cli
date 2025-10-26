@@ -137,7 +137,7 @@ export class GrokAgent extends EventEmitter {
     // Initialize with system message
     this.messages.push({
       role: "system",
-      content: `You are Grok CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}
+      content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}
 
 You have access to these tools:
 

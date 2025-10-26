@@ -4,7 +4,7 @@ title: Plan Mode
 
 # 🎯 Plan Mode
 
-Plan Mode is Grok CLI's signature read-only exploration feature that brings Claude Code-level intelligent planning to your terminal. It provides safe, comprehensive codebase analysis and AI-powered implementation planning without any risk of modifying your code.
+Plan Mode is X-CLI's signature read-only exploration feature that brings Claude Code-level intelligent planning to your terminal. It provides safe, comprehensive codebase analysis and AI-powered implementation planning without any risk of modifying your code.
 
 ## Quick Start
 
@@ -242,7 +242,7 @@ grok --headless "check if proposed changes follow our architecture guidelines"
 
 ## Comparison with Claude Code
 
-| Feature | Claude Code | Grok CLI Plan Mode |
+| Feature | Claude Code | X-CLI Plan Mode |
 |---------|-------------|-------------------|
 | Activation | Shift+Tab twice | ✅ Shift+Tab twice |
 | Read-only Safety | ✅ | ✅ |

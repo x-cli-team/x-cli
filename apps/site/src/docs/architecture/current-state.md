@@ -24,7 +24,7 @@ title: 🔧 Current System State
 - **Documentation Commands**: Full suite with /init-agent, /docs menu, /readme generation, /api-docs, /changelog, /comments, /update-agent-docs, /compact (subagent), /heal (self-healing), /guardrails
 
 ## Authentication & Storage
-- **Auth**: Environment variable GROK_API_KEY or user settings
+- **Auth**: Environment variable X_API_KEY or user settings
 - **Storage**: Local file system only
 - **Database**: None (settings via JSON files)
 - **MCP**: Optional server integration

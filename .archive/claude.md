@@ -1,10 +1,10 @@
-# Grok CLI - CLAUDE.md
+# X-CLI - CLAUDE.md
 
-This document provides context for Claude Code to help improve this Grok CLI application to be as feature-rich and capable as Claude Code itself.
+This document provides context for Claude Code to help improve this X-CLI application to be as feature-rich and capable as Claude Code itself.
 
 ## Project Overview
 
-Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directly into the terminal. It features an intelligent agent system with tool usage, file operations, and MCP (Model Context Protocol) integration.
+X-CLI is a conversational AI CLI tool that brings Grok's capabilities directly into the terminal. It features an intelligent agent system with tool usage, file operations, and MCP (Model Context Protocol) integration.
 
 ## Current Architecture
 
@@ -263,4 +263,4 @@ This CLI aims to bring the power of Claude Code to terminal-based workflows whil
 
 ---
 
-_This section was added by the Grok CLI documentation system_
+_This section was added by the X-CLI documentation system_

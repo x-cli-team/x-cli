@@ -271,7 +271,7 @@ jobs:
             
             🚀 **This PR will auto-merge shortly** and your testimonial will be live within minutes!
             
-            Thank you for contributing to the Grok CLI community! 🎉
+            Thank you for contributing to the X-CLI community! 🎉
             
       - name: Enable auto-merge
         if: success()

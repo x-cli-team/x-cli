@@ -218,14 +218,14 @@ which xcli      # Should show installation path
 **Try without installing:**
 
 ```bash
-GROK_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest --help
+X_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest --help
 ```
 
 **Or install globally:**
 
 ```bash
 npm install -g @xagent/x-cli@latest && \
-echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc && \
+echo 'export X_API_KEY=your_api_key_here' >> ~/.zshrc && \
 source ~/.zshrc && \
 xcli --help
 ```
@@ -249,7 +249,7 @@ npm link
 **Method 1: Environment Variable**
 
 ```bash
-export GROK_API_KEY=your_api_key_here
+export X_API_KEY=your_api_key_here
 ```
 
 **Method 2: .env File**
@@ -381,7 +381,7 @@ This means you can have different models for different projects while maintainin
 
 ### Using Other API Providers
 
-**Important**: Grok CLI uses **OpenAI-compatible APIs**. You can use any provider that implements the OpenAI chat completions standard.
+**Important**: X-CLI uses **OpenAI-compatible APIs**. You can use any provider that implements the OpenAI chat completions standard.
 
 **Popular Providers**:
 
@@ -449,7 +449,7 @@ This mode is particularly useful for:
 
 ### Tool Execution Control
 
-By default, Grok CLI allows up to 400 tool execution rounds to handle complex multi-step tasks. You can control this behavior:
+By default, X-CLI allows up to 400 tool execution rounds to handle complex multi-step tasks. You can control this behavior:
 
 ```bash
 # Limit tool rounds for faster execution on simple tasks
@@ -514,7 +514,7 @@ xcli [options]
 Options:
   -V, --version          output the version number
   -d, --directory <dir>  set working directory
-  -k, --api-key <key>    Grok API key (or set GROK_API_KEY env var)
+  -k, --api-key <key>    Grok API key (or set X_API_KEY env var)
   -u, --base-url <url>   Grok API base URL (or set GROK_BASE_URL env var)
   -m, --model <model>    AI model to use (e.g., grok-code-fast-1, grok-4-latest) (or set GROK_MODEL env var)
   -p, --prompt <prompt>  process a single prompt and exit (headless mode)
@@ -546,7 +546,7 @@ Grok will automatically load and follow these instructions when working in your 
 
 ## Morph Fast Apply (Optional)
 
-Grok CLI supports Morph's Fast Apply model for high-speed code editing at **4,500+ tokens/sec with 98% accuracy**. This is an optional feature that provides lightning-fast file editing capabilities.
+X-CLI supports Morph's Fast Apply model for high-speed code editing at **4,500+ tokens/sec with 98% accuracy**. This is an optional feature that provides lightning-fast file editing capabilities.
 
 **Setup**: Configure your Morph API key following the [setup instructions](#setup) above.
 
@@ -577,7 +577,7 @@ The AI will automatically choose between `edit_file` (Morph) for complex changes
 
 ## MCP Tools
 
-Grok CLI supports MCP (Model Context Protocol) servers, allowing you to extend the AI assistant with additional tools and capabilities.
+X-CLI supports MCP (Model Context Protocol) servers, allowing you to extend the AI assistant with additional tools and capabilities.
 
 ### Adding MCP Tools
 
@@ -856,14 +856,14 @@ This issue is being tracked and the fallbacks ensure the CLI remains functional.
 
 ```bash
 # Set your API key (replace with your actual key)
-export GROK_API_KEY=your_actual_api_key_here
+export X_API_KEY=your_actual_api_key_here
 
 # Or add to your shell profile permanently
-echo 'export GROK_API_KEY=your_actual_api_key_here' >> ~/.zshrc
+echo 'export X_API_KEY=your_actual_api_key_here' >> ~/.zshrc
 source ~/.zshrc
 
 # Verify it's set
-echo $GROK_API_KEY
+echo $X_API_KEY
 ```
 
 **🚨 Network/connectivity issues**
@@ -885,7 +885,7 @@ curl -I https://api.x.ai/v1/models
 
 ## 🙏 Credits
 
-This project is built upon the excellent foundation of the original [Grok CLI](https://github.com/superagent-ai/xcli-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
+This project is built upon the excellent foundation of the original [X-CLI](https://github.com/superagent-ai/xcli-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
 
 **Original Project**: [superagent-ai/xcli-cli](https://github.com/superagent-ai/xcli-cli)  
 **Founder**: [Ismail Pelaseyed](https://github.com/homanp)  
@@ -909,7 +909,7 @@ To add yourself as a contributor:
 ### Core Contributors
 
 - **[@hinetapora](https://github.com/hinetapora)** — Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system
-- **[@homanp](https://github.com/homanp)** — Original Grok CLI creator and foundation
+- **[@homanp](https://github.com/homanp)** — Original X-CLI creator and foundation
 
 ### Community Contributors
 

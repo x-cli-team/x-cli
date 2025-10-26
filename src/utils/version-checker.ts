@@ -69,7 +69,7 @@ function isNewerVersion(version1: string, version2: string): boolean {
  */
 export async function autoUpgrade(): Promise<boolean> {
   try {
-    console.log("🔄 Upgrading Grok CLI...");
+    console.log("🔄 Upgrading X-CLI...");
     await execAsync(`npm update -g ${pkg.name}@latest`, {
       timeout: 30000,
     });

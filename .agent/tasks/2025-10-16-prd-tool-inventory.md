@@ -1,7 +1,7 @@
 # PRD: Tool Inventory and Fault Check
 
 ## Overview
-This PRD outlines the requirements for conducting a comprehensive inventory of all available tools in the Grok CLI system and performing initial fault checks to identify any issues. The goal is to catalog tools and assess their operational status without implementing fixes at this stage.
+This PRD outlines the requirements for conducting a comprehensive inventory of all available tools in the X-CLI system and performing initial fault checks to identify any issues. The goal is to catalog tools and assess their operational status without implementing fixes at this stage.
 
 ## Objectives
 - Create a complete inventory of all tools available in the system

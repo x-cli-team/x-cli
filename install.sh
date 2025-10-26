@@ -107,7 +107,7 @@ main() {
         echo "   xcli --help"
         echo ""
         echo "💡 Set your API key:"
-        echo "   export GROK_API_KEY=your_api_key_here"
+        echo "   export X_API_KEY=your_api_key_here"
         echo ""
         
         # Verify installation

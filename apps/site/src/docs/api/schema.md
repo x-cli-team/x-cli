@@ -9,7 +9,7 @@ title: 🔌 API Schema
 {
   baseURL: "https://api.x.ai/v1",
   defaultModel: "grok-code-fast-1",
-  apiKey: process.env.GROK_API_KEY
+  apiKey: process.env.X_API_KEY
 }
 ```
 

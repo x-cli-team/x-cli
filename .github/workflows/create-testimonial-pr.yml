@@ -79,7 +79,7 @@ jobs:
           const name = extractField('👤 Your Name') || extractField('Your Name');
           const title = extractField('💼 Job Title') || extractField('Job Title');
           const company = extractField('🏢 Company/Organization') || extractField('Company');
-          const quote = extractTextarea('💬 Your Experience with Grok CLI') || extractTextarea('Your Experience');
+          const quote = extractTextarea('💬 Your Experience with X-CLI') || extractTextarea('Your Experience');
           const link = extractField('🔗 Your Profile Link') || extractField('Profile Link');
           const tags = extractTags();
 
@@ -236,7 +236,7 @@ jobs:
             ### ❓ Need Changes?
             Comment on the PR if you need any modifications before it goes live.
 
-            **Welcome to the Grok CLI community! 🚀**
+            **Welcome to the X-CLI community! 🚀**
 
       - name: Handle parsing errors
         if: failure()

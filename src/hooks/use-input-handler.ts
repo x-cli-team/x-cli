@@ -375,7 +375,7 @@ export function useInputHandler({
     if (trimmedInput === "/help") {
       const helpEntry: ChatEntry = {
         type: "assistant",
-        content: `Grok CLI Help:
+        content: `X-CLI Help:
 
 Built-in Commands:
   /clear      - Clear chat history
@@ -483,7 +483,7 @@ Available models: ${modelNames.join(", ")}`,
         const versionInfo = await checkForUpdates();
         const versionEntry: ChatEntry = {
           type: "assistant",
-          content: `📦 **Grok CLI Version Information**
+          content: `📦 **X-CLI Version Information**
 
 Current Version: **${versionInfo.current}**
 Latest Version: **${versionInfo.latest}**
@@ -542,7 +542,7 @@ Upgrading now... This may take a moment.`,
         const resultEntry: ChatEntry = {
           type: "assistant",
           content: success 
-            ? `✅ **Upgrade Complete!**\n\nSuccessfully upgraded to version **${versionInfo.latest}**.\n\n**Please restart Grok CLI** to use the new version:\n- Exit with \`/exit\` or Ctrl+C\n- Run \`grok\` again`
+            ? `✅ **Upgrade Complete!**\n\nSuccessfully upgraded to version **${versionInfo.latest}**.\n\n**Please restart X-CLI** to use the new version:\n- Exit with \`/exit\` or Ctrl+C\n- Run \`grok\` again`
             : `❌ **Upgrade Failed**\n\nPlease try upgrading manually:\n\`${versionInfo.updateCommand}\``,
           timestamp: new Date(),
         };
@@ -600,7 +600,7 @@ Command: \`npm install -g ${pkg.name}@<version>\``,
         
         const successEntry: ChatEntry = {
           type: "assistant",
-          content: `✅ **Version Switch Complete!**\n\nSuccessfully installed version **${versionArg}**.\n\n**Please restart Grok CLI** to use the new version:\n- Exit with \`/exit\` or Ctrl+C\n- Run \`grok\` again`,
+          content: `✅ **Version Switch Complete!**\n\nSuccessfully installed version **${versionArg}**.\n\n**Please restart X-CLI** to use the new version:\n- Exit with \`/exit\` or Ctrl+C\n- Run \`grok\` again`,
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, successEntry]);

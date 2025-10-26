@@ -33,8 +33,8 @@ Creates `.agent/` folder structure:
 
 ## Project Types
 
-### Grok CLI (Internal)
-- Documents Grok CLI's own architecture
+### X-CLI (Internal)
+- Documents X-CLI's own architecture
 - Includes command system patterns
 - References existing tool structure
 

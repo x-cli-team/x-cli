@@ -35,7 +35,7 @@ echo "   export GROK_API_KEY=your_api_key_here"
 #### Enhanced Implementation
 ```bash
 # After successful package installation
-echo "✅ Grok CLI installed successfully!"
+echo "✅ X-CLI installed successfully!"
 
 # Test if grok command works
 if ! command -v grok >/dev/null 2>&1; then
@@ -100,7 +100,7 @@ auto_setup_path() {
     if ! grep -q "npm config get prefix" "$SHELL_FILE" 2>/dev/null; then
         echo "📝 Adding PATH to $SHELL_FILE"
         echo "" >> "$SHELL_FILE"
-        echo "# Added by Grok CLI installer" >> "$SHELL_FILE"
+        echo "# Added by X-CLI installer" >> "$SHELL_FILE"
         echo "$PATH_CMD" >> "$SHELL_FILE"
         echo "✅ PATH updated! Restart terminal or run: source $SHELL_FILE"
     else
@@ -130,7 +130,7 @@ save_api_key_to_profile() {
     if [[ -n "$SHELL_FILE" ]]; then
         if ! grep -q "GROK_API_KEY" "$SHELL_FILE" 2>/dev/null; then
             echo "" >> "$SHELL_FILE"
-            echo "# Grok CLI API key" >> "$SHELL_FILE"
+            echo "# X-CLI API key" >> "$SHELL_FILE"
             echo "export GROK_API_KEY=\"$api_key\"" >> "$SHELL_FILE"
             echo "✅ API key saved to $SHELL_FILE"
         else
@@ -178,7 +178,7 @@ const isSetupIncomplete = () => {
     
     {/* Welcome Message */}
     <Text color="green" bold marginTop={1}>
-      🚀 Welcome to Grok CLI - Claude Code-level intelligence!
+      🚀 Welcome to X-CLI - Claude Code-level intelligence!
     </Text>
     
     {/* Rest of existing welcome... */}
@@ -246,7 +246,7 @@ program
   });
 
 const runInteractiveSetup = async () => {
-  console.log('🛠️ Grok CLI Setup\n');
+  console.log('🛠️ X-CLI Setup\n');
   
   // Check PATH
   if (!checkCommandExists('grok')) {

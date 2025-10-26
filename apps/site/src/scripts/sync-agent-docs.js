@@ -87,7 +87,7 @@ function generateRoadmap() {
     'sidebar_position: 1',
     '---',
     '',
-    '# Grok CLI Roadmap',
+    '# X-CLI Roadmap',
     '',
     'This roadmap is automatically generated from our internal task tracking system.',
     '',

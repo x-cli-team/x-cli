@@ -1,4 +1,4 @@
-# 🏗️ Grok CLI Architecture
+# 🏗️ X-CLI Architecture
 
 ## Project Type
 **CLI Application** - Conversational AI tool with terminal interface

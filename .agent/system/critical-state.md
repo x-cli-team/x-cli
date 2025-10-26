@@ -27,7 +27,7 @@
 
 ## Authentication & Storage
 
-- **Auth**: Environment variable GROK_API_KEY or user settings
+- **Auth**: Environment variable X_API_KEY or user settings
 - **Storage**: Local file system only
 - **Database**: None (settings via JSON files)
 - **MCP**: Optional server integration

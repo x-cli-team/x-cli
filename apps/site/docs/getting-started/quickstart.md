@@ -10,7 +10,7 @@ Get started with X CLI in under 5 minutes.
 
 ```bash
 # Run immediately with API key
-GROK_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest
+X_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest
 ```
 
 Or install globally:
@@ -25,10 +25,10 @@ Set your API key (choose one method):
 
 ```bash
 # Method 1: Environment variable
-export GROK_API_KEY=your_api_key_here
+export X_API_KEY=your_api_key_here
 
 # Method 2: Pass inline with npx
-GROK_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest
+X_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest
 
 # Method 3: Command flag (if installed globally)
 xcli --api-key your_api_key_here
@@ -57,7 +57,7 @@ Experience Claude Code's signature feature:
 
 ```bash
 # 1. Start X CLI
-GROK_API_KEY=your_key npx -y @xagent/x-cli@latest
+X_API_KEY=your_key npx -y @xagent/x-cli@latest
 # Or if installed globally: xcli
 
 # 2. Press Shift+Tab twice quickly

@@ -4,7 +4,7 @@ title: Tools Overview
 
 # Tools Overview
 
-Grok CLI features a comprehensive tool system that provides powerful capabilities for file operations, code analysis, web integration, and workflow automation. The AI automatically selects and combines these tools to accomplish complex tasks through natural language interaction.
+X-CLI features a comprehensive tool system that provides powerful capabilities for file operations, code analysis, web integration, and workflow automation. The AI automatically selects and combines these tools to accomplish complex tasks through natural language interaction.
 
 ## Tool Categories
 
@@ -250,7 +250,7 @@ grok "Cancel the long-running test"
 ## Tool Selection and Orchestration
 
 ### Automatic Tool Selection
-Grok CLI's AI automatically selects the most appropriate tools for each task:
+X-CLI's AI automatically selects the most appropriate tools for each task:
 
 - **Single operations**: Uses individual tools directly
 - **Complex tasks**: Combines multiple tools in sequence

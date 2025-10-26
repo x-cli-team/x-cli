@@ -36,7 +36,7 @@
 
 ## 🎯 Sprint Goal
 
-Transform Grok CLI's user experience to match Claude Code's "feel" through targeted UX multipliers: tight feedback loops, clean focus, implicit context awareness, motion design, and color hierarchy. Achieve +40% perceived intelligence and -30% support load through quick-win interface improvements.
+Transform X-CLI's user experience to match Claude Code's "feel" through targeted UX multipliers: tight feedback loops, clean focus, implicit context awareness, motion design, and color hierarchy. Achieve +40% perceived intelligence and -30% support load through quick-win interface improvements.
 
 ---
 

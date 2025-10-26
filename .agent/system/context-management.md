@@ -2,7 +2,7 @@
 
 ## Overview
 
-Grok CLI uses a **message-based context management** system that differs significantly from more advanced context management approaches like Claude Code. This document outlines the current implementation, limitations, and roadmap for improvements.
+X-CLI uses a **message-based context management** system that differs significantly from more advanced context management approaches like Claude Code. This document outlines the current implementation, limitations, and roadmap for improvements.
 
 ## Current Architecture
 
@@ -196,7 +196,7 @@ export class GrokAgent extends EventEmitter {
 
 ## Documentation Status
 
-**CRITICAL GAP IDENTIFIED**: This document is the first comprehensive documentation of Grok CLI's context management system. Previous documentation gaps included:
+**CRITICAL GAP IDENTIFIED**: This document is the first comprehensive documentation of X-CLI's context management system. Previous documentation gaps included:
 
 - No architecture documentation for context handling
 - No user documentation for context limitations

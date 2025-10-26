@@ -1,7 +1,7 @@
 # 🎨 UX Feedback System - Maintenance SOP
 
 ## Overview
-Standard Operating Procedures for maintaining and extending the Claude Code-style UX feedback system implemented in Grok CLI.
+Standard Operating Procedures for maintaining and extending the Claude Code-style UX feedback system implemented in X-CLI.
 
 ## System Components
 

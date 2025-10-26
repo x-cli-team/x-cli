@@ -1,10 +1,10 @@
 # 📋 Example PRD: Documentation System Enhancement
 
 ## Objective
-Add comprehensive documentation generation capabilities to Grok CLI.
+Add comprehensive documentation generation capabilities to X-CLI.
 
 ## Background
-Grok CLI needs better documentation tools to help users document both the CLI itself and their projects efficiently.
+X-CLI needs better documentation tools to help users document both the CLI itself and their projects efficiently.
 
 ## Requirements
 

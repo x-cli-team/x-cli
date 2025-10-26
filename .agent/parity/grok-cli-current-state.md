@@ -1,10 +1,10 @@
-# 🚀 Grok CLI Current Capabilities
+# 🚀 X-CLI Current Capabilities
 
-Comprehensive inventory of Grok CLI's implemented features as of October 2024, serving as baseline for competitive gap analysis.
+Comprehensive inventory of X-CLI's implemented features as of October 2024, serving as baseline for competitive gap analysis.
 
 ## 🎯 Project Overview
 
-**Terminal-Native AI Coding Assistant** - Grok CLI brings Claude Code-level intelligence directly into the terminal with X.AI's Grok models, focusing on professional UX and comprehensive tool integration.
+**Terminal-Native AI Coding Assistant** - X-CLI brings Claude Code-level intelligence directly into the terminal with X.AI's Grok models, focusing on professional UX and comprehensive tool integration.
 
 ## 🛠️ Technical Architecture
 
@@ -108,7 +108,7 @@ Comprehensive inventory of Grok CLI's implemented features as of October 2024, s
 - **User Settings**: `~/.grok/user-settings.json` for global configuration
 - **Project Settings**: `.grok/settings.json` for project-specific behavior
 - **Custom Instructions**: `.grok/GROK.md` for project-specific AI behavior
-- **Environment Variables**: `GROK_API_KEY` and other environment configuration
+- **Environment Variables**: `X_API_KEY` and other environment configuration
 
 ## 🚀 Advanced Features
 

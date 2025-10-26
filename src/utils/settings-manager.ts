@@ -3,11 +3,11 @@ import * as path from "path";
 import * as os from "os";
 
 /**
- * User-level settings stored in ~/.grok/user-settings.json
+ * User-level settings stored in ~/.x/user-settings.json (or ~/.grok/user-settings.json for backwards compatibility)
  * These are global settings that apply across all projects
  */
 export interface UserSettings {
-  apiKey?: string; // Grok API key
+  apiKey?: string; // X API key
   baseURL?: string; // API base URL
   defaultModel?: string; // User's preferred default model
   models?: string[]; // Available models list
@@ -19,7 +19,7 @@ export interface UserSettings {
 }
 
 /**
- * Project-level settings stored in .grok/settings.json
+ * Project-level settings stored in .x/settings.json (or .grok/settings.json for backwards compatibility)
  * These are project-specific settings
  */
 export interface ProjectSettings {
@@ -59,19 +59,25 @@ export class SettingsManager {
   private projectSettingsPath: string;
 
   private constructor() {
-    // User settings path: ~/.grok/user-settings.json
-    this.userSettingsPath = path.join(
-      os.homedir(),
-      ".grok",
-      "user-settings.json"
-    );
+    // User settings path: try ~/.x first, fallback to ~/.grok for backwards compatibility
+    const newUserDir = path.join(os.homedir(), ".x");
+    const oldUserDir = path.join(os.homedir(), ".grok");
+    
+    if (fs.existsSync(newUserDir) || !fs.existsSync(oldUserDir)) {
+      this.userSettingsPath = path.join(newUserDir, "user-settings.json");
+    } else {
+      this.userSettingsPath = path.join(oldUserDir, "user-settings.json");
+    }
 
-    // Project settings path: .grok/settings.json (in current working directory)
-    this.projectSettingsPath = path.join(
-      process.cwd(),
-      ".grok",
-      "settings.json"
-    );
+    // Project settings path: try .x first, fallback to .grok for backwards compatibility
+    const newProjectDir = path.join(process.cwd(), ".x");
+    const oldProjectDir = path.join(process.cwd(), ".grok");
+    
+    if (fs.existsSync(newProjectDir) || !fs.existsSync(oldProjectDir)) {
+      this.projectSettingsPath = path.join(newProjectDir, "settings.json");
+    } else {
+      this.projectSettingsPath = path.join(oldProjectDir, "settings.json");
+    }
   }
 
   /**
@@ -95,7 +101,7 @@ export class SettingsManager {
   }
 
   /**
-   * Load user settings from ~/.grok/user-settings.json
+   * Load user settings from ~/.x/user-settings.json
    */
   public loadUserSettings(): UserSettings {
     try {
@@ -120,7 +126,7 @@ export class SettingsManager {
   }
 
   /**
-   * Save user settings to ~/.grok/user-settings.json
+   * Save user settings to ~/.x/user-settings.json
    */
   public saveUserSettings(settings: Partial<UserSettings>): void {
     try {
@@ -175,7 +181,7 @@ export class SettingsManager {
   }
 
   /**
-   * Load project settings from .grok/settings.json
+   * Load project settings from .x/settings.json
    */
   public loadProjectSettings(): ProjectSettings {
     try {
@@ -200,7 +206,7 @@ export class SettingsManager {
   }
 
   /**
-   * Save project settings to .grok/settings.json
+   * Save project settings to .x/settings.json
    */
   public saveProjectSettings(settings: Partial<ProjectSettings>): void {
     try {
@@ -295,7 +301,7 @@ export class SettingsManager {
    */
   public getApiKey(): string | undefined {
     // First check environment variable
-    const envApiKey = process.env.GROK_API_KEY;
+    const envApiKey = process.env.X_API_KEY || process.env.GROK_API_KEY;
     if (envApiKey) {
       return envApiKey;
     }

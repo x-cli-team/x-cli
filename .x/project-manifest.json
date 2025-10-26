@@ -1,0 +1,430 @@
+{
+  "rootPath": "/Users/based/Documents/Github/hurry/x-cli-hurry-mode",
+  "projectName": "@xagent/x-cli",
+  "projectType": "react",
+  "primaryLanguage": "typescript",
+  "rootFiles": [
+    {
+      "name": "package.json",
+      "path": "package.json",
+      "type": "config",
+      "purpose": "Node.js project configuration, dependencies, and scripts",
+      "importance": "critical",
+      "size": 5079,
+      "lastModified": "2025-10-25T08:07:34.254Z"
+    },
+    {
+      "name": "tsconfig.json",
+      "path": "tsconfig.json",
+      "type": "config",
+      "purpose": "TypeScript compiler configuration and project settings",
+      "importance": "critical",
+      "size": 548,
+      "lastModified": "2025-10-16T21:15:49.800Z"
+    },
+    {
+      "name": ".env.example",
+      "path": ".env.example",
+      "type": "config",
+      "purpose": "Environment variables template for configuration",
+      "importance": "important",
+      "size": 134,
+      "lastModified": "2025-10-08T08:28:27.009Z"
+    },
+    {
+      "name": ".gitignore",
+      "path": ".gitignore",
+      "type": "config",
+      "purpose": "Git version control ignore patterns",
+      "importance": "important",
+      "size": 2092,
+      "lastModified": "2025-10-25T07:56:44.930Z"
+    },
+    {
+      "name": "CHANGELOG.md",
+      "path": "CHANGELOG.md",
+      "type": "documentation",
+      "purpose": "Version history and release notes",
+      "importance": "important",
+      "size": 4438,
+      "lastModified": "2025-10-24T15:10:19.897Z"
+    },
+    {
+      "name": "eslint.config.mjs",
+      "path": "eslint.config.mjs",
+      "type": "config",
+      "purpose": "ESLint code linting configuration",
+      "importance": "important",
+      "size": 823,
+      "lastModified": "2025-10-25T06:35:04.444Z"
+    },
+    {
+      "name": "LICENSE",
+      "path": "LICENSE",
+      "type": "metadata",
+      "purpose": "Software license and legal terms",
+      "importance": "important",
+      "size": 1080,
+      "lastModified": "2025-10-08T08:28:27.010Z"
+    },
+    {
+      "name": "package-lock.json",
+      "path": "package-lock.json",
+      "type": "metadata",
+      "purpose": "Dependency lock file ensuring reproducible builds",
+      "importance": "important",
+      "size": 303941,
+      "lastModified": "2025-10-25T07:44:08.166Z"
+    },
+    {
+      "name": "README.md",
+      "path": "README.md",
+      "type": "documentation",
+      "purpose": "Project overview, setup instructions, and documentation",
+      "importance": "important",
+      "size": 31595,
+      "lastModified": "2025-10-25T07:44:08.188Z"
+    },
+    {
+      "name": ".DS_Store",
+      "path": ".DS_Store",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 8196,
+      "lastModified": "2025-10-18T11:28:53.098Z"
+    },
+    {
+      "name": ".grokignore",
+      "path": ".grokignore",
+      "type": "config",
+      "purpose": "Grok CLI ignore patterns for codebase analysis",
+      "importance": "optional",
+      "size": 1070,
+      "lastModified": "2025-10-25T08:06:48.215Z"
+    },
+    {
+      "name": ".npmignore",
+      "path": ".npmignore",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 585,
+      "lastModified": "2025-10-18T07:45:54.157Z"
+    },
+    {
+      "name": ".npmrc",
+      "path": ".npmrc",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 37,
+      "lastModified": "2025-10-08T16:28:29.077Z"
+    },
+    {
+      "name": "bun.lock",
+      "path": "bun.lock",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 83220,
+      "lastModified": "2025-10-09T15:23:48.361Z"
+    },
+    {
+      "name": "x-cli-smart.sh",
+      "path": "x-cli-smart.sh",
+      "type": "script",
+      "purpose": "Shell script for automation or setup tasks",
+      "importance": "optional",
+      "size": 993,
+      "lastModified": "2025-10-16T19:47:19.682Z"
+    },
+    {
+      "name": "install.sh",
+      "path": "install.sh",
+      "type": "script",
+      "purpose": "Shell script for automation or setup tasks",
+      "importance": "optional",
+      "size": 3724,
+      "lastModified": "2025-10-12T10:17:55.847Z"
+    },
+    {
+      "name": "pnpm-workspace.yaml",
+      "path": "pnpm-workspace.yaml",
+      "type": "config",
+      "purpose": "YAML configuration file",
+      "importance": "optional",
+      "size": 39,
+      "lastModified": "2025-10-18T07:43:00.993Z"
+    },
+    {
+      "name": "tsup.config.ts",
+      "path": "tsup.config.ts",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 608,
+      "lastModified": "2025-10-16T18:28:40.606Z"
+    },
+    {
+      "name": "tsup.debug.config.ts",
+      "path": "tsup.debug.config.ts",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 198,
+      "lastModified": "2025-10-12T13:23:37.646Z"
+    },
+    {
+      "name": "tsup.node.config.ts",
+      "path": "tsup.node.config.ts",
+      "type": "other",
+      "purpose": "Project file - purpose needs manual review",
+      "importance": "optional",
+      "size": 337,
+      "lastModified": "2025-10-12T13:23:37.646Z"
+    },
+    {
+      "name": "vercel.json",
+      "path": "vercel.json",
+      "type": "config",
+      "purpose": "Deployment platform configuration",
+      "importance": "optional",
+      "size": 277,
+      "lastModified": "2025-10-18T08:09:38.119Z"
+    }
+  ],
+  "directories": [
+    {
+      "name": "src",
+      "path": "src",
+      "fileCount": 89,
+      "primaryFileTypes": [
+        ".png",
+        ".ts"
+      ],
+      "type": "source",
+      "purpose": "Main application source code and components",
+      "importance": "critical"
+    },
+    {
+      "name": ".github",
+      "path": ".github",
+      "fileCount": 12,
+      "primaryFileTypes": [
+        ".md"
+      ],
+      "type": "config",
+      "purpose": "Configuration files and development environment settings",
+      "importance": "important"
+    },
+    {
+      "name": "dist",
+      "path": "dist",
+      "fileCount": 3,
+      "primaryFileTypes": [
+        ".ts",
+        ".js",
+        ".map"
+      ],
+      "type": "build",
+      "purpose": "Built/compiled output files for distribution",
+      "importance": "important"
+    },
+    {
+      "name": ".agent",
+      "path": ".agent",
+      "fileCount": 50,
+      "primaryFileTypes": [
+        ".md",
+        ".json"
+      ],
+      "type": "other",
+      "purpose": "Directory containing 50 files (.md, .json)",
+      "importance": "optional"
+    },
+    {
+      "name": ".archive",
+      "path": ".archive",
+      "fileCount": 11,
+      "primaryFileTypes": [
+        ".md",
+        ".rb",
+        ".zip",
+        ".tsx",
+        ".js"
+      ],
+      "type": "other",
+      "purpose": "Directory containing 11 files (.md, .rb, .zip)",
+      "importance": "optional"
+    },
+    {
+      "name": ".git",
+      "path": ".git",
+      "fileCount": 2909,
+      "primaryFileTypes": [],
+      "type": "other",
+      "purpose": "Directory containing 2909 files ()",
+      "importance": "optional"
+    },
+    {
+      "name": ".githooks",
+      "path": ".githooks",
+      "fileCount": 1,
+      "primaryFileTypes": [],
+      "type": "other",
+      "purpose": "Directory containing 1 files ()",
+      "importance": "optional"
+    },
+    {
+      "name": ".grok",
+      "path": ".grok",
+      "fileCount": 3,
+      "primaryFileTypes": [
+        ".json",
+        ".md"
+      ],
+      "type": "other",
+      "purpose": "Directory containing 3 files (.json, .md)",
+      "importance": "optional"
+    },
+    {
+      "name": ".husky",
+      "path": ".husky",
+      "fileCount": 20,
+      "primaryFileTypes": [],
+      "type": "other",
+      "purpose": "Directory containing 20 files ()",
+      "importance": "optional"
+    },
+    {
+      "name": "apps",
+      "path": "apps",
+      "fileCount": 121,
+      "primaryFileTypes": [],
+      "type": "other",
+      "purpose": "Directory containing 121 files ()",
+      "importance": "optional"
+    },
+    {
+      "name": "data",
+      "path": "data",
+      "fileCount": 2,
+      "primaryFileTypes": [
+        ".yml"
+      ],
+      "type": "other",
+      "purpose": "Directory containing 2 files (.yml)",
+      "importance": "optional"
+    },
+    {
+      "name": "dev",
+      "path": "dev",
+      "fileCount": 4,
+      "primaryFileTypes": [
+        ".md"
+      ],
+      "type": "other",
+      "purpose": "Directory containing 4 files (.md)",
+      "importance": "optional"
+    },
+    {
+      "name": "node_modules",
+      "path": "node_modules",
+      "fileCount": 9501,
+      "primaryFileTypes": [
+        ".json"
+      ],
+      "type": "other",
+      "purpose": "Node.js package dependencies (auto-generated)",
+      "importance": "optional"
+    },
+    {
+      "name": "scripts",
+      "path": "scripts",
+      "fileCount": 5,
+      "primaryFileTypes": [
+        ".mjs",
+        ".sh",
+        ".cjs"
+      ],
+      "type": "tools",
+      "purpose": "Build scripts, utilities, and development tools",
+      "importance": "optional"
+    }
+  ],
+  "configFiles": [
+    {
+      "name": "package.json",
+      "path": "package.json",
+      "configures": "Node.js/npm",
+      "type": "other",
+      "description": "Node.js project configuration, dependencies, and scripts"
+    },
+    {
+      "name": "tsconfig.json",
+      "path": "tsconfig.json",
+      "configures": "TypeScript",
+      "type": "type",
+      "description": "TypeScript compiler configuration and project settings"
+    },
+    {
+      "name": ".env.example",
+      "path": ".env.example",
+      "configures": "Unknown",
+      "type": "other",
+      "description": "Environment variables template for configuration"
+    },
+    {
+      "name": ".gitignore",
+      "path": ".gitignore",
+      "configures": "Unknown",
+      "type": "other",
+      "description": "Git version control ignore patterns"
+    },
+    {
+      "name": "eslint.config.mjs",
+      "path": "eslint.config.mjs",
+      "configures": "ESLint",
+      "type": "lint",
+      "description": "ESLint code linting configuration"
+    },
+    {
+      "name": ".grokignore",
+      "path": ".grokignore",
+      "configures": "Unknown",
+      "type": "other",
+      "description": "Grok CLI ignore patterns for codebase analysis"
+    },
+    {
+      "name": "pnpm-workspace.yaml",
+      "path": "pnpm-workspace.yaml",
+      "configures": "Unknown",
+      "type": "other",
+      "description": "YAML configuration file"
+    },
+    {
+      "name": "vercel.json",
+      "path": "vercel.json",
+      "configures": "Unknown",
+      "type": "deploy",
+      "description": "Deployment platform configuration"
+    }
+  ],
+  "entryPoints": [
+    {
+      "name": "index.js",
+      "path": "dist/index.js",
+      "type": "main",
+      "description": "Main module entry point specified in package.json"
+    },
+    {
+      "name": "index.js",
+      "path": "dist/index.js",
+      "type": "cli",
+      "description": "CLI command 'xcli' entry point"
+    }
+  ],
+  "generatedAt": "2025-10-25T08:11:07.319Z",
+  "version": "1.0.0"
+}

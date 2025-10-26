@@ -7,7 +7,7 @@
 
 ## 🎯 Sprint Goal
 
-Transform Grok CLI's basic message-based context system into an advanced context management system that matches or exceeds Claude Code's capabilities, providing users with intelligent context handling, file chunking, memory optimization, and real-time context visibility.
+Transform X-CLI's basic message-based context system into an advanced context management system that matches or exceeds Claude Code's capabilities, providing users with intelligent context handling, file chunking, memory optimization, and real-time context visibility.
 
 ## 📊 Current State Analysis
 

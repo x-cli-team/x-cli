@@ -3,7 +3,7 @@ title: Roadmap
 sidebar_position: 1
 ---
 
-# Grok CLI Roadmap
+# X-CLI Roadmap
 
 This roadmap is automatically generated from our internal task tracking system.
 
@@ -35,7 +35,7 @@ Implement a fully automated testimonial collection system with bot-managed PR wo
 
 **[View Complete Competitive Analysis](https://github.com/hinetapora/@xagent/x-cli/tree/main/.agent/parity)**
 
-Comprehensive analysis of Grok CLI vs leading AI coding tools (Claude Code, Cursor IDE, OpenAI Codex) with strategic roadmap through Q4 2025.
+Comprehensive analysis of X-CLI vs leading AI coding tools (Claude Code, Cursor IDE, OpenAI Codex) with strategic roadmap through Q4 2025.
 
 ### Current Position
 

@@ -27,7 +27,7 @@ npx -y @xagent/x-cli@latest
 **Usage with API key:**
 
 ```bash
-GROK_API_KEY=your_key npx -y @xagent/x-cli@latest
+X_API_KEY=your_key npx -y @xagent/x-cli@latest
 ```
 
 ### Option 2: Global Installation
@@ -84,14 +84,14 @@ xcli --version
 
 ```bash
 # Environment variable (recommended)
-export GROK_API_KEY=your_api_key_here
+export X_API_KEY=your_api_key_here
 
 # Save permanently to shell profile
-echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc
+echo 'export X_API_KEY=your_api_key_here' >> ~/.zshrc
 source ~/.zshrc
 
 # Or save permanently (bash users)
-echo 'export GROK_API_KEY=your_api_key_here' >> ~/.bashrc
+echo 'export X_API_KEY=your_api_key_here' >> ~/.bashrc
 source ~/.bashrc
 ```
 

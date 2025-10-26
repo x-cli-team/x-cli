@@ -2,7 +2,7 @@
 
 ## Overview
 
-Grok CLI uses an automated version synchronization system to ensure all version displays remain consistent across the codebase, documentation, and NPM releases. This prevents version drift and manual synchronization errors.
+X-CLI uses an automated version synchronization system to ensure all version displays remain consistent across the codebase, documentation, and NPM releases. This prevents version drift and manual synchronization errors.
 
 ## 🎯 System Architecture
 

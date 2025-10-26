@@ -17,7 +17,7 @@ const SAMPLE_TESTIMONIALS: Testimonial[] = [
     name: "Alex Chen",
     title: "Senior Software Engineer",
     company: "TechCorp",
-    quote: "Grok CLI transformed my development workflow. The AI assistance is incredible and it never leaves my terminal.",
+    quote: "X-CLI transformed my development workflow. The AI assistance is incredible and it never leaves my terminal.",
     link: "https://github.com/alexchen",
     avatar: "https://github.com/alexchen.png",
     featured: true,
@@ -52,7 +52,7 @@ export default function TestimonialsSection() {
         <div className={styles.header}>
           <h2 className={styles.sectionTitle}>Loved by Developers</h2>
           <p className={styles.sectionSubtitle}>
-            See what the community is saying about Grok CLI
+            See what the community is saying about X-CLI
           </p>
         </div>
         

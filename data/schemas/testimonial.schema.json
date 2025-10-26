@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Grok CLI Testimonials",
-  "description": "Schema for community testimonials about Grok CLI",
+  "title": "X-CLI Testimonials",
+  "description": "Schema for community testimonials about X-CLI",
   "type": "array",
   "items": {
     "type": "object",

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This SOP ensures consistent version management across the Grok CLI codebase, preventing version drift and maintaining synchronization between NPM releases, documentation, and application displays.
+This SOP ensures consistent version management across the X-CLI codebase, preventing version drift and maintaining synchronization between NPM releases, documentation, and application displays.
 
 ## 🎯 Quick Reference
 
@@ -39,7 +39,7 @@ This SOP ensures consistent version management across the Grok CLI codebase, pre
    ```typescript
    const version = pkg.version;
    // or inline
-   console.log(`Grok CLI v${pkg.version}`);
+   console.log(`X-CLI v${pkg.version}`);
    ```
 
 3. Test the implementation:

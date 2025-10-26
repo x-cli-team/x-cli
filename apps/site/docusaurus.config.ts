@@ -166,7 +166,7 @@ const config: Config = {
           title: 'Credits',
           items: [
             {
-              label: 'Original Grok CLI',
+              label: 'Original X-CLI',
               href: 'https://github.com/superagent-ai/grok-cli',
             },
             {

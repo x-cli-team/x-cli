@@ -114,7 +114,7 @@ apps/site/
 ```js
 // docusaurus.config.js
 module.exports = {
-  title: "Grok CLI",
+  title: "X-CLI",
   tagline: "Claude Code-level intelligence in your terminal",
   favicon: "img/favicon.ico",
   url: "https://docs.X CLI.dev",
@@ -122,9 +122,9 @@ module.exports = {
 
   themeConfig: {
     navbar: {
-      title: "Grok CLI",
+      title: "X-CLI",
       logo: {
-        alt: "Grok CLI Logo",
+        alt: "X-CLI Logo",
         src: "img/logo.svg",
       },
       items: [
@@ -149,7 +149,7 @@ module.exports = {
     },
     footer: {
       style: "dark",
-      copyright: `Copyright © ${new Date().getFullYear()} Grok CLI. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} X-CLI. Built with Docusaurus.`,
     },
     colorMode: {
       defaultMode: "dark",
@@ -179,7 +179,7 @@ module.exports = {
 - **Installation section** → `/docs/quickstart.mdx`
 - **Troubleshooting** → `/docs/guides/troubleshooting.mdx`
 - **Automation docs** → `/docs/guides/automation.mdx`
-- **Existing page.tsx** → `src/pages/index.js` (adapted for Grok CLI)
+- **Existing page.tsx** → `src/pages/index.js` (adapted for X-CLI)
 
 #### Landing Page Adaptation
 
@@ -192,7 +192,7 @@ The existing `page.tsx` provides:
 **Required Customization**:
 
 ```jsx
-// Updated content for Grok CLI
+// Updated content for X-CLI
 <h1>Claude Code-Level Intelligence in Your Terminal</h1>
 <ChipBtn variant="solid" label="npm install -g @xagent/x-cli@latest" />
 
@@ -201,8 +201,8 @@ The existing `page.tsx` provides:
 <NavLink>Roadmap</NavLink>
 <NavLink>Discord</NavLink>
 
-// Grok CLI branding
-<LogoMark /> // Replace with Grok CLI logo
+// X-CLI branding
+<LogoMark /> // Replace with X-CLI logo
 ```
 
 #### New Content
@@ -216,12 +216,12 @@ The existing `page.tsx` provides:
 ````mdx
 ---
 title: Quick Start
-description: Get up and running with Grok CLI in minutes
+description: Get up and running with X-CLI in minutes
 ---
 
 # Quick Start
 
-Get up and running with Grok CLI in minutes.
+Get up and running with X-CLI in minutes.
 
 ## Installation
 
@@ -453,7 +453,7 @@ module.exports = {
 - **30 min**: Adapt existing page.tsx as landing page and blog setup
 - **1 hour**: Implement automatic roadmap generation
 - **1 hour**: Configure sidebars and navigation
-- **30 min**: Customize landing page content for Grok CLI branding
+- **30 min**: Customize landing page content for X-CLI branding
 
 ### Phase 3: Deployment (1 hour)
 
