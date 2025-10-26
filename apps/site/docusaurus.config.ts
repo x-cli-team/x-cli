@@ -75,10 +75,10 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'grok-cli',
+      title: 'X CLI',
       logo: {
-        alt: 'Grok CLI Logo',
-        src: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzFhMWExYSIvPgo8dGV4dCB4PSIxNiIgeT0iMjEiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWkiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5HPC90ZXh0Pgo8L3N2Zz4K',
+        alt: 'X CLI Logo',
+        src: 'img/x-cli-logo.svg',
       },
       items: [
         {
@@ -102,7 +102,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/hinetapora/grok-cli-hurry-mode',
+          href: 'https://github.com/x-cli-team/x-cli',
           label: 'GitHub',
           position: 'right',
         },
@@ -137,11 +137,11 @@ const config: Config = {
             },
             {
               label: 'GitHub Issues',
-              href: 'https://github.com/hinetapora/grok-cli-hurry-mode/issues',
+              href: 'https://github.com/x-cli-team/x-cli/issues',
             },
             {
               label: 'NPM Package',
-              href: 'https://www.npmjs.com/package/grok-cli-hurry-mode',
+              href: 'https://www.npmjs.com/package/@xagent/x-cli',
             },
           ],
         },
@@ -158,7 +158,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/hinetapora/grok-cli-hurry-mode',
+              href: 'https://github.com/x-cli-team/x-cli',
             },
           ],
         },
@@ -180,7 +180,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Grok CLI. Built with Docusaurus. Forked from <a href="https://github.com/superagent-ai/grok-cli" target="_blank" rel="noopener noreferrer">Superagent.ai</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
+      copyright: `Copyright © ${new Date().getFullYear()} X CLI. Built with Docusaurus. Forked from <a href="https://github.com/superagent-ai/grok-cli" target="_blank" rel="noopener noreferrer">Superagent.ai</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
     },
     prism: {
       theme: prismThemes.github,

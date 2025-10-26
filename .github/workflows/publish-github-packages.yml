@@ -11,30 +11,30 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@hinetapora'
-      
+          node-version: "20"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@xagent"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Build
         run: npm run build
-      
+
       - name: Configure package for GitHub Packages
         run: |
           # Create a temporary package.json for GitHub Packages
-          jq '.name = "@hinetapora/grok-cli-hurry-mode" | .publishConfig.registry = "https://npm.pkg.github.com"' package.json > package-github.json
+          jq '.name = "@xagent/x-cli" | .publishConfig.registry = "https://npm.pkg.github.com"' package.json > package-github.json
           mv package-github.json package.json
-      
+
       - name: Publish to GitHub Packages
         run: npm publish
         env:
