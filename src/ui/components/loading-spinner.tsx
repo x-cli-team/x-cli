@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Box, Text } from "ink";
 import { formatTokenCount } from "../../utils/token-counter.js";
 import { inkColors, getSpinnerColor } from "../colors.js";
@@ -78,29 +78,13 @@ export function LoadingSpinner({
   message,
   progress,
 }: LoadingSpinnerProps) {
-  const [spinnerIndex, setSpinnerIndex] = useState(0);
-  const [messageIndex, setMessageIndex] = useState(0);
-
-  useEffect(() => {
-    if (!isActive) return;
-
-    const interval = setInterval(() => {
-      setSpinnerIndex((prev) => (prev + 1) % 10);
-      // Change message every 3 seconds
-      if (Date.now() % 3000 < 200) {
-        const config = operationConfig[operation];
-        setMessageIndex((prev) => (prev + 1) % config.messages.length);
-      }
-    }, 120); // 120ms for smooth animation
-
-    return () => clearInterval(interval);
-  }, [isActive, operation]);
+  // Static spinner - no animation to prevent repaint storm
 
   if (!isActive) return null;
 
   const config = operationConfig[operation];
-  const spinnerChar = config.spinner[spinnerIndex];
-  const operationMessage = message || config.messages[messageIndex];
+  const spinnerChar = config.spinner[0]; // Use first spinner character (static)
+  const operationMessage = message || config.messages[0]; // Use first message (static)
   const color = getSpinnerColor(operation);
 
   // Generate progress bar if progress is provided

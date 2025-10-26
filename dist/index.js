@@ -43,7 +43,7 @@ var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-function getSettingsManager2() {
+function getSettingsManager() {
   return SettingsManager.getInstance();
 }
 var DEFAULT_USER_SETTINGS, DEFAULT_PROJECT_SETTINGS, SettingsManager;
@@ -65,16 +65,20 @@ var init_settings_manager = __esm({
     };
     SettingsManager = class _SettingsManager {
       constructor() {
-        this.userSettingsPath = path7.join(
-          os.homedir(),
-          ".grok",
-          "user-settings.json"
-        );
-        this.projectSettingsPath = path7.join(
-          process.cwd(),
-          ".grok",
-          "settings.json"
-        );
+        const newUserDir = path7.join(os.homedir(), ".x");
+        const oldUserDir = path7.join(os.homedir(), ".grok");
+        if (fs.existsSync(newUserDir) || !fs.existsSync(oldUserDir)) {
+          this.userSettingsPath = path7.join(newUserDir, "user-settings.json");
+        } else {
+          this.userSettingsPath = path7.join(oldUserDir, "user-settings.json");
+        }
+        const newProjectDir = path7.join(process.cwd(), ".x");
+        const oldProjectDir = path7.join(process.cwd(), ".grok");
+        if (fs.existsSync(newProjectDir) || !fs.existsSync(oldProjectDir)) {
+          this.projectSettingsPath = path7.join(newProjectDir, "settings.json");
+        } else {
+          this.projectSettingsPath = path7.join(oldProjectDir, "settings.json");
+        }
       }
       /**
        * Get singleton instance
@@ -95,7 +99,7 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Load user settings from ~/.grok/user-settings.json
+       * Load user settings from ~/.x/user-settings.json
        */
       loadUserSettings() {
         try {
@@ -115,7 +119,7 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Save user settings to ~/.grok/user-settings.json
+       * Save user settings to ~/.x/user-settings.json
        */
       saveUserSettings(settings) {
         try {
@@ -160,7 +164,7 @@ var init_settings_manager = __esm({
         return settings[key];
       }
       /**
-       * Load project settings from .grok/settings.json
+       * Load project settings from .x/settings.json
        */
       loadProjectSettings() {
         try {
@@ -180,7 +184,7 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Save project settings to .grok/settings.json
+       * Save project settings to .x/settings.json
        */
       saveProjectSettings(settings) {
         try {
@@ -256,7 +260,7 @@ var init_settings_manager = __esm({
        * Get API key from user settings or environment
        */
       getApiKey() {
-        const envApiKey = process.env.GROK_API_KEY;
+        const envApiKey = process.env.X_API_KEY || process.env.GROK_API_KEY;
         if (envApiKey) {
           return envApiKey;
         }
@@ -288,13 +292,13 @@ __export(config_exports, {
   saveMCPConfig: () => saveMCPConfig
 });
 function loadMCPConfig() {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   const projectSettings = manager.loadProjectSettings();
   const servers = projectSettings.mcpServers ? Object.values(projectSettings.mcpServers) : [];
   return { servers };
 }
 function saveMCPConfig(config2) {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   const mcpServers = {};
   for (const server of config2.servers) {
     mcpServers[server.name] = server;
@@ -302,14 +306,14 @@ function saveMCPConfig(config2) {
   manager.updateProjectSetting("mcpServers", mcpServers);
 }
 function addMCPServer(config2) {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   const projectSettings = manager.loadProjectSettings();
   const mcpServers = projectSettings.mcpServers || {};
   mcpServers[config2.name] = config2;
   manager.updateProjectSetting("mcpServers", mcpServers);
 }
 function removeMCPServer(serverName) {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   const projectSettings = manager.loadProjectSettings();
   const mcpServers = projectSettings.mcpServers;
   if (mcpServers) {
@@ -318,7 +322,7 @@ function removeMCPServer(serverName) {
   }
 }
 function getMCPServer(serverName) {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   const projectSettings = manager.loadProjectSettings();
   return projectSettings.mcpServers?.[serverName];
 }
@@ -8524,7 +8528,7 @@ var GrokAgent = class extends EventEmitter {
     this.minRequestInterval = 500;
     // ms
     this.lastRequestTime = 0;
-    const manager = getSettingsManager2();
+    const manager = getSettingsManager();
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
     this.maxToolRounds = maxToolRounds || 400;
@@ -9287,7 +9291,7 @@ EOF`;
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.42",
+  version: "1.1.43",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -11642,14 +11646,14 @@ function CommandSuggestions({
 // src/utils/model-config.ts
 init_settings_manager();
 function loadModelConfig() {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   const models = manager.getAvailableModels();
   return models.map((model) => ({
     model: model.trim()
   }));
 }
 function updateCurrentModel(modelName) {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   manager.setCurrentModel(modelName);
 }
 var ClaudeMdParserImpl = class {
@@ -12021,7 +12025,7 @@ External project documented using X-CLI's .agent system.
 - **Extension Pattern**: Add to handleDirectCommand function
 
 ## Authentication & Storage
-- **Auth**: Environment variable GROK_API_KEY or user settings
+- **Auth**: Environment variable X_API_KEY or user settings
 - **Storage**: Local file system only
 - **Database**: None (settings via JSON files)
 - **MCP**: Optional server integration
@@ -12093,7 +12097,7 @@ Updated By: Agent System Generator during /init-agent
 {
   baseURL: "https://api.x.ai/v1",
   defaultModel: "grok-code-fast-1",
-  apiKey: process.env.GROK_API_KEY
+  apiKey: process.env.X_API_KEY
 }
 \`\`\`
 
@@ -14853,6 +14857,7 @@ async function getCachedVersionInfo() {
 }
 
 // src/hooks/use-input-handler.ts
+init_settings_manager();
 function useInputHandler({
   agent,
   chatHistory,
@@ -16517,17 +16522,6 @@ function LoadingSpinner({
 }) {
   const [spinnerIndex, setSpinnerIndex] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
-  useEffect(() => {
-    if (!isActive) return;
-    const interval = setInterval(() => {
-      setSpinnerIndex((prev) => (prev + 1) % 10);
-      if (Date.now() % 3e3 < 200) {
-        const config3 = operationConfig[operation];
-        setMessageIndex((prev) => (prev + 1) % config3.messages.length);
-      }
-    }, 120);
-    return () => clearInterval(interval);
-  }, [isActive, operation]);
   if (!isActive) return null;
   const config2 = operationConfig[operation];
   const spinnerChar = config2.spinner[spinnerIndex];
@@ -18041,7 +18035,7 @@ function ApiKeyInput({ onApiKeySet }) {
       const agent = new GrokAgent(apiKey);
       process.env.GROK_API_KEY = apiKey;
       try {
-        const manager = getSettingsManager2();
+        const manager = getSettingsManager();
         manager.updateUserSetting("apiKey", apiKey);
         console.log(`
 \u2705 API key saved to ~/.grok/user-settings.json`);
@@ -18179,7 +18173,7 @@ function ChatInterfaceWithAgent({
           let lastUpdateTime = Date.now();
           const flushUpdates = () => {
             const now = Date.now();
-            if (now - lastUpdateTime < 500) return;
+            if (now - lastUpdateTime < 150) return;
             setChatHistory((prev) => {
               let newHistory = [...prev];
               if (lastTokenCount !== 0) {
@@ -18760,14 +18754,14 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 function ensureUserSettingsDirectory() {
   try {
-    const manager = getSettingsManager2();
+    const manager = getSettingsManager();
     manager.loadUserSettings();
   } catch {
   }
 }
 function checkAutoCompact() {
   try {
-    const manager = getSettingsManager2();
+    const manager = getSettingsManager();
     const settings = manager.loadUserSettings();
     if (!settings.autoCompact) {
       return;
@@ -18798,16 +18792,16 @@ async function checkStartupUpdates() {
   }
 }
 function loadApiKey() {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   return manager.getApiKey();
 }
 function loadBaseURL() {
-  const manager = getSettingsManager2();
+  const manager = getSettingsManager();
   return manager.getBaseURL();
 }
 async function saveCommandLineSettings(apiKey, baseURL) {
   try {
-    const manager = getSettingsManager2();
+    const manager = getSettingsManager();
     if (apiKey) {
       manager.updateUserSetting("apiKey", apiKey);
       console.log("\u2705 API key saved to ~/.grok/user-settings.json");
@@ -18827,7 +18821,7 @@ function loadModel() {
   let model = process.env.GROK_MODEL;
   if (!model) {
     try {
-      const manager = getSettingsManager2();
+      const manager = getSettingsManager();
       model = manager.getCurrentModel();
     } catch {
     }
@@ -18969,7 +18963,7 @@ async function processPromptHeadless(prompt, apiKey, baseURL, model, maxToolRoun
 }
 program.name("grok").description(
   "A conversational AI CLI tool powered by Grok with text editor capabilities"
-).version(package_default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)").option(
+).version(package_default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key (or set X_API_KEY env var)").option(
   "-u, --base-url <url>",
   "Grok API base URL (or set GROK_BASE_URL env var)"
 ).option(
@@ -19001,7 +18995,7 @@ program.name("grok").description(
     const maxToolRounds = parseInt(options.maxToolRounds) || 400;
     if (!apiKey) {
       console.error(
-        "\u274C Error: API key required. Set GROK_API_KEY environment variable, use --api-key flag, or save to ~/.grok/user-settings.json"
+        "\u274C Error: API key required. Set X_API_KEY environment variable, use --api-key flag, or save to ~/.x/user-settings.json"
       );
       process.exit(1);
     }
@@ -19049,7 +19043,7 @@ program.name("grok").description(
   }
 });
 var gitCommand = program.command("git").description("Git operations with AI assistance");
-gitCommand.command("commit-and-push").description("Generate AI commit message and push to remote").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "Grok API key (or set GROK_API_KEY env var)").option(
+gitCommand.command("commit-and-push").description("Generate AI commit message and push to remote").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key (or set X_API_KEY env var)").option(
   "-u, --base-url <url>",
   "Grok API base URL (or set GROK_BASE_URL env var)"
 ).option(
@@ -19078,7 +19072,7 @@ gitCommand.command("commit-and-push").description("Generate AI commit message an
     const maxToolRounds = parseInt(options.maxToolRounds) || 400;
     if (!apiKey) {
       console.error(
-        "\u274C Error: API key required. Set GROK_API_KEY environment variable, use --api-key flag, or save to ~/.grok/user-settings.json"
+        "\u274C Error: API key required. Set X_API_KEY environment variable, use --api-key flag, or save to ~/.x/user-settings.json"
       );
       process.exit(1);
     }
