@@ -1,20 +1,22 @@
-## 1.1.38 – Repository Migration Complete
+## 1.1.38 – Logo Assets & NPM Publication Complete
 
-This release includes latest updates and automated publishing via GitHub Actions.
+✅ **Live on NPM**: [@xagent/x-cli](https://www.npmjs.com/package/@xagent/x-cli) - Fully published and ready for global installation
 
-- Fixes all Read/Update tool reliability issues
-- Ensures consistent FS imports (`node:` namespace)
-- Adds proper Node shebang for global installs
-- Temporarily removes experimental features (e.g. compress)
+This release includes corrected logo assets and complete automated publishing pipeline.
+
+- ✅ **Corrected Logo Design**: Updated all assets to use proper black X logo
+- ✅ **NPM Package Live**: Full publication to npm registry with automated version management
+- ✅ **Logo Assets Included**: All variants (standard, small, large, favicon, social preview) in distribution
+- ✅ **Automated Publishing**: GitHub Actions pipeline fully operational with quality gates
 
 ---
 
 # X CLI
 
 [![NPM Version](https://img.shields.io/npm/v/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
-[![GitHub Release](https://img.shields.io/github/v/release/hinetapora/x-cli-hurry-mode?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/x-cli/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/x-cli-team/x-cli?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/x-cli/releases)
 [![Downloads](https://img.shields.io/npm/dm/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
-[![License](https://img.shields.io/github/license/hinetapora/x-cli-hurry-mode?style=for-the-badge&color=green)](https://github.com/x-cli-team/x-cli/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/x-cli-team/x-cli?style=for-the-badge&color=green)](https://github.com/x-cli-team/x-cli/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-xAI_Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/channels/1315720379607679066/1315822328139223064)
 
 A conversational AI CLI tool powered by Grok with **Claude Code-level intelligence** and advanced tool capabilities.
@@ -889,7 +891,9 @@ This project is built upon the excellent foundation of the original [Grok CLI](h
 **Founder**: [Ismail Pelaseyed](https://github.com/homanp)  
 **Organization**: [Superagent.ai](https://github.com/superagent-ai)
 
-This "Hurry Mode" fork extends the original with advanced file operations, enhanced tool systems, and comprehensive automation while maintaining the core vision of bringing AI-powered terminal intelligence to developers.
+X CLI extends the original with advanced file operations, enhanced tool systems, and comprehensive automation while maintaining the core vision of bringing AI-powered terminal intelligence to developers.
+
+**🚀 Now live on NPM**: Install globally with `npm install -g @xagent/x-cli` and start using `xcli` immediately!
 
 ## 👥 Contributors
 
