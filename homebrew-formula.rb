@@ -1,10 +1,10 @@
 # Formula for Homebrew distribution
 # This will be submitted to homebrew-core later
 
-class GrokCliHurryMode < Formula
-  desc "Conversational AI CLI tool powered by Grok with text editor capabilities"
-  homepage "https://github.com/hinetapora/grok-cli-hurry-mode"
-  url "https://registry.npmjs.org/grok-cli-hurry-mode/-/grok-cli-hurry-mode-1.0.18.tgz"
+class XCli < Formula
+  desc "Conversational AI CLI tool powered by Grok with Claude Code-level intelligence"
+  homepage "https://github.com/x-cli-team/x-cli"
+  url "https://registry.npmjs.org/@xagent/x-cli/-/@xagent/x-cli-1.1.41.tgz"
   sha256 "UPDATE_SHA256_HERE"
   license "MIT"
 
@@ -16,6 +16,6 @@ class GrokCliHurryMode < Formula
   end
 
   test do
-    assert_match "1.0.18", shell_output("#{bin}/grok --version")
+    assert_match "1.1.41", shell_output("#{bin}/xcli --version")
   end
 end

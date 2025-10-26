@@ -15,6 +15,22 @@ const truncateContent = (content: string, maxLength: number = 100): string => {
   return content.length > maxLength ? content.substring(0, maxLength) + '...' : content;
 };
 
+// Helper to handle very long content that might cause rendering issues
+const handleLongContent = (content: string, maxLength: number = 5000): { content: string; isTruncated: boolean } => {
+  if (content.length <= maxLength) {
+    return { content, isTruncated: false };
+  }
+
+  // For very long content, truncate and provide a summary
+  const truncated = content.substring(0, maxLength);
+  const summary = `\n\n[Content truncated - ${content.length - maxLength} characters remaining. Full content available in chat history.]`;
+
+  return {
+    content: truncated + summary,
+    isTruncated: true
+  };
+};
+
 // Memoized ChatEntry component to prevent unnecessary re-renders
 const MemoizedChatEntry = React.memo(
   ({ entry, index }: { entry: ChatEntry; index: number }) => {
@@ -69,6 +85,9 @@ const MemoizedChatEntry = React.memo(
         );
 
       case "assistant":
+        // Handle very long content to prevent rendering issues
+        const { content: processedContent, isTruncated } = handleLongContent(entry.content);
+
         return (
           <Box key={index} flexDirection="column" marginTop={1}>
             <Box flexDirection="row" alignItems="flex-start">
@@ -76,12 +95,17 @@ const MemoizedChatEntry = React.memo(
               <Box flexDirection="column" flexGrow={1}>
                 {entry.toolCalls ? (
                   // If there are tool calls, just show plain text
-                  <Text color="white">{entry.content.trim()}</Text>
+                  <Text color="white">{processedContent.trim()}</Text>
                 ) : (
                   // If no tool calls, render as markdown
-                  <MarkdownRenderer content={entry.content.trim()} />
+                  <MarkdownRenderer content={processedContent.trim()} />
                 )}
                 {entry.isStreaming && <Text color="cyan">█</Text>}
+                {isTruncated && (
+                  <Text color="yellow" italic>
+                    [Response truncated for performance - full content in session log]
+                  </Text>
+                )}
               </Box>
             </Box>
           </Box>

@@ -492,7 +492,7 @@ ${versionInfo.isUpdateAvailable
 }
 
 Package: ${pkg.name}
-GitHub: https://github.com/hinetapora/grok-cli-hurry-mode
+GitHub: https://github.com/x-cli-team/x-cli
 NPM: https://www.npmjs.com/package/${pkg.name}`,
           timestamp: new Date(),
         };
@@ -836,12 +836,12 @@ Respond with ONLY the commit message, no additional text.`;
       setIsProcessing(true);
 
       try {
-        // Determine project type - assume external project for now, could detect Grok CLI
-        const isGrokCli = process.cwd().includes('grok-cli') || 
-                         trimmedInput.includes('--grok');
+        // Determine project type - assume external project for now, could detect X CLI
+        const isXCli = process.cwd().includes('x-cli') || 
+                         trimmedInput.includes('--xcli');
         
-        const projectType = isGrokCli ? 'grok-cli' : 'external';
-        const projectName = isGrokCli ? 'Grok CLI' : 'Current Project';
+        const projectType = isXCli ? 'x-cli' : 'external';
+        const projectName = isXCli ? 'X CLI' : 'Current Project';
 
         const generator = new AgentSystemGenerator({
           projectName,

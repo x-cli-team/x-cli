@@ -9287,7 +9287,7 @@ EOF`;
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.34",
+  version: "1.1.41",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -9392,16 +9392,18 @@ var package_default = {
   preferGlobal: true,
   repository: {
     type: "git",
-    url: "https://github.com/hinetapora/x-cli-hurry-mode.git"
+    url: "https://github.com/x-cli-team/x-cli.git"
   },
   bugs: {
-    url: "https://github.com/hinetapora/x-cli-hurry-mode/issues"
+    url: "https://github.com/x-cli-team/x-cli/issues"
   },
   homepage: "https://grokcli.dev",
+  icon: "docs/assets/logos/x-cli-logo.svg",
   files: [
     "dist/**/*",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "docs/assets/logos/**/*"
   ],
   publishConfig: {
     access: "public"
@@ -15227,7 +15229,7 @@ Use \`/upgrade\` to update automatically or run:
 \`${versionInfo.updateCommand}\`` : "\u2705 **You are up to date!**"}
 
 Package: ${package_default.name}
-GitHub: https://github.com/hinetapora/grok-cli-hurry-mode
+GitHub: https://github.com/x-cli-team/x-cli
 NPM: https://www.npmjs.com/package/${package_default.name}`,
           timestamp: /* @__PURE__ */ new Date()
         };
@@ -15540,9 +15542,9 @@ ${commitMessage}`
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const isGrokCli = process.cwd().includes("grok-cli") || trimmedInput.includes("--grok");
-        const projectType = isGrokCli ? "grok-cli" : "external";
-        const projectName = isGrokCli ? "Grok CLI" : "Current Project";
+        const isXCli = process.cwd().includes("x-cli") || trimmedInput.includes("--xcli");
+        const projectType = isXCli ? "x-cli" : "external";
+        const projectName = isXCli ? "X CLI" : "Current Project";
         const generator = new AgentSystemGenerator({
           projectName,
           projectType,
@@ -16663,6 +16665,19 @@ var truncateContent = (content, maxLength = 100) => {
   if (process.env.COMPACT !== "1") return content;
   return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
 };
+var handleLongContent = (content, maxLength = 5e3) => {
+  if (content.length <= maxLength) {
+    return { content, isTruncated: false };
+  }
+  const truncated = content.substring(0, maxLength);
+  const summary = `
+
+[Content truncated - ${content.length - maxLength} characters remaining. Full content available in chat history.]`;
+  return {
+    content: truncated + summary,
+    isTruncated: true
+  };
+};
 var MemoizedChatEntry = React3.memo(
   ({ entry, index }) => {
     const renderDiff = (diffContent, filename) => {
@@ -16702,17 +16717,19 @@ var MemoizedChatEntry = React3.memo(
           truncateContent(displayText)
         ] }) }) }, index);
       case "assistant":
+        const { content: processedContent, isTruncated } = handleLongContent(entry.content);
         return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
           /* @__PURE__ */ jsx(Text, { color: "white", children: "\u23FA " }),
           /* @__PURE__ */ jsxs(Box, { flexDirection: "column", flexGrow: 1, children: [
             entry.toolCalls ? (
               // If there are tool calls, just show plain text
-              /* @__PURE__ */ jsx(Text, { color: "white", children: entry.content.trim() })
+              /* @__PURE__ */ jsx(Text, { color: "white", children: processedContent.trim() })
             ) : (
               // If no tool calls, render as markdown
-              /* @__PURE__ */ jsx(MarkdownRenderer, { content: entry.content.trim() })
+              /* @__PURE__ */ jsx(MarkdownRenderer, { content: processedContent.trim() })
             ),
-            entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" })
+            entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" }),
+            isTruncated && /* @__PURE__ */ jsx(Text, { color: "yellow", italic: true, children: "[Response truncated for performance - full content in session log]" })
           ] })
         ] }) }, index);
       case "tool_call":

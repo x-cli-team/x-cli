@@ -5,7 +5,7 @@ import TestimonialsSection from '@site/src/components/TestimonialsSection';
 export default function Page() {
   return (
     <>
-      <GrokCliHero />
+      <XCliHero />
       <OpenSourceSection />
       <FeaturesSection />
       <CollaborationSection />
@@ -16,7 +16,7 @@ export default function Page() {
   );
 }
 
-function GrokCliHero() {
+function XCliHero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   return (
@@ -38,7 +38,7 @@ function GrokCliHero() {
             <NavLink href="/docs/overview">Docs</NavLink>
             <NavLink href="/docs/roadmap">Roadmap</NavLink>
             <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
-            <NavLink href="https://github.com/hinetapora/grok-cli-hurry-mode">GitHub</NavLink>
+            <NavLink href="https://github.com/x-cli-team/x-cli">GitHub</NavLink>
           </div>
           <div className={styles.navRight}>
             <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
@@ -61,7 +61,7 @@ function GrokCliHero() {
               <NavLink href="/docs/overview">Docs</NavLink>
               <NavLink href="/docs/roadmap">Roadmap</NavLink>
               <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
-              <NavLink href="https://github.com/hinetapora/grok-cli-hurry-mode">GitHub</NavLink>
+              <NavLink href="https://github.com/x-cli-team/x-cli">GitHub</NavLink>
               <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
             </div>
           </div>
@@ -69,7 +69,7 @@ function GrokCliHero() {
 
         {/* NPM Install button */}
         <div className={styles.installSection}>
-          <ChipBtn variant="solid" label="npm install -g grok-cli-hurry-mode@latest" showCopyIcon={true} />
+          <ChipBtn variant="solid" label="npm install -g @xagent/x-cli@latest" showCopyIcon={true} />
         </div>
 
         {/* Hero card (moved up from bottom) */}
@@ -84,7 +84,7 @@ function GrokCliHero() {
             <div className={styles.heroCardOverlay}></div>
             <div className={styles.heroCardContent}>
               <div className={styles.heroCardText}>
-                <h3 className={styles.heroCardTitle}>Grok CLI</h3>
+                <h3 className={styles.heroCardTitle}>X CLI</h3>
                 <p className={styles.heroCardDescription}>Open source terminal AI assistant with Claude Code's signature Plan Mode. Shift+Tab twice for read-only exploration and AI-powered implementation planning. Community-driven project built by developers, for developers.</p>
                 
                 <div className={styles.featureGrid}>
@@ -133,7 +133,7 @@ function GrokCliHero() {
               <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v16.19l6.22-6.22a.75.75 0 111.06 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 111.06-1.06l6.22 6.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
             </svg>
           </button>
-          <ChipBtn variant="outline" label="Join as Collaborator" href="https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml" />
+          <ChipBtn variant="outline" label="Join as Collaborator" href="https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml" />
         </div>
       </div>
 
@@ -147,12 +147,12 @@ function OpenSourceSection() {
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>Open Source</h2>
         <p className={styles.sectionDescription}>
-          Built by developers, for developers. Grok CLI is completely open source and community-driven.
+          Built by developers, for developers. X CLI is completely open source and community-driven.
         </p>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
             <h3>MIT Licensed</h3>
-            <p>Free to use, modify, and distribute. Build on top of Grok CLI for your own projects.</p>
+            <p>Free to use, modify, and distribute. Build on top of X CLI for your own projects.</p>
           </div>
           <div className={styles.featureCard}>
             <h3>Community Driven</h3>
@@ -223,7 +223,7 @@ function CollaborationSection() {
           <div className={styles.collaborationCard}>
             <h3>Submit a Testimonial</h3>
             <p>Share your experience and automatically become a repository collaborator.</p>
-            <a href="https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml" className={styles.cardButton}>
+            <a href="https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml" className={styles.cardButton}>
               Join as Collaborator
             </a>
           </div>
@@ -296,8 +296,8 @@ function Footer() {
             <h3>Community</h3>
             <ul>
               <li><a href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</a></li>
-              <li><a href="https://github.com/hinetapora/grok-cli-hurry-mode/issues">GitHub Issues</a></li>
-              <li><a href="https://www.npmjs.com/package/grok-cli-hurry-mode">NPM Package</a></li>
+              <li><a href="https://github.com/x-cli-team/x-cli/issues">GitHub Issues</a></li>
+              <li><a href="https://www.npmjs.com/package/@xagent/x-cli">NPM Package</a></li>
             </ul>
           </div>
           <div className={styles.footerSection}>
@@ -305,7 +305,7 @@ function Footer() {
             <ul>
               <li><a href="/docs/roadmap">Roadmap</a></li>
               <li><a href="/docs/community/testimonials">Testimonials</a></li>
-              <li><a href="https://github.com/hinetapora/grok-cli-hurry-mode">GitHub</a></li>
+              <li><a href="https://github.com/x-cli-team/x-cli">GitHub</a></li>
             </ul>
           </div>
           <div className={styles.footerSection}>
@@ -317,7 +317,7 @@ function Footer() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>Copyright © 2024 Grok CLI. Forked from <a href="https://github.com/superagent-ai/grok-cli">Superagent.ai</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
+          <p>Copyright © 2024 X CLI. Forked from <a href="https://github.com/superagent-ai/grok-cli">Superagent.ai</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
         </div>
       </div>
     </footer>
@@ -401,9 +401,9 @@ function LogoMark() {
   return (
     <div className={styles.logo}>
       <div className={styles.logoIcon}>
-        G
+        X
       </div>
-      <span className={styles.logoText}>grok-cli</span>
+      <span className={styles.logoText}>x-cli</span>
     </div>
   );
 }

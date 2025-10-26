@@ -1,10 +1,10 @@
-# Grok CLI - CLAUDE.md
+# X CLI - CLAUDE.md
 
-This document provides context for Claude Code to help improve this Grok CLI application to be as feature-rich and capable as Claude Code itself.
+This document provides context for Claude Code to help improve this X CLI application to be as feature-rich and capable as Claude Code itself.
 
 ## Project Overview
 
-Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directly into the terminal. It features an intelligent agent system with tool usage, file operations, and MCP (Model Context Protocol) integration.
+X CLI is a conversational AI CLI tool that brings Grok's capabilities directly into the terminal. It features an intelligent agent system with tool usage, file operations, and MCP (Model Context Protocol) integration.
 
 ## Current Architecture
 
@@ -20,6 +20,7 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
 ### Available Tools
 
 #### Core Tools
+
 1. **Read** - File viewing and content inspection
 2. **Write** - File creation and complete content replacement
 3. **Edit** - Precise string replacement and file modification
@@ -29,6 +30,7 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
 7. **LS** - Directory listing and file system navigation
 
 #### Advanced Tools (NEW - P1 Complete!)
+
 8. **MultiEdit** - Atomic multi-file operations with transaction support
    - Multi-file editing with rollback capabilities
    - File operations: create, edit, delete, rename, move
@@ -57,6 +59,7 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
     - Persistent task history and completion tracking
 
 #### 🎯 Plan Mode System (NEW - P0 Critical Complete!)
+
 13. **Plan Mode** - ✅ Claude Code's signature read-only exploration feature (IMPLEMENTED!)
     - **Shift+Tab twice activation** - ✅ Exact Claude Code parity achieved
     - **Comprehensive codebase analysis** - ✅ Project structure, dependencies, complexity metrics
@@ -68,16 +71,18 @@ Grok CLI is a conversational AI CLI tool that brings Grok's capabilities directl
     - **User approval workflow** - ✅ Plan review and confirmation before execution
 
 #### UX Enhancement System (NEW - P4 Complete!)
+
 14. **Enhanced Visual Feedback** - Claude Code-style interface improvements
-   - Professional ASCII welcome banner with dynamic context status
-   - 8 contextual operation spinners (🧠 thinking, 🔍 search, 📂 indexing, 📝 write, etc.)
-   - Advanced progress indicators with ETA calculations and pulse effects
-   - Background activity monitoring for workspace awareness
-   - Unified color system with Claude Code-inspired hierarchy
-   - 120ms smooth animations with 1.5s breathing rhythm for calm interface
-   - Context tooltip with Ctrl+I shortcut (workspace insights, git branch, project stats)
-   - Dynamic status display with real-time memory pressure and activity indicators
-   - Professional bordered layouts for organized information presentation
+
+- Professional ASCII welcome banner with dynamic context status
+- 8 contextual operation spinners (🧠 thinking, 🔍 search, 📂 indexing, 📝 write, etc.)
+- Advanced progress indicators with ETA calculations and pulse effects
+- Background activity monitoring for workspace awareness
+- Unified color system with Claude Code-inspired hierarchy
+- 120ms smooth animations with 1.5s breathing rhythm for calm interface
+- Context tooltip with Ctrl+I shortcut (workspace insights, git branch, project stats)
+- Dynamic status display with real-time memory pressure and activity indicators
+- Professional bordered layouts for organized information presentation
 
 ### Key Features
 
@@ -104,21 +109,23 @@ bun run lint             # ESLint checking
 bun run typecheck        # TypeScript type checking
 
 # Installation
-bun add -g grok-cli-hurry-mode    # Global installation
-npm install -g grok-cli-hurry-mode
+npm install -g @xagent/x-cli    # Global installation
+bun add -g @xagent/x-cli
 ```
 
 ## Areas for Improvement (Inspired by Claude Code)
 
 ### 1. Enhanced Tool Capabilities
+
 - **NotebookEdit**: Jupyter notebook cell editing and management
-- **mcp__ide__getDiagnostics**: VS Code language diagnostics integration
-- **mcp__ide__executeCode**: Code execution in Jupyter kernels
+- **mcp**ide**getDiagnostics**: VS Code language diagnostics integration
+- **mcp**ide**executeCode**: Code execution in Jupyter kernels
 - **BashOutput**: Background process monitoring and output streaming
 - **KillBash**: Process termination and cleanup
 - **ExitPlanMode**: Planning workflow management
 
 ### 2. Advanced AI Features
+
 - **Code Context**: Better understanding of project structure and relationships
 - **Semantic Search**: Content-aware search beyond text matching
 - **Code Generation**: Template-based code scaffolding
@@ -126,6 +133,7 @@ npm install -g grok-cli-hurry-mode
 - **Documentation Generation**: Automatic README, API docs, and code comments
 
 ### 3. User Experience Enhancements
+
 - **Autocomplete**: Command and file path completion
 - **Syntax Highlighting**: Better code display in terminal
 - **Progress Indicators**: Better feedback for long-running operations
@@ -133,6 +141,7 @@ npm install -g grok-cli-hurry-mode
 - **Session Management**: Persistent conversations and context
 
 ### 4. Integration Improvements
+
 - **IDE Integration**: VS Code extension via MCP, Vim plugin support
 - **CI/CD Hooks**: GitHub Actions, pre-commit hooks integration
 - **Cloud Services**: AWS, GCP, Azure integration via MCP servers
@@ -140,12 +149,14 @@ npm install -g grok-cli-hurry-mode
 - **API Testing**: Advanced HTTP client with request/response management
 
 ### 5. Performance Optimizations
+
 - **Streaming UI**: Real-time response rendering
 - **Caching**: Intelligent caching of API responses and file operations
 - **Parallel Execution**: Concurrent tool execution
 - **Memory Management**: Efficient handling of large files and responses
 
 ### 6. Security and Reliability
+
 - **Sandboxing**: Safe execution of untrusted code
 - **Permission System**: Granular control over tool capabilities
 - **Audit Logging**: Track all operations for security
@@ -154,6 +165,7 @@ npm install -g grok-cli-hurry-mode
 ## Configuration Files
 
 ### User Settings (`~/.grok/user-settings.json`)
+
 ```json
 {
   "apiKey": "your_api_key",
@@ -164,6 +176,7 @@ npm install -g grok-cli-hurry-mode
 ```
 
 ### Project Settings (`.grok/settings.json`)
+
 ```json
 {
   "model": "grok-3-fast",
@@ -178,6 +191,7 @@ npm install -g grok-cli-hurry-mode
 ```
 
 ### Custom Instructions (`.grok/GROK.md`)
+
 Project-specific behavior customization loaded automatically.
 
 ## Development Priorities
@@ -200,6 +214,7 @@ Project-specific behavior customization loaded automatically.
 ## Claude Code Feature Parity Goals
 
 The ultimate goal is to match Claude Code's capabilities in:
+
 - **Code Understanding**: Deep semantic analysis of codebases
 - **Multi-file Operations**: Complex refactoring across multiple files
 - **Context Awareness**: Maintaining understanding of project structure
@@ -211,35 +226,41 @@ This CLI aims to bring the power of Claude Code to terminal-based workflows whil
 ## 📚 Documentation System Workflow
 
 ### Before Planning Features:
+
 1. **Read `.agent/README.md`** for project overview
 2. **Check `.agent/system/`** for architecture context
 3. **Review `.agent/tasks/`** for related work
 4. **Scan `.agent/sop/`** for established patterns
 
 ### During Implementation:
+
 - Store PRDs in `.agent/tasks/` before coding
 - Reference architecture docs for consistency
 - Follow established patterns from SOPs
 - Use cross-references between .agent docs
 
 ### After Implementation:
+
 - **ALWAYS use smart push**: `git pushup` or `npm run smart-push` (never `git push origin main`)
-- Run `/update-agent-docs` to capture changes  
+- Run `/update-agent-docs` to capture changes
 - Update `.agent/system/` if architecture changed
 - Add new SOPs for repeatable processes
 - Link related tasks and documents
 
 ### Documentation Rules:
+
 - Keep system docs as single source of truth
-- Use relative links between .agent documents  
+- Use relative links between .agent documents
 - Maintain concise, actionable content
 - Update cross-references when adding new docs
 
 ### Token Optimization:
+
 - Read .agent docs hierarchically (README → critical-state → relevant docs)
 - Expect ~600 tokens for full context vs 3000+ without system
 - Use .agent structure to avoid redundant codebase scanning
 - Reference existing documentation rather than recreating context
 
 ---
-*This section was added by the Grok CLI documentation system*
+
+_This section was added by the X CLI documentation system_

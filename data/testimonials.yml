@@ -1,8 +1,12 @@
-# Grok CLI Community Testimonials\n# This file is automatically managed by GitHub Actions\n# Submit testimonials via: https://github.com/hinetapora/grok-cli-hurry-mode/issues/new?template=testimonial.yml\n\n- name: Alex Chen
+# X CLI Community Testimonials
+# This file is automatically managed by GitHub Actions
+# Submit testimonials via: https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml
+
+- name: Alex Chen
   title: Senior Software Engineer
   company: TechCorp
   quote: >-
-    Grok CLI transformed my development workflow. The AI assistance is
+    X CLI transformed my development workflow. The AI assistance is
     incredible and it never leaves my terminal.
   link: https://github.com/alexchen
   avatar: https://github.com/alexchen.png
@@ -11,7 +15,7 @@
     - productivity
     - ai-assistance
     - terminal
-  submittedAt: '2025-10-18T19:30:00Z'
+  submittedAt: "2025-10-18T19:30:00Z"
 - name: Sarah Johnson
   title: DevOps Engineer
   company: CloudStartup
@@ -25,7 +29,7 @@
     - devops
     - automation
     - tools
-  submittedAt: '2025-10-18T19:30:00Z'
+  submittedAt: "2025-10-18T19:30:00Z"
 - name: Mike Rodriguez
   title: Full Stack Developer
   company: Startup Inc
@@ -39,7 +43,7 @@
     - open-source
     - community
     - developer-experience
-  submittedAt: '2025-10-18T19:30:00Z'
+  submittedAt: "2025-10-18T19:30:00Z"
 - name: Michael Jackson
   title: Singer
   company: Thriller
@@ -51,4 +55,4 @@
     - I
     - I
     - I
-  submittedAt: '2025-10-19T06:12:22.295Z'
+  submittedAt: "2025-10-19T06:12:22.295Z"
