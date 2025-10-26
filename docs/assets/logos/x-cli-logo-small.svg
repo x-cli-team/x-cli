@@ -1,0 +1,30 @@
+<svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chrome-inspired X CLI Logo - Small -->
+  <defs>
+    <radialGradient id="centerGradientSmall" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#4285f4"/>
+      <stop offset="100%" style="stop-color:#1a73e8"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Red section -->
+  <path d="M50 15 A35 35 0 0 1 73.2 32.3 L61.6 50 A17.5 17.5 0 0 0 50 32.5 Z" fill="#ea4335"/>
+  
+  <!-- Yellow section -->
+  <path d="M73.2 32.3 A35 35 0 0 1 73.2 67.7 L61.6 50 A17.5 17.5 0 0 0 73.2 32.3 Z" fill="#fbbc04"/>
+  
+  <!-- Green section -->
+  <path d="M73.2 67.7 A35 35 0 0 1 26.8 67.7 L38.4 50 A17.5 17.5 0 0 0 61.6 50 Z" fill="#34a853"/>
+  
+  <!-- Blue center circle -->
+  <circle cx="50" cy="50" r="17.5" fill="url(#centerGradientSmall)"/>
+  
+  <!-- White inner circle for contrast -->
+  <circle cx="50" cy="50" r="12" fill="white"/>
+  
+  <!-- X symbol in center -->
+  <g stroke="#1a73e8" stroke-width="2" stroke-linecap="round">
+    <line x1="45" y1="45" x2="55" y2="55"/>
+    <line x1="55" y1="45" x2="45" y2="55"/>
+  </g>
+</svg>

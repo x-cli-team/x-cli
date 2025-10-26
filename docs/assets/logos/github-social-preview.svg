@@ -1,0 +1,56 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- GitHub Social Preview for X CLI -->
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <radialGradient id="logoGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#4285f4"/>
+      <stop offset="100%" style="stop-color:#1a73e8"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#backgroundGradient)"/>
+  
+  <!-- Logo (scaled and positioned) -->
+  <g transform="translate(350, 200)">
+    <!-- Red section -->
+    <path d="M50 15 A35 35 0 0 1 73.2 32.3 L61.6 50 A17.5 17.5 0 0 0 50 32.5 Z" fill="#ea4335" transform="scale(3)"/>
+    
+    <!-- Yellow section -->
+    <path d="M73.2 32.3 A35 35 0 0 1 73.2 67.7 L61.6 50 A17.5 17.5 0 0 0 73.2 32.3 Z" fill="#fbbc04" transform="scale(3)"/>
+    
+    <!-- Green section -->
+    <path d="M73.2 67.7 A35 35 0 0 1 26.8 67.7 L38.4 50 A17.5 17.5 0 0 0 61.6 50 Z" fill="#34a853" transform="scale(3)"/>
+    
+    <!-- Blue center circle -->
+    <circle cx="50" cy="50" r="17.5" fill="url(#logoGradient)" transform="scale(3)"/>
+    
+    <!-- White inner circle for contrast -->
+    <circle cx="50" cy="50" r="12" fill="white" transform="scale(3)"/>
+    
+    <!-- X symbol in center -->
+    <g stroke="#1a73e8" stroke-width="6" stroke-linecap="round" transform="scale(3)">
+      <line x1="45" y1="45" x2="55" y2="55"/>
+      <line x1="55" y1="45" x2="45" y2="55"/>
+    </g>
+  </g>
+  
+  <!-- Title -->
+  <text x="550" y="280" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="bold" fill="white">X CLI</text>
+  
+  <!-- Subtitle -->
+  <text x="550" y="340" font-family="Inter, Arial, sans-serif" font-size="28" fill="#94a3b8">Claude Code-level intelligence in your terminal</text>
+  
+  <!-- Features -->
+  <text x="550" y="390" font-family="Inter, Arial, sans-serif" font-size="20" fill="#64748b">🚀 Advanced File Operations  •  🧠 AI-Powered Tools  •  🔧 MCP Integration</text>
+  
+  <!-- Command -->
+  <rect x="520" y="450" width="400" height="50" rx="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="540" y="480" font-family="JetBrains Mono, monospace" font-size="18" fill="#10b981">npm install -g @xagent/x-cli</text>
+  
+  <!-- GitHub URL -->
+  <text x="550" y="550" font-family="Inter, Arial, sans-serif" font-size="16" fill="#475569">github.com/x-cli-team/x-cli</text>
+</svg>

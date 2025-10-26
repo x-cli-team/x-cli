@@ -20,7 +20,7 @@ This release includes latest updates and automated publishing via GitHub Actions
 A conversational AI CLI tool powered by Grok with **Claude Code-level intelligence** and advanced tool capabilities.
 
 <div align="center">
-  <img src="docs/grok-welcome.png" alt="X CLI" width="600" />
+  <img src="docs/assets/logos/x-cli-logo-large.svg" alt="X CLI Logo" width="120" />
 </div>
 
 ## 🔗 Quick Links

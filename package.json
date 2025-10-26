@@ -112,10 +112,12 @@
     "url": "https://github.com/x-cli-team/x-cli/issues"
   },
   "homepage": "https://grokcli.dev",
+  "icon": "docs/assets/logos/x-cli-logo.svg",
   "files": [
     "dist/**/*",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "docs/assets/logos/**/*"
   ],
   "publishConfig": {
     "access": "public"

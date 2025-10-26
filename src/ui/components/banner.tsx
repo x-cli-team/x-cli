@@ -13,6 +13,12 @@ export const grokBanner = `
 ██   ██      ██████ ███████ ██ 
 `;
 
+// Logo-based banner (simplified for terminal)
+export const grokLogo = `
+    ⭕ X CLI ⭕
+   🔴🟡🟢🔵 v{VERSION}
+`;
+
 // Alternative minimal banner for --quiet mode
 export const grokMini = `
 ▄   ▄     ▄▄▄▄▄▄  ▄     ▄
