@@ -1,30 +1,8 @@
 <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <!-- Chrome-inspired X CLI Logo -->
-  <defs>
-    <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#4285f4"/>
-      <stop offset="100%" style="stop-color:#1a73e8"/>
-    </radialGradient>
-  </defs>
-  
-  <!-- Red section -->
-  <path d="M50 15 A35 35 0 0 1 73.2 32.3 L61.6 50 A17.5 17.5 0 0 0 50 32.5 Z" fill="#ea4335"/>
-  
-  <!-- Yellow section -->
-  <path d="M73.2 32.3 A35 35 0 0 1 73.2 67.7 L61.6 50 A17.5 17.5 0 0 0 73.2 32.3 Z" fill="#fbbc04"/>
-  
-  <!-- Green section -->
-  <path d="M73.2 67.7 A35 35 0 0 1 26.8 67.7 L38.4 50 A17.5 17.5 0 0 0 61.6 50 Z" fill="#34a853"/>
-  
-  <!-- Blue center circle -->
-  <circle cx="50" cy="50" r="17.5" fill="url(#centerGradient)"/>
-  
-  <!-- White inner circle for contrast -->
-  <circle cx="50" cy="50" r="12" fill="white"/>
-  
-  <!-- X symbol in center -->
-  <g stroke="#1a73e8" stroke-width="2" stroke-linecap="round">
-    <line x1="45" y1="45" x2="55" y2="55"/>
-    <line x1="55" y1="45" x2="45" y2="55"/>
+  <!-- X CLI Logo - Black Fill -->
+  <g transform="translate(17, 39) scale(2, 2)">
+    <path d="M0.00555015 7.77631L9.75248 22H14.085L4.33691 7.77631H0.00555015ZM4.33358 15.6762L0 22H4.3358L6.50092 18.8387L4.33358 15.6762ZM15.076 0L7.58515 10.9308L9.75248 14.0944L19.4118 0H15.076ZM15.8606 6.76374V22H19.4118V1.5818L15.8606 6.76374Z" fill="black"/>
+    <path d="M21.0122 7.77826V22H25.348H32.924V18.8387H24.924V10.9328L29.5 10.9308L26.5 7.77631L24.924 7.77826H21.0122ZM30 11.9727V17.4727H33V11.9727H30Z" fill="black"/>
+    <path d="M33 7.77631L32.924 10.9328L30 7.77631H33Z" fill="black"/>
   </g>
 </svg>

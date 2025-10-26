@@ -1,27 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <!-- X CLI Favicon -->
-  <defs>
-    <radialGradient id="faviconGradient" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#4285f4"/>
-      <stop offset="100%" style="stop-color:#1a73e8"/>
-    </radialGradient>
-  </defs>
-  
-  <!-- Background circle -->
-  <circle cx="16" cy="16" r="15" fill="white" stroke="#e5e7eb" stroke-width="1"/>
-  
-  <!-- Logo sections (simplified for favicon) -->
-  <path d="M16 5 A11 11 0 0 1 23.4 10.3 L19.7 16 A5.5 5.5 0 0 0 16 10.5 Z" fill="#ea4335"/>
-  <path d="M23.4 10.3 A11 11 0 0 1 23.4 21.7 L19.7 16 A5.5 5.5 0 0 0 23.4 10.3 Z" fill="#fbbc04"/>
-  <path d="M23.4 21.7 A11 11 0 0 1 8.6 21.7 L12.3 16 A5.5 5.5 0 0 0 19.7 16 Z" fill="#34a853"/>
-  
-  <!-- Center circle -->
-  <circle cx="16" cy="16" r="5.5" fill="url(#faviconGradient)"/>
-  <circle cx="16" cy="16" r="3.5" fill="white"/>
-  
-  <!-- X symbol -->
-  <g stroke="#1a73e8" stroke-width="1" stroke-linecap="round">
-    <line x1="14.5" y1="14.5" x2="17.5" y2="17.5"/>
-    <line x1="17.5" y1="14.5" x2="14.5" y2="17.5"/>
+  <!-- X CLI Logo - Black Fill - Favicon -->
+  <g transform="translate(5, 12) scale(0.65, 0.65)">
+    <path d="M0.00555015 7.77631L9.75248 22H14.085L4.33691 7.77631H0.00555015ZM4.33358 15.6762L0 22H4.3358L6.50092 18.8387L4.33358 15.6762ZM15.076 0L7.58515 10.9308L9.75248 14.0944L19.4118 0H15.076ZM15.8606 6.76374V22H19.4118V1.5818L15.8606 6.76374Z" fill="black"/>
+    <path d="M21.0122 7.77826V22H25.348H32.924V18.8387H24.924V10.9328L29.5 10.9308L26.5 7.77631L24.924 7.77826H21.0122ZM30 11.9727V17.4727H33V11.9727H30Z" fill="black"/>
+    <path d="M33 7.77631L32.924 10.9328L30 7.77631H33Z" fill="black"/>
   </g>
 </svg>
