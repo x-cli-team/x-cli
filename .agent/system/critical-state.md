@@ -1,6 +1,7 @@
 # 🔧 Current System State
 
 ## Architecture Overview
+
 - **Type**: CLI application with React/Ink UI
 - **Language**: TypeScript (ESM modules)
 - **Build**: TypeScript compiler + tsup dual build (CJS/ESM)
@@ -8,6 +9,7 @@
 - **Runtime**: Node.js (Bun recommended)
 
 ## Core Components
+
 - **Commands**: Slash-based in src/commands/ (limited - only MCP command currently)
 - **Tools**: Modular tools in src/tools/ (extensive tool system)
 - **UI**: Ink components in src/ui/ with Claude Code-style feedback system
@@ -16,6 +18,7 @@
 - **Input**: Enhanced terminal input with history in src/hooks/
 
 ## Command System
+
 - **Slash Commands**: Handled in useInputHandler.ts
 - **Current Commands**: /help, /clear, /models, /commit-and-push, /exit, /init-agent, /docs, /readme, /api-docs, /changelog, /comments, /update-agent-docs, /compact, /heal, /guardrails
 - **Command Registration**: Direct implementation in input handler
@@ -23,12 +26,14 @@
 - **Documentation Commands**: Full suite with /init-agent, /docs menu, /readme generation, /api-docs, /changelog, /comments, /update-agent-docs, /compact (subagent), /heal (self-healing), /guardrails
 
 ## Authentication & Storage
+
 - **Auth**: Environment variable GROK_API_KEY or user settings
 - **Storage**: Local file system only
 - **Database**: None (settings via JSON files)
 - **MCP**: Optional server integration
 
 ## Current Capabilities
+
 - ✅ File operations (read, write, edit, multi-file)
 - ✅ Bash command execution with output capture
 - ✅ Code analysis (AST parsing, refactoring)
@@ -49,24 +54,34 @@
 - ✅ Smart auto-update system with configurable triggers
 - ✅ **🎯 Plan Mode (P0 Critical Feature)** - Claude Code's signature read-only exploration mode
   - ✅ **Shift+Tab twice activation** - Exact keyboard shortcut parity
-  - ✅ **Read-only tool execution** - Safe exploration with destructive operation blocking  
+  - ✅ **Read-only tool execution** - Safe exploration with destructive operation blocking
   - ✅ **Real-time context awareness** - Workspace intelligence and project insights
   - ✅ **AI-powered plan generation** - Strategic implementation planning with Grok models
   - ✅ **Progress visualization** - Multi-phase exploration and planning indicators
 - ❌ No cloud storage integration
 - ❌ No built-in authentication system
 
+## Deployment & Domains
+
+- **Primary Domain**: xcli.org (Vercel landing page)
+- **Previous Domain**: xclicli.dev (deprecated)
+- **Documentation Site**: Built with Docusaurus, deployed via Vercel
+- **NPM Package**: @xagent/x-cli on npmjs.com
+
 ## Build Configuration
+
 - **TypeScript**: ESM modules with dual CJS/ESM output
 - **Dependencies**: Ink, React, commander, chalk, ripgrep
 - **Scripts**: dev, build, start, lint, typecheck
 
 ## Known Limitations
+
 - Command system not centralized (handled in input hook)
 - No formal command registration system
 - Limited built-in documentation capabilities
 
 ## Recent Changes
+
 - **✅ Plan Mode Implementation (2025-10-24)**: Complete Plan Mode feature with Claude Code parity
   - Fixed Shift+Tab twice activation logic in input handler
   - Implemented read-only tool execution with simulation
@@ -85,26 +100,32 @@
 - Implemented self-healing system with incident tracking and guardrails
 
 ## Current Tool Inventory (P1-P3 Complete)
+
 ### Core Tools
+
 - **TextEditorTool** - File viewing, creation, string replacement
 - **BashTool** - Shell command execution with output capture
 - **SearchTool** - Basic file and content search
 
 ### P1 Advanced Tools (✅ Complete)
+
 - **MorphEditorTool** - High-speed editing (4,500+ tokens/sec, 98% accuracy)
 - **MultiFileEditorTool** - Atomic multi-file operations with transaction support
 - **AdvancedSearchTool** - Enhanced search and replace with regex support
 - **FileTreeOperationsTool** - Comprehensive file system management
 
 ### P2 Code Intelligence (✅ Complete)
+
 - **CodeAwareEditorTool** - Intelligent code editing with syntax understanding
 - **OperationHistoryTool** - Comprehensive undo/redo system
 
 ### P3 Reliability & Workflow (✅ Complete)
+
 - **TodoTool** - Task management and progress tracking
 - **ConfirmationTool** - User confirmation for dangerous operations
 
 ## Automation Status
+
 - **✅ NPM Publishing**: Fully automated on every push to main
 - **✅ Version Management**: Auto-bump patch versions with README sync
 - **✅ GitHub Actions**: Combined release workflow with proper authentication

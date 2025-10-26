@@ -112,7 +112,7 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **📚 Task/TodoWrite**: Specialized agent delegation and comprehensive task management
 - **🚀 Read/Write/Edit**: Claude Code-standard file operations at high speed
 
-🌐 **Visit [xclicli.dev](https://xclicli.dev)** for complete documentation and guides.
+🌐 **Visit [xcli.org](https://xcli.org)** for complete documentation and guides.
 
 ### 🤖 **Core AI Capabilities**
 
