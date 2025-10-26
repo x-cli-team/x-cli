@@ -8,6 +8,7 @@
     "dev": "npm run kill-port && docusaurus start",
     "prebuild": "node src/scripts/sync-agent-docs.js",
     "build": "docusaurus build",
+    "postbuild": "node scripts/check-og-tags.js",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
