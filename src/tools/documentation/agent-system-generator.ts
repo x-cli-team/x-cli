@@ -162,7 +162,7 @@ Documentation for documentation system commands:
     const files: string[] = [];
 
     // Architecture overview
-    const archContent = this.config.projectType === 'grok-cli' 
+    const archContent = this.config.projectType === 'x-cli' 
       ? this.generateGrokArchitecture() 
       : this.generateExternalArchitecture();
     
@@ -289,7 +289,7 @@ External project documented using Grok CLI's .agent system.
   private generateCriticalState(): string {
     const timestamp = new Date().toISOString();
     
-    if (this.config.projectType === 'grok-cli') {
+    if (this.config.projectType === 'x-cli') {
       return `# 🔧 Current System State
 
 ## Architecture Overview
@@ -376,7 +376,7 @@ Updated By: Agent System Generator during /init-agent
   }
 
   private generateApiSchema(): string {
-    if (this.config.projectType === 'grok-cli') {
+    if (this.config.projectType === 'x-cli') {
       return `# 🔌 API Schema
 
 ## Grok API Integration
@@ -547,7 +547,7 @@ interface Tool {
     files.push('.agent/sop/documentation-workflow.md');
 
     // Adding new command SOP (Grok CLI specific)
-    if (this.config.projectType === 'grok-cli') {
+    if (this.config.projectType === 'x-cli') {
       const newCommandContent = `# ⚙️ Adding New Commands SOP
 
 ## Command System Architecture
@@ -632,7 +632,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
     const tasksPath = path.join(agentPath, 'tasks');
     const files: string[] = [];
 
-    const exampleContent = this.config.projectType === 'grok-cli'
+    const exampleContent = this.config.projectType === 'x-cli'
       ? this.generateGrokExampleTask()
       : this.generateExternalExampleTask();
 
