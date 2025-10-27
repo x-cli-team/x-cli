@@ -1,6 +1,7 @@
 # 📚 .agent Documentation System
 
 *Last synced: 2025-10-27*
+*Protection: Husky pre-commit hook prevents accidental folder deletion*
 
 ## Overview
 This directory contains AI agent documentation for Grok CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.

@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Critical folder protection check
+node -e "
+const fs = require('fs');
+const path = require('path');
+
+const criticalFolders = [
+  '.agent',
+  '.github',
+  'apps/site/docs',
+  'src',
+  'apps/site/src'
+];
+
+const missingFolders = criticalFolders.filter(folder => {
+  try {
+    return !fs.existsSync(folder) || !fs.statSync(folder).isDirectory();
+  } catch (e) {
+    return true;
+  }
+});
+
+if (missingFolders.length > 0) {
+  console.error('🚨 CRITICAL FOLDERS MISSING! Commit blocked to prevent accidental deletion.');
+  console.error('Missing folders:', missingFolders.join(', '));
+  console.error('If this is intentional, use --no-verify to bypass: git commit --no-verify');
+  process.exit(1);
+} else {
+  console.log('✅ Critical folders verified');
+}
+"
+
+# Run lint-staged for code formatting
+npx lint-staged
+
+# Sync .agent docs to public docs
+npm run sync:docs
+
+# TODO: Add session learnings capture here
+# This could log agent interactions, learnings, or changes made during the session
+# For now, this is a placeholder for future implementation
