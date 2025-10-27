@@ -479,8 +479,6 @@ function ChatInterfaceWithAgent({
             progress={undefined} // TODO: Add progress tracking for long operations
           />
 
-          <VersionNotification isVisible={!isProcessing && !isStreaming} />
-          
           {/* Plan Mode Detailed Indicator */}
           {planMode.isActive && (
             <Box marginBottom={1}>
@@ -493,13 +491,15 @@ function ChatInterfaceWithAgent({
               />
             </Box>
           )}
-          
+
           <ChatInput
             input={input}
             cursorPosition={cursorPosition}
             isProcessing={isProcessing}
             isStreaming={isStreaming}
           />
+
+          <VersionNotification isVisible={!isProcessing && !isStreaming} />
 
           <Box flexDirection="row" marginTop={1}>
             <Box marginRight={2}>
