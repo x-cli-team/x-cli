@@ -92,6 +92,20 @@
 ✅ **Error Recovery** - Self-healing with guardrails
 ✅ **Documentation** - Comprehensive troubleshooting guides
 
+## Documentation Architecture
+
+### Internal Documentation System (`.agent/`)
+- **Source of Truth**: All internal docs stored in `.agent/` directory
+- **Organized Structure**: system/, sop/, tasks/, incidents/, parity/, sessions/
+- **Git Integration**: Husky pre-commit hook auto-syncs to public docs
+- **Session Logging**: `.agent/sessions/` captures agent-assisted development learnings
+
+### Public Documentation System
+- **Docusaurus Site**: `apps/site/` with comprehensive documentation
+- **Auto-Sync**: `apps/site/src/scripts/sync-agent-docs.js` maps internal to public docs
+- **OG Tags System**: Custom meta tags for social media branding
+- **Build Validation**: Post-build checks prevent Docusaurus branding regressions
+
 ## Future Roadmap (2025)
 🔲 **Git Integration** - Advanced operations, PR management
 🔲 **Testing Framework** - Jest/Pytest integration

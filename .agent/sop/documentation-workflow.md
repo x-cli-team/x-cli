@@ -30,6 +30,8 @@
 - [ ] Add new SOPs for repeatable processes
 - [ ] Link related tasks and documents
 - [ ] Test documentation updates for accuracy
+- [ ] Create session log in .agent/sessions/ documenting learnings
+- [ ] Commit changes to trigger automated sync to public docs
 
 ## Documentation Standards
 
@@ -54,6 +56,13 @@
 - Maintain clear navigation
 
 ## Automation
+
+### Git Integration
+- **Pre-commit Hook**: `.husky/pre-commit` automatically syncs `.agent` docs to public Docusaurus docs
+- **Sync Script**: `apps/site/src/scripts/sync-agent-docs.js` maps internal docs to public documentation
+- **Session Logging**: `.agent/sessions/` captures learnings from agent-assisted development sessions
+
+### Auto-update Triggers
 - Auto-update triggers configured in .grok/settings.json
 - Smart prompts after key file changes
 - Token threshold reminders

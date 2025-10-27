@@ -87,6 +87,12 @@ Documentation for documentation system commands:
 - Usage guides for /init-agent, /update-agent-docs, etc.
 - Integration workflows
 
+### 📝 sessions/
+Agent-assisted development session logs:
+- Documented learnings and changes from development sessions
+- Technical insights gained during implementation
+- Process improvements and future recommendations
+
 ## 🎯 Usage Guidelines
 
 ### For AI Agents
