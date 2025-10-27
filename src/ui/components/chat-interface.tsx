@@ -77,6 +77,7 @@ function ChatInterfaceWithAgent({
     commandSuggestions,
     availableModels,
     autoEditEnabled,
+    verbosityLevel,
     planMode,
   } = useInputHandler({
     agent,
@@ -448,6 +449,7 @@ function ChatInterfaceWithAgent({
         <ChatHistory
           entries={chatHistory}
           isConfirmationActive={!!confirmationOptions}
+          verbosityLevel={verbosityLevel}
         />
       </Box>
 

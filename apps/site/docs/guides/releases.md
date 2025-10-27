@@ -51,7 +51,7 @@ The system handles:
 
 ```json
 {
-  "name": "@xagent/x-cli", // NEVER change - breaks publishing
+  "name": "grok-cli-hurry-mode", // NEVER change - breaks publishing
   "publishConfig": {
     "access": "public" // Must NOT include registry override
   }

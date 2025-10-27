@@ -1,8 +1,11 @@
 ---
 title: Current System State
----# Current System State
+---
+
+# Current System State
 
 ## Architecture Overview
+
 - **Type**: CLI application with React/Ink UI
 - **Language**: TypeScript (ESM modules)
 - **Build**: TypeScript compiler + tsup dual build (CJS/ESM)
@@ -10,13 +13,16 @@ title: Current System State
 - **Runtime**: Node.js (Bun recommended)
 
 ## Core Components
+
 - **Commands**: Slash-based in src/commands/ (limited - only MCP command currently)
 - **Tools**: Modular tools in src/tools/ (extensive tool system)
-- **UI**: Ink components in src/ui/
+- **UI**: Ink components in src/ui/ with Claude Code-style feedback system
+- **Services**: UI state management, paste detection, context coordination in src/services/
 - **Settings**: File-based .grok/settings.json + ~/.grok/user-settings.json
 - **Input**: Enhanced terminal input with history in src/hooks/
 
 ## Command System
+
 - **Slash Commands**: Handled in useInputHandler.ts
 - **Current Commands**: /help, /clear, /models, /commit-and-push, /exit, /init-agent, /docs, /readme, /api-docs, /changelog, /comments, /update-agent-docs, /compact, /heal, /guardrails
 - **Command Registration**: Direct implementation in input handler
@@ -24,12 +30,14 @@ title: Current System State
 - **Documentation Commands**: Full suite with /init-agent, /docs menu, /readme generation, /api-docs, /changelog, /comments, /update-agent-docs, /compact (subagent), /heal (self-healing), /guardrails
 
 ## Authentication & Storage
-- **Auth**: Environment variable X_API_KEY or user settings
+
+- **Auth**: Environment variable GROK_API_KEY or user settings
 - **Storage**: Local file system only
 - **Database**: None (settings via JSON files)
 - **MCP**: Optional server integration
 
 ## Current Capabilities
+
 - File operations (read, write, edit, multi-file)
 - Bash command execution with output capture
 - Code analysis (AST parsing, refactoring)
@@ -40,16 +48,25 @@ title: Current System State
 - Complete documentation generation system (15+ commands)
 - Subagent framework for token optimization
 - Self-healing system with incident tracking
+- **Claude Code-style UX system** (Professional visual feedback)
+- **Enhanced visual experience** (ASCII banner, contextual spinners, progress bars)
+- **Real-time feedback** (Background activity monitoring, state coordination)
+- **Consistent design system** (Unified color palette, motion design)
+- **Context awareness surface** (Ctrl+I tooltip, dynamic workspace intelligence)
+- **Keyboard shortcuts** (Global shortcuts for enhanced workflow efficiency)
+- **Memory pressure monitoring** (Real-time system state visualization)
 - Smart auto-update system with configurable triggers
 - No cloud storage integration
 - No built-in authentication system
 
 ## Build Configuration
+
 - **TypeScript**: ESM modules with dual CJS/ESM output
 - **Dependencies**: Ink, React, commander, chalk, ripgrep
 - **Scripts**: dev, build, start, lint, typecheck
 
 ## Recent Changes
+
 - ** NPM Automation Fixed (2025-10-17)**: Fully automated NPM publishing workflow operational
 - ** Protection System (2025-10-17)**: Comprehensive safeguards against workflow breakage
 - ** P1-P3 Advanced Tools (2025-10-16)**: MultiFileEditor, AdvancedSearch, FileTreeOps, CodeAwareEditor, OperationHistory
@@ -62,26 +79,32 @@ title: Current System State
 - Implemented self-healing system with incident tracking and guardrails
 
 ## Current Tool Inventory (P1-P3 Complete)
+
 ### Core Tools
+
 - **TextEditorTool** - File viewing, creation, string replacement
 - **BashTool** - Shell command execution with output capture
 - **SearchTool** - Basic file and content search
 
 ### P1 Advanced Tools ( Complete)
+
 - **MorphEditorTool** - High-speed editing (4,500+ tokens/sec, 98% accuracy)
 - **MultiFileEditorTool** - Atomic multi-file operations with transaction support
 - **AdvancedSearchTool** - Enhanced search and replace with regex support
 - **FileTreeOperationsTool** - Comprehensive file system management
 
 ### P2 Code Intelligence ( Complete)
+
 - **CodeAwareEditorTool** - Intelligent code editing with syntax understanding
 - **OperationHistoryTool** - Comprehensive undo/redo system
 
 ### P3 Reliability & Workflow ( Complete)
+
 - **TodoTool** - Task management and progress tracking
 - **ConfirmationTool** - User confirmation for dangerous operations
 
 ## Automation Status
+
 - ** NPM Publishing**: Fully automated on every push to main
 - ** Version Management**: Auto-bump patch versions with README sync
 - ** GitHub Actions**: Combined release workflow with proper authentication

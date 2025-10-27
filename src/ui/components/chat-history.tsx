@@ -7,6 +7,7 @@ import { MarkdownRenderer } from "../utils/markdown-renderer.js";
 interface ChatHistoryProps {
   entries: ChatEntry[];
   isConfirmationActive?: boolean;
+  verbosityLevel?: 'normal' | 'quiet' | 'minimal';
 }
 
 // Helper to truncate content in compact mode
@@ -33,7 +34,7 @@ const handleLongContent = (content: string, maxLength: number = 5000): { content
 
 // Memoized ChatEntry component to prevent unnecessary re-renders
 const MemoizedChatEntry = React.memo(
-  ({ entry, index }: { entry: ChatEntry; index: number }) => {
+  ({ entry, index, verbosityLevel }: { entry: ChatEntry; index: number; verbosityLevel: 'normal' | 'quiet' | 'minimal' }) => {
     const renderDiff = (diffContent: string, filename?: string) => {
       return (
         <DiffRenderer
@@ -199,6 +200,10 @@ const MemoizedChatEntry = React.memo(
           entry.toolResult?.success &&
           !shouldShowDiff;
 
+        // Verbosity-based content filtering
+        const shouldShowToolContent = verbosityLevel !== 'minimal';
+        const shouldShowFullContent = verbosityLevel === 'normal';
+
         return (
           <Box key={index} flexDirection="column" marginTop={1}>
             <Box>
@@ -208,24 +213,28 @@ const MemoizedChatEntry = React.memo(
                 {filePath ? `${actionName}(${filePath})` : actionName}
               </Text>
             </Box>
-            <Box marginLeft={2} flexDirection="column">
-              {isExecuting ? (
-                <Text color="cyan">⎿ Executing...</Text>
-              ) : shouldShowFileContent ? (
-                <Box flexDirection="column">
-                  <Text color="gray">⎿ File contents:</Text>
-                  <Box marginLeft={2} flexDirection="column">
-                    {renderFileContent(entry.content)}
+            {shouldShowToolContent && (
+              <Box marginLeft={2} flexDirection="column">
+                {isExecuting ? (
+                  <Text color="cyan">⎿ Executing...</Text>
+                ) : shouldShowFileContent && shouldShowFullContent ? (
+                  <Box flexDirection="column">
+                    <Text color="gray">⎿ File contents:</Text>
+                    <Box marginLeft={2} flexDirection="column">
+                      {renderFileContent(entry.content)}
+                    </Box>
                   </Box>
-                </Box>
-              ) : shouldShowDiff ? (
-                // For diff results, show only the summary line, not the raw content
-                <Text color="gray">⎿ {entry.content.split("\n")[0]}</Text>
-              ) : (
-                <Text color="gray">⎿ {formatToolContent(entry.content, toolName)}</Text>
-              )}
-            </Box>
-            {shouldShowDiff && !isExecuting && (
+                ) : shouldShowDiff && shouldShowFullContent ? (
+                  // For diff results, show only the summary line, not the raw content
+                  <Text color="gray">⎿ {entry.content.split("\n")[0]}</Text>
+                ) : verbosityLevel === 'quiet' ? (
+                  <Text color="gray">⎿ Completed</Text>
+                ) : (
+                  <Text color="gray">⎿ {formatToolContent(entry.content, toolName)}</Text>
+                )}
+              </Box>
+            )}
+            {shouldShowDiff && !isExecuting && shouldShowFullContent && (
               <Box marginLeft={4} flexDirection="column">
                 {renderDiff(entry.content, filePath)}
               </Box>
@@ -244,6 +253,7 @@ MemoizedChatEntry.displayName = "MemoizedChatEntry";
 export function ChatHistory({
   entries,
   isConfirmationActive = false,
+  verbosityLevel = 'normal',
 }: ChatHistoryProps) {
   // Filter out tool_call entries with "Executing..." when confirmation is active
   const filteredEntries = isConfirmationActive
@@ -263,6 +273,7 @@ export function ChatHistory({
           key={`${entry.timestamp.getTime()}-${index}`}
           entry={entry}
           index={index}
+          verbosityLevel={verbosityLevel}
         />
       ))}
     </Box>

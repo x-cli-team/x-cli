@@ -1,5 +1,12 @@
 # Hotfix Sprint: Stop Repaint Storm & CPU Spikes
 
+## Status: RESOLVED ✅
+
+**Resolution:** CPU spikes and repaint storm issue has self-resolved. No active CPU usage problems detected in recent usage.
+
+**Date Resolved:** 2025-10-27
+**Root Cause:** Unknown (potentially resolved through other refactoring or environmental changes)
+
 ## Immediate Triage (No Code Changes)
 
 Run your local CLI with these guardrails to calm the UI while you work:

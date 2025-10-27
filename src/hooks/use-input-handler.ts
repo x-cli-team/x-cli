@@ -73,6 +73,7 @@ export function useInputHandler({
   });
   const [shiftTabPressCount, setShiftTabPressCount] = useState(0);
   const [lastShiftTabTime, setLastShiftTabTime] = useState(0);
+  const [verbosityLevel, setVerbosityLevel] = useState<'normal' | 'quiet' | 'minimal'>('normal');
 
   // Initialize plan mode hook
   const planMode = usePlanMode({}, agent);
@@ -1603,6 +1604,40 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
       return true;
     }
 
+    // Add verbosity command
+    if (trimmedInput === "/verbosity" || trimmedInput.startsWith("/verbosity ")) {
+      const args = trimmedInput.split(' ').slice(1);
+      const newLevel = args[0];
+
+      if (!newLevel) {
+        // Show current verbosity level
+        const levelEntry: ChatEntry = {
+          type: "assistant",
+          content: `🔊 **Current Verbosity Level: ${verbosityLevel.toUpperCase()}**\n\n**Available levels:**\n- \`normal\` - Full tool output and details\n- \`quiet\` - Reduced tool output, show summaries only\n- \`minimal\` - Show only tool names, hide detailed content\n\n**Usage:** \`/verbosity <level>\`\n**Example:** \`/verbosity quiet\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, levelEntry]);
+      } else if (['normal', 'quiet', 'minimal'].includes(newLevel)) {
+        setVerbosityLevel(newLevel as 'normal' | 'quiet' | 'minimal');
+        const confirmEntry: ChatEntry = {
+          type: "assistant",
+          content: `✅ **Verbosity level set to: ${newLevel.toUpperCase()}**\n\nTool outputs will now show ${newLevel === 'minimal' ? 'only tool names' : newLevel === 'quiet' ? 'summaries only' : 'full details'}.`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, confirmEntry]);
+      } else {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ **Invalid verbosity level: ${newLevel}**\n\n**Available levels:** normal, quiet, minimal\n\n**Usage:** \`/verbosity <level>\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+
+      clearInput();
+      return true;
+    }
+
     const directBashCommands = [
       "ls",
       "pwd",
@@ -1846,6 +1881,7 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
     availableModels,
     agent,
     autoEditEnabled,
+    verbosityLevel,
     // Plan mode state and actions
     planMode,
   };

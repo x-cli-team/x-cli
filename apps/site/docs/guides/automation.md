@@ -47,7 +47,7 @@ This document outlines the protection measures in place to prevent accidental br
 
 ```json
 {
-  "name": "@xagent/x-cli", // NEVER change - breaks publishing
+  "name": "grok-cli-hurry-mode", // NEVER change - breaks publishing
   "publishConfig": {
     "access": "public" // NEVER add registry override
   }
@@ -126,7 +126,7 @@ echo " ERROR: package.json contains registry override - this breaks NPM publishi
 exit 1
 fi
 
-if ! grep -q '"name": "@xagent/x-cli"' package.json; then
+if ! grep -q '"name": "grok-cli-hurry-mode"' package.json; then
 echo " ERROR: package.json name changed - this breaks NPM publishing!"
 exit 1
 fi
@@ -138,7 +138,7 @@ fi
 # Could add to workflow
 - name: Validate critical settings
 run: |
-if [[ "$(jq -r '.name' package.json)" != "@xagent/x-cli" ]]; then
+if [[ "$(jq -r '.name' package.json)" != "grok-cli-hurry-mode" ]]; then
 echo " ERROR: Package name changed!"
 exit 1
 fi

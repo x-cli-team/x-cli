@@ -10,15 +10,15 @@ title: NPM Publishing Troubleshooting Guide
 
 ```bash
 # Check current published version
-npm view @xagent/x-cli version
+npm view grok-cli-hurry-mode version
 
 # Check if new version exists
-npm view @xagent/x-cli time --json | tail -5
+npm view grok-cli-hurry-mode time --json | tail -5
 ```
 
 ### Check GitHub Actions
 
-1. Go to: https://github.com/hinetapora/@xagent/x-cli/actions
+1. Go to: https://github.com/hinetapora/grok-cli-hurry-mode/actions
 2. Look for failed "Release" workflows
 3. Check logs for specific error messages
 
@@ -48,7 +48,7 @@ fatal: could not read Username for 'https://github.com'
 
 ```bash
 # In GitHub repo Settings → Secrets → Actions
-PAT_TOKEN: <your-github-personal-access-token>
+PAT_TOKEN: ghp_your_personal_access_token_here
 ```
 
 ### 3. Git Push Fails
@@ -130,7 +130,7 @@ echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 
 ```json
 {
-  "name": "@xagent/x-cli", // Must remain unscoped
+  "name": "grok-cli-hurry-mode", // Must remain unscoped
   "publishConfig": {
     "access": "public" // Must NOT include registry
   }
@@ -142,8 +142,8 @@ echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 ### Required GitHub Secrets
 
 ```
-PAT_TOKEN=<your-github-pat-token>
-NPM_TOKEN=<your-npm-automation-token>
+PAT_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+NPM_TOKEN=npm_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ### Critical Workflow Steps
@@ -183,7 +183,7 @@ NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```bash
 # 1. Check current state
 git status
-npm view @xagent/x-cli version
+npm view grok-cli-hurry-mode version
 
 # 2. Manual version bump
 npm version patch # or minor/major as needed
@@ -205,7 +205,7 @@ git push origin main --follow-tags
 
 ```bash
 # Check what's actually published
-npm view @xagent/x-cli time --json
+npm view grok-cli-hurry-mode time --json
 
 # Check local package.json
 cat package.json | grep version

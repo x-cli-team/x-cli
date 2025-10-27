@@ -317,7 +317,7 @@ function Footer() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>Copyright © 2024 X CLI. Forked from <a href="https://github.com/superagent-ai/grok-cli">Superagent.ai</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
+          <p>Copyright © 2025 X CLI. Forked from <a href="https://github.com/superagent-ai/grok-cli">Superagent.ai</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
         </div>
       </div>
     </footer>
