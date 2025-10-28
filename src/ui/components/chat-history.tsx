@@ -7,7 +7,8 @@ import { MarkdownRenderer } from "../utils/markdown-renderer.js";
 interface ChatHistoryProps {
   entries: ChatEntry[];
   isConfirmationActive?: boolean;
-  verbosityLevel?: 'normal' | 'quiet' | 'minimal';
+  verbosityLevel?: 'quiet' | 'normal' | 'verbose';
+  explainLevel?: 'off' | 'brief' | 'detailed';
 }
 
 // Helper to truncate content in compact mode
@@ -34,7 +35,41 @@ const handleLongContent = (content: string, maxLength: number = 5000): { content
 
 // Memoized ChatEntry component to prevent unnecessary re-renders
 const MemoizedChatEntry = React.memo(
-  ({ entry, index, verbosityLevel }: { entry: ChatEntry; index: number; verbosityLevel: 'normal' | 'quiet' | 'minimal' }) => {
+  ({ entry, index, verbosityLevel, explainLevel }: { entry: ChatEntry; index: number; verbosityLevel: 'quiet' | 'normal' | 'verbose'; explainLevel: 'off' | 'brief' | 'detailed' }) => {
+
+    // Generate explanations for operations
+    const getExplanation = (toolName: string, filePath: string, _isExecuting: boolean) => {
+      if (explainLevel === 'off') return null;
+
+      const explanations = {
+        view_file: {
+          brief: `Reading ${filePath} to examine its contents`,
+          detailed: `Reading the file ${filePath} to examine its current contents, structure, and implementation details for analysis or modification.`
+        },
+        str_replace_editor: {
+          brief: `Updating ${filePath} with changes`,
+          detailed: `Applying targeted modifications to ${filePath} using precise string replacement to update specific code sections while preserving the rest of the file structure.`
+        },
+        create_file: {
+          brief: `Creating new file ${filePath}`,
+          detailed: `Creating a new file at ${filePath} with the specified content, establishing the initial structure and implementation for this component or module.`
+        },
+        bash: {
+          brief: `Executing command: ${filePath}`,
+          detailed: `Running the shell command "${filePath}" to perform system operations, file management, or external tool execution as requested.`
+        },
+        search: {
+          brief: `Searching for: ${filePath}`,
+          detailed: `Performing a comprehensive search across the codebase for "${filePath}" to locate relevant files, functions, or code patterns that match the query.`
+        }
+      };
+
+      const explanation = explanations[toolName as keyof typeof explanations];
+      if (!explanation) return null;
+
+      return explainLevel === 'detailed' ? explanation.detailed : explanation.brief;
+    };
+
     const renderDiff = (diffContent: string, filename?: string) => {
       return (
         <DiffRenderer
@@ -201,8 +236,10 @@ const MemoizedChatEntry = React.memo(
           !shouldShowDiff;
 
         // Verbosity-based content filtering
-        const shouldShowToolContent = verbosityLevel !== 'minimal';
-        const shouldShowFullContent = verbosityLevel === 'normal';
+        const shouldShowToolContent = verbosityLevel !== 'quiet';
+        const shouldShowFullContent = verbosityLevel === 'normal' || verbosityLevel === 'verbose';
+
+        const explanation = getExplanation(toolName, filePath, isExecuting);
 
         return (
           <Box key={index} flexDirection="column" marginTop={1}>
@@ -213,6 +250,13 @@ const MemoizedChatEntry = React.memo(
                 {filePath ? `${actionName}(${filePath})` : actionName}
               </Text>
             </Box>
+            {explanation && (
+              <Box marginLeft={2}>
+                <Text color="blue" italic>
+                  💡 {explanation}
+                </Text>
+              </Box>
+            )}
             {shouldShowToolContent && (
               <Box marginLeft={2} flexDirection="column">
                 {isExecuting ? (
@@ -253,7 +297,8 @@ MemoizedChatEntry.displayName = "MemoizedChatEntry";
 export function ChatHistory({
   entries,
   isConfirmationActive = false,
-  verbosityLevel = 'normal',
+  verbosityLevel = 'quiet',
+  explainLevel = 'brief',
 }: ChatHistoryProps) {
   // Filter out tool_call entries with "Executing..." when confirmation is active
   const filteredEntries = isConfirmationActive
@@ -274,6 +319,7 @@ export function ChatHistory({
           entry={entry}
           index={index}
           verbosityLevel={verbosityLevel}
+          explainLevel={explainLevel}
         />
       ))}
     </Box>

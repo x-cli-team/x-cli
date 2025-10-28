@@ -16,6 +16,8 @@ export interface UserSettings {
     lines?: number; // Auto-compact when session exceeds this many lines (default: 800)
     bytes?: number; // Auto-compact when session exceeds this many bytes (default: 200000)
   };
+  verbosityLevel?: 'quiet' | 'normal' | 'verbose'; // Output verbosity level
+  explainLevel?: 'off' | 'brief' | 'detailed'; // Explanation detail level
 }
 
 /**
@@ -40,6 +42,8 @@ const DEFAULT_USER_SETTINGS: Partial<UserSettings> = {
     "grok-3-fast",
     "grok-3-mini-fast",
   ],
+  verbosityLevel: 'quiet',
+  explainLevel: 'brief',
 };
 
 /**

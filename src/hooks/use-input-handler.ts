@@ -73,7 +73,22 @@ export function useInputHandler({
   });
   const [shiftTabPressCount, setShiftTabPressCount] = useState(0);
   const [lastShiftTabTime, setLastShiftTabTime] = useState(0);
-  const [verbosityLevel, setVerbosityLevel] = useState<'normal' | 'quiet' | 'minimal'>('normal');
+  const [verbosityLevel, setVerbosityLevel] = useState<'quiet' | 'normal' | 'verbose'>(() => {
+    try {
+      const manager = getSettingsManager();
+      return manager.getUserSetting('verbosityLevel') || 'quiet';
+    } catch {
+      return 'quiet';
+    }
+  });
+  const [explainLevel, setExplainLevel] = useState<'off' | 'brief' | 'detailed'>(() => {
+    try {
+      const manager = getSettingsManager();
+      return manager.getUserSetting('explainLevel') || 'brief';
+    } catch {
+      return 'brief';
+    }
+  });
 
   // Initialize plan mode hook
   const planMode = usePlanMode({}, agent);
@@ -382,6 +397,8 @@ Built-in Commands:
   /clear      - Clear chat history
   /help       - Show this help
   /models     - Switch between available models
+  /verbosity  - Control output verbosity (quiet/normal/verbose)
+  /explain    - Control operation explanations (off/brief/detailed)
   /version    - Show version information and check for updates
   /upgrade    - Check for updates and upgrade automatically
   /switch     - Switch to specific version (/switch <version>)
@@ -1613,22 +1630,70 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
         // Show current verbosity level
         const levelEntry: ChatEntry = {
           type: "assistant",
-          content: `🔊 **Current Verbosity Level: ${verbosityLevel.toUpperCase()}**\n\n**Available levels:**\n- \`normal\` - Full tool output and details\n- \`quiet\` - Reduced tool output, show summaries only\n- \`minimal\` - Show only tool names, hide detailed content\n\n**Usage:** \`/verbosity <level>\`\n**Example:** \`/verbosity quiet\``,
+          content: `🔊 **Current Verbosity Level: ${verbosityLevel.toUpperCase()}**\n\n**Available levels:**\n- \`quiet\` - Minimal output, suppress prefixes and extra formatting\n- \`normal\` - Current default behavior with full details\n- \`verbose\` - Additional details and debug information\n\n**Usage:** \`/verbosity <level>\`\n**Example:** \`/verbosity quiet\``,
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, levelEntry]);
-      } else if (['normal', 'quiet', 'minimal'].includes(newLevel)) {
-        setVerbosityLevel(newLevel as 'normal' | 'quiet' | 'minimal');
+      } else if (['quiet', 'normal', 'verbose'].includes(newLevel)) {
+        setVerbosityLevel(newLevel as 'quiet' | 'normal' | 'verbose');
+        // Save to settings
+        try {
+          const manager = getSettingsManager();
+          manager.updateUserSetting('verbosityLevel', newLevel as 'quiet' | 'normal' | 'verbose');
+        } catch (_error) {
+          // Silently ignore settings save errors
+        }
         const confirmEntry: ChatEntry = {
           type: "assistant",
-          content: `✅ **Verbosity level set to: ${newLevel.toUpperCase()}**\n\nTool outputs will now show ${newLevel === 'minimal' ? 'only tool names' : newLevel === 'quiet' ? 'summaries only' : 'full details'}.`,
+          content: `✅ **Verbosity level set to: ${newLevel.toUpperCase()}**\n\nTool outputs will now show ${newLevel === 'quiet' ? 'minimal output' : newLevel === 'normal' ? 'full details' : 'extra details and debug information'}.`,
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, confirmEntry]);
       } else {
         const errorEntry: ChatEntry = {
           type: "assistant",
-          content: `❌ **Invalid verbosity level: ${newLevel}**\n\n**Available levels:** normal, quiet, minimal\n\n**Usage:** \`/verbosity <level>\``,
+          content: `❌ **Invalid verbosity level: ${newLevel}**\n\n**Available levels:** quiet, normal, verbose\n\n**Usage:** \`/verbosity <level>\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+
+      clearInput();
+      return true;
+    }
+
+    // Add explain command
+    if (trimmedInput === "/explain" || trimmedInput.startsWith("/explain ")) {
+      const args = trimmedInput.split(' ').slice(1);
+      const newLevel = args[0];
+
+      if (!newLevel) {
+        // Show current explain level
+        const levelEntry: ChatEntry = {
+          type: "assistant",
+          content: `💡 **Current Explain Level: ${explainLevel.toUpperCase()}**\n\n**Available levels:**\n- \`off\` - No explanations\n- \`brief\` - Short reasons for operations\n- \`detailed\` - Comprehensive explanations with context\n\n**Usage:** \`/explain <level>\`\n**Example:** \`/explain brief\``,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, levelEntry]);
+      } else if (['off', 'brief', 'detailed'].includes(newLevel)) {
+        setExplainLevel(newLevel as 'off' | 'brief' | 'detailed');
+        // Save to settings
+        try {
+          const manager = getSettingsManager();
+          manager.updateUserSetting('explainLevel', newLevel as 'off' | 'brief' | 'detailed');
+        } catch (_error) {
+          // Silently ignore settings save errors
+        }
+        const confirmEntry: ChatEntry = {
+          type: "assistant",
+          content: `✅ **Explain level set to: ${newLevel.toUpperCase()}**\n\nOperations will now ${newLevel === 'off' ? 'show no explanations' : newLevel === 'brief' ? 'show brief reasons' : 'show detailed explanations with context'}.`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, confirmEntry]);
+      } else {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ **Invalid explain level: ${newLevel}**\n\n**Available levels:** off, brief, detailed\n\n**Usage:** \`/explain <level>\``,
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, errorEntry]);
@@ -1882,6 +1947,7 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
     agent,
     autoEditEnabled,
     verbosityLevel,
+    explainLevel,
     // Plan mode state and actions
     planMode,
   };

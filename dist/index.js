@@ -58,7 +58,9 @@ var init_settings_manager = __esm({
         "grok-3-latest",
         "grok-3-fast",
         "grok-3-mini-fast"
-      ]
+      ],
+      verbosityLevel: "quiet",
+      explainLevel: "brief"
     };
     DEFAULT_PROJECT_SETTINGS = {
       model: "grok-code-fast-1"
@@ -14883,7 +14885,22 @@ function useInputHandler({
   });
   const [shiftTabPressCount, setShiftTabPressCount] = useState(0);
   const [lastShiftTabTime, setLastShiftTabTime] = useState(0);
-  const [verbosityLevel, setVerbosityLevel] = useState("normal");
+  const [verbosityLevel, setVerbosityLevel] = useState(() => {
+    try {
+      const manager = getSettingsManager();
+      return manager.getUserSetting("verbosityLevel") || "quiet";
+    } catch {
+      return "quiet";
+    }
+  });
+  const [explainLevel, setExplainLevel] = useState(() => {
+    try {
+      const manager = getSettingsManager();
+      return manager.getUserSetting("explainLevel") || "brief";
+    } catch {
+      return "brief";
+    }
+  });
   const planMode = usePlanMode({}, agent);
   const handleSpecialKey = (key) => {
     if (isConfirmationActive) {
@@ -16239,22 +16256,27 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
           content: `\u{1F50A} **Current Verbosity Level: ${verbosityLevel.toUpperCase()}**
 
 **Available levels:**
-- \`normal\` - Full tool output and details
-- \`quiet\` - Reduced tool output, show summaries only
-- \`minimal\` - Show only tool names, hide detailed content
+- \`quiet\` - Minimal output, suppress prefixes and extra formatting
+- \`normal\` - Current default behavior with full details
+- \`verbose\` - Additional details and debug information
 
 **Usage:** \`/verbosity <level>\`
 **Example:** \`/verbosity quiet\``,
           timestamp: /* @__PURE__ */ new Date()
         };
         setChatHistory((prev) => [...prev, levelEntry]);
-      } else if (["normal", "quiet", "minimal"].includes(newLevel)) {
+      } else if (["quiet", "normal", "verbose"].includes(newLevel)) {
         setVerbosityLevel(newLevel);
+        try {
+          const manager = getSettingsManager();
+          manager.updateUserSetting("verbosityLevel", newLevel);
+        } catch (error) {
+        }
         const confirmEntry = {
           type: "assistant",
           content: `\u2705 **Verbosity level set to: ${newLevel.toUpperCase()}**
 
-Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLevel === "quiet" ? "summaries only" : "full details"}.`,
+Tool outputs will now show ${newLevel === "quiet" ? "minimal output" : newLevel === "normal" ? "full details" : "extra details and debug information"}.`,
           timestamp: /* @__PURE__ */ new Date()
         };
         setChatHistory((prev) => [...prev, confirmEntry]);
@@ -16263,9 +16285,57 @@ Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLev
           type: "assistant",
           content: `\u274C **Invalid verbosity level: ${newLevel}**
 
-**Available levels:** normal, quiet, minimal
+**Available levels:** quiet, normal, verbose
 
 **Usage:** \`/verbosity <level>\``,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
+    if (trimmedInput === "/explain" || trimmedInput.startsWith("/explain ")) {
+      const args = trimmedInput.split(" ").slice(1);
+      const newLevel = args[0];
+      if (!newLevel) {
+        const levelEntry = {
+          type: "assistant",
+          content: `\u{1F4A1} **Current Explain Level: ${explainLevel.toUpperCase()}**
+
+**Available levels:**
+- \`off\` - No explanations
+- \`brief\` - Short reasons for operations
+- \`detailed\` - Comprehensive explanations with context
+
+**Usage:** \`/explain <level>\`
+**Example:** \`/explain brief\``,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, levelEntry]);
+      } else if (["off", "brief", "detailed"].includes(newLevel)) {
+        setExplainLevel(newLevel);
+        try {
+          const manager = getSettingsManager();
+          manager.updateUserSetting("explainLevel", newLevel);
+        } catch (error) {
+        }
+        const confirmEntry = {
+          type: "assistant",
+          content: `\u2705 **Explain level set to: ${newLevel.toUpperCase()}**
+
+Operations will now ${newLevel === "off" ? "show no explanations" : newLevel === "brief" ? "show brief reasons" : "show detailed explanations with context"}.`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, confirmEntry]);
+      } else {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C **Invalid explain level: ${newLevel}**
+
+**Available levels:** off, brief, detailed
+
+**Usage:** \`/explain <level>\``,
           timestamp: /* @__PURE__ */ new Date()
         };
         setChatHistory((prev) => [...prev, errorEntry]);
@@ -16475,6 +16545,7 @@ Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLev
     agent,
     autoEditEnabled,
     verbosityLevel,
+    explainLevel,
     // Plan mode state and actions
     planMode
   };
@@ -16866,7 +16937,35 @@ var handleLongContent = (content, maxLength = 5e3) => {
   };
 };
 var MemoizedChatEntry = React3.memo(
-  ({ entry, index, verbosityLevel }) => {
+  ({ entry, index, verbosityLevel, explainLevel }) => {
+    const getExplanation = (toolName, filePath, isExecuting) => {
+      if (explainLevel === "off") return null;
+      const explanations = {
+        view_file: {
+          brief: `Reading ${filePath} to examine its contents`,
+          detailed: `Reading the file ${filePath} to examine its current contents, structure, and implementation details for analysis or modification.`
+        },
+        str_replace_editor: {
+          brief: `Updating ${filePath} with changes`,
+          detailed: `Applying targeted modifications to ${filePath} using precise string replacement to update specific code sections while preserving the rest of the file structure.`
+        },
+        create_file: {
+          brief: `Creating new file ${filePath}`,
+          detailed: `Creating a new file at ${filePath} with the specified content, establishing the initial structure and implementation for this component or module.`
+        },
+        bash: {
+          brief: `Executing command: ${filePath}`,
+          detailed: `Running the shell command "${filePath}" to perform system operations, file management, or external tool execution as requested.`
+        },
+        search: {
+          brief: `Searching for: ${filePath}`,
+          detailed: `Performing a comprehensive search across the codebase for "${filePath}" to locate relevant files, functions, or code patterns that match the query.`
+        }
+      };
+      const explanation = explanations[toolName];
+      if (!explanation) return null;
+      return explainLevel === "detailed" ? explanation.detailed : explanation.brief;
+    };
     const renderDiff = (diffContent, filename) => {
       return /* @__PURE__ */ jsx(
         DiffRenderer,
@@ -16985,8 +17084,9 @@ var MemoizedChatEntry = React3.memo(
         };
         const shouldShowDiff = entry.toolCall?.function?.name === "str_replace_editor" && entry.toolResult?.success && entry.content.includes("Updated") && entry.content.includes("---") && entry.content.includes("+++");
         const shouldShowFileContent = (entry.toolCall?.function?.name === "view_file" || entry.toolCall?.function?.name === "create_file") && entry.toolResult?.success && !shouldShowDiff;
-        const shouldShowToolContent = verbosityLevel !== "minimal";
-        const shouldShowFullContent = verbosityLevel === "normal";
+        const shouldShowToolContent = verbosityLevel !== "quiet";
+        const shouldShowFullContent = verbosityLevel === "normal" || verbosityLevel === "verbose";
+        const explanation = getExplanation(toolName, filePath);
         return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
           /* @__PURE__ */ jsxs(Box, { children: [
             /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
@@ -16995,6 +17095,10 @@ var MemoizedChatEntry = React3.memo(
               filePath ? `${actionName}(${filePath})` : actionName
             ] })
           ] }),
+          explanation && /* @__PURE__ */ jsx(Box, { marginLeft: 2, children: /* @__PURE__ */ jsxs(Text, { color: "blue", italic: true, children: [
+            "\u{1F4A1} ",
+            explanation
+          ] }) }),
           shouldShowToolContent && /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: isExecuting ? /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u23BF Executing..." }) : shouldShowFileContent && shouldShowFullContent ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
             /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF File contents:" }),
             /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: renderFileContent(entry.content) })
@@ -17019,7 +17123,8 @@ MemoizedChatEntry.displayName = "MemoizedChatEntry";
 function ChatHistory({
   entries,
   isConfirmationActive = false,
-  verbosityLevel = "normal"
+  verbosityLevel = "quiet",
+  explainLevel = "brief"
 }) {
   const filteredEntries = isConfirmationActive ? entries.filter(
     (entry) => !(entry.type === "tool_call" && entry.content === "Executing...")
@@ -17030,7 +17135,8 @@ function ChatHistory({
     {
       entry,
       index,
-      verbosityLevel
+      verbosityLevel,
+      explainLevel
     },
     `${entry.timestamp.getTime()}-${index}`
   )) });
@@ -18166,6 +18272,7 @@ function ChatInterfaceWithAgent({
     availableModels,
     autoEditEnabled,
     verbosityLevel,
+    explainLevel,
     planMode
   } = useInputHandler({
     agent,
@@ -18468,7 +18575,8 @@ function ChatInterfaceWithAgent({
       {
         entries: chatHistory,
         isConfirmationActive: !!confirmationOptions,
-        verbosityLevel
+        verbosityLevel,
+        explainLevel
       }
     ) }),
     /* @__PURE__ */ jsx(
