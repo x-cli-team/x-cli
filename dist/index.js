@@ -9293,7 +9293,7 @@ EOF`;
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.49",
+  version: "1.1.50",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -15147,6 +15147,8 @@ Built-in Commands:
   /clear      - Clear chat history
   /help       - Show this help
   /models     - Switch between available models
+  /verbosity  - Control output verbosity (quiet/normal/verbose)
+  /explain    - Control operation explanations (off/brief/detailed)
   /version    - Show version information and check for updates
   /upgrade    - Check for updates and upgrade automatically
   /switch     - Switch to specific version (/switch <version>)
@@ -16270,7 +16272,7 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
         try {
           const manager = getSettingsManager();
           manager.updateUserSetting("verbosityLevel", newLevel);
-        } catch (error) {
+        } catch (_error) {
         }
         const confirmEntry = {
           type: "assistant",
@@ -16318,7 +16320,7 @@ Tool outputs will now show ${newLevel === "quiet" ? "minimal output" : newLevel 
         try {
           const manager = getSettingsManager();
           manager.updateUserSetting("explainLevel", newLevel);
-        } catch (error) {
+        } catch (_error) {
         }
         const confirmEntry = {
           type: "assistant",
@@ -16938,7 +16940,7 @@ var handleLongContent = (content, maxLength = 5e3) => {
 };
 var MemoizedChatEntry = React3.memo(
   ({ entry, index, verbosityLevel, explainLevel }) => {
-    const getExplanation = (toolName, filePath, isExecuting) => {
+    const getExplanation = (toolName, filePath, _isExecuting) => {
       if (explainLevel === "off") return null;
       const explanations = {
         view_file: {
@@ -17108,7 +17110,7 @@ var MemoizedChatEntry = React3.memo(
               "\u23BF ",
               entry.content.split("\n")[0]
             ] })
-          ) : verbosityLevel === "quiet" ? /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Completed" }) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          ) : !shouldShowFullContent ? /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Completed" }) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
             "\u23BF ",
             formatToolContent(entry.content, toolName)
           ] }) }),
@@ -18307,6 +18309,82 @@ function ChatInterfaceWithAgent({
     });
     console.log(" ");
     setChatHistory([]);
+    if (fs__default.existsSync(".agent")) {
+      const initialMessages = [];
+      const archPath = path7__default.join(".agent", "system", "architecture.md");
+      if (fs__default.existsSync(archPath)) {
+        try {
+          const archContent = fs__default.readFileSync(archPath, "utf8");
+          initialMessages.push({
+            type: "assistant",
+            content: `\u{1F4CB} **System Architecture (from .agent/system/architecture.md)**
+
+${archContent}`,
+            timestamp: /* @__PURE__ */ new Date()
+          });
+        } catch (error) {
+        }
+      }
+      const workflowPath = path7__default.join(".agent", "sop", "git-workflow.md");
+      if (fs__default.existsSync(workflowPath)) {
+        try {
+          const workflowContent = fs__default.readFileSync(workflowPath, "utf8");
+          initialMessages.push({
+            type: "assistant",
+            content: `\u{1F527} **Git Workflow SOP (from .agent/sop/git-workflow.md)**
+
+${workflowContent}`,
+            timestamp: /* @__PURE__ */ new Date()
+          });
+        } catch (error) {
+        }
+      }
+      const sopDir = path7__default.join(".agent", "sop");
+      if (fs__default.existsSync(sopDir)) {
+        const sopFiles = ["release-management.md", "automation-protection.md"];
+        for (const file of sopFiles) {
+          const filePath = path7__default.join(sopDir, file);
+          if (fs__default.existsSync(filePath)) {
+            try {
+              const content = fs__default.readFileSync(filePath, "utf8");
+              const title = file.replace(".md", "").replace("-", " ").toUpperCase();
+              initialMessages.push({
+                type: "assistant",
+                content: `\u{1F4D6} **${title} SOP (from .agent/sop/${file})**
+
+${content}`,
+                timestamp: /* @__PURE__ */ new Date()
+              });
+            } catch (error) {
+            }
+          }
+        }
+      }
+      const systemDir = path7__default.join(".agent", "system");
+      if (fs__default.existsSync(systemDir)) {
+        const systemFiles = ["critical-state.md", "installation.md", "api-schema.md"];
+        for (const file of systemFiles) {
+          const filePath = path7__default.join(systemDir, file);
+          if (fs__default.existsSync(filePath)) {
+            try {
+              const content = fs__default.readFileSync(filePath, "utf8");
+              const title = file.replace(".md", "").replace("-", " ").toUpperCase();
+              initialMessages.push({
+                type: "assistant",
+                content: `\u{1F3D7}\uFE0F **${title} (from .agent/system/${file})**
+
+${content}`,
+                timestamp: /* @__PURE__ */ new Date()
+              });
+            } catch (error) {
+            }
+          }
+        }
+      }
+      if (initialMessages.length > 0) {
+        setChatHistory(initialMessages);
+      }
+    }
   }, []);
   useEffect(() => {
     const newEntries = chatHistory.slice(lastChatHistoryLength.current);

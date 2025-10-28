@@ -129,6 +129,89 @@ function ChatInterfaceWithAgent({
     console.log(" "); // Spacing after logo
 
     setChatHistory([]);
+
+    // Auto-read .agent folder on first run if exists
+    if (fs.existsSync('.agent')) {
+      const initialMessages: ChatEntry[] = [];
+
+      // Read system/architecture.md
+      const archPath = path.join('.agent', 'system', 'architecture.md');
+      if (fs.existsSync(archPath)) {
+        try {
+          const archContent = fs.readFileSync(archPath, 'utf8');
+          initialMessages.push({
+            type: 'assistant',
+            content: `📋 **System Architecture (from .agent/system/architecture.md)**\n\n${archContent}`,
+            timestamp: new Date(),
+          });
+        } catch (_error) {
+          // Silently ignore read errors
+        }
+      }
+
+      // Read sop/git-workflow.md
+      const workflowPath = path.join('.agent', 'sop', 'git-workflow.md');
+      if (fs.existsSync(workflowPath)) {
+        try {
+          const workflowContent = fs.readFileSync(workflowPath, 'utf8');
+          initialMessages.push({
+            type: 'assistant',
+            content: `🔧 **Git Workflow SOP (from .agent/sop/git-workflow.md)**\n\n${workflowContent}`,
+            timestamp: new Date(),
+          });
+        } catch (_error) {
+          // Silently ignore read errors
+        }
+      }
+
+      // Add other key SOP files if they exist
+      const sopDir = path.join('.agent', 'sop');
+      if (fs.existsSync(sopDir)) {
+        const sopFiles = ['release-management.md', 'automation-protection.md'];
+        for (const file of sopFiles) {
+          const filePath = path.join(sopDir, file);
+          if (fs.existsSync(filePath)) {
+            try {
+              const content = fs.readFileSync(filePath, 'utf8');
+              const title = file.replace('.md', '').replace('-', ' ').toUpperCase();
+              initialMessages.push({
+                type: 'assistant',
+                content: `📖 **${title} SOP (from .agent/sop/${file})**\n\n${content}`,
+                timestamp: new Date(),
+              });
+            } catch (_error) {
+              // Silently ignore
+            }
+          }
+        }
+      }
+
+      // Add system files
+      const systemDir = path.join('.agent', 'system');
+      if (fs.existsSync(systemDir)) {
+        const systemFiles = ['critical-state.md', 'installation.md', 'api-schema.md'];
+        for (const file of systemFiles) {
+          const filePath = path.join(systemDir, file);
+          if (fs.existsSync(filePath)) {
+            try {
+              const content = fs.readFileSync(filePath, 'utf8');
+              const title = file.replace('.md', '').replace('-', ' ').toUpperCase();
+              initialMessages.push({
+                type: 'assistant',
+                content: `🏗️ **${title} (from .agent/system/${file})**\n\n${content}`,
+                timestamp: new Date(),
+              });
+            } catch (_error) {
+              // Silently ignore
+            }
+          }
+        }
+      }
+
+      if (initialMessages.length > 0) {
+        setChatHistory(initialMessages);
+      }
+    }
   }, []);
 
   // Session logging: append new chat entries to ~/.grok/session.log
