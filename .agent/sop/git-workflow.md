@@ -43,9 +43,21 @@ git push origin main
 ## 🔧 How Smart Push Works
 
 1. **Pulls with rebase** to get automated version bumps from GitHub Actions
-2. **Rebases local changes** on top of remote changes  
+2. **Rebases local changes** on top of remote changes
 3. **Pushes cleanly** without merge conflicts
-4. **Handles conflicts** gracefully if they occur
+4. **Monitors GitHub Actions** for automated tasks (version bumps, publishing)
+5. **Waits for completion** before reporting success
+6. **Handles conflicts** gracefully if they occur
+
+### 🤖 GitHub Actions Integration
+
+Smart push now includes **real-time GitHub Actions monitoring**:
+
+- **Automatic detection** of workflow runs triggered by your commit
+- **Status monitoring** for version bumps, NPM publishing, and documentation sync
+- **Completion waiting** - ensures automated tasks finish before reporting success
+- **Failure detection** - alerts if GitHub Actions fail
+- **Fallback support** - works even without GitHub CLI (`gh`) installed
 
 ## 🤖 Why This is Needed
 
@@ -101,5 +113,5 @@ git push origin main
 
 ---
 
-**Last Updated**: 2025-10-18  
+**Last Updated**: 2024-10-28  
 **Status**: Active - Required for all Git operations

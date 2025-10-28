@@ -24,7 +24,28 @@
 - **Documentation Tools**: NEW - Agent system generation and maintenance
 
 ### 🖥️ UI Components (`src/ui/`)
-- **Chat Interface**: Streaming responses with tool execution display
+
+#### Component Architecture
+- **Modular Design**: Single Responsibility Principle with focused components
+- **Entry-Based Rendering**: Chat entries routed through specialized renderers
+- **Content Renderers**: Dedicated components for different content types
+- **Router Pattern**: ChatEntryRouter for type-based component selection
+
+#### Core Components
+- **ChatInterface** (180 lines): Main chat orchestration with agent integration
+- **ChatHistory** (74 lines): Entry list management with filtering and pagination
+- **ChatInterfaceRenderer**: Pure UI component for chat display logic
+
+#### Entry Renderers (`components/chat-entries/`)
+- **UserMessageEntry**: User input display with paste summary handling
+- **AssistantMessageEntry**: AI response rendering with markdown support
+- **ToolCallEntry**: Tool execution display with explanations and content rendering
+
+#### Content Renderers (`components/content-renderers/`)
+- **FileContentRenderer**: Syntax-aware file content display with indentation
+- **MarkdownRenderer**: Rich text formatting for assistant responses
+
+#### Supporting Components
 - **Input Handling**: Enhanced terminal input with history and shortcuts
 - **Component Library**: Reusable Ink components for consistent UX
 - **Visual Feedback System**: Claude Code-style UX with contextual spinners and progress indicators
@@ -113,4 +134,4 @@
 🔲 **Database Tools** - SQL/NoSQL operation assistance
 🔲 **Cloud Integration** - AWS, Docker, Kubernetes support
 
-*Updated: 2025-10-18*
+*Updated: 2025-10-28*

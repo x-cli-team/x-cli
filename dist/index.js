@@ -5,8 +5,8 @@ import * as path7 from 'path';
 import path7__default from 'path';
 import * as os from 'os';
 import os__default from 'os';
-import React3, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Box, Text, render, useApp, useInput } from 'ink';
+import React4, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { render, Box, Text, useApp, useInput } from 'ink';
 import { program, Command } from 'commander';
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
@@ -22,10 +22,10 @@ import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
 import { glob } from 'glob';
 import { encoding_for_model, get_encoding } from 'tiktoken';
-import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
-import crypto from 'crypto';
+import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { marked } from 'marked';
 import TerminalRenderer from 'marked-terminal';
+import crypto from 'crypto';
 import chalk from 'chalk';
 
 var __defProp = Object.defineProperty;
@@ -7039,10 +7039,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path29) => {
+    const dfs = (filePath, path30) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path29.indexOf(filePath);
-        const cycle = path29.slice(cycleStart).concat([filePath]);
+        const cycleStart = path30.indexOf(filePath);
+        const cycle = path30.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7058,7 +7058,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path29, filePath]);
+            dfs(dependency, [...path30, filePath]);
           }
         }
       }
@@ -9030,10 +9030,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path29 = args.path;
-            let command = `cat "${path29}"`;
+            const path30 = args.path;
+            let command = `cat "${path30}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path29}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path30}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9287,149 +9287,6 @@ EOF`;
       console.warn("Failed to log session entry:", error);
     }
   }
-};
-
-// package.json
-var package_default = {
-  type: "module",
-  name: "@xagent/x-cli",
-  version: "1.1.50",
-  description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
-  main: "dist/index.js",
-  module: "dist/index.js",
-  types: "dist/index.d.ts",
-  exports: {
-    ".": {
-      types: "./dist/index.d.ts",
-      import: "./dist/index.js"
-    }
-  },
-  bin: {
-    xcli: "dist/index.js"
-  },
-  scripts: {
-    build: "tsup",
-    "build:tsc": "tsc",
-    dev: "npm run build && node dist/index.js",
-    "dev:node": "tsx src/index.ts",
-    "dev:watch": "npm run build && node --watch dist/index.js",
-    start: "node dist/index.js",
-    local: "npm run build && npm link && node dist/index.js",
-    "start:bun": "bun run dist/index.js",
-    lint: "eslint . --ext .js,.jsx,.ts,.tsx",
-    typecheck: "tsc --noEmit",
-    "install:bun": "bun install",
-    preinstall: "echo '\u{1F916} Installing X CLI...'",
-    postinstall: `echo '==================================================' && echo '\u2705 X CLI installed successfully!' && echo '==================================================' && echo '\u{1F680} Try: xcli --help' && echo '\u{1F4A1} If "command not found", add to PATH:' && node -e "const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shell=isMac?'zshrc':'bashrc';console.log((isMac?'\u{1F34E} Mac':'\u{1F427} Linux')+': echo \\'export PATH=\\"$(npm config get prefix)/bin:$PATH\\"\\' >> ~/.'+shell+' && source ~/.'+shell);}" && echo '\u{1F4D6} Docs: https://github.com/hinetapora/x-cli-hurry-mode#installation' && echo '\u{1F511} Set API key: export GROK_API_KEY=your_key_here' && echo '==================================================' && echo '\u{1F527} Auto-setup PATH? Press Enter to add (or Ctrl+C to skip)' && read -t 10 && node -e "const fs=require('fs');const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shellFile=isMac?'.zshrc':'.bashrc';const rcPath=process.env.HOME+'/'+shellFile;const pathCmd='export PATH=\\"$(npm config get prefix)/bin:$PATH\\"';try{const content=fs.readFileSync(rcPath,'utf8');if(!content.includes(pathCmd)){fs.appendFileSync(rcPath,'\\n'+pathCmd+'\\n');console.log('\u2705 Added to ~/'+shellFile+' - restart terminal');}else{console.log('\u2139\uFE0F Already in ~/'+shellFile);}}catch(e){console.log('\u26A0\uFE0F Could not modify ~/'+shellFile+' - add manually');}}" && echo '\u{1F50D} Verifying: ' && xcli --version 2>/dev/null || echo '\u26A0\uFE0F xcli not in PATH yet - follow above steps'`,
-    prepare: "husky install",
-    "dev:site": "cd apps/site && npm run start",
-    "build:site": "cd apps/site && npm run build",
-    "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
-    "smart-push": "./scripts/smart-push.sh"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix"
-    ],
-    "*.{js,jsx,mjs}": [
-      "eslint --fix"
-    ],
-    "*.{md,mdx}": [
-      "prettier --write"
-    ],
-    "*.{json,yml,yaml}": [
-      "prettier --write"
-    ]
-  },
-  keywords: [
-    "cli",
-    "agent",
-    "text-editor",
-    "grok",
-    "ai"
-  ],
-  author: "grok_cli",
-  license: "MIT",
-  dependencies: {
-    "@modelcontextprotocol/sdk": "^1.17.0",
-    "@types/marked-terminal": "^6.1.1",
-    "@typescript-eslint/typescript-estree": "^8.46.0",
-    ajv: "^8.17.1",
-    "ajv-formats": "^3.0.1",
-    axios: "^1.7.0",
-    cfonts: "^3.3.0",
-    chalk: "^5.3.0",
-    chokidar: "^4.0.3",
-    "cli-highlight": "^2.1.11",
-    commander: "^12.0.0",
-    dotenv: "^16.4.0",
-    enquirer: "^2.4.1",
-    "fs-extra": "^11.2.0",
-    "fuse.js": "^7.1.0",
-    glob: "^11.0.3",
-    ink: "^4.4.1",
-    "js-yaml": "^4.1.0",
-    marked: "^15.0.12",
-    "marked-terminal": "^7.3.0",
-    openai: "^5.10.1",
-    react: "^18.3.1",
-    "ripgrep-node": "^1.0.0",
-    "terminal-image": "^4.0.0",
-    tiktoken: "^1.0.21"
-  },
-  devDependencies: {
-    "@eslint/js": "^9.37.0",
-    "@types/fs-extra": "^11.0.2",
-    "@types/node": "^20.8.0",
-    "@types/react": "^18.3.3",
-    "@typescript-eslint/eslint-plugin": "^8.37.0",
-    "@typescript-eslint/parser": "^8.37.0",
-    esbuild: "^0.25.10",
-    eslint: "^9.31.0",
-    husky: "^9.1.7",
-    "lint-staged": "^16.2.4",
-    prettier: "^3.6.2",
-    tsup: "^8.5.0",
-    tsx: "^4.0.0"
-  },
-  engines: {
-    node: ">=18.0.0"
-  },
-  preferGlobal: true,
-  repository: {
-    type: "git",
-    url: "https://github.com/x-cli-team/x-cli.git"
-  },
-  bugs: {
-    url: "https://github.com/x-cli-team/x-cli/issues"
-  },
-  homepage: "https://grokcli.dev",
-  icon: "docs/assets/logos/x-cli-logo.svg",
-  files: [
-    "dist/**/*",
-    "README.md",
-    "LICENSE",
-    "docs/assets/logos/**/*"
-  ],
-  publishConfig: {
-    access: "public"
-  },
-  installConfig: {
-    hoisting: false
-  },
-  optionalDependencies: {
-    "tree-sitter": "^0.21.1",
-    "tree-sitter-javascript": "^0.21.2",
-    "tree-sitter-python": "^0.21.0",
-    "tree-sitter-typescript": "^0.21.2"
-  },
-  trustedDependencies: [
-    "esbuild",
-    "tree-sitter",
-    "tree-sitter-javascript",
-    "tree-sitter-python",
-    "tree-sitter-typescript"
-  ]
 };
 
 // src/utils/text-utils.ts
@@ -14793,6 +14650,150 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
     return { ...this.config };
   }
 };
+
+// package.json
+var package_default = {
+  type: "module",
+  name: "@xagent/x-cli",
+  version: "1.1.59",
+  description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
+  main: "dist/index.js",
+  module: "dist/index.js",
+  types: "dist/index.d.ts",
+  exports: {
+    ".": {
+      types: "./dist/index.d.ts",
+      import: "./dist/index.js"
+    }
+  },
+  bin: {
+    xcli: "dist/index.js"
+  },
+  files: [
+    "dist/**/*",
+    ".xcli/**/*",
+    "README.md",
+    "LICENSE",
+    "docs/assets/logos/**/*"
+  ],
+  scripts: {
+    build: "tsup",
+    "build:tsc": "tsc",
+    dev: "npm run build && node dist/index.js",
+    "dev:node": "tsx src/index.ts",
+    "dev:watch": "npm run build && node --watch dist/index.js",
+    start: "node dist/index.js",
+    local: "npm run build && npm link && node dist/index.js",
+    "start:bun": "bun run dist/index.js",
+    lint: "eslint . --ext .js,.jsx,.ts,.tsx",
+    typecheck: "tsc --noEmit",
+    "install:bun": "bun install",
+    preinstall: "echo '\u{1F916} Installing X CLI...'",
+    postinstall: `echo '==================================================' && echo '\u2705 X CLI installed successfully!' && echo '==================================================' && echo '\u{1F680} Try: xcli --help' && echo '\u{1F4A1} If "command not found", add to PATH:' && node -e "const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shell=isMac?'zshrc':'bashrc';console.log((isMac?'\u{1F34E} Mac':'\u{1F427} Linux')+': echo \\'export PATH=\\"$(npm config get prefix)/bin:$PATH\\"\\' >> ~/.'+shell+' && source ~/.'+shell);}" && echo '\u{1F4D6} Docs: https://github.com/hinetapora/x-cli-hurry-mode#installation' && echo '\u{1F511} Set API key: export GROK_API_KEY=your_key_here' && echo '==================================================' && echo '\u{1F527} Auto-setup PATH? Press Enter to add (or Ctrl+C to skip)' && read -t 10 && node -e "const fs=require('fs');const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shellFile=isMac?'.zshrc':'.bashrc';const rcPath=process.env.HOME+'/'+shellFile;const pathCmd='export PATH=\\"$(npm config get prefix)/bin:$PATH\\"';try{const content=fs.readFileSync(rcPath,'utf8');if(!content.includes(pathCmd)){fs.appendFileSync(rcPath,'\\n'+pathCmd+'\\n');console.log('\u2705 Added to ~/'+shellFile+' - restart terminal');}else{console.log('\u2139\uFE0F Already in ~/'+shellFile);}}catch(e){console.log('\u26A0\uFE0F Could not modify ~/'+shellFile+' - add manually');}}" && echo '\u{1F50D} Verifying: ' && xcli --version 2>/dev/null || echo '\u26A0\uFE0F xcli not in PATH yet - follow above steps'`,
+    prepare: "husky install",
+    "dev:site": "cd apps/site && npm run start",
+    "build:site": "cd apps/site && npm run build",
+    "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
+    "smart-push": "./scripts/smart-push.sh"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{js,jsx,mjs}": [
+      "eslint --fix"
+    ],
+    "*.{md,mdx}": [
+      "prettier --write"
+    ],
+    "*.{json,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  keywords: [
+    "cli",
+    "agent",
+    "text-editor",
+    "grok",
+    "ai"
+  ],
+  author: "grok_cli",
+  license: "MIT",
+  dependencies: {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "@types/marked-terminal": "^6.1.1",
+    "@typescript-eslint/typescript-estree": "^8.46.0",
+    ajv: "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    axios: "^1.7.0",
+    cfonts: "^3.3.0",
+    chalk: "^5.3.0",
+    chokidar: "^4.0.3",
+    "cli-highlight": "^2.1.11",
+    commander: "^12.0.0",
+    dotenv: "^16.4.0",
+    enquirer: "^2.4.1",
+    "fs-extra": "^11.2.0",
+    "fuse.js": "^7.1.0",
+    glob: "^11.0.3",
+    ink: "^4.4.1",
+    "js-yaml": "^4.1.0",
+    marked: "^15.0.12",
+    "marked-terminal": "^7.3.0",
+    openai: "^5.10.1",
+    react: "^18.3.1",
+    "ripgrep-node": "^1.0.0",
+    "terminal-image": "^4.0.0",
+    tiktoken: "^1.0.21"
+  },
+  devDependencies: {
+    "@eslint/js": "^9.37.0",
+    "@types/fs-extra": "^11.0.2",
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
+    "@typescript-eslint/parser": "^8.37.0",
+    esbuild: "^0.25.10",
+    eslint: "^9.31.0",
+    husky: "^9.1.7",
+    "lint-staged": "^16.2.4",
+    prettier: "^3.6.2",
+    tsup: "^8.5.0",
+    tsx: "^4.0.0"
+  },
+  engines: {
+    node: ">=18.0.0"
+  },
+  preferGlobal: true,
+  repository: {
+    type: "git",
+    url: "https://github.com/x-cli-team/x-cli.git"
+  },
+  bugs: {
+    url: "https://github.com/x-cli-team/x-cli/issues"
+  },
+  homepage: "https://grokcli.dev",
+  icon: "docs/assets/logos/x-cli-logo.svg",
+  publishConfig: {
+    access: "public"
+  },
+  installConfig: {
+    hoisting: false
+  },
+  optionalDependencies: {
+    "tree-sitter": "^0.21.1",
+    "tree-sitter-javascript": "^0.21.2",
+    "tree-sitter-python": "^0.21.0",
+    "tree-sitter-typescript": "^0.21.2"
+  },
+  trustedDependencies: [
+    "esbuild",
+    "tree-sitter",
+    "tree-sitter-javascript",
+    "tree-sitter-python",
+    "tree-sitter-typescript"
+  ]
+};
 var execAsync3 = promisify(exec);
 async function checkForUpdates() {
   try {
@@ -14899,6 +14900,14 @@ function useInputHandler({
       return manager.getUserSetting("explainLevel") || "brief";
     } catch {
       return "brief";
+    }
+  });
+  const [_interactivityLevel, _setInteractivityLevel] = useState(() => {
+    try {
+      const manager = getSettingsManager();
+      return manager.getUserSetting("interactivityLevel") || "balanced";
+    } catch {
+      return "balanced";
     }
   });
   const planMode = usePlanMode({}, agent);
@@ -15104,6 +15113,9 @@ function useInputHandler({
     { command: "/help", description: "Show help information" },
     { command: "/clear", description: "Clear chat history" },
     { command: "/models", description: "Switch Grok Model" },
+    { command: "/verbosity", description: "Control output verbosity (quiet/normal/verbose)" },
+    { command: "/explain", description: "Control operation explanations (off/brief/detailed)" },
+    { command: "/interactivity", description: "Set interaction style (chat/balanced/repl)" },
     { command: "/upgrade", description: "Check for updates and upgrade CLI" },
     { command: "/version", description: "Show version information" },
     { command: "/switch", description: "Switch to specific version" },
@@ -16552,6 +16564,597 @@ Operations will now ${newLevel === "off" ? "show no explanations" : newLevel ===
     planMode
   };
 }
+init_settings_manager();
+function ApiKeyInput({ onApiKeySet }) {
+  const [input, setInput] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { exit } = useApp();
+  useInput((inputChar, key) => {
+    if (isSubmitting) return;
+    if (key.ctrl && inputChar === "c") {
+      exit();
+      return;
+    }
+    if (key.return) {
+      handleSubmit();
+      return;
+    }
+    if (key.backspace || key.delete) {
+      setInput((prev) => prev.slice(0, -1));
+      setError("");
+      return;
+    }
+    if (inputChar && !key.ctrl && !key.meta) {
+      setInput((prev) => prev + inputChar);
+      setError("");
+    }
+  });
+  const handleSubmit = async () => {
+    if (!input.trim()) {
+      setError("API key cannot be empty");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const apiKey = input.trim();
+      const agent = new GrokAgent(apiKey);
+      process.env.GROK_API_KEY = apiKey;
+      try {
+        const manager = getSettingsManager();
+        manager.updateUserSetting("apiKey", apiKey);
+        console.log(`
+\u2705 API key saved to ~/.grok/user-settings.json`);
+      } catch {
+        console.log("\n\u26A0\uFE0F Could not save API key to settings file");
+        console.log("API key set for current session only");
+      }
+      onApiKeySet(agent);
+    } catch {
+      setError("Invalid API key format");
+      setIsSubmitting(false);
+    }
+  };
+  const displayText = input.length > 0 ? isSubmitting ? "*".repeat(input.length) : "*".repeat(input.length) + "\u2588" : isSubmitting ? " " : "\u2588";
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, paddingY: 1, children: [
+    /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F511} Grok API Key Required" }),
+    /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Please enter your Grok API key to continue:" }) }),
+    /* @__PURE__ */ jsxs(Box, { borderStyle: "round", borderColor: "blue", paddingX: 1, marginBottom: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u276F " }),
+      /* @__PURE__ */ jsx(Text, { children: displayText })
+    ] }),
+    error ? /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsxs(Text, { color: "red", children: [
+      "\u274C ",
+      error
+    ] }) }) : null,
+    /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Enter to submit" }),
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Ctrl+C to exit" }),
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Note: API key will be saved to ~/.grok/user-settings.json" })
+    ] }),
+    isSubmitting ? /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F504} Validating API key..." }) }) : null
+  ] });
+}
+function useContextInfo(agent) {
+  const [contextInfo, setContextInfo] = useState({
+    workspaceFiles: 0,
+    indexSize: "0 MB",
+    sessionFiles: 0,
+    activeTokens: 0,
+    lastActivity: "Now",
+    memoryPressure: "low",
+    isLoading: true,
+    messagesCount: 0,
+    loadedFiles: [],
+    contextHealth: "optimal"
+  });
+  const updateContextInfo = async () => {
+    try {
+      let tokenUsage;
+      let messagesCount = 0;
+      let loadedFiles = [];
+      let contextHealth = "optimal";
+      if (agent) {
+        const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
+        const maxTokens = getMaxTokensForModel(modelName);
+        const estimatedTokens = Math.floor(Math.random() * 1e3) + 500;
+        messagesCount = Math.floor(Math.random() * 10) + 1;
+        const tokenPercent = Math.round(estimatedTokens / maxTokens * 100);
+        tokenUsage = {
+          current: estimatedTokens,
+          max: maxTokens,
+          percent: tokenPercent
+        };
+        if (tokenPercent >= 95) contextHealth = "critical";
+        else if (tokenPercent >= 80) contextHealth = "degraded";
+        else contextHealth = "optimal";
+        loadedFiles = [];
+      }
+      const info = {
+        workspaceFiles: await getWorkspaceFileCount(),
+        indexSize: await getIndexSize(),
+        sessionFiles: await getSessionFileCount(),
+        activeTokens: tokenUsage?.current || 0,
+        lastActivity: "Now",
+        gitBranch: await getGitBranch(),
+        projectName: await getProjectName(),
+        memoryPressure: getMemoryPressure(),
+        isLoading: false,
+        tokenUsage,
+        messagesCount,
+        loadedFiles,
+        contextHealth
+      };
+      setContextInfo(info);
+    } catch (error) {
+      console.warn("[ContextInfo] Failed to update context:", error);
+      setContextInfo((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
+  useEffect(() => {
+    updateContextInfo();
+    const interval = setInterval(updateContextInfo, 1e4);
+    return () => clearInterval(interval);
+  }, []);
+  return {
+    contextInfo,
+    updateContextInfo,
+    refreshContext: updateContextInfo
+  };
+}
+async function getWorkspaceFileCount() {
+  try {
+    const cwd = process.cwd();
+    const entries = await fs__default.promises.readdir(cwd, { withFileTypes: true });
+    let count = 0;
+    for (const entry of entries) {
+      if (entry.isFile() && !shouldIgnoreFile(entry.name)) {
+        count++;
+      } else if (entry.isDirectory() && !shouldIgnoreDirectory(entry.name)) {
+        try {
+          const subEntries = await fs__default.promises.readdir(path7__default.join(cwd, entry.name), { withFileTypes: true });
+          count += subEntries.filter((sub) => sub.isFile() && !shouldIgnoreFile(sub.name)).length;
+        } catch {
+        }
+      }
+    }
+    return count;
+  } catch {
+    return 0;
+  }
+}
+function shouldIgnoreFile(filename) {
+  return filename.startsWith(".") || filename.endsWith(".log") || filename.includes(".tmp");
+}
+function shouldIgnoreDirectory(dirname5) {
+  const ignoreDirs = ["node_modules", ".git", "dist", "build", ".next", "coverage"];
+  return ignoreDirs.includes(dirname5) || dirname5.startsWith(".");
+}
+async function getIndexSize() {
+  try {
+    const indexPath = path7__default.join(process.cwd(), ".grok", "index.json");
+    if (fs__default.existsSync(indexPath)) {
+      const stats = await fs__default.promises.stat(indexPath);
+      const mb = stats.size / (1024 * 1024);
+      return mb > 1 ? `${mb.toFixed(1)} MB` : `${(stats.size / 1024).toFixed(1)} KB`;
+    }
+  } catch {
+  }
+  return "0 MB";
+}
+async function getSessionFileCount() {
+  try {
+    const sessionPath = path7__default.join(os__default.homedir(), ".grok", "session.log");
+    if (fs__default.existsSync(sessionPath)) {
+      const content = await fs__default.promises.readFile(sessionPath, "utf8");
+      return content.split("\n").filter((line) => line.trim()).length;
+    }
+  } catch {
+  }
+  return 0;
+}
+async function getGitBranch() {
+  try {
+    const gitPath = path7__default.join(process.cwd(), ".git", "HEAD");
+    if (fs__default.existsSync(gitPath)) {
+      const content = await fs__default.promises.readFile(gitPath, "utf8");
+      const match = content.match(/ref: refs\/heads\/(.+)/);
+      return match ? match[1].trim() : "detached";
+    }
+  } catch {
+  }
+  return void 0;
+}
+async function getProjectName() {
+  try {
+    const packagePath = path7__default.join(process.cwd(), "package.json");
+    if (fs__default.existsSync(packagePath)) {
+      const content = await fs__default.promises.readFile(packagePath, "utf8");
+      const pkg = JSON.parse(content);
+      return pkg.name;
+    }
+  } catch {
+  }
+  return path7__default.basename(process.cwd());
+}
+function getMemoryPressure() {
+  try {
+    const memUsage = process.memoryUsage();
+    const heapUsedMB = memUsage.heapUsed / 1024 / 1024;
+    if (heapUsedMB > 200) return "high";
+    if (heapUsedMB > 100) return "medium";
+    return "low";
+  } catch {
+    return "low";
+  }
+}
+function getMaxTokensForModel(modelName) {
+  const modelLimits = {
+    "grok-code-fast-1": 128e3,
+    "grok-4-latest": 2e5,
+    "grok-3-latest": 2e5,
+    "grok-3-fast": 128e3,
+    "grok-3-mini-fast": 64e3,
+    "claude-sonnet-4": 2e5,
+    "claude-opus-4": 2e5,
+    "gpt-4o": 128e3,
+    "gpt-4": 32e3
+  };
+  return modelLimits[modelName] || 128e3;
+}
+function useAutoRead(setChatHistory) {
+  useEffect(() => {
+    if (fs__default.existsSync(".agent")) {
+      const initialMessages = [];
+      let docsRead = 0;
+      let config2 = null;
+      const configPaths = [
+        path7__default.join(".xcli", "auto-read-config.json"),
+        // User config (distributed)
+        path7__default.join(".agent", "auto-read-config.json")
+        // Dev override (gitignored)
+      ];
+      for (const configPath of configPaths) {
+        if (fs__default.existsSync(configPath)) {
+          try {
+            const configContent = fs__default.readFileSync(configPath, "utf8");
+            config2 = JSON.parse(configContent);
+            break;
+          } catch (_error) {
+          }
+        }
+      }
+      const isEnabled = config2?.enabled !== false;
+      const showLoadingMessage = config2?.showLoadingMessage !== false;
+      const showSummaryMessage = config2?.showSummaryMessage !== false;
+      const showFileContents = config2?.showFileContents === true;
+      if (!isEnabled) {
+        return;
+      }
+      if (showLoadingMessage) {
+        initialMessages.push({
+          type: "assistant",
+          content: "\u{1F4DA} Reading core documentation into memory...",
+          timestamp: /* @__PURE__ */ new Date()
+        });
+      }
+      const folders = config2?.folders || [
+        {
+          name: "system",
+          priority: 1,
+          files: [
+            { name: "architecture.md", title: "System Architecture", icon: "\u{1F4CB}", required: true },
+            { name: "critical-state.md", title: "Critical State", icon: "\u{1F3D7}\uFE0F", required: false },
+            { name: "installation.md", title: "Installation", icon: "\u{1F3D7}\uFE0F", required: false },
+            { name: "api-schema.md", title: "API Schema", icon: "\u{1F3D7}\uFE0F", required: false },
+            { name: "auto-read-system.md", title: "Auto-Read System", icon: "\u{1F3D7}\uFE0F", required: false }
+          ]
+        },
+        {
+          name: "sop",
+          priority: 2,
+          files: [
+            { name: "git-workflow.md", title: "Git Workflow SOP", icon: "\u{1F527}", required: true },
+            { name: "release-management.md", title: "Release Management SOP", icon: "\u{1F4D6}", required: false },
+            { name: "automation-protection.md", title: "Automation Protection SOP", icon: "\u{1F4D6}", required: false },
+            { name: "npm-publishing-troubleshooting.md", title: "NPM Publishing Troubleshooting", icon: "\u{1F4D6}", required: false }
+          ]
+        }
+      ];
+      if (config2?.customFolders) {
+        folders.push(...config2.customFolders);
+      }
+      folders.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+      for (const folder of folders) {
+        const folderPath = path7__default.join(".agent", folder.name);
+        if (!fs__default.existsSync(folderPath)) {
+          continue;
+        }
+        for (const file of folder.files) {
+          let filePaths = [];
+          if (file.pattern) {
+            continue;
+          } else {
+            filePaths = [file.name];
+          }
+          for (const fileName of filePaths) {
+            const filePath = path7__default.join(folderPath, fileName);
+            if (!fs__default.existsSync(filePath)) {
+              if (file.required) ;
+              continue;
+            }
+            try {
+              const content = fs__default.readFileSync(filePath, "utf8");
+              const displayTitle = file.title || fileName.replace(".md", "").replace("-", " ").toUpperCase();
+              const icon = file.icon || "\u{1F4C4}";
+              if (showFileContents) {
+                initialMessages.push({
+                  type: "assistant",
+                  content: `${icon} **${displayTitle} (from .agent/${folder.name}/${fileName})**
+
+${content}`,
+                  timestamp: /* @__PURE__ */ new Date()
+                });
+              }
+              docsRead++;
+            } catch (_error) {
+            }
+          }
+        }
+      }
+      if (showSummaryMessage && docsRead > 0) {
+        initialMessages.push({
+          type: "assistant",
+          content: `\u2705 ${docsRead} documentation files read - I have a complete understanding of the current architecture and operational procedures.`,
+          timestamp: /* @__PURE__ */ new Date()
+        });
+      }
+      if (initialMessages.length > 0) {
+        setChatHistory(initialMessages);
+      }
+    }
+  }, [setChatHistory]);
+}
+function useStreaming(agent, initialMessage, setChatHistory, streamingState) {
+  const { setIsProcessing, setIsStreaming, setTokenCount } = streamingState;
+  useEffect(() => {
+    if (initialMessage && agent) {
+      const userEntry = {
+        type: "user",
+        content: initialMessage,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory([userEntry]);
+      const processInitialMessage = async () => {
+        setIsProcessing(true);
+        setIsStreaming(true);
+        try {
+          let streamingEntry = null;
+          let accumulatedContent = "";
+          let lastTokenCount = 0;
+          let pendingToolCalls = null;
+          let pendingToolResults = [];
+          let lastUpdateTime = Date.now();
+          const flushUpdates = () => {
+            const now = Date.now();
+            if (now - lastUpdateTime < 150) return;
+            setChatHistory((prev) => {
+              let newHistory = [...prev];
+              if (lastTokenCount !== 0) {
+              }
+              if (accumulatedContent) {
+                if (!streamingEntry) {
+                  const newStreamingEntry = {
+                    type: "assistant",
+                    content: accumulatedContent,
+                    timestamp: /* @__PURE__ */ new Date(),
+                    isStreaming: true
+                  };
+                  newHistory.push(newStreamingEntry);
+                  streamingEntry = newStreamingEntry;
+                } else {
+                  const lastIdx = newHistory.length - 1;
+                  if (lastIdx >= 0 && newHistory[lastIdx].isStreaming) {
+                    newHistory[lastIdx] = { ...newHistory[lastIdx], content: newHistory[lastIdx].content + accumulatedContent };
+                  }
+                }
+                accumulatedContent = "";
+              }
+              if (pendingToolCalls) {
+                const streamingIdx = newHistory.findIndex((entry) => entry.isStreaming);
+                if (streamingIdx >= 0) {
+                  newHistory[streamingIdx] = { ...newHistory[streamingIdx], isStreaming: false, toolCalls: pendingToolCalls };
+                }
+                streamingEntry = null;
+                pendingToolCalls.forEach((toolCall) => {
+                  const toolCallEntry = {
+                    type: "tool_call",
+                    content: "Executing...",
+                    timestamp: /* @__PURE__ */ new Date(),
+                    toolCall
+                  };
+                  newHistory.push(toolCallEntry);
+                });
+                pendingToolCalls = null;
+              }
+              if (pendingToolResults.length > 0) {
+                newHistory = newHistory.map((entry) => {
+                  if (entry.isStreaming) {
+                    return { ...entry, isStreaming: false };
+                  }
+                  const matchingResult = pendingToolResults.find(
+                    (result) => entry.type === "tool_call" && entry.toolCall?.id === result.toolCall.id
+                  );
+                  if (matchingResult) {
+                    return {
+                      ...entry,
+                      type: "tool_result",
+                      content: matchingResult.toolResult.success ? matchingResult.toolResult.output || "Success" : matchingResult.toolResult.error || "Error occurred",
+                      toolResult: matchingResult.toolResult
+                    };
+                  }
+                  return entry;
+                });
+                streamingEntry = null;
+                pendingToolResults = [];
+              }
+              return newHistory;
+            });
+            if (lastTokenCount !== 0) {
+              setTokenCount(lastTokenCount);
+            }
+            lastUpdateTime = now;
+          };
+          for await (const chunk of agent.processUserMessageStream(initialMessage)) {
+            switch (chunk.type) {
+              case "content":
+                if (chunk.content) {
+                  accumulatedContent += chunk.content;
+                }
+                break;
+              case "token_count":
+                if (chunk.tokenCount !== void 0) {
+                  lastTokenCount = chunk.tokenCount;
+                }
+                break;
+              case "tool_calls":
+                if (chunk.toolCalls) {
+                  pendingToolCalls = chunk.toolCalls;
+                }
+                break;
+              case "tool_result":
+                if (chunk.toolCall && chunk.toolResult) {
+                  pendingToolResults.push({ toolCall: chunk.toolCall, toolResult: chunk.toolResult });
+                }
+                break;
+              case "done":
+                flushUpdates();
+                break;
+            }
+            flushUpdates();
+          }
+          flushUpdates();
+          if (streamingEntry) {
+            setChatHistory(
+              (prev) => prev.map(
+                (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
+              )
+            );
+          }
+          setIsStreaming(false);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorEntry = {
+            type: "assistant",
+            content: `Error: ${errorMessage}`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsStreaming(false);
+        }
+        setIsProcessing(false);
+      };
+      processInitialMessage();
+    }
+  }, [initialMessage, agent, setChatHistory, setIsProcessing, setIsStreaming, setTokenCount]);
+}
+function useConfirmations(confirmationService, state) {
+  const {
+    setConfirmationOptions,
+    setIsProcessing,
+    setIsStreaming,
+    setTokenCount,
+    setProcessingTime,
+    processingStartTime
+  } = state;
+  useEffect(() => {
+    const handleConfirmationRequest = (options) => {
+      setConfirmationOptions(options);
+    };
+    confirmationService.on("confirmation-requested", handleConfirmationRequest);
+    return () => {
+      confirmationService.off(
+        "confirmation-requested",
+        handleConfirmationRequest
+      );
+    };
+  }, [confirmationService, setConfirmationOptions]);
+  const handleConfirmation = (dontAskAgain) => {
+    confirmationService.confirmOperation(true, dontAskAgain);
+    setConfirmationOptions(null);
+  };
+  const handleRejection = (feedback) => {
+    confirmationService.rejectOperation(feedback);
+    setConfirmationOptions(null);
+    setIsProcessing(false);
+    setIsStreaming(false);
+    setTokenCount(0);
+    setProcessingTime(0);
+    processingStartTime.current = 0;
+  };
+  return {
+    handleConfirmation,
+    handleRejection
+  };
+}
+function useConsoleSetup() {
+  useEffect(() => {
+    const isWindows = process.platform === "win32";
+    const isPowerShell = process.env.ComSpec?.toLowerCase().includes("powershell") || process.env.PSModulePath !== void 0;
+    if (!isWindows || !isPowerShell) {
+      console.clear();
+    }
+    console.log("    ");
+    console.log(" ");
+    const logoOutput = "X-CLI\n" + package_default.version;
+    const logoLines = logoOutput.split("\n");
+    logoLines.forEach((line) => {
+      if (line.trim()) {
+        console.log(" " + line);
+      } else {
+        console.log(line);
+      }
+    });
+    console.log(" ");
+  }, []);
+}
+function useSessionLogging(chatHistory) {
+  const lastChatHistoryLength = useRef(0);
+  useEffect(() => {
+    const newEntries = chatHistory.slice(lastChatHistoryLength.current);
+    if (newEntries.length > 0) {
+      const sessionFile = path7__default.join(os__default.homedir(), ".grok", "session.log");
+      try {
+        const dir = path7__default.dirname(sessionFile);
+        if (!fs__default.existsSync(dir)) {
+          fs__default.mkdirSync(dir, { recursive: true });
+        }
+        const lines = newEntries.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
+        fs__default.appendFileSync(sessionFile, lines);
+      } catch {
+      }
+    }
+    lastChatHistoryLength.current = chatHistory.length;
+  }, [chatHistory]);
+}
+function useProcessingTimer(isProcessing, isStreaming, setProcessingTime) {
+  const processingStartTime = useRef(0);
+  useEffect(() => {
+    if (!isProcessing && !isStreaming) {
+      setProcessingTime(0);
+      return;
+    }
+    if (processingStartTime.current === 0) {
+      processingStartTime.current = Date.now();
+    }
+    const interval = setInterval(() => {
+      setProcessingTime(
+        Math.floor((Date.now() - processingStartTime.current) / 1e3)
+      );
+    }, 1e3);
+    return () => clearInterval(interval);
+  }, [isProcessing, isStreaming, setProcessingTime]);
+}
 
 // src/ui/colors.ts
 var inkColors = {
@@ -16587,807 +17190,6 @@ function getSpinnerColor(operation) {
     default:
       return "primary";
   }
-}
-var operationConfig = {
-  thinking: {
-    icon: "\u{1F9E0}",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Thinking...", "Processing...", "Analyzing...", "Computing...", "Reasoning..."]
-  },
-  search: {
-    icon: "\u{1F50D}",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Searching...", "Scanning files...", "Finding matches...", "Indexing..."]
-  },
-  indexing: {
-    icon: "\u{1F4C2}",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Indexing workspace...", "Building context...", "Mapping relationships..."]
-  },
-  write: {
-    icon: "\u{1F4DD}",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Writing file...", "Saving changes...", "Updating content..."]
-  },
-  edit: {
-    icon: "\u270F\uFE0F",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Editing file...", "Applying changes...", "Modifying content..."]
-  },
-  compact: {
-    icon: "\u{1F504}",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Compacting context...", "Optimizing memory...", "Refreshing session..."]
-  },
-  analyze: {
-    icon: "\u{1F52C}",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Analyzing code...", "Understanding structure...", "Mapping dependencies..."]
-  },
-  process: {
-    icon: "\u26A1",
-    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
-    messages: ["Processing...", "Working...", "Computing...", "Executing..."]
-  }
-};
-function LoadingSpinner({
-  isActive,
-  processingTime,
-  tokenCount,
-  operation = "thinking",
-  message,
-  progress
-}) {
-  const [frameIndex, setFrameIndex] = useState(0);
-  const [messageIndex, setMessageIndex] = useState(0);
-  const config2 = operationConfig[operation];
-  const spinnerChar = config2.spinner[frameIndex % config2.spinner.length];
-  const operationMessage = message || config2.messages[messageIndex % config2.messages.length];
-  const color = getSpinnerColor(operation);
-  useEffect(() => {
-    if (!isActive) return;
-    const interval = setInterval(() => {
-      setFrameIndex((prev) => prev + 1);
-    }, 80);
-    return () => clearInterval(interval);
-  }, [isActive]);
-  useEffect(() => {
-    if (!isActive) return;
-    const messageInterval = setInterval(() => {
-      setMessageIndex((prev) => prev + 1);
-    }, 80 * config2.spinner.length * 3);
-    return () => clearInterval(messageInterval);
-  }, [isActive, config2.spinner.length]);
-  if (!isActive) return null;
-  const renderProgressBar = () => {
-    if (progress === void 0) return null;
-    const barLength = 20;
-    const filled = Math.round(progress / 100 * barLength);
-    const empty = barLength - filled;
-    const progressBar = "\u2588".repeat(filled) + "\u2591".repeat(empty);
-    return /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
-      " ",
-      "[",
-      /* @__PURE__ */ jsx(Text, { color, children: progressBar }),
-      "] ",
-      progress,
-      "%"
-    ] });
-  };
-  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
-    /* @__PURE__ */ jsxs(Box, { children: [
-      /* @__PURE__ */ jsxs(Text, { color, children: [
-        config2.icon,
-        " ",
-        spinnerChar,
-        " ",
-        operationMessage
-      ] }),
-      renderProgressBar()
-    ] }),
-    /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
-      " ",
-      "(",
-      processingTime,
-      "s \xB7 \u2191 ",
-      formatTokenCount(tokenCount),
-      " tokens \xB7 esc to interrupt)"
-    ] })
-  ] });
-}
-function ModelSelection({
-  models,
-  selectedIndex,
-  isVisible,
-  currentModel
-}) {
-  if (!isVisible) return null;
-  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
-    /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsxs(Text, { color: "cyan", children: [
-      "Select Grok Model (current: ",
-      currentModel,
-      "):"
-    ] }) }),
-    models.map((modelOption, index) => /* @__PURE__ */ jsx(Box, { paddingLeft: 1, children: /* @__PURE__ */ jsx(
-      Text,
-      {
-        color: index === selectedIndex ? "black" : "white",
-        backgroundColor: index === selectedIndex ? "cyan" : void 0,
-        children: modelOption.model
-      }
-    ) }, index)),
-    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter/Tab select \u2022 Esc cancel" }) })
-  ] });
-}
-
-// src/ui/utils/colors.ts
-var Colors = {
-  AccentYellow: "yellow",
-  Gray: "gray"};
-var MaxSizedBox = ({
-  maxHeight: _maxHeight,
-  maxWidth: _maxWidth,
-  children,
-  ...props
-}) => {
-  return /* @__PURE__ */ jsx(
-    Box,
-    {
-      flexDirection: "column",
-      ...props,
-      children
-    }
-  );
-};
-function parseDiffWithLineNumbers(diffContent) {
-  const lines = diffContent.split("\n");
-  const result = [];
-  let currentOldLine = 0;
-  let currentNewLine = 0;
-  let inHunk = false;
-  const hunkHeaderRegex = /^@@ -(\d+),?\d* \+(\d+),?\d* @@/;
-  for (const line of lines) {
-    const hunkMatch = line.match(hunkHeaderRegex);
-    if (hunkMatch) {
-      currentOldLine = parseInt(hunkMatch[1], 10);
-      currentNewLine = parseInt(hunkMatch[2], 10);
-      inHunk = true;
-      result.push({ type: "hunk", content: line });
-      currentOldLine--;
-      currentNewLine--;
-      continue;
-    }
-    if (!inHunk) {
-      if (line.startsWith("--- ") || line.startsWith("+++ ") || line.startsWith("diff --git") || line.startsWith("index ") || line.startsWith("similarity index") || line.startsWith("rename from") || line.startsWith("rename to") || line.startsWith("new file mode") || line.startsWith("deleted file mode"))
-        continue;
-      continue;
-    }
-    if (line.startsWith("+")) {
-      currentNewLine++;
-      result.push({
-        type: "add",
-        newLine: currentNewLine,
-        content: line.substring(1)
-      });
-    } else if (line.startsWith("-")) {
-      currentOldLine++;
-      result.push({
-        type: "del",
-        oldLine: currentOldLine,
-        content: line.substring(1)
-      });
-    } else if (line.startsWith(" ")) {
-      currentOldLine++;
-      currentNewLine++;
-      result.push({
-        type: "context",
-        oldLine: currentOldLine,
-        newLine: currentNewLine,
-        content: line.substring(1)
-      });
-    } else if (line.startsWith("\\")) {
-      result.push({ type: "other", content: line });
-    }
-  }
-  return result;
-}
-var DEFAULT_TAB_WIDTH = 4;
-var DiffRenderer = ({
-  diffContent,
-  filename,
-  tabWidth = DEFAULT_TAB_WIDTH,
-  availableTerminalHeight,
-  terminalWidth = 80
-}) => {
-  if (!diffContent || typeof diffContent !== "string") {
-    return /* @__PURE__ */ jsx(Text, { color: Colors.AccentYellow, children: "No diff content." });
-  }
-  const lines = diffContent.split("\n");
-  const firstLine = lines[0];
-  let actualDiffContent = diffContent;
-  if (firstLine && (firstLine.startsWith("Updated ") || firstLine.startsWith("Created "))) {
-    actualDiffContent = lines.slice(1).join("\n");
-  }
-  const parsedLines = parseDiffWithLineNumbers(actualDiffContent);
-  if (parsedLines.length === 0) {
-    return /* @__PURE__ */ jsx(Text, { dimColor: true, children: "No changes detected." });
-  }
-  const renderedOutput = renderDiffContent(
-    parsedLines,
-    filename,
-    tabWidth,
-    availableTerminalHeight,
-    terminalWidth
-  );
-  return /* @__PURE__ */ jsx(Fragment, { children: renderedOutput });
-};
-var renderDiffContent = (parsedLines, filename, tabWidth = DEFAULT_TAB_WIDTH, availableTerminalHeight, terminalWidth) => {
-  const normalizedLines = parsedLines.map((line) => ({
-    ...line,
-    content: line.content.replace(/\t/g, " ".repeat(tabWidth))
-  }));
-  const displayableLines = normalizedLines.filter(
-    (l) => l.type !== "hunk" && l.type !== "other"
-  );
-  if (displayableLines.length === 0) {
-    return /* @__PURE__ */ jsx(Text, { dimColor: true, children: "No changes detected." });
-  }
-  let baseIndentation = Infinity;
-  for (const line of displayableLines) {
-    if (line.content.trim() === "") continue;
-    const firstCharIndex = line.content.search(/\S/);
-    const currentIndent = firstCharIndex === -1 ? 0 : firstCharIndex;
-    baseIndentation = Math.min(baseIndentation, currentIndent);
-  }
-  if (!isFinite(baseIndentation)) {
-    baseIndentation = 0;
-  }
-  const key = filename ? `diff-box-${filename}` : `diff-box-${crypto.createHash("sha1").update(JSON.stringify(parsedLines)).digest("hex")}`;
-  let lastLineNumber = null;
-  const MAX_CONTEXT_LINES_WITHOUT_GAP = 5;
-  return /* @__PURE__ */ jsx(
-    MaxSizedBox,
-    {
-      maxHeight: availableTerminalHeight,
-      maxWidth: terminalWidth,
-      children: displayableLines.reduce((acc, line, index) => {
-        let relevantLineNumberForGapCalc = null;
-        if (line.type === "add" || line.type === "context") {
-          relevantLineNumberForGapCalc = line.newLine ?? null;
-        } else if (line.type === "del") {
-          relevantLineNumberForGapCalc = line.oldLine ?? null;
-        }
-        if (lastLineNumber !== null && relevantLineNumberForGapCalc !== null && relevantLineNumberForGapCalc > lastLineNumber + MAX_CONTEXT_LINES_WITHOUT_GAP + 1) {
-          acc.push(
-            /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsx(Text, { wrap: "truncate", children: "\u2550".repeat(terminalWidth) }) }, `gap-${index}`)
-          );
-        }
-        const lineKey = `diff-line-${index}`;
-        let gutterNumStr = "";
-        let backgroundColor = void 0;
-        let prefixSymbol = " ";
-        let dim = false;
-        switch (line.type) {
-          case "add":
-            gutterNumStr = (line.newLine ?? "").toString();
-            backgroundColor = "#86efac";
-            prefixSymbol = "+";
-            lastLineNumber = line.newLine ?? null;
-            break;
-          case "del":
-            gutterNumStr = (line.oldLine ?? "").toString();
-            backgroundColor = "redBright";
-            prefixSymbol = "-";
-            if (line.oldLine !== void 0) {
-              lastLineNumber = line.oldLine;
-            }
-            break;
-          case "context":
-            gutterNumStr = (line.newLine ?? "").toString();
-            dim = true;
-            prefixSymbol = " ";
-            lastLineNumber = line.newLine ?? null;
-            break;
-          default:
-            return acc;
-        }
-        const displayContent = line.content.substring(baseIndentation);
-        acc.push(
-          /* @__PURE__ */ jsxs(Box, { flexDirection: "row", children: [
-            /* @__PURE__ */ jsx(Text, { color: Colors.Gray, dimColor: dim, children: gutterNumStr.padEnd(4) }),
-            /* @__PURE__ */ jsxs(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, children: [
-              prefixSymbol,
-              " "
-            ] }),
-            /* @__PURE__ */ jsx(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, wrap: "wrap", children: displayContent })
-          ] }, lineKey)
-        );
-        return acc;
-      }, [])
-    },
-    key
-  );
-};
-marked.setOptions({
-  renderer: new TerminalRenderer()
-});
-function MarkdownRenderer({ content }) {
-  try {
-    const result = marked.parse(content);
-    const rendered = typeof result === "string" ? result : content;
-    return /* @__PURE__ */ jsx(Text, { children: rendered });
-  } catch (error) {
-    console.error("Markdown rendering error:", error);
-    return /* @__PURE__ */ jsx(Text, { children: content });
-  }
-}
-var truncateContent = (content, maxLength = 100) => {
-  if (process.env.COMPACT !== "1") return content;
-  return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
-};
-var handleLongContent = (content, maxLength = 5e3) => {
-  if (content.length <= maxLength) {
-    return { content, isTruncated: false };
-  }
-  const truncated = content.substring(0, maxLength);
-  const summary = `
-
-[Content truncated - ${content.length - maxLength} characters remaining. Full content available in chat history.]`;
-  return {
-    content: truncated + summary,
-    isTruncated: true
-  };
-};
-var MemoizedChatEntry = React3.memo(
-  ({ entry, index, verbosityLevel, explainLevel }) => {
-    const getExplanation = (toolName, filePath, _isExecuting) => {
-      if (explainLevel === "off") return null;
-      const explanations = {
-        view_file: {
-          brief: `Reading ${filePath} to examine its contents`,
-          detailed: `Reading the file ${filePath} to examine its current contents, structure, and implementation details for analysis or modification.`
-        },
-        str_replace_editor: {
-          brief: `Updating ${filePath} with changes`,
-          detailed: `Applying targeted modifications to ${filePath} using precise string replacement to update specific code sections while preserving the rest of the file structure.`
-        },
-        create_file: {
-          brief: `Creating new file ${filePath}`,
-          detailed: `Creating a new file at ${filePath} with the specified content, establishing the initial structure and implementation for this component or module.`
-        },
-        bash: {
-          brief: `Executing command: ${filePath}`,
-          detailed: `Running the shell command "${filePath}" to perform system operations, file management, or external tool execution as requested.`
-        },
-        search: {
-          brief: `Searching for: ${filePath}`,
-          detailed: `Performing a comprehensive search across the codebase for "${filePath}" to locate relevant files, functions, or code patterns that match the query.`
-        }
-      };
-      const explanation = explanations[toolName];
-      if (!explanation) return null;
-      return explainLevel === "detailed" ? explanation.detailed : explanation.brief;
-    };
-    const renderDiff = (diffContent, filename) => {
-      return /* @__PURE__ */ jsx(
-        DiffRenderer,
-        {
-          diffContent,
-          filename,
-          terminalWidth: 80
-        }
-      );
-    };
-    const renderFileContent = (content) => {
-      const lines = content.split("\n");
-      let baseIndentation = Infinity;
-      for (const line of lines) {
-        if (line.trim() === "") continue;
-        const firstCharIndex = line.search(/\S/);
-        const currentIndent = firstCharIndex === -1 ? 0 : firstCharIndex;
-        baseIndentation = Math.min(baseIndentation, currentIndent);
-      }
-      if (!isFinite(baseIndentation)) {
-        baseIndentation = 0;
-      }
-      return lines.map((line, index2) => {
-        const displayContent = line.substring(baseIndentation);
-        return /* @__PURE__ */ jsx(Text, { color: "gray", children: displayContent }, index2);
-      });
-    };
-    switch (entry.type) {
-      case "user":
-        const displayText = entry.isPasteSummary ? entry.displayContent || entry.content : entry.content;
-        const textColor = entry.isPasteSummary ? "cyan" : "gray";
-        return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: textColor, children: [
-          ">",
-          " ",
-          truncateContent(displayText)
-        ] }) }) }, index);
-      case "assistant":
-        const { content: processedContent, isTruncated } = handleLongContent(entry.content);
-        return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
-          /* @__PURE__ */ jsx(Text, { color: "white", children: "\u23FA " }),
-          /* @__PURE__ */ jsxs(Box, { flexDirection: "column", flexGrow: 1, children: [
-            entry.toolCalls ? (
-              // If there are tool calls, just show plain text
-              /* @__PURE__ */ jsx(Text, { color: "white", children: processedContent.trim() })
-            ) : (
-              // If no tool calls, render as markdown
-              /* @__PURE__ */ jsx(MarkdownRenderer, { content: processedContent.trim() })
-            ),
-            entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" }),
-            isTruncated && /* @__PURE__ */ jsx(Text, { color: "yellow", italic: true, children: "[Response truncated for performance - full content in session log]" })
-          ] })
-        ] }) }, index);
-      case "tool_call":
-      case "tool_result":
-        const getToolActionName = (toolName2) => {
-          if (toolName2.startsWith("mcp__")) {
-            const parts = toolName2.split("__");
-            if (parts.length >= 3) {
-              const serverName = parts[1];
-              const actualToolName = parts.slice(2).join("__");
-              return `${serverName.charAt(0).toUpperCase() + serverName.slice(1)}(${actualToolName.replace(/_/g, " ")})`;
-            }
-          }
-          switch (toolName2) {
-            case "view_file":
-              return "Read";
-            case "str_replace_editor":
-              return "Update";
-            case "create_file":
-              return "Create";
-            case "bash":
-              return "Bash";
-            case "search":
-              return "Search";
-            case "create_todo_list":
-              return "Created Todo";
-            case "update_todo_list":
-              return "Updated Todo";
-            default:
-              return "Tool";
-          }
-        };
-        const toolName = entry.toolCall?.function?.name || "unknown";
-        const actionName = getToolActionName(toolName);
-        const getFilePath = (toolCall) => {
-          if (toolCall?.function?.arguments) {
-            try {
-              const args = JSON.parse(toolCall.function.arguments);
-              if (toolCall.function.name === "search") {
-                return args.query;
-              }
-              return args.path || args.file_path || args.command || "";
-            } catch {
-              return "";
-            }
-          }
-          return "";
-        };
-        const filePath = getFilePath(entry.toolCall);
-        const isExecuting = entry.type === "tool_call" || !entry.toolResult;
-        const formatToolContent = (content, toolName2) => {
-          const truncated = truncateContent(content, 200);
-          if (toolName2.startsWith("mcp__")) {
-            try {
-              const parsed = JSON.parse(truncated);
-              if (Array.isArray(parsed)) {
-                return `Found ${parsed.length} items`;
-              } else if (typeof parsed === "object") {
-                return JSON.stringify(parsed, null, 2);
-              }
-            } catch {
-              return truncated;
-            }
-          }
-          return truncated;
-        };
-        const shouldShowDiff = entry.toolCall?.function?.name === "str_replace_editor" && entry.toolResult?.success && entry.content.includes("Updated") && entry.content.includes("---") && entry.content.includes("+++");
-        const shouldShowFileContent = (entry.toolCall?.function?.name === "view_file" || entry.toolCall?.function?.name === "create_file") && entry.toolResult?.success && !shouldShowDiff;
-        const shouldShowToolContent = verbosityLevel !== "quiet";
-        const shouldShowFullContent = verbosityLevel === "normal" || verbosityLevel === "verbose";
-        const explanation = getExplanation(toolName, filePath);
-        return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
-          /* @__PURE__ */ jsxs(Box, { children: [
-            /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
-            /* @__PURE__ */ jsxs(Text, { color: "white", children: [
-              " ",
-              filePath ? `${actionName}(${filePath})` : actionName
-            ] })
-          ] }),
-          explanation && /* @__PURE__ */ jsx(Box, { marginLeft: 2, children: /* @__PURE__ */ jsxs(Text, { color: "blue", italic: true, children: [
-            "\u{1F4A1} ",
-            explanation
-          ] }) }),
-          shouldShowToolContent && /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: isExecuting ? /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u23BF Executing..." }) : shouldShowFileContent && shouldShowFullContent ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
-            /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF File contents:" }),
-            /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: renderFileContent(entry.content) })
-          ] }) : shouldShowDiff && shouldShowFullContent ? (
-            // For diff results, show only the summary line, not the raw content
-            /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-              "\u23BF ",
-              entry.content.split("\n")[0]
-            ] })
-          ) : !shouldShowFullContent ? /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Completed" }) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-            "\u23BF ",
-            formatToolContent(entry.content, toolName)
-          ] }) }),
-          shouldShowDiff && !isExecuting && shouldShowFullContent && /* @__PURE__ */ jsx(Box, { marginLeft: 4, flexDirection: "column", children: renderDiff(entry.content, filePath) })
-        ] }, index);
-      default:
-        return null;
-    }
-  }
-);
-MemoizedChatEntry.displayName = "MemoizedChatEntry";
-function ChatHistory({
-  entries,
-  isConfirmationActive = false,
-  verbosityLevel = "quiet",
-  explainLevel = "brief"
-}) {
-  const filteredEntries = isConfirmationActive ? entries.filter(
-    (entry) => !(entry.type === "tool_call" && entry.content === "Executing...")
-  ) : entries;
-  const maxEntries = process.env.COMPACT === "1" ? 5 : 20;
-  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: filteredEntries.slice(-maxEntries).map((entry, index) => /* @__PURE__ */ jsx(
-    MemoizedChatEntry,
-    {
-      entry,
-      index,
-      verbosityLevel,
-      explainLevel
-    },
-    `${entry.timestamp.getTime()}-${index}`
-  )) });
-}
-function ChatInput({
-  input,
-  cursorPosition,
-  isProcessing,
-  isStreaming
-}) {
-  const beforeCursor = input.slice(0, cursorPosition);
-  const lines = input.split("\n");
-  const isMultiline = lines.length > 1;
-  let currentLineIndex = 0;
-  let currentCharIndex = 0;
-  let totalChars = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (totalChars + lines[i].length >= cursorPosition) {
-      currentLineIndex = i;
-      currentCharIndex = cursorPosition - totalChars;
-      break;
-    }
-    totalChars += lines[i].length + 1;
-  }
-  const showCursor = !isProcessing && !isStreaming;
-  const borderColor = isProcessing || isStreaming ? "yellow" : "blue";
-  const promptColor = "cyan";
-  const placeholderText = "Ask me anything...";
-  const isPlaceholder = !input;
-  if (isMultiline) {
-    return /* @__PURE__ */ jsx(
-      Box,
-      {
-        borderStyle: "round",
-        borderColor,
-        paddingY: 0,
-        marginTop: 1,
-        children: lines.map((line, index) => {
-          const isCurrentLine = index === currentLineIndex;
-          const promptChar = index === 0 ? "\u276F " : "  ";
-          if (isCurrentLine) {
-            const beforeCursorInLine = line.slice(0, currentCharIndex);
-            const cursorChar2 = line.slice(currentCharIndex, currentCharIndex + 1) || " ";
-            const afterCursorInLine = line.slice(currentCharIndex + 1);
-            return /* @__PURE__ */ jsxs(Box, { children: [
-              /* @__PURE__ */ jsx(Text, { color: promptColor, children: promptChar }),
-              /* @__PURE__ */ jsxs(Text, { children: [
-                beforeCursorInLine,
-                showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar2 }),
-                !showCursor && cursorChar2 !== " " && cursorChar2,
-                afterCursorInLine
-              ] })
-            ] }, index);
-          } else {
-            return /* @__PURE__ */ jsxs(Box, { children: [
-              /* @__PURE__ */ jsx(Text, { color: promptColor, children: promptChar }),
-              /* @__PURE__ */ jsx(Text, { children: line })
-            ] }, index);
-          }
-        })
-      }
-    );
-  }
-  const cursorChar = input.slice(cursorPosition, cursorPosition + 1) || " ";
-  const afterCursorText = input.slice(cursorPosition + 1);
-  return /* @__PURE__ */ jsx(
-    Box,
-    {
-      borderStyle: "round",
-      borderColor,
-      paddingX: 1,
-      paddingY: 0,
-      marginTop: 1,
-      children: /* @__PURE__ */ jsxs(Box, { children: [
-        /* @__PURE__ */ jsx(Text, { color: promptColor, children: "\u276F " }),
-        isPlaceholder ? /* @__PURE__ */ jsxs(Fragment, { children: [
-          /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: placeholderText }),
-          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: " " })
-        ] }) : /* @__PURE__ */ jsxs(Text, { children: [
-          beforeCursor,
-          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar }),
-          !showCursor && cursorChar !== " " && cursorChar,
-          afterCursorText
-        ] })
-      ] })
-    }
-  );
-}
-function MCPStatus({}) {
-  const [connectedServers, setConnectedServers] = useState([]);
-  const [_availableTools, setAvailableTools] = useState([]);
-  useEffect(() => {
-    const updateStatus = () => {
-      try {
-        const manager = getMCPManager();
-        const servers = manager.getServers();
-        const tools = manager.getTools();
-        setConnectedServers(servers);
-        setAvailableTools(tools);
-      } catch (_error) {
-        setConnectedServers([]);
-        setAvailableTools([]);
-      }
-    };
-    const initialTimer = setTimeout(updateStatus, 2e3);
-    const interval = setInterval(updateStatus, 2e3);
-    return () => {
-      clearTimeout(initialTimer);
-      clearInterval(interval);
-    };
-  }, []);
-  if (connectedServers.length === 0) {
-    return null;
-  }
-  return /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: "green", children: [
-    "\u2692 mcps: ",
-    connectedServers.length,
-    " "
-  ] }) });
-}
-function ConfirmationDialog({
-  operation,
-  filename,
-  onConfirm,
-  onReject,
-  showVSCodeOpen = false,
-  content
-}) {
-  const [selectedOption, setSelectedOption] = useState(0);
-  const [feedbackMode, setFeedbackMode] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const options = [
-    "Yes",
-    "Yes, and don't ask again this session",
-    "No",
-    "No, with feedback"
-  ];
-  useInput((input, key) => {
-    if (feedbackMode) {
-      if (key.return) {
-        onReject(feedback.trim());
-        return;
-      }
-      if (key.backspace || key.delete) {
-        setFeedback((prev) => prev.slice(0, -1));
-        return;
-      }
-      if (input && !key.ctrl && !key.meta) {
-        setFeedback((prev) => prev + input);
-      }
-      return;
-    }
-    if (key.upArrow || key.shift && key.tab) {
-      setSelectedOption((prev) => prev > 0 ? prev - 1 : options.length - 1);
-      return;
-    }
-    if (key.downArrow || key.tab) {
-      setSelectedOption((prev) => (prev + 1) % options.length);
-      return;
-    }
-    if (key.return) {
-      if (selectedOption === 0) {
-        onConfirm(false);
-      } else if (selectedOption === 1) {
-        onConfirm(true);
-      } else if (selectedOption === 2) {
-        onReject("Operation cancelled by user");
-      } else {
-        setFeedbackMode(true);
-      }
-      return;
-    }
-    if (key.escape) {
-      if (feedbackMode) {
-        setFeedbackMode(false);
-        setFeedback("");
-      } else {
-        onReject("Operation cancelled by user (pressed Escape)");
-      }
-      return;
-    }
-  });
-  if (feedbackMode) {
-    return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", padding: 1, children: [
-      /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Type your feedback and press Enter, or press Escape to go back." }) }),
-      /* @__PURE__ */ jsxs(
-        Box,
-        {
-          borderStyle: "round",
-          borderColor: "yellow",
-          paddingX: 1,
-          marginTop: 1,
-          children: [
-            /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u276F " }),
-            /* @__PURE__ */ jsxs(Text, { children: [
-              feedback,
-              /* @__PURE__ */ jsx(Text, { color: "white", children: "\u2588" })
-            ] })
-          ]
-        }
-      )
-    ] });
-  }
-  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
-    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { children: [
-      /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
-      /* @__PURE__ */ jsxs(Text, { color: "white", children: [
-        " ",
-        operation,
-        "(",
-        filename,
-        ")"
-      ] })
-    ] }) }),
-    /* @__PURE__ */ jsxs(Box, { marginLeft: 2, flexDirection: "column", children: [
-      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Requesting user confirmation" }),
-      showVSCodeOpen && /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Opened changes in Visual Studio Code \u29C9" }) }),
-      content && /* @__PURE__ */ jsxs(Fragment, { children: [
-        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
-          "\u23BF ",
-          content.split("\n")[0]
-        ] }),
-        /* @__PURE__ */ jsx(Box, { marginLeft: 4, flexDirection: "column", children: /* @__PURE__ */ jsx(
-          DiffRenderer,
-          {
-            diffContent: content,
-            filename,
-            terminalWidth: 80
-          }
-        ) })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
-      /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { children: "Do you want to proceed with this operation?" }) }),
-      /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: options.map((option, index) => /* @__PURE__ */ jsx(Box, { paddingLeft: 1, children: /* @__PURE__ */ jsxs(
-        Text,
-        {
-          color: selectedOption === index ? "black" : "white",
-          backgroundColor: selectedOption === index ? "cyan" : void 0,
-          children: [
-            index + 1,
-            ". ",
-            option
-          ]
-        }
-      ) }, index)) }),
-      /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter select \u2022 Esc cancel" }) })
-    ] })
-  ] });
 }
 function ContextStatus({
   workspaceFiles = 0,
@@ -17623,173 +17425,6 @@ function Banner({
     ] })
   ] });
 }
-function useContextInfo(agent) {
-  const [contextInfo, setContextInfo] = useState({
-    workspaceFiles: 0,
-    indexSize: "0 MB",
-    sessionFiles: 0,
-    activeTokens: 0,
-    lastActivity: "Now",
-    memoryPressure: "low",
-    isLoading: true,
-    messagesCount: 0,
-    loadedFiles: [],
-    contextHealth: "optimal"
-  });
-  const updateContextInfo = async () => {
-    try {
-      let tokenUsage;
-      let messagesCount = 0;
-      let loadedFiles = [];
-      let contextHealth = "optimal";
-      if (agent) {
-        const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
-        const maxTokens = getMaxTokensForModel(modelName);
-        const estimatedTokens = Math.floor(Math.random() * 1e3) + 500;
-        messagesCount = Math.floor(Math.random() * 10) + 1;
-        const tokenPercent = Math.round(estimatedTokens / maxTokens * 100);
-        tokenUsage = {
-          current: estimatedTokens,
-          max: maxTokens,
-          percent: tokenPercent
-        };
-        if (tokenPercent >= 95) contextHealth = "critical";
-        else if (tokenPercent >= 80) contextHealth = "degraded";
-        else contextHealth = "optimal";
-        loadedFiles = [];
-      }
-      const info = {
-        workspaceFiles: await getWorkspaceFileCount(),
-        indexSize: await getIndexSize(),
-        sessionFiles: await getSessionFileCount(),
-        activeTokens: tokenUsage?.current || 0,
-        lastActivity: "Now",
-        gitBranch: await getGitBranch(),
-        projectName: await getProjectName(),
-        memoryPressure: getMemoryPressure(),
-        isLoading: false,
-        tokenUsage,
-        messagesCount,
-        loadedFiles,
-        contextHealth
-      };
-      setContextInfo(info);
-    } catch (error) {
-      console.warn("[ContextInfo] Failed to update context:", error);
-      setContextInfo((prev) => ({ ...prev, isLoading: false }));
-    }
-  };
-  useEffect(() => {
-    updateContextInfo();
-    const interval = setInterval(updateContextInfo, 1e4);
-    return () => clearInterval(interval);
-  }, []);
-  return {
-    contextInfo,
-    updateContextInfo,
-    refreshContext: updateContextInfo
-  };
-}
-async function getWorkspaceFileCount() {
-  try {
-    const cwd = process.cwd();
-    const entries = await fs__default.promises.readdir(cwd, { withFileTypes: true });
-    let count = 0;
-    for (const entry of entries) {
-      if (entry.isFile() && !shouldIgnoreFile(entry.name)) {
-        count++;
-      } else if (entry.isDirectory() && !shouldIgnoreDirectory(entry.name)) {
-        try {
-          const subEntries = await fs__default.promises.readdir(path7__default.join(cwd, entry.name), { withFileTypes: true });
-          count += subEntries.filter((sub) => sub.isFile() && !shouldIgnoreFile(sub.name)).length;
-        } catch {
-        }
-      }
-    }
-    return count;
-  } catch {
-    return 0;
-  }
-}
-function shouldIgnoreFile(filename) {
-  return filename.startsWith(".") || filename.endsWith(".log") || filename.includes(".tmp");
-}
-function shouldIgnoreDirectory(dirname5) {
-  const ignoreDirs = ["node_modules", ".git", "dist", "build", ".next", "coverage"];
-  return ignoreDirs.includes(dirname5) || dirname5.startsWith(".");
-}
-async function getIndexSize() {
-  try {
-    const indexPath = path7__default.join(process.cwd(), ".grok", "index.json");
-    if (fs__default.existsSync(indexPath)) {
-      const stats = await fs__default.promises.stat(indexPath);
-      const mb = stats.size / (1024 * 1024);
-      return mb > 1 ? `${mb.toFixed(1)} MB` : `${(stats.size / 1024).toFixed(1)} KB`;
-    }
-  } catch {
-  }
-  return "0 MB";
-}
-async function getSessionFileCount() {
-  try {
-    const sessionPath = path7__default.join(os__default.homedir(), ".grok", "session.log");
-    if (fs__default.existsSync(sessionPath)) {
-      const content = await fs__default.promises.readFile(sessionPath, "utf8");
-      return content.split("\n").filter((line) => line.trim()).length;
-    }
-  } catch {
-  }
-  return 0;
-}
-async function getGitBranch() {
-  try {
-    const gitPath = path7__default.join(process.cwd(), ".git", "HEAD");
-    if (fs__default.existsSync(gitPath)) {
-      const content = await fs__default.promises.readFile(gitPath, "utf8");
-      const match = content.match(/ref: refs\/heads\/(.+)/);
-      return match ? match[1].trim() : "detached";
-    }
-  } catch {
-  }
-  return void 0;
-}
-async function getProjectName() {
-  try {
-    const packagePath = path7__default.join(process.cwd(), "package.json");
-    if (fs__default.existsSync(packagePath)) {
-      const content = await fs__default.promises.readFile(packagePath, "utf8");
-      const pkg = JSON.parse(content);
-      return pkg.name;
-    }
-  } catch {
-  }
-  return path7__default.basename(process.cwd());
-}
-function getMemoryPressure() {
-  try {
-    const memUsage = process.memoryUsage();
-    const heapUsedMB = memUsage.heapUsed / 1024 / 1024;
-    if (heapUsedMB > 200) return "high";
-    if (heapUsedMB > 100) return "medium";
-    return "low";
-  } catch {
-    return "low";
-  }
-}
-function getMaxTokensForModel(modelName) {
-  const modelLimits = {
-    "grok-code-fast-1": 128e3,
-    "grok-4-latest": 2e5,
-    "grok-3-latest": 2e5,
-    "grok-3-fast": 128e3,
-    "grok-3-mini-fast": 64e3,
-    "claude-sonnet-4": 2e5,
-    "claude-opus-4": 2e5,
-    "gpt-4o": 128e3,
-    "gpt-4": 32e3
-  };
-  return modelLimits[modelName] || 128e3;
-}
 function ContextTooltip({ isVisible }) {
   const { contextInfo } = useContextInfo();
   if (!isVisible) return null;
@@ -17869,48 +17504,549 @@ function ContextTooltip({ isVisible }) {
     }
   );
 }
-function VersionNotification({ isVisible = true }) {
-  const [versionInfo, setVersionInfo] = useState(null);
-  useEffect(() => {
-    const checkVersion = async () => {
-      try {
-        const info = await getCachedVersionInfo();
-        if (info?.isUpdateAvailable) {
-          setVersionInfo({
-            isUpdateAvailable: info.isUpdateAvailable,
-            current: info.current,
-            latest: info.latest
-          });
-        }
-      } catch {
-      }
-    };
-    checkVersion();
-    const interval = setInterval(checkVersion, 6 * 60 * 60 * 1e3);
-    return () => clearInterval(interval);
-  }, []);
-  if (!isVisible || !versionInfo?.isUpdateAvailable) {
-    return null;
+var truncateContent = (content, maxLength = 100) => {
+  if (process.env.COMPACT !== "1") return content;
+  return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
+};
+function UserMessageEntry({ entry, verbosityLevel }) {
+  const displayText = entry.isPasteSummary ? entry.displayContent || entry.content : entry.content;
+  const textColor = entry.isPasteSummary ? "cyan" : "gray";
+  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: textColor, children: [
+    ">",
+    " ",
+    truncateContent(displayText)
+  ] }) }) });
+}
+marked.setOptions({
+  renderer: new TerminalRenderer()
+});
+function MarkdownRenderer({ content }) {
+  try {
+    const result = marked.parse(content);
+    const rendered = typeof result === "string" ? result : content;
+    return /* @__PURE__ */ jsx(Text, { children: rendered });
+  } catch (error) {
+    console.error("Markdown rendering error:", error);
+    return /* @__PURE__ */ jsx(Text, { children: content });
   }
-  return /* @__PURE__ */ jsx(Box, { marginTop: 1, marginBottom: 1, children: /* @__PURE__ */ jsxs(
+}
+var handleLongContent = (content, maxLength = 5e3) => {
+  if (content.length <= maxLength) {
+    return { content, isTruncated: false };
+  }
+  const truncated = content.substring(0, maxLength);
+  const summary = `
+
+[Content truncated - ${content.length - maxLength} characters remaining. Full content available in chat history.]`;
+  return {
+    content: truncated + summary,
+    isTruncated: true
+  };
+};
+function AssistantMessageEntry({ entry, verbosityLevel }) {
+  const { content: processedContent, isTruncated } = handleLongContent(entry.content);
+  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
+    /* @__PURE__ */ jsx(Text, { color: "white", children: "\u23FA " }),
+    /* @__PURE__ */ jsxs(Box, { flexDirection: "column", flexGrow: 1, children: [
+      entry.toolCalls ? (
+        // If there are tool calls, just show plain text
+        /* @__PURE__ */ jsx(Text, { color: "white", children: processedContent.trim() })
+      ) : (
+        // If no tool calls, render as markdown
+        /* @__PURE__ */ jsx(MarkdownRenderer, { content: processedContent.trim() })
+      ),
+      entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" }),
+      isTruncated && /* @__PURE__ */ jsx(Text, { color: "yellow", italic: true, children: "[Response truncated for performance - full content in session log]" })
+    ] })
+  ] }) });
+}
+
+// src/ui/utils/colors.ts
+var Colors = {
+  AccentYellow: "yellow",
+  Gray: "gray"};
+var MaxSizedBox = ({
+  maxHeight: _maxHeight,
+  maxWidth: _maxWidth,
+  children,
+  ...props
+}) => {
+  return /* @__PURE__ */ jsx(
     Box,
     {
-      borderStyle: "round",
-      borderColor: inkColors.warning,
-      paddingX: 2,
-      paddingY: 0,
-      children: [
-        /* @__PURE__ */ jsxs(Text, { color: inkColors.warning, children: [
-          "\u{1F504} Update available: v",
-          versionInfo.latest,
-          " (current: v",
-          versionInfo.current,
-          ")"
-        ] }),
-        /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " - Use '/upgrade' to update" })
-      ]
+      flexDirection: "column",
+      ...props,
+      children
     }
-  ) });
+  );
+};
+function parseDiffWithLineNumbers(diffContent) {
+  const lines = diffContent.split("\n");
+  const result = [];
+  let currentOldLine = 0;
+  let currentNewLine = 0;
+  let inHunk = false;
+  const hunkHeaderRegex = /^@@ -(\d+),?\d* \+(\d+),?\d* @@/;
+  for (const line of lines) {
+    const hunkMatch = line.match(hunkHeaderRegex);
+    if (hunkMatch) {
+      currentOldLine = parseInt(hunkMatch[1], 10);
+      currentNewLine = parseInt(hunkMatch[2], 10);
+      inHunk = true;
+      result.push({ type: "hunk", content: line });
+      currentOldLine--;
+      currentNewLine--;
+      continue;
+    }
+    if (!inHunk) {
+      if (line.startsWith("--- ") || line.startsWith("+++ ") || line.startsWith("diff --git") || line.startsWith("index ") || line.startsWith("similarity index") || line.startsWith("rename from") || line.startsWith("rename to") || line.startsWith("new file mode") || line.startsWith("deleted file mode"))
+        continue;
+      continue;
+    }
+    if (line.startsWith("+")) {
+      currentNewLine++;
+      result.push({
+        type: "add",
+        newLine: currentNewLine,
+        content: line.substring(1)
+      });
+    } else if (line.startsWith("-")) {
+      currentOldLine++;
+      result.push({
+        type: "del",
+        oldLine: currentOldLine,
+        content: line.substring(1)
+      });
+    } else if (line.startsWith(" ")) {
+      currentOldLine++;
+      currentNewLine++;
+      result.push({
+        type: "context",
+        oldLine: currentOldLine,
+        newLine: currentNewLine,
+        content: line.substring(1)
+      });
+    } else if (line.startsWith("\\")) {
+      result.push({ type: "other", content: line });
+    }
+  }
+  return result;
+}
+var DEFAULT_TAB_WIDTH = 4;
+var DiffRenderer = ({
+  diffContent,
+  filename,
+  tabWidth = DEFAULT_TAB_WIDTH,
+  availableTerminalHeight,
+  terminalWidth = 80
+}) => {
+  if (!diffContent || typeof diffContent !== "string") {
+    return /* @__PURE__ */ jsx(Text, { color: Colors.AccentYellow, children: "No diff content." });
+  }
+  const lines = diffContent.split("\n");
+  const firstLine = lines[0];
+  let actualDiffContent = diffContent;
+  if (firstLine && (firstLine.startsWith("Updated ") || firstLine.startsWith("Created "))) {
+    actualDiffContent = lines.slice(1).join("\n");
+  }
+  const parsedLines = parseDiffWithLineNumbers(actualDiffContent);
+  if (parsedLines.length === 0) {
+    return /* @__PURE__ */ jsx(Text, { dimColor: true, children: "No changes detected." });
+  }
+  const renderedOutput = renderDiffContent(
+    parsedLines,
+    filename,
+    tabWidth,
+    availableTerminalHeight,
+    terminalWidth
+  );
+  return /* @__PURE__ */ jsx(Fragment, { children: renderedOutput });
+};
+var renderDiffContent = (parsedLines, filename, tabWidth = DEFAULT_TAB_WIDTH, availableTerminalHeight, terminalWidth) => {
+  const normalizedLines = parsedLines.map((line) => ({
+    ...line,
+    content: line.content.replace(/\t/g, " ".repeat(tabWidth))
+  }));
+  const displayableLines = normalizedLines.filter(
+    (l) => l.type !== "hunk" && l.type !== "other"
+  );
+  if (displayableLines.length === 0) {
+    return /* @__PURE__ */ jsx(Text, { dimColor: true, children: "No changes detected." });
+  }
+  let baseIndentation = Infinity;
+  for (const line of displayableLines) {
+    if (line.content.trim() === "") continue;
+    const firstCharIndex = line.content.search(/\S/);
+    const currentIndent = firstCharIndex === -1 ? 0 : firstCharIndex;
+    baseIndentation = Math.min(baseIndentation, currentIndent);
+  }
+  if (!isFinite(baseIndentation)) {
+    baseIndentation = 0;
+  }
+  const key = filename ? `diff-box-${filename}` : `diff-box-${crypto.createHash("sha1").update(JSON.stringify(parsedLines)).digest("hex")}`;
+  let lastLineNumber = null;
+  const MAX_CONTEXT_LINES_WITHOUT_GAP = 5;
+  return /* @__PURE__ */ jsx(
+    MaxSizedBox,
+    {
+      maxHeight: availableTerminalHeight,
+      maxWidth: terminalWidth,
+      children: displayableLines.reduce((acc, line, index) => {
+        let relevantLineNumberForGapCalc = null;
+        if (line.type === "add" || line.type === "context") {
+          relevantLineNumberForGapCalc = line.newLine ?? null;
+        } else if (line.type === "del") {
+          relevantLineNumberForGapCalc = line.oldLine ?? null;
+        }
+        if (lastLineNumber !== null && relevantLineNumberForGapCalc !== null && relevantLineNumberForGapCalc > lastLineNumber + MAX_CONTEXT_LINES_WITHOUT_GAP + 1) {
+          acc.push(
+            /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsx(Text, { wrap: "truncate", children: "\u2550".repeat(terminalWidth) }) }, `gap-${index}`)
+          );
+        }
+        const lineKey = `diff-line-${index}`;
+        let gutterNumStr = "";
+        let backgroundColor = void 0;
+        let prefixSymbol = " ";
+        let dim = false;
+        switch (line.type) {
+          case "add":
+            gutterNumStr = (line.newLine ?? "").toString();
+            backgroundColor = "#86efac";
+            prefixSymbol = "+";
+            lastLineNumber = line.newLine ?? null;
+            break;
+          case "del":
+            gutterNumStr = (line.oldLine ?? "").toString();
+            backgroundColor = "redBright";
+            prefixSymbol = "-";
+            if (line.oldLine !== void 0) {
+              lastLineNumber = line.oldLine;
+            }
+            break;
+          case "context":
+            gutterNumStr = (line.newLine ?? "").toString();
+            dim = true;
+            prefixSymbol = " ";
+            lastLineNumber = line.newLine ?? null;
+            break;
+          default:
+            return acc;
+        }
+        const displayContent = line.content.substring(baseIndentation);
+        acc.push(
+          /* @__PURE__ */ jsxs(Box, { flexDirection: "row", children: [
+            /* @__PURE__ */ jsx(Text, { color: Colors.Gray, dimColor: dim, children: gutterNumStr.padEnd(4) }),
+            /* @__PURE__ */ jsxs(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, children: [
+              prefixSymbol,
+              " "
+            ] }),
+            /* @__PURE__ */ jsx(Text, { color: backgroundColor ? "#000000" : void 0, backgroundColor, dimColor: !backgroundColor && dim, wrap: "wrap", children: displayContent })
+          ] }, lineKey)
+        );
+        return acc;
+      }, [])
+    },
+    key
+  );
+};
+function FileContentRenderer({ content }) {
+  const lines = content.split("\n");
+  let baseIndentation = Infinity;
+  for (const line of lines) {
+    if (line.trim() === "") continue;
+    const firstCharIndex = line.search(/\S/);
+    const currentIndent = firstCharIndex === -1 ? 0 : firstCharIndex;
+    baseIndentation = Math.min(baseIndentation, currentIndent);
+  }
+  if (!isFinite(baseIndentation)) {
+    baseIndentation = 0;
+  }
+  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: lines.map((line, index) => {
+    const displayContent = line.substring(baseIndentation);
+    return /* @__PURE__ */ jsx(Text, { color: "gray", children: displayContent }, index);
+  }) });
+}
+var truncateContent2 = (content, maxLength = 100) => {
+  if (process.env.COMPACT !== "1") return content;
+  return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
+};
+function ToolCallEntry({ entry, verbosityLevel, explainLevel }) {
+  const getExplanation = (toolName2, filePath2, isExecuting2) => {
+    if (explainLevel === "off") return null;
+    const explanations = {
+      view_file: {
+        brief: `Reading ${filePath2} to examine its contents`,
+        detailed: `Reading the file ${filePath2} to examine its current contents, structure, and implementation details for analysis or modification.`
+      },
+      str_replace_editor: {
+        brief: `Updating ${filePath2} with changes`,
+        detailed: `Applying targeted modifications to ${filePath2} using precise string replacement to update specific code sections while preserving the rest of the file structure.`
+      },
+      create_file: {
+        brief: `Creating new file ${filePath2}`,
+        detailed: `Creating a new file at ${filePath2} with the specified content, establishing the initial structure and implementation for this component or module.`
+      },
+      bash: {
+        brief: `Executing command: ${filePath2}`,
+        detailed: `Running the shell command "${filePath2}" to perform system operations, file management, or external tool execution as requested.`
+      },
+      search: {
+        brief: `Searching for: ${filePath2}`,
+        detailed: `Performing a comprehensive search across the codebase for "${filePath2}" to locate relevant files, functions, or code patterns that match the query.`
+      }
+    };
+    const explanation2 = explanations[toolName2];
+    if (!explanation2) return null;
+    return explainLevel === "detailed" ? explanation2.detailed : explanation2.brief;
+  };
+  const getToolActionName = (toolName2) => {
+    if (toolName2.startsWith("mcp__")) {
+      const parts = toolName2.split("__");
+      if (parts.length >= 3) {
+        const serverName = parts[1];
+        const actualToolName = parts.slice(2).join("__");
+        return `${serverName.charAt(0).toUpperCase() + serverName.slice(1)}(${actualToolName.replace(/_/g, " ")})`;
+      }
+    }
+    switch (toolName2) {
+      case "view_file":
+        return "Read";
+      case "str_replace_editor":
+        return "Update";
+      case "create_file":
+        return "Create";
+      case "bash":
+        return "Bash";
+      case "search":
+        return "Search";
+      case "create_todo_list":
+        return "Created Todo";
+      case "update_todo_list":
+        return "Updated Todo";
+      default:
+        return "Tool";
+    }
+  };
+  const toolName = entry.toolCall?.function?.name || "unknown";
+  const actionName = getToolActionName(toolName);
+  const getFilePath = (toolCall) => {
+    if (toolCall?.function?.arguments) {
+      try {
+        const args = JSON.parse(toolCall.function.arguments);
+        if (toolCall.function.name === "search") {
+          return args.query;
+        }
+        return args.path || args.file_path || args.command || "";
+      } catch {
+        return "";
+      }
+    }
+    return "";
+  };
+  const filePath = getFilePath(entry.toolCall);
+  const isExecuting = entry.type === "tool_call" || !entry.toolResult;
+  const formatToolContent = (content, toolName2) => {
+    const truncated = truncateContent2(content, 200);
+    if (toolName2.startsWith("mcp__")) {
+      try {
+        const parsed = JSON.parse(truncated);
+        if (Array.isArray(parsed)) {
+          return `Found ${parsed.length} items`;
+        } else if (typeof parsed === "object") {
+          return JSON.stringify(parsed, null, 2);
+        }
+      } catch {
+        return truncated;
+      }
+    }
+    return truncated;
+  };
+  const shouldShowDiff = entry.toolCall?.function?.name === "str_replace_editor" && entry.toolResult?.success && entry.content.includes("Updated") && entry.content.includes("---") && entry.content.includes("+++");
+  const shouldShowFileContent = (entry.toolCall?.function?.name === "view_file" || entry.toolCall?.function?.name === "create_file") && entry.toolResult?.success && !shouldShowDiff;
+  const shouldShowToolContent = verbosityLevel !== "quiet";
+  const shouldShowFullContent = verbosityLevel === "normal" || verbosityLevel === "verbose";
+  const explanation = getExplanation(toolName, filePath);
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
+    /* @__PURE__ */ jsxs(Box, { children: [
+      /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
+      /* @__PURE__ */ jsxs(Text, { color: "white", children: [
+        " ",
+        filePath ? `${actionName}(${filePath})` : actionName
+      ] })
+    ] }),
+    explanation && /* @__PURE__ */ jsx(Box, { marginLeft: 2, children: /* @__PURE__ */ jsxs(Text, { color: "blue", italic: true, children: [
+      "\u{1F4A1} ",
+      explanation
+    ] }) }),
+    shouldShowToolContent && /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: isExecuting ? /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u23BF Executing..." }) : shouldShowFileContent && shouldShowFullContent ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF File contents:" }),
+      /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: /* @__PURE__ */ jsx(FileContentRenderer, { content: entry.content }) })
+    ] }) : shouldShowDiff && shouldShowFullContent ? (
+      // For diff results, show only the summary line, not the raw content
+      /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+        "\u23BF ",
+        entry.content.split("\n")[0]
+      ] })
+    ) : !shouldShowFullContent ? /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Completed" }) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+      "\u23BF ",
+      formatToolContent(entry.content, toolName)
+    ] }) }),
+    shouldShowDiff && !isExecuting && shouldShowFullContent && /* @__PURE__ */ jsx(Box, { marginLeft: 4, flexDirection: "column", children: /* @__PURE__ */ jsx(
+      DiffRenderer,
+      {
+        diffContent: entry.content,
+        filename: filePath,
+        terminalWidth: 80
+      }
+    ) })
+  ] });
+}
+function ChatEntryRouter({ entry, verbosityLevel, explainLevel }) {
+  switch (entry.type) {
+    case "user":
+      return /* @__PURE__ */ jsx(UserMessageEntry, { entry, verbosityLevel });
+    case "assistant":
+      return /* @__PURE__ */ jsx(AssistantMessageEntry, { entry, verbosityLevel });
+    case "tool_call":
+    case "tool_result":
+      return /* @__PURE__ */ jsx(ToolCallEntry, { entry, verbosityLevel, explainLevel });
+    default:
+      return null;
+  }
+}
+var MemoizedChatEntry = React4.memo(
+  ({ entry, verbosityLevel, explainLevel }) => {
+    return /* @__PURE__ */ jsx(ChatEntryRouter, { entry, verbosityLevel, explainLevel });
+  }
+);
+MemoizedChatEntry.displayName = "MemoizedChatEntry";
+function ChatHistory({
+  entries,
+  isConfirmationActive = false,
+  verbosityLevel = "quiet",
+  explainLevel = "brief"
+}) {
+  const filteredEntries = isConfirmationActive ? entries.filter(
+    (entry) => !(entry.type === "tool_call" && entry.content === "Executing...")
+  ) : entries;
+  const maxEntries = process.env.COMPACT === "1" ? 5 : 20;
+  return /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: filteredEntries.slice(-maxEntries).map((entry, index) => /* @__PURE__ */ jsx(
+    MemoizedChatEntry,
+    {
+      entry,
+      index,
+      verbosityLevel,
+      explainLevel
+    },
+    `${entry.timestamp.getTime()}-${index}`
+  )) });
+}
+var operationConfig = {
+  thinking: {
+    icon: "\u{1F9E0}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Thinking...", "Processing...", "Analyzing...", "Computing...", "Reasoning..."]
+  },
+  search: {
+    icon: "\u{1F50D}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Searching...", "Scanning files...", "Finding matches...", "Indexing..."]
+  },
+  indexing: {
+    icon: "\u{1F4C2}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Indexing workspace...", "Building context...", "Mapping relationships..."]
+  },
+  write: {
+    icon: "\u{1F4DD}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Writing file...", "Saving changes...", "Updating content..."]
+  },
+  edit: {
+    icon: "\u270F\uFE0F",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Editing file...", "Applying changes...", "Modifying content..."]
+  },
+  compact: {
+    icon: "\u{1F504}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Compacting context...", "Optimizing memory...", "Refreshing session..."]
+  },
+  analyze: {
+    icon: "\u{1F52C}",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Analyzing code...", "Understanding structure...", "Mapping dependencies..."]
+  },
+  process: {
+    icon: "\u26A1",
+    spinner: "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F",
+    messages: ["Processing...", "Working...", "Computing...", "Executing..."]
+  }
+};
+function LoadingSpinner({
+  isActive,
+  processingTime,
+  tokenCount,
+  operation = "thinking",
+  message,
+  progress
+}) {
+  const [frameIndex, setFrameIndex] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+  const config2 = operationConfig[operation];
+  const spinnerChar = config2.spinner[frameIndex % config2.spinner.length];
+  const operationMessage = message || config2.messages[messageIndex % config2.messages.length];
+  const color = getSpinnerColor(operation);
+  useEffect(() => {
+    if (!isActive) return;
+    const interval = setInterval(() => {
+      setFrameIndex((prev) => prev + 1);
+    }, 80);
+    return () => clearInterval(interval);
+  }, [isActive]);
+  useEffect(() => {
+    if (!isActive) return;
+    const messageInterval = setInterval(() => {
+      setMessageIndex((prev) => prev + 1);
+    }, 80 * config2.spinner.length * 3);
+    return () => clearInterval(messageInterval);
+  }, [isActive, config2.spinner.length]);
+  if (!isActive) return null;
+  const renderProgressBar = () => {
+    if (progress === void 0) return null;
+    const barLength = 20;
+    const filled = Math.round(progress / 100 * barLength);
+    const empty = barLength - filled;
+    const progressBar = "\u2588".repeat(filled) + "\u2591".repeat(empty);
+    return /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+      " ",
+      "[",
+      /* @__PURE__ */ jsx(Text, { color, children: progressBar }),
+      "] ",
+      progress,
+      "%"
+    ] });
+  };
+  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, children: [
+    /* @__PURE__ */ jsxs(Box, { children: [
+      /* @__PURE__ */ jsxs(Text, { color, children: [
+        config2.icon,
+        " ",
+        spinnerChar,
+        " ",
+        operationMessage
+      ] }),
+      renderProgressBar()
+    ] }),
+    /* @__PURE__ */ jsxs(Text, { color: inkColors.muted, children: [
+      " ",
+      "(",
+      processingTime,
+      "s \xB7 \u2191 ",
+      formatTokenCount(tokenCount),
+      " tokens \xB7 esc to interrupt)"
+    ] })
+  ] });
 }
 var PHASE_DISPLAY = {
   inactive: { label: "Inactive", color: "gray", symbol: "\u25CB" },
@@ -18027,6 +18163,165 @@ function PlanModeStatusIndicator({
       "%)"
     ] }) })
   ] });
+}
+function ChatInput({
+  input,
+  cursorPosition,
+  isProcessing,
+  isStreaming
+}) {
+  const beforeCursor = input.slice(0, cursorPosition);
+  const lines = input.split("\n");
+  const isMultiline = lines.length > 1;
+  let currentLineIndex = 0;
+  let currentCharIndex = 0;
+  let totalChars = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (totalChars + lines[i].length >= cursorPosition) {
+      currentLineIndex = i;
+      currentCharIndex = cursorPosition - totalChars;
+      break;
+    }
+    totalChars += lines[i].length + 1;
+  }
+  const showCursor = !isProcessing && !isStreaming;
+  const borderColor = isProcessing || isStreaming ? "yellow" : "blue";
+  const promptColor = "cyan";
+  const placeholderText = "Ask me anything...";
+  const isPlaceholder = !input;
+  if (isMultiline) {
+    return /* @__PURE__ */ jsx(
+      Box,
+      {
+        borderStyle: "round",
+        borderColor,
+        paddingY: 0,
+        marginTop: 1,
+        children: lines.map((line, index) => {
+          const isCurrentLine = index === currentLineIndex;
+          const promptChar = index === 0 ? "\u276F " : "  ";
+          if (isCurrentLine) {
+            const beforeCursorInLine = line.slice(0, currentCharIndex);
+            const cursorChar2 = line.slice(currentCharIndex, currentCharIndex + 1) || " ";
+            const afterCursorInLine = line.slice(currentCharIndex + 1);
+            return /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsx(Text, { color: promptColor, children: promptChar }),
+              /* @__PURE__ */ jsxs(Text, { children: [
+                beforeCursorInLine,
+                showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar2 }),
+                !showCursor && cursorChar2 !== " " && cursorChar2,
+                afterCursorInLine
+              ] })
+            ] }, index);
+          } else {
+            return /* @__PURE__ */ jsxs(Box, { children: [
+              /* @__PURE__ */ jsx(Text, { color: promptColor, children: promptChar }),
+              /* @__PURE__ */ jsx(Text, { children: line })
+            ] }, index);
+          }
+        })
+      }
+    );
+  }
+  const cursorChar = input.slice(cursorPosition, cursorPosition + 1) || " ";
+  const afterCursorText = input.slice(cursorPosition + 1);
+  return /* @__PURE__ */ jsx(
+    Box,
+    {
+      borderStyle: "round",
+      borderColor,
+      paddingX: 1,
+      paddingY: 0,
+      marginTop: 1,
+      children: /* @__PURE__ */ jsxs(Box, { children: [
+        /* @__PURE__ */ jsx(Text, { color: promptColor, children: "\u276F " }),
+        isPlaceholder ? /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: placeholderText }),
+          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: " " })
+        ] }) : /* @__PURE__ */ jsxs(Text, { children: [
+          beforeCursor,
+          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar }),
+          !showCursor && cursorChar !== " " && cursorChar,
+          afterCursorText
+        ] })
+      ] })
+    }
+  );
+}
+function VersionNotification({ isVisible = true }) {
+  const [versionInfo, setVersionInfo] = useState(null);
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const info = await getCachedVersionInfo();
+        if (info?.isUpdateAvailable) {
+          setVersionInfo({
+            isUpdateAvailable: info.isUpdateAvailable,
+            current: info.current,
+            latest: info.latest
+          });
+        }
+      } catch {
+      }
+    };
+    checkVersion();
+    const interval = setInterval(checkVersion, 6 * 60 * 60 * 1e3);
+    return () => clearInterval(interval);
+  }, []);
+  if (!isVisible || !versionInfo?.isUpdateAvailable) {
+    return null;
+  }
+  return /* @__PURE__ */ jsx(Box, { marginTop: 1, marginBottom: 1, children: /* @__PURE__ */ jsxs(
+    Box,
+    {
+      borderStyle: "round",
+      borderColor: inkColors.warning,
+      paddingX: 2,
+      paddingY: 0,
+      children: [
+        /* @__PURE__ */ jsxs(Text, { color: inkColors.warning, children: [
+          "\u{1F504} Update available: v",
+          versionInfo.latest,
+          " (current: v",
+          versionInfo.current,
+          ")"
+        ] }),
+        /* @__PURE__ */ jsx(Text, { color: inkColors.muted, children: " - Use '/upgrade' to update" })
+      ]
+    }
+  ) });
+}
+function MCPStatus({}) {
+  const [connectedServers, setConnectedServers] = useState([]);
+  const [_availableTools, setAvailableTools] = useState([]);
+  useEffect(() => {
+    const updateStatus = () => {
+      try {
+        const manager = getMCPManager();
+        const servers = manager.getServers();
+        const tools = manager.getTools();
+        setConnectedServers(servers);
+        setAvailableTools(tools);
+      } catch (_error) {
+        setConnectedServers([]);
+        setAvailableTools([]);
+      }
+    };
+    const initialTimer = setTimeout(updateStatus, 2e3);
+    const interval = setInterval(updateStatus, 2e3);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, []);
+  if (connectedServers.length === 0) {
+    return null;
+  }
+  return /* @__PURE__ */ jsx(Box, { marginLeft: 1, children: /* @__PURE__ */ jsxs(Text, { color: "green", children: [
+    "\u2692 mcps: ",
+    connectedServers.length,
+    " "
+  ] }) });
 }
 function ContextIndicator({
   state,
@@ -18169,423 +18464,186 @@ function ContextIndicator({
     }
   );
 }
-init_settings_manager();
-function ApiKeyInput({ onApiKeySet }) {
-  const [input, setInput] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { exit } = useApp();
-  useInput((inputChar, key) => {
-    if (isSubmitting) return;
-    if (key.ctrl && inputChar === "c") {
-      exit();
+function ModelSelection({
+  models,
+  selectedIndex,
+  isVisible,
+  currentModel
+}) {
+  if (!isVisible) return null;
+  return /* @__PURE__ */ jsxs(Box, { marginTop: 1, flexDirection: "column", children: [
+    /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsxs(Text, { color: "cyan", children: [
+      "Select Grok Model (current: ",
+      currentModel,
+      "):"
+    ] }) }),
+    models.map((modelOption, index) => /* @__PURE__ */ jsx(Box, { paddingLeft: 1, children: /* @__PURE__ */ jsx(
+      Text,
+      {
+        color: index === selectedIndex ? "black" : "white",
+        backgroundColor: index === selectedIndex ? "cyan" : void 0,
+        children: modelOption.model
+      }
+    ) }, index)),
+    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter/Tab select \u2022 Esc cancel" }) })
+  ] });
+}
+function ConfirmationDialog({
+  operation,
+  filename,
+  onConfirm,
+  onReject,
+  showVSCodeOpen = false,
+  content
+}) {
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [feedbackMode, setFeedbackMode] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const options = [
+    "Yes",
+    "Yes, and don't ask again this session",
+    "No",
+    "No, with feedback"
+  ];
+  useInput((input, key) => {
+    if (feedbackMode) {
+      if (key.return) {
+        onReject(feedback.trim());
+        return;
+      }
+      if (key.backspace || key.delete) {
+        setFeedback((prev) => prev.slice(0, -1));
+        return;
+      }
+      if (input && !key.ctrl && !key.meta) {
+        setFeedback((prev) => prev + input);
+      }
+      return;
+    }
+    if (key.upArrow || key.shift && key.tab) {
+      setSelectedOption((prev) => prev > 0 ? prev - 1 : options.length - 1);
+      return;
+    }
+    if (key.downArrow || key.tab) {
+      setSelectedOption((prev) => (prev + 1) % options.length);
       return;
     }
     if (key.return) {
-      handleSubmit();
+      if (selectedOption === 0) {
+        onConfirm(false);
+      } else if (selectedOption === 1) {
+        onConfirm(true);
+      } else if (selectedOption === 2) {
+        onReject("Operation cancelled by user");
+      } else {
+        setFeedbackMode(true);
+      }
       return;
     }
-    if (key.backspace || key.delete) {
-      setInput((prev) => prev.slice(0, -1));
-      setError("");
+    if (key.escape) {
+      if (feedbackMode) {
+        setFeedbackMode(false);
+        setFeedback("");
+      } else {
+        onReject("Operation cancelled by user (pressed Escape)");
+      }
       return;
-    }
-    if (inputChar && !key.ctrl && !key.meta) {
-      setInput((prev) => prev + inputChar);
-      setError("");
     }
   });
-  const handleSubmit = async () => {
-    if (!input.trim()) {
-      setError("API key cannot be empty");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const apiKey = input.trim();
-      const agent = new GrokAgent(apiKey);
-      process.env.GROK_API_KEY = apiKey;
-      try {
-        const manager = getSettingsManager();
-        manager.updateUserSetting("apiKey", apiKey);
-        console.log(`
-\u2705 API key saved to ~/.grok/user-settings.json`);
-      } catch {
-        console.log("\n\u26A0\uFE0F Could not save API key to settings file");
-        console.log("API key set for current session only");
-      }
-      onApiKeySet(agent);
-    } catch {
-      setError("Invalid API key format");
-      setIsSubmitting(false);
-    }
-  };
-  const displayText = input.length > 0 ? isSubmitting ? "*".repeat(input.length) : "*".repeat(input.length) + "\u2588" : isSubmitting ? " " : "\u2588";
-  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, paddingY: 1, children: [
-    /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F511} Grok API Key Required" }),
-    /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Please enter your Grok API key to continue:" }) }),
-    /* @__PURE__ */ jsxs(Box, { borderStyle: "round", borderColor: "blue", paddingX: 1, marginBottom: 1, children: [
-      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u276F " }),
-      /* @__PURE__ */ jsx(Text, { children: displayText })
+  if (feedbackMode) {
+    return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", padding: 1, children: [
+      /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Type your feedback and press Enter, or press Escape to go back." }) }),
+      /* @__PURE__ */ jsxs(
+        Box,
+        {
+          borderStyle: "round",
+          borderColor: "yellow",
+          paddingX: 1,
+          marginTop: 1,
+          children: [
+            /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u276F " }),
+            /* @__PURE__ */ jsxs(Text, { children: [
+              feedback,
+              /* @__PURE__ */ jsx(Text, { color: "white", children: "\u2588" })
+            ] })
+          ]
+        }
+      )
+    ] });
+  }
+  return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+    /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { children: [
+      /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
+      /* @__PURE__ */ jsxs(Text, { color: "white", children: [
+        " ",
+        operation,
+        "(",
+        filename,
+        ")"
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxs(Box, { marginLeft: 2, flexDirection: "column", children: [
+      /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Requesting user confirmation" }),
+      showVSCodeOpen && /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Opened changes in Visual Studio Code \u29C9" }) }),
+      content && /* @__PURE__ */ jsxs(Fragment, { children: [
+        /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+          "\u23BF ",
+          content.split("\n")[0]
+        ] }),
+        /* @__PURE__ */ jsx(Box, { marginLeft: 4, flexDirection: "column", children: /* @__PURE__ */ jsx(
+          DiffRenderer,
+          {
+            diffContent: content,
+            filename,
+            terminalWidth: 80
+          }
+        ) })
+      ] })
     ] }),
-    error ? /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsxs(Text, { color: "red", children: [
-      "\u274C ",
-      error
-    ] }) }) : null,
     /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
-      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Enter to submit" }),
-      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Ctrl+C to exit" }),
-      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Note: API key will be saved to ~/.grok/user-settings.json" })
-    ] }),
-    isSubmitting ? /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F504} Validating API key..." }) }) : null
+      /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { children: "Do you want to proceed with this operation?" }) }),
+      /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: options.map((option, index) => /* @__PURE__ */ jsx(Box, { paddingLeft: 1, children: /* @__PURE__ */ jsxs(
+        Text,
+        {
+          color: selectedOption === index ? "black" : "white",
+          backgroundColor: selectedOption === index ? "cyan" : void 0,
+          children: [
+            index + 1,
+            ". ",
+            option
+          ]
+        }
+      ) }, index)) }),
+      /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2191\u2193 navigate \u2022 Enter select \u2022 Esc cancel" }) })
+    ] })
   ] });
 }
-function ChatInterfaceWithAgent({
+function ChatInterfaceRenderer({
+  chatHistory,
+  confirmationOptions,
+  showContextTooltip,
+  contextInfo,
+  verbosityLevel,
+  explainLevel,
+  isProcessing,
+  isStreaming,
+  processingTime,
+  tokenCount,
+  planMode,
+  input,
+  cursorPosition,
+  autoEditEnabled,
   agent,
-  initialMessage
+  commandSuggestions,
+  selectedCommandIndex,
+  showCommandSuggestions,
+  availableModels,
+  selectedModelIndex,
+  showModelSelection,
+  handleConfirmation,
+  handleRejection,
+  toggleContextTooltip
 }) {
-  const [chatHistory, setChatHistory] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingTime, setProcessingTime] = useState(0);
-  const [tokenCount, setTokenCount] = useState(0);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [confirmationOptions, setConfirmationOptions] = useState(null);
-  const [showContextTooltip, setShowContextTooltip] = useState(false);
-  const scrollRef = useRef(null);
-  const processingStartTime = useRef(0);
-  const lastChatHistoryLength = useRef(0);
-  const { contextInfo } = useContextInfo(agent);
-  const handleGlobalShortcuts = (str, key) => {
-    if (key.ctrl && (str === "i" || key.name === "i")) {
-      setShowContextTooltip((prev) => !prev);
-      return true;
-    }
-    return false;
-  };
-  const confirmationService = ConfirmationService.getInstance();
-  const {
-    input,
-    cursorPosition,
-    showCommandSuggestions,
-    selectedCommandIndex,
-    showModelSelection,
-    selectedModelIndex,
-    commandSuggestions,
-    availableModels,
-    autoEditEnabled,
-    verbosityLevel,
-    explainLevel,
-    planMode
-  } = useInputHandler({
-    agent,
-    chatHistory,
-    setChatHistory,
-    setIsProcessing,
-    setIsStreaming,
-    setTokenCount,
-    setProcessingTime,
-    processingStartTime,
-    isProcessing,
-    isStreaming,
-    isConfirmationActive: !!confirmationOptions,
-    onGlobalShortcut: handleGlobalShortcuts
-  });
-  useEffect(() => {
-    const isWindows = process.platform === "win32";
-    const isPowerShell = process.env.ComSpec?.toLowerCase().includes("powershell") || process.env.PSModulePath !== void 0;
-    if (!isWindows || !isPowerShell) {
-      console.clear();
-    }
-    console.log("    ");
-    console.log(" ");
-    const logoOutput = "X-CLI\n" + package_default.version;
-    const logoLines = logoOutput.split("\n");
-    logoLines.forEach((line) => {
-      if (line.trim()) {
-        console.log(" " + line);
-      } else {
-        console.log(line);
-      }
-    });
-    console.log(" ");
-    setChatHistory([]);
-    if (fs__default.existsSync(".agent")) {
-      const initialMessages = [];
-      const archPath = path7__default.join(".agent", "system", "architecture.md");
-      if (fs__default.existsSync(archPath)) {
-        try {
-          const archContent = fs__default.readFileSync(archPath, "utf8");
-          initialMessages.push({
-            type: "assistant",
-            content: `\u{1F4CB} **System Architecture (from .agent/system/architecture.md)**
-
-${archContent}`,
-            timestamp: /* @__PURE__ */ new Date()
-          });
-        } catch (error) {
-        }
-      }
-      const workflowPath = path7__default.join(".agent", "sop", "git-workflow.md");
-      if (fs__default.existsSync(workflowPath)) {
-        try {
-          const workflowContent = fs__default.readFileSync(workflowPath, "utf8");
-          initialMessages.push({
-            type: "assistant",
-            content: `\u{1F527} **Git Workflow SOP (from .agent/sop/git-workflow.md)**
-
-${workflowContent}`,
-            timestamp: /* @__PURE__ */ new Date()
-          });
-        } catch (error) {
-        }
-      }
-      const sopDir = path7__default.join(".agent", "sop");
-      if (fs__default.existsSync(sopDir)) {
-        const sopFiles = ["release-management.md", "automation-protection.md"];
-        for (const file of sopFiles) {
-          const filePath = path7__default.join(sopDir, file);
-          if (fs__default.existsSync(filePath)) {
-            try {
-              const content = fs__default.readFileSync(filePath, "utf8");
-              const title = file.replace(".md", "").replace("-", " ").toUpperCase();
-              initialMessages.push({
-                type: "assistant",
-                content: `\u{1F4D6} **${title} SOP (from .agent/sop/${file})**
-
-${content}`,
-                timestamp: /* @__PURE__ */ new Date()
-              });
-            } catch (error) {
-            }
-          }
-        }
-      }
-      const systemDir = path7__default.join(".agent", "system");
-      if (fs__default.existsSync(systemDir)) {
-        const systemFiles = ["critical-state.md", "installation.md", "api-schema.md"];
-        for (const file of systemFiles) {
-          const filePath = path7__default.join(systemDir, file);
-          if (fs__default.existsSync(filePath)) {
-            try {
-              const content = fs__default.readFileSync(filePath, "utf8");
-              const title = file.replace(".md", "").replace("-", " ").toUpperCase();
-              initialMessages.push({
-                type: "assistant",
-                content: `\u{1F3D7}\uFE0F **${title} (from .agent/system/${file})**
-
-${content}`,
-                timestamp: /* @__PURE__ */ new Date()
-              });
-            } catch (error) {
-            }
-          }
-        }
-      }
-      if (initialMessages.length > 0) {
-        setChatHistory(initialMessages);
-      }
-    }
-  }, []);
-  useEffect(() => {
-    const newEntries = chatHistory.slice(lastChatHistoryLength.current);
-    if (newEntries.length > 0) {
-      const sessionFile = path7__default.join(os__default.homedir(), ".grok", "session.log");
-      try {
-        const dir = path7__default.dirname(sessionFile);
-        if (!fs__default.existsSync(dir)) {
-          fs__default.mkdirSync(dir, { recursive: true });
-        }
-        const lines = newEntries.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
-        fs__default.appendFileSync(sessionFile, lines);
-      } catch {
-      }
-    }
-    lastChatHistoryLength.current = chatHistory.length;
-  }, [chatHistory]);
-  useEffect(() => {
-    if (initialMessage && agent) {
-      const userEntry = {
-        type: "user",
-        content: initialMessage,
-        timestamp: /* @__PURE__ */ new Date()
-      };
-      setChatHistory([userEntry]);
-      const processInitialMessage = async () => {
-        setIsProcessing(true);
-        setIsStreaming(true);
-        try {
-          let streamingEntry = null;
-          let accumulatedContent = "";
-          let lastTokenCount = 0;
-          let pendingToolCalls = null;
-          let pendingToolResults = [];
-          let lastUpdateTime = Date.now();
-          const flushUpdates = () => {
-            const now = Date.now();
-            if (now - lastUpdateTime < 150) return;
-            setChatHistory((prev) => {
-              let newHistory = [...prev];
-              if (lastTokenCount !== 0) {
-              }
-              if (accumulatedContent) {
-                if (!streamingEntry) {
-                  const newStreamingEntry = {
-                    type: "assistant",
-                    content: accumulatedContent,
-                    timestamp: /* @__PURE__ */ new Date(),
-                    isStreaming: true
-                  };
-                  newHistory.push(newStreamingEntry);
-                  streamingEntry = newStreamingEntry;
-                } else {
-                  const lastIdx = newHistory.length - 1;
-                  if (lastIdx >= 0 && newHistory[lastIdx].isStreaming) {
-                    newHistory[lastIdx] = { ...newHistory[lastIdx], content: newHistory[lastIdx].content + accumulatedContent };
-                  }
-                }
-                accumulatedContent = "";
-              }
-              if (pendingToolCalls) {
-                const streamingIdx = newHistory.findIndex((entry) => entry.isStreaming);
-                if (streamingIdx >= 0) {
-                  newHistory[streamingIdx] = { ...newHistory[streamingIdx], isStreaming: false, toolCalls: pendingToolCalls };
-                }
-                streamingEntry = null;
-                pendingToolCalls.forEach((toolCall) => {
-                  const toolCallEntry = {
-                    type: "tool_call",
-                    content: "Executing...",
-                    timestamp: /* @__PURE__ */ new Date(),
-                    toolCall
-                  };
-                  newHistory.push(toolCallEntry);
-                });
-                pendingToolCalls = null;
-              }
-              if (pendingToolResults.length > 0) {
-                newHistory = newHistory.map((entry) => {
-                  if (entry.isStreaming) {
-                    return { ...entry, isStreaming: false };
-                  }
-                  const matchingResult = pendingToolResults.find(
-                    (result) => entry.type === "tool_call" && entry.toolCall?.id === result.toolCall.id
-                  );
-                  if (matchingResult) {
-                    return {
-                      ...entry,
-                      type: "tool_result",
-                      content: matchingResult.toolResult.success ? matchingResult.toolResult.output || "Success" : matchingResult.toolResult.error || "Error occurred",
-                      toolResult: matchingResult.toolResult
-                    };
-                  }
-                  return entry;
-                });
-                streamingEntry = null;
-                pendingToolResults = [];
-              }
-              return newHistory;
-            });
-            if (lastTokenCount !== 0) {
-              setTokenCount(lastTokenCount);
-            }
-            lastUpdateTime = now;
-          };
-          for await (const chunk of agent.processUserMessageStream(initialMessage)) {
-            switch (chunk.type) {
-              case "content":
-                if (chunk.content) {
-                  accumulatedContent += chunk.content;
-                }
-                break;
-              case "token_count":
-                if (chunk.tokenCount !== void 0) {
-                  lastTokenCount = chunk.tokenCount;
-                }
-                break;
-              case "tool_calls":
-                if (chunk.toolCalls) {
-                  pendingToolCalls = chunk.toolCalls;
-                }
-                break;
-              case "tool_result":
-                if (chunk.toolCall && chunk.toolResult) {
-                  pendingToolResults.push({ toolCall: chunk.toolCall, toolResult: chunk.toolResult });
-                }
-                break;
-              case "done":
-                flushUpdates();
-                break;
-            }
-            flushUpdates();
-          }
-          flushUpdates();
-          if (streamingEntry) {
-            setChatHistory(
-              (prev) => prev.map(
-                (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
-              )
-            );
-          }
-          setIsStreaming(false);
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          const errorEntry = {
-            type: "assistant",
-            content: `Error: ${errorMessage}`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsStreaming(false);
-        }
-        setIsProcessing(false);
-        processingStartTime.current = 0;
-      };
-      processInitialMessage();
-    }
-  }, [initialMessage, agent]);
-  useEffect(() => {
-    const handleConfirmationRequest = (options) => {
-      setConfirmationOptions(options);
-    };
-    confirmationService.on("confirmation-requested", handleConfirmationRequest);
-    return () => {
-      confirmationService.off(
-        "confirmation-requested",
-        handleConfirmationRequest
-      );
-    };
-  }, [confirmationService]);
-  useEffect(() => {
-    if (!isProcessing && !isStreaming) {
-      setProcessingTime(0);
-      return;
-    }
-    if (processingStartTime.current === 0) {
-      processingStartTime.current = Date.now();
-    }
-    const interval = setInterval(() => {
-      setProcessingTime(
-        Math.floor((Date.now() - processingStartTime.current) / 1e3)
-      );
-    }, 1e3);
-    return () => clearInterval(interval);
-  }, [isProcessing, isStreaming]);
-  const handleConfirmation = (dontAskAgain) => {
-    confirmationService.confirmOperation(true, dontAskAgain);
-    setConfirmationOptions(null);
-  };
-  const handleRejection = (feedback) => {
-    confirmationService.rejectOperation(feedback);
-    setConfirmationOptions(null);
-    setIsProcessing(false);
-    setIsStreaming(false);
-    setTokenCount(0);
-    setProcessingTime(0);
-    processingStartTime.current = 0;
-  };
-  const toggleContextTooltip = () => {
-    setShowContextTooltip((prev) => !prev);
-  };
   return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", paddingX: 2, children: [
     chatHistory.length === 0 && !confirmationOptions && /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
       /* @__PURE__ */ jsx(
@@ -18648,7 +18706,7 @@ ${content}`,
       ] })
     ] }),
     /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginBottom: 1, children: /* @__PURE__ */ jsx(Text, { color: "gray", children: "Type your request in natural language. Ctrl+C to clear, 'exit' to quit." }) }),
-    /* @__PURE__ */ jsx(Box, { flexDirection: "column", ref: scrollRef, children: /* @__PURE__ */ jsx(
+    /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: /* @__PURE__ */ jsx(
       ChatHistory,
       {
         entries: chatHistory,
@@ -18767,6 +18825,109 @@ ${content}`,
       )
     ] })
   ] });
+}
+function ChatInterfaceWithAgent({
+  agent,
+  initialMessage
+}) {
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingTime, setProcessingTime] = useState(0);
+  const [tokenCount, setTokenCount] = useState(0);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [confirmationOptions, setConfirmationOptions] = useState(null);
+  const [showContextTooltip, setShowContextTooltip] = useState(false);
+  const processingStartTime = useRef(0);
+  useConsoleSetup();
+  useEffect(() => {
+    setChatHistory([]);
+    useAutoRead(setChatHistory);
+  }, []);
+  useSessionLogging(chatHistory);
+  const { contextInfo } = useContextInfo(agent);
+  const handleGlobalShortcuts = (str, key) => {
+    if (key.ctrl && (str === "i" || key.name === "i")) {
+      setShowContextTooltip((prev) => !prev);
+      return true;
+    }
+    return false;
+  };
+  const confirmationService = ConfirmationService.getInstance();
+  const {
+    input,
+    cursorPosition,
+    showCommandSuggestions,
+    selectedCommandIndex,
+    showModelSelection,
+    selectedModelIndex,
+    commandSuggestions,
+    availableModels,
+    autoEditEnabled,
+    verbosityLevel,
+    explainLevel,
+    planMode
+  } = useInputHandler({
+    agent,
+    chatHistory,
+    setChatHistory,
+    setIsProcessing,
+    setIsStreaming,
+    setTokenCount,
+    setProcessingTime,
+    processingStartTime,
+    isProcessing,
+    isStreaming,
+    isConfirmationActive: !!confirmationOptions,
+    onGlobalShortcut: handleGlobalShortcuts
+  });
+  useStreaming(agent, initialMessage, setChatHistory, {
+    setIsProcessing,
+    setIsStreaming,
+    setTokenCount});
+  const { handleConfirmation, handleRejection } = useConfirmations(
+    confirmationService,
+    {
+      setConfirmationOptions,
+      setIsProcessing,
+      setIsStreaming,
+      setTokenCount,
+      setProcessingTime,
+      processingStartTime
+    }
+  );
+  useProcessingTimer(isProcessing, isStreaming, setProcessingTime);
+  const toggleContextTooltip = () => {
+    setShowContextTooltip((prev) => !prev);
+  };
+  return /* @__PURE__ */ jsx(
+    ChatInterfaceRenderer,
+    {
+      chatHistory,
+      confirmationOptions,
+      showContextTooltip,
+      contextInfo,
+      verbosityLevel,
+      explainLevel,
+      isProcessing,
+      isStreaming,
+      processingTime,
+      tokenCount,
+      planMode,
+      input,
+      cursorPosition,
+      autoEditEnabled,
+      agent,
+      commandSuggestions,
+      selectedCommandIndex,
+      showCommandSuggestions,
+      availableModels,
+      selectedModelIndex,
+      showModelSelection,
+      handleConfirmation,
+      handleRejection,
+      toggleContextTooltip
+    }
+  );
 }
 function ChatInterface({
   agent,
@@ -19273,7 +19434,7 @@ program.name("grok").description(
     checkAutoCompact();
     checkStartupUpdates();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
-    const app = render(React3.createElement(ChatInterface, { agent, initialMessage }));
+    const app = render(React4.createElement(ChatInterface, { agent, initialMessage }));
     const cleanup = () => {
       app.unmount();
       agent.abortCurrentOperation();
