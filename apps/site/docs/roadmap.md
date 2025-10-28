@@ -7,6 +7,8 @@ sidebar_position: 1
 
 This roadmap is automatically generated from our internal task tracking system.
 
+## Sprint: Implement Interactive Chat Interface with Research-Confirm-Proceed Flow
+
 ## Sprint: Implement Verbosity and Explanation Features
 
 ## Sprint: Paste Text Summary Enhancement

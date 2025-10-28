@@ -89,6 +89,14 @@ export function useInputHandler({
       return 'brief';
     }
   });
+  const [_interactivityLevel, _setInteractivityLevel] = useState<'chat' | 'balanced' | 'repl'>(() => {
+    try {
+      const manager = getSettingsManager();
+      return manager.getUserSetting('interactivityLevel') || 'balanced';
+    } catch {
+      return 'balanced';
+    }
+  });
 
   // Initialize plan mode hook
   const planMode = usePlanMode({}, agent);
@@ -345,6 +353,7 @@ export function useInputHandler({
     { command: "/models", description: "Switch Grok Model" },
     { command: "/verbosity", description: "Control output verbosity (quiet/normal/verbose)" },
     { command: "/explain", description: "Control operation explanations (off/brief/detailed)" },
+    { command: "/interactivity", description: "Set interaction style (chat/balanced/repl)" },
     { command: "/upgrade", description: "Check for updates and upgrade CLI" },
     { command: "/version", description: "Show version information" },
     { command: "/switch", description: "Switch to specific version" },

@@ -10,6 +10,7 @@ const sidebars: SidebarsConfig = {
     "getting-started/quickstart",
     "getting-started/installation",
     "guides/plan-mode",
+    "guides/interactive-chat-interface",
     "tools/overview",
     "troubleshooting/npm",
     "roadmap",

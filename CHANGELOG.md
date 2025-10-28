@@ -54,6 +54,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Reduced support load** through transparent operation feedback
 - **Enhanced user confidence** with clear system state communication
 
+### Changed - Default Interactivity Mode
+
+- Changed default interaction mode from 'chat' to 'balanced' for improved user experience on complex tasks
+
 ---
 
 ## [1.1.24] - 2024-10-24

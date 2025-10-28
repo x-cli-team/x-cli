@@ -123,6 +123,15 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **💻 Beautiful Terminal UI**: Interactive interface with Claude Code-style animations and feedback
 - **📋 Smart Paste Detection**: Large pasted content automatically summarizes as `[Pasted text #1 +12 lines]` for clean chat history
 
+### 🎛️ **Interactive Chat Interface**
+
+- **Three Interaction Modes**: Chat (immediate), Balanced (smart detection), REPL (full interactive)
+- **Balanced Mode Default**: Automatically chooses workflow based on task complexity
+- **Research Phase**: Agent explains investigation approach with progress indicators
+- **Options Presentation**: Clear recommendations with pros/cons for complex tasks
+- **Confirmation Workflow**: Keyboard shortcuts (y/n/modify/cancel) for efficient decisions
+- **State Persistence**: Settings saved to `~/.xcli/config.json` across sessions
+
 ### 🎨 **Enhanced User Experience**
 
 - **🎭 Professional Welcome Banner**: ASCII art with dynamic context status (`Context: Dynamic │ Files: indexed │ Session: Restored`)
