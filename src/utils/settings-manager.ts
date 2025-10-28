@@ -18,6 +18,7 @@ export interface UserSettings {
   };
   verbosityLevel?: 'quiet' | 'normal' | 'verbose'; // Output verbosity level
   explainLevel?: 'off' | 'brief' | 'detailed'; // Explanation detail level
+  interactivityLevel?: 'chat' | 'balanced' | 'repl'; // Interaction mode
 }
 
 /**

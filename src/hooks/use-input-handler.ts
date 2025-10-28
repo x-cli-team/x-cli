@@ -92,7 +92,7 @@ export function useInputHandler({
   const [_interactivityLevel, _setInteractivityLevel] = useState<'chat' | 'balanced' | 'repl'>(() => {
     try {
       const manager = getSettingsManager();
-      return manager.getUserSetting('interactivityLevel') || 'balanced';
+      return (manager.getUserSetting('interactivityLevel') as 'chat' | 'balanced' | 'repl' | undefined) || 'balanced';
     } catch {
       return 'balanced';
     }
