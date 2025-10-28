@@ -132,12 +132,10 @@ jobs:
 
       # ---------- Create GitHub Release ----------
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.NEW_VER }}
-          release_name: Release v${{ env.NEW_VER }}
+          name: Release v${{ env.NEW_VER }}
           body: |
             ## 🚀 X-CLI v${{ env.NEW_VER }}
 
@@ -146,7 +144,9 @@ jobs:
 
             ### Installation
             ```bash
-            npm install -g @xagent/x-cli@v${{ env.NEW_VER }}
+            npm install -g @xagent/x-cli@${{ env.NEW_VER }}
+            # or
+            npx @xagent/x-cli@${{ env.NEW_VER }}
             ```
 
             ### What's New
@@ -154,6 +154,8 @@ jobs:
             - Full release notes available in commit history
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Cleanup
         run: |
