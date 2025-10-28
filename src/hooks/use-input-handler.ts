@@ -343,6 +343,8 @@ export function useInputHandler({
     { command: "/help", description: "Show help information" },
     { command: "/clear", description: "Clear chat history" },
     { command: "/models", description: "Switch Grok Model" },
+    { command: "/verbosity", description: "Control output verbosity (quiet/normal/verbose)" },
+    { command: "/explain", description: "Control operation explanations (off/brief/detailed)" },
     { command: "/upgrade", description: "Check for updates and upgrade CLI" },
     { command: "/version", description: "Show version information" },
     { command: "/switch", description: "Switch to specific version" },
