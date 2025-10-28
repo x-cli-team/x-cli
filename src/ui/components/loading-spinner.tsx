@@ -91,14 +91,21 @@ export function LoadingSpinner({
 
     const interval = setInterval(() => {
       setFrameIndex(prev => prev + 1);
-      // Change message every 3 spinner cycles for variety
-      if ((frameIndex + 1) % (config.spinner.length * 3) === 0) {
-        setMessageIndex(prev => prev + 1);
-      }
     }, 80); // ~12 FPS animation
 
     return () => clearInterval(interval);
-  }, [isActive, frameIndex, config.spinner.length]);
+  }, [isActive]);
+
+  // Separate effect for message rotation to avoid dependency issues
+  useEffect(() => {
+    if (!isActive) return;
+
+    const messageInterval = setInterval(() => {
+      setMessageIndex(prev => prev + 1);
+    }, 80 * config.spinner.length * 3); // Change message every 3 spinner cycles
+
+    return () => clearInterval(messageInterval);
+  }, [isActive, config.spinner.length]);
 
   if (!isActive) return null;
 
