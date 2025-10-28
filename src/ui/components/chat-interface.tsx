@@ -133,6 +133,14 @@ function ChatInterfaceWithAgent({
     // Auto-read .agent folder on first run if exists
     if (fs.existsSync('.agent')) {
       const initialMessages: ChatEntry[] = [];
+      let docsRead = 0;
+
+      // Add loading message
+      initialMessages.push({
+        type: 'assistant',
+        content: '📚 Reading core documentation into memory...',
+        timestamp: new Date(),
+      });
 
       // Read system/architecture.md
       const archPath = path.join('.agent', 'system', 'architecture.md');
@@ -144,6 +152,7 @@ function ChatInterfaceWithAgent({
             content: `📋 **System Architecture (from .agent/system/architecture.md)**\n\n${archContent}`,
             timestamp: new Date(),
           });
+          docsRead++;
         } catch (_error) {
           // Silently ignore read errors
         }
@@ -159,6 +168,7 @@ function ChatInterfaceWithAgent({
             content: `🔧 **Git Workflow SOP (from .agent/sop/git-workflow.md)**\n\n${workflowContent}`,
             timestamp: new Date(),
           });
+          docsRead++;
         } catch (_error) {
           // Silently ignore read errors
         }
@@ -179,6 +189,7 @@ function ChatInterfaceWithAgent({
                 content: `📖 **${title} SOP (from .agent/sop/${file})**\n\n${content}`,
                 timestamp: new Date(),
               });
+              docsRead++;
             } catch (_error) {
               // Silently ignore
             }
@@ -189,7 +200,7 @@ function ChatInterfaceWithAgent({
       // Add system files
       const systemDir = path.join('.agent', 'system');
       if (fs.existsSync(systemDir)) {
-        const systemFiles = ['critical-state.md', 'installation.md', 'api-schema.md'];
+        const systemFiles = ['critical-state.md', 'installation.md', 'api-schema.md', 'auto-read-system.md'];
         for (const file of systemFiles) {
           const filePath = path.join(systemDir, file);
           if (fs.existsSync(filePath)) {
@@ -201,11 +212,21 @@ function ChatInterfaceWithAgent({
                 content: `🏗️ **${title} (from .agent/system/${file})**\n\n${content}`,
                 timestamp: new Date(),
               });
+              docsRead++;
             } catch (_error) {
               // Silently ignore
             }
           }
         }
+      }
+
+      // Add summary message
+      if (docsRead > 0) {
+        initialMessages.push({
+          type: 'assistant',
+          content: `✅ ${docsRead} documentation files read - I have a complete understanding of the current architecture and operational procedures.`,
+          timestamp: new Date(),
+        });
       }
 
       if (initialMessages.length > 0) {
