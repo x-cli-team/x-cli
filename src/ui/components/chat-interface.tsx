@@ -137,13 +137,20 @@ function ChatInterfaceWithAgent({
 
       // Load configuration if available
       let config: any = null;
-      const configPath = path.join('.agent', 'auto-read-config.json');
-      if (fs.existsSync(configPath)) {
-        try {
-          const configContent = fs.readFileSync(configPath, 'utf8');
-          config = JSON.parse(configContent);
-        } catch (_error) {
-          // Silently ignore config parsing errors, fall back to defaults
+      const configPaths = [
+        path.join('.xcli', 'auto-read-config.json'), // User config (distributed)
+        path.join('.agent', 'auto-read-config.json') // Dev override (gitignored)
+      ];
+
+      for (const configPath of configPaths) {
+        if (fs.existsSync(configPath)) {
+          try {
+            const configContent = fs.readFileSync(configPath, 'utf8');
+            config = JSON.parse(configContent);
+            break; // Use first config found (user config takes precedence)
+          } catch (_error) {
+            // Silently ignore config parsing errors, continue to next path
+          }
         }
       }
 

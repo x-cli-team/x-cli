@@ -430,7 +430,7 @@ The **`.agent` folder** is the most powerful feature of X CLI, enabling **self-d
 When you run `npx -y @xagent/x-cli@latest`, the CLI automatically detects and reads `.agent/` documentation:
 
 1. **Auto-Discovery**: Scans for `.agent/` folder in current directory
-2. **Configuration Loading**: Reads `.agent/auto-read-config.json` for custom settings
+2. **Configuration Loading**: Reads `.xcli/auto-read-config.json` (distributed) or `.agent/auto-read-config.json` (project override)
 3. **Smart Loading**: Reads configured documentation files into chat context
 4. **Context Enhancement**: Provides comprehensive project understanding to AI
 

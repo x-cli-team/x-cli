@@ -15,6 +15,12 @@
   "bin": {
     "xcli": "dist/index.js"
   },
+  "files": [
+    "dist",
+    ".xcli",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup",
     "build:tsc": "tsc",
@@ -115,6 +121,7 @@
   "icon": "docs/assets/logos/x-cli-logo.svg",
   "files": [
     "dist/**/*",
+    ".xcli/**/*",
     "README.md",
     "LICENSE",
     "docs/assets/logos/**/*"
