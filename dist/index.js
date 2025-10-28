@@ -9291,7 +9291,7 @@ EOF`;
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.48",
+  version: "1.1.49",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -14884,49 +14884,6 @@ function useInputHandler({
   const [shiftTabPressCount, setShiftTabPressCount] = useState(0);
   const [lastShiftTabTime, setLastShiftTabTime] = useState(0);
   const [verbosityLevel, setVerbosityLevel] = useState("normal");
-  if (trimmedInput === "/verbosity" || trimmedInput.startsWith("/verbosity ")) {
-    const args = trimmedInput.split(" ").slice(1);
-    const newLevel = args[0];
-    if (!newLevel) {
-      const levelEntry = {
-        type: "assistant",
-        content: `\u{1F50A} **Current Verbosity Level: ${verbosityLevel.toUpperCase()}**
-
-**Available levels:**
-- \`normal\` - Full tool output and details
-- \`quiet\` - Reduced tool output, show summaries only
-- \`minimal\` - Show only tool names, hide detailed content
-
-**Usage:** \`/verbosity <level>\`
-**Example:** \`/verbosity quiet\``,
-        timestamp: /* @__PURE__ */ new Date()
-      };
-      setChatHistory((prev) => [...prev, levelEntry]);
-    } else if (["normal", "quiet", "minimal"].includes(newLevel)) {
-      setVerbosityLevel(newLevel);
-      const confirmEntry = {
-        type: "assistant",
-        content: `\u2705 **Verbosity level set to: ${newLevel.toUpperCase()}**
-
-Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLevel === "quiet" ? "summaries only" : "full details"}.`,
-        timestamp: /* @__PURE__ */ new Date()
-      };
-      setChatHistory((prev) => [...prev, confirmEntry]);
-    } else {
-      const errorEntry = {
-        type: "assistant",
-        content: `\u274C **Invalid verbosity level: ${newLevel}**
-
-**Available levels:** normal, quiet, minimal
-
-**Usage:** \`/verbosity <level>\``,
-        timestamp: /* @__PURE__ */ new Date()
-      };
-      setChatHistory((prev) => [...prev, errorEntry]);
-    }
-    clearInput();
-    return true;
-  }
   const planMode = usePlanMode({}, agent);
   const handleSpecialKey = (key) => {
     if (isConfirmationActive) {
@@ -15150,8 +15107,8 @@ Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLev
     return loadModelConfig();
   }, []);
   const handleDirectCommand = async (input2) => {
-    const trimmedInput2 = input2.trim();
-    if (trimmedInput2 === "/clear") {
+    const trimmedInput = input2.trim();
+    if (trimmedInput === "/clear") {
       setChatHistory([]);
       setIsProcessing(false);
       setIsStreaming(false);
@@ -15164,7 +15121,7 @@ Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLev
       resetHistory();
       return true;
     }
-    if (trimmedInput2 === "/help") {
+    if (trimmedInput === "/help") {
       const helpEntry = {
         type: "assistant",
         content: `X-CLI Help:
@@ -15228,18 +15185,18 @@ Examples:
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/exit") {
+    if (trimmedInput === "/exit") {
       process.exit(0);
       return true;
     }
-    if (trimmedInput2 === "/models") {
+    if (trimmedInput === "/models") {
       setShowModelSelection(true);
       setSelectedModelIndex(0);
       clearInput();
       return true;
     }
-    if (trimmedInput2.startsWith("/models ")) {
-      const modelArg = trimmedInput2.split(" ")[1];
+    if (trimmedInput.startsWith("/models ")) {
+      const modelArg = trimmedInput.split(" ")[1];
       const modelNames = availableModels.map((m) => m.model);
       if (modelNames.includes(modelArg)) {
         agent.setModel(modelArg);
@@ -15263,7 +15220,7 @@ Available models: ${modelNames.join(", ")}`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/version") {
+    if (trimmedInput === "/version") {
       try {
         const versionInfo = await checkForUpdates();
         const versionEntry = {
@@ -15294,7 +15251,7 @@ NPM: https://www.npmjs.com/package/${package_default.name}`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/upgrade") {
+    if (trimmedInput === "/upgrade") {
       try {
         const versionInfo = await checkForUpdates();
         if (!versionInfo.isUpdateAvailable) {
@@ -15348,8 +15305,8 @@ Please try upgrading manually:
       clearInput();
       return true;
     }
-    if (trimmedInput2.startsWith("/switch ")) {
-      const versionArg = trimmedInput2.split(" ")[1];
+    if (trimmedInput.startsWith("/switch ")) {
+      const versionArg = trimmedInput.split(" ")[1];
       if (!versionArg) {
         const helpEntry = {
           type: "assistant",
@@ -15411,7 +15368,7 @@ Please try manually:
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/commit-and-push") {
+    if (trimmedInput === "/commit-and-push") {
       const userEntry = {
         type: "user",
         content: "/commit-and-push",
@@ -15582,7 +15539,7 @@ ${commitMessage}`
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/init-agent") {
+    if (trimmedInput === "/init-agent") {
       const userEntry = {
         type: "user",
         content: "/init-agent",
@@ -15591,7 +15548,7 @@ ${commitMessage}`
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const isXCli = process.cwd().includes("x-cli") || trimmedInput2.includes("--xcli");
+        const isXCli = process.cwd().includes("x-cli") || trimmedInput.includes("--xcli");
         const projectType = isXCli ? "x-cli" : "external";
         const projectName = isXCli ? "X CLI" : "Current Project";
         const generator = new AgentSystemGenerator({
@@ -15633,7 +15590,7 @@ ${commitMessage}`
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/docs") {
+    if (trimmedInput === "/docs") {
       const userEntry = {
         type: "user",
         content: "/docs",
@@ -15649,11 +15606,11 @@ ${commitMessage}`
       clearInput();
       return true;
     }
-    const docsMenuOption = findDocsMenuOption(trimmedInput2);
+    const docsMenuOption = findDocsMenuOption(trimmedInput);
     if (docsMenuOption) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
@@ -15670,16 +15627,16 @@ Executing: \`${docsMenuOption.command}\`...`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/readme" || trimmedInput2.startsWith("/readme ")) {
+    if (trimmedInput === "/readme" || trimmedInput.startsWith("/readme ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const updateExisting = args.includes("--update");
         const template = args.find((arg) => arg.startsWith("--template="))?.split("=")[1] || "default";
         const generator = new ReadmeGenerator({
@@ -15724,16 +15681,16 @@ Executing: \`${docsMenuOption.command}\`...`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/comments" || trimmedInput2.startsWith("/comments ")) {
+    if (trimmedInput === "/comments" || trimmedInput.startsWith("/comments ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const filePath = args[0];
         if (!filePath) {
           const errorEntry = {
@@ -15786,16 +15743,16 @@ Executing: \`${docsMenuOption.command}\`...`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/api-docs" || trimmedInput2.startsWith("/api-docs ")) {
+    if (trimmedInput === "/api-docs" || trimmedInput.startsWith("/api-docs ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const outputFormat = args.includes("--format=html") ? "html" : "md";
         const includePrivate = args.includes("--private");
         const scanPaths = args.filter((arg) => !arg.startsWith("--") && arg !== "");
@@ -15842,16 +15799,16 @@ Executing: \`${docsMenuOption.command}\`...`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/changelog" || trimmedInput2.startsWith("/changelog ")) {
+    if (trimmedInput === "/changelog" || trimmedInput.startsWith("/changelog ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const sinceVersion = args.find((arg) => arg.startsWith("--since="))?.split("=")[1];
         const commitCount = args.find((arg) => arg.startsWith("--commits="))?.split("=")[1];
         const format = args.includes("--simple") ? "simple" : "conventional";
@@ -15899,16 +15856,16 @@ Executing: \`${docsMenuOption.command}\`...`,
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/update-agent-docs" || trimmedInput2.startsWith("/update-agent-docs ")) {
+    if (trimmedInput === "/update-agent-docs" || trimmedInput.startsWith("/update-agent-docs ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const updateTarget = args.includes("--system") ? "system" : args.includes("--tasks") ? "tasks" : args.includes("--sop") ? "sop" : "all";
         const autoCommit = args.includes("--commit");
         const updater = new UpdateAgentDocs({
@@ -15950,16 +15907,16 @@ ${result.suggestions.map((s) => `- ${s}`).join("\n")}
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/compact" || trimmedInput2.startsWith("/compact ")) {
+    if (trimmedInput === "/compact" || trimmedInput.startsWith("/compact ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const dryRun = args.includes("--dry-run");
         const subagentFramework = new SubagentFramework();
         const taskId = await subagentFramework.spawnSubagent({
@@ -16020,10 +15977,10 @@ ${result.summary}
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/heal" || trimmedInput2.startsWith("/heal ")) {
+    if (trimmedInput === "/heal" || trimmedInput.startsWith("/heal ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
@@ -16035,7 +15992,7 @@ ${result.summary}
           stack: "at someFunction (src/example.ts:42:10)"
         };
         const mockContext = {
-          command: trimmedInput2,
+          command: trimmedInput,
           operation: "heal-demo",
           files: ["src/example.ts"]
         };
@@ -16081,16 +16038,16 @@ ${result.summary}
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/guardrails" || trimmedInput2.startsWith("/guardrails ")) {
+    if (trimmedInput === "/guardrails" || trimmedInput.startsWith("/guardrails ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const check = args.includes("--check");
         const healingSystem = new SelfHealingSystem(process.cwd());
         if (check) {
@@ -16139,16 +16096,16 @@ ${incidents.slice(0, 3).map((i) => `- ${i.title} (${i.impact} impact)`).join("\n
       clearInput();
       return true;
     }
-    if (trimmedInput2 === "/switch" || trimmedInput2.startsWith("/switch ")) {
+    if (trimmedInput === "/switch" || trimmedInput.startsWith("/switch ")) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const args = trimmedInput2.split(" ").slice(1);
+        const args = trimmedInput.split(" ").slice(1);
         const settingsManager = getSettingsManager();
         if (args.length === 0) {
           const settings = settingsManager.loadUserSettings();
@@ -16273,6 +16230,49 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
       clearInput();
       return true;
     }
+    if (trimmedInput === "/verbosity" || trimmedInput.startsWith("/verbosity ")) {
+      const args = trimmedInput.split(" ").slice(1);
+      const newLevel = args[0];
+      if (!newLevel) {
+        const levelEntry = {
+          type: "assistant",
+          content: `\u{1F50A} **Current Verbosity Level: ${verbosityLevel.toUpperCase()}**
+
+**Available levels:**
+- \`normal\` - Full tool output and details
+- \`quiet\` - Reduced tool output, show summaries only
+- \`minimal\` - Show only tool names, hide detailed content
+
+**Usage:** \`/verbosity <level>\`
+**Example:** \`/verbosity quiet\``,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, levelEntry]);
+      } else if (["normal", "quiet", "minimal"].includes(newLevel)) {
+        setVerbosityLevel(newLevel);
+        const confirmEntry = {
+          type: "assistant",
+          content: `\u2705 **Verbosity level set to: ${newLevel.toUpperCase()}**
+
+Tool outputs will now show ${newLevel === "minimal" ? "only tool names" : newLevel === "quiet" ? "summaries only" : "full details"}.`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, confirmEntry]);
+      } else {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C **Invalid verbosity level: ${newLevel}**
+
+**Available levels:** normal, quiet, minimal
+
+**Usage:** \`/verbosity <level>\``,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      clearInput();
+      return true;
+    }
     const directBashCommands = [
       "ls",
       "pwd",
@@ -16287,16 +16287,16 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
       "mv",
       "rm"
     ];
-    const firstWord = trimmedInput2.split(" ")[0];
+    const firstWord = trimmedInput.split(" ")[0];
     if (directBashCommands.includes(firstWord)) {
       const userEntry = {
         type: "user",
-        content: trimmedInput2,
+        content: trimmedInput,
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, userEntry]);
       try {
-        const result = await agent.executeBashCommand(trimmedInput2);
+        const result = await agent.executeBashCommand(trimmedInput);
         const commandEntry = {
           type: "tool_result",
           content: result.success ? result.output || "Command completed" : result.error || "Command failed",
@@ -16306,7 +16306,7 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
             type: "function",
             function: {
               name: "bash",
-              arguments: JSON.stringify({ command: trimmedInput2 })
+              arguments: JSON.stringify({ command: trimmedInput })
             }
           },
           toolResult: result
@@ -16575,12 +16575,16 @@ function LoadingSpinner({
     if (!isActive) return;
     const interval = setInterval(() => {
       setFrameIndex((prev) => prev + 1);
-      if ((frameIndex + 1) % (config2.spinner.length * 3) === 0) {
-        setMessageIndex((prev) => prev + 1);
-      }
     }, 80);
     return () => clearInterval(interval);
-  }, [isActive, frameIndex, config2.spinner.length]);
+  }, [isActive]);
+  useEffect(() => {
+    if (!isActive) return;
+    const messageInterval = setInterval(() => {
+      setMessageIndex((prev) => prev + 1);
+    }, 80 * config2.spinner.length * 3);
+    return () => clearInterval(messageInterval);
+  }, [isActive, config2.spinner.length]);
   if (!isActive) return null;
   const renderProgressBar = () => {
     if (progress === void 0) return null;

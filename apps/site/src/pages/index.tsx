@@ -67,9 +67,41 @@ function XCliHero() {
           </div>
         )}
 
-        {/* NPM Install button */}
+        {/* Installation Options */}
         <div className={styles.installSection}>
-          <ChipBtn variant="solid" label="npm install -g @xagent/x-cli@latest" showCopyIcon={true} />
+          {/* Npx chip design */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '1rem'
+          }}>
+            <div style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '8px',
+              padding: '1rem',
+              fontFamily: 'monospace',
+              color: 'white',
+              textAlign: 'center',
+              maxWidth: '400px'
+            }}>
+              <div style={{ marginBottom: '0.5rem', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                🚀 One-Command Start
+              </div>
+              <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', opacity: 0.9 }}>
+                npx -y @xagent/x-cli@latest
+              </div>
+              <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                Always latest version • Zero setup
+              </div>
+            </div>
+          </div>
+
+          {/* Alternative: Global install */}
+          <div style={{ textAlign: 'center', marginBottom: '0.5rem', fontSize: '0.9rem', opacity: 0.7 }}>
+            Or install globally:
+          </div>
+          <ChipBtn variant="outline" label="npm install -g @xagent/x-cli@latest" showCopyIcon={true} />
         </div>
 
         {/* Hero card (moved up from bottom) */}
