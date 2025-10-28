@@ -419,6 +419,140 @@ This means you can have different models for different projects while maintainin
 }
 ```
 
+## 📚 .agent Documentation System
+
+### 🎯 **Best Feature of X CLI - AI Context Optimization**
+
+The **`.agent` folder** is the most powerful feature of X CLI, enabling **self-documenting AI workflows** that automatically provide context to AI agents. This revolutionary approach ensures every AI interaction is informed by comprehensive project documentation, making conversations with Grok significantly more productive and accurate.
+
+### 🏗️ **How It Works**
+
+When you run `npx -y @xagent/x-cli@latest`, the CLI automatically detects and reads `.agent/` documentation:
+
+1. **Auto-Discovery**: Scans for `.agent/` folder in current directory
+2. **Smart Loading**: Reads key documentation files into chat context
+3. **Context Enhancement**: Provides comprehensive project understanding to AI
+
+### 📂 **Key Components**
+
+#### **`sop/` - Standard Operating Procedures**
+
+- **`git-workflow.md`** - Git workflow standards and smart push guidelines
+- **`release-management.md`** - Automated release processes and version management
+- **`automation-protection.md`** - Safeguards for automated NPM publishing
+- **`npm-publishing-troubleshooting.md`** - NPM publication issue resolution
+- **`documentation-workflow.md`** - Documentation maintenance procedures
+
+#### **`system/` - System Architecture & State**
+
+- **`architecture.md`** - Complete system design and technology stack
+- **`critical-state.md`** - Current system capabilities and status
+- **`api-schema.md`** - API integration specifications
+- **`installation.md`** - Setup and deployment procedures
+- **`auto-read-system.md`** - Documentation of this auto-loading feature!
+
+### 🔄 **Auto-Read System Benefits**
+
+#### **Immediate Context**
+
+- **Zero Setup Required**: Just having `.agent/` folder provides instant AI context
+- **Comprehensive Understanding**: AI gets complete project overview on startup
+- **Standardized Knowledge**: Consistent documentation format across projects
+
+#### **Self-Documenting Workflows**
+
+- **Living Documentation**: Docs evolve with project development
+- **AI-Assisted Maintenance**: AI can help update documentation
+- **Version-Controlled**: All docs tracked in git with project history
+
+#### **Quality Assurance**
+
+- **Error Prevention**: SOPs guide AI to follow established patterns
+- **Consistency Enforcement**: Standardized approaches across team
+- **Knowledge Preservation**: Critical procedures documented and accessible
+
+### 🪝 **Husky Commit Hook Integration**
+
+**Best Practice**: Set up automatic documentation syncing with git hooks.
+
+#### **Why Husky Integration?**
+
+The `.agent` folder is intentionally **gitignored** (contains sensitive project-specific docs), but you want docs to sync to public repositories or team wikis. Husky commit hooks automate this process:
+
+1. **Pre-commit Validation**: Ensure docs are up-to-date before commits
+2. **Auto-Sync**: Push docs to Docusaurus, GitHub Wiki, or team documentation sites
+3. **Quality Gates**: Prevent commits if critical docs are missing
+
+#### **Setup Instructions**
+
+1. **Initialize `.agent` system**:
+
+```bash
+xcli
+/init-agent
+```
+
+2. **Install Husky**:
+
+```bash
+npm install --save-dev husky
+npx husky install
+```
+
+3. **Add documentation sync hook**:
+
+```bash
+npx husky add .husky/pre-commit "npm run sync-docs"
+```
+
+4. **Configure sync script** (add to `package.json`):
+
+```json
+{
+  "scripts": {
+    "sync-docs": "xcli /update-agent-docs --sync-to-docusaurus"
+  }
+}
+```
+
+#### **Benefits of Husky Integration**
+
+- **Automatic Updates**: Docs sync on every commit
+- **Team Consistency**: Everyone's local docs stay current
+- **Quality Assurance**: Pre-commit checks ensure documentation completeness
+- **Zero Manual Work**: Documentation maintenance becomes automatic
+
+### 🎖️ **Why This is Revolutionary**
+
+1. **Context-First AI**: Unlike other CLIs that start conversations from scratch, X CLI begins with complete project context
+
+2. **Self-Improving System**: As you document procedures, AI gets better at following them
+
+3. **Knowledge Preservation**: Critical procedures are documented where they're actually used
+
+4. **Team Synchronization**: Everyone works with the same documented standards
+
+5. **Future-Proof**: AI can help maintain and evolve documentation
+
+### 🚀 **Getting Started**
+
+1. **Initialize your project**:
+
+```bash
+xcli
+/init-agent
+```
+
+2. **Customize documentation** in `.agent/` folder
+
+3. **Set up Husky hooks** for automatic syncing
+
+4. **Enjoy context-aware AI** that understands your project's standards and procedures!
+
+**This feature transforms AI CLI interactions from generic conversations to informed, context-aware development sessions.**
+
+---
+
 ## Usage
 
 ### Interactive Mode
