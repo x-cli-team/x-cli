@@ -55,8 +55,6 @@ title: Current System State
 - **Context awareness surface** (Ctrl+I tooltip, dynamic workspace intelligence)
 - **Keyboard shortcuts** (Global shortcuts for enhanced workflow efficiency)
 - **Memory pressure monitoring** (Real-time system state visualization)
-- **Smart auto-read system** (Automatic documentation loading with verbosity feedback)
-- **Output customization** (Verbosity levels: quiet/normal/verbose, Explain levels: off/brief/detailed)
 - Smart auto-update system with configurable triggers
 - No cloud storage integration
 - No built-in authentication system
