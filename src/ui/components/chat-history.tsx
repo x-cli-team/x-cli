@@ -271,7 +271,7 @@ const MemoizedChatEntry = React.memo(
                 ) : shouldShowDiff && shouldShowFullContent ? (
                   // For diff results, show only the summary line, not the raw content
                   <Text color="gray">⎿ {entry.content.split("\n")[0]}</Text>
-                ) : verbosityLevel === 'quiet' ? (
+                ) : !shouldShowFullContent ? (
                   <Text color="gray">⎿ Completed</Text>
                 ) : (
                   <Text color="gray">⎿ {formatToolContent(entry.content, toolName)}</Text>
