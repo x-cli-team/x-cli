@@ -135,93 +135,119 @@ function ChatInterfaceWithAgent({
       const initialMessages: ChatEntry[] = [];
       let docsRead = 0;
 
+      // Load configuration if available
+      let config: any = null;
+      const configPath = path.join('.agent', 'auto-read-config.json');
+      if (fs.existsSync(configPath)) {
+        try {
+          const configContent = fs.readFileSync(configPath, 'utf8');
+          config = JSON.parse(configContent);
+        } catch (_error) {
+          // Silently ignore config parsing errors, fall back to defaults
+        }
+      }
+
+      // Use config or fall back to hardcoded defaults
+      const isEnabled = config?.enabled !== false;
+      const showLoadingMessage = config?.showLoadingMessage !== false;
+      const showSummaryMessage = config?.showSummaryMessage !== false;
+
+      if (!isEnabled) {
+        // Auto-read is disabled
+        return;
+      }
+
       // Add loading message
-      initialMessages.push({
-        type: 'assistant',
-        content: '📚 Reading core documentation into memory...',
-        timestamp: new Date(),
-      });
-
-      // Read system/architecture.md
-      const archPath = path.join('.agent', 'system', 'architecture.md');
-      if (fs.existsSync(archPath)) {
-        try {
-          const archContent = fs.readFileSync(archPath, 'utf8');
-          initialMessages.push({
-            type: 'assistant',
-            content: `📋 **System Architecture (from .agent/system/architecture.md)**\n\n${archContent}`,
-            timestamp: new Date(),
-          });
-          docsRead++;
-        } catch (_error) {
-          // Silently ignore read errors
-        }
+      if (showLoadingMessage) {
+        initialMessages.push({
+          type: 'assistant',
+          content: '📚 Reading core documentation into memory...',
+          timestamp: new Date(),
+        });
       }
 
-      // Read sop/git-workflow.md
-      const workflowPath = path.join('.agent', 'sop', 'git-workflow.md');
-      if (fs.existsSync(workflowPath)) {
-        try {
-          const workflowContent = fs.readFileSync(workflowPath, 'utf8');
-          initialMessages.push({
-            type: 'assistant',
-            content: `🔧 **Git Workflow SOP (from .agent/sop/git-workflow.md)**\n\n${workflowContent}`,
-            timestamp: new Date(),
-          });
-          docsRead++;
-        } catch (_error) {
-          // Silently ignore read errors
+      // Process folders in priority order
+      const folders = config?.folders || [
+        {
+          name: 'system',
+          priority: 1,
+          files: [
+            { name: 'architecture.md', title: 'System Architecture', icon: '📋', required: true },
+            { name: 'critical-state.md', title: 'Critical State', icon: '🏗️', required: false },
+            { name: 'installation.md', title: 'Installation', icon: '🏗️', required: false },
+            { name: 'api-schema.md', title: 'API Schema', icon: '🏗️', required: false },
+            { name: 'auto-read-system.md', title: 'Auto-Read System', icon: '🏗️', required: false }
+          ]
+        },
+        {
+          name: 'sop',
+          priority: 2,
+          files: [
+            { name: 'git-workflow.md', title: 'Git Workflow SOP', icon: '🔧', required: true },
+            { name: 'release-management.md', title: 'Release Management SOP', icon: '📖', required: false },
+            { name: 'automation-protection.md', title: 'Automation Protection SOP', icon: '📖', required: false },
+            { name: 'npm-publishing-troubleshooting.md', title: 'NPM Publishing Troubleshooting', icon: '📖', required: false }
+          ]
         }
+      ];
+
+      // Add custom folders if configured
+      if (config?.customFolders) {
+        folders.push(...config.customFolders);
       }
 
-      // Add other key SOP files if they exist
-      const sopDir = path.join('.agent', 'sop');
-      if (fs.existsSync(sopDir)) {
-        const sopFiles = ['release-management.md', 'automation-protection.md'];
-        for (const file of sopFiles) {
-          const filePath = path.join(sopDir, file);
-          if (fs.existsSync(filePath)) {
-            try {
-              const content = fs.readFileSync(filePath, 'utf8');
-              const title = file.replace('.md', '').replace('-', ' ').toUpperCase();
-              initialMessages.push({
-                type: 'assistant',
-                content: `📖 **${title} SOP (from .agent/sop/${file})**\n\n${content}`,
-                timestamp: new Date(),
-              });
-              docsRead++;
-            } catch (_error) {
-              // Silently ignore
-            }
+      // Sort folders by priority
+      folders.sort((a: any, b: any) => (a.priority || 999) - (b.priority || 999));
+
+      // Process each folder
+      for (const folder of folders) {
+        const folderPath = path.join('.agent', folder.name);
+
+        if (!fs.existsSync(folderPath)) {
+          continue;
+        }
+
+        for (const file of folder.files) {
+          let filePaths: string[] = [];
+
+          if (file.pattern) {
+            // Handle glob patterns (future enhancement)
+            // For now, skip pattern files
+            continue;
+          } else {
+            filePaths = [file.name];
           }
-        }
-      }
 
-      // Add system files
-      const systemDir = path.join('.agent', 'system');
-      if (fs.existsSync(systemDir)) {
-        const systemFiles = ['critical-state.md', 'installation.md', 'api-schema.md', 'auto-read-system.md'];
-        for (const file of systemFiles) {
-          const filePath = path.join(systemDir, file);
-          if (fs.existsSync(filePath)) {
+          for (const fileName of filePaths) {
+            const filePath = path.join(folderPath, fileName);
+
+            if (!fs.existsSync(filePath)) {
+              if (file.required) {
+                // Log missing required files (optional enhancement)
+              }
+              continue;
+            }
+
             try {
               const content = fs.readFileSync(filePath, 'utf8');
-              const title = file.replace('.md', '').replace('-', ' ').toUpperCase();
+              const displayTitle = file.title || fileName.replace('.md', '').replace('-', ' ').toUpperCase();
+              const icon = file.icon || '📄';
+
               initialMessages.push({
                 type: 'assistant',
-                content: `🏗️ **${title} (from .agent/system/${file})**\n\n${content}`,
+                content: `${icon} **${displayTitle} (from .agent/${folder.name}/${fileName})**\n\n${content}`,
                 timestamp: new Date(),
               });
               docsRead++;
             } catch (_error) {
-              // Silently ignore
+              // Silently ignore read errors
             }
           }
         }
       }
 
       // Add summary message
-      if (docsRead > 0) {
+      if (showSummaryMessage && docsRead > 0) {
         initialMessages.push({
           type: 'assistant',
           content: `✅ ${docsRead} documentation files read - I have a complete understanding of the current architecture and operational procedures.`,
