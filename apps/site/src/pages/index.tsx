@@ -53,7 +53,21 @@ function XCliHero() {
             <span className={styles.hamburgerLine}></span>
           </button>
         </div>
-        
+
+        {/* Installation Options - Moved Up */}
+        <div className={styles.installSection}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '1rem',
+            alignItems: 'center',
+            marginBottom: '1.5rem'
+          }}>
+            <ChipBtn variant="outline" label="npx -y @xagent/x-cli@latest" showCopyIcon={true} />
+            <ChipBtn variant="outline" label="npm install -g @xagent/x-cli@latest" showCopyIcon={true} />
+          </div>
+        </div>
+
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div className={styles.mobileMenuOverlay} onClick={() => setMobileMenuOpen(false)}>
@@ -66,20 +80,6 @@ function XCliHero() {
             </div>
           </div>
         )}
-
-        {/* Installation Options */}
-        <div className={styles.installSection}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '1rem',
-            alignItems: 'center',
-            marginBottom: '0.5rem'
-          }}>
-            <ChipBtn variant="outline" label="npx -y @xagent/x-cli@latest" showCopyIcon={true} />
-            <ChipBtn variant="outline" label="npm install -g @xagent/x-cli@latest" showCopyIcon={true} />
-          </div>
-        </div>
 
         {/* Hero card (moved up from bottom) */}
         <div className={styles.heroCardContainer}>

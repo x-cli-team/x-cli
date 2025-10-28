@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsup",
     "build:tsc": "tsc",
-    "dev": "npm run build && node dist/index.js",
+    "dev": "npm run build && node dist/index.js --prompt 'Development test: Hello X-CLI!'",
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     "start": "node dist/index.js",

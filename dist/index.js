@@ -14655,7 +14655,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.59",
+  version: "1.1.61",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -14679,7 +14679,7 @@ var package_default = {
   scripts: {
     build: "tsup",
     "build:tsc": "tsc",
-    dev: "npm run build && node dist/index.js",
+    dev: "npm run build && node dist/index.js --prompt 'Development test: Hello X-CLI!'",
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     start: "node dist/index.js",
@@ -16924,7 +16924,7 @@ function useStreaming(agent, initialMessage, setChatHistory, streamingState) {
         content: initialMessage,
         timestamp: /* @__PURE__ */ new Date()
       };
-      setChatHistory([userEntry]);
+      setChatHistory(() => [userEntry]);
       const processInitialMessage = async () => {
         setIsProcessing(true);
         setIsStreaming(true);
@@ -17508,7 +17508,7 @@ var truncateContent = (content, maxLength = 100) => {
   if (process.env.COMPACT !== "1") return content;
   return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
 };
-function UserMessageEntry({ entry, verbosityLevel }) {
+function UserMessageEntry({ entry, verbosityLevel: _verbosityLevel }) {
   const displayText = entry.isPasteSummary ? entry.displayContent || entry.content : entry.content;
   const textColor = entry.isPasteSummary ? "cyan" : "gray";
   return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsx(Box, { children: /* @__PURE__ */ jsxs(Text, { color: textColor, children: [
@@ -17543,7 +17543,7 @@ var handleLongContent = (content, maxLength = 5e3) => {
     isTruncated: true
   };
 };
-function AssistantMessageEntry({ entry, verbosityLevel }) {
+function AssistantMessageEntry({ entry, verbosityLevel: _verbosityLevel }) {
   const { content: processedContent, isTruncated } = handleLongContent(entry.content);
   return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
     /* @__PURE__ */ jsx(Text, { color: "white", children: "\u23FA " }),
@@ -17771,7 +17771,7 @@ var truncateContent2 = (content, maxLength = 100) => {
   return content.length > maxLength ? content.substring(0, maxLength) + "..." : content;
 };
 function ToolCallEntry({ entry, verbosityLevel, explainLevel }) {
-  const getExplanation = (toolName2, filePath2, isExecuting2) => {
+  const getExplanation = (toolName2, filePath2, _isExecuting) => {
     if (explainLevel === "off") return null;
     const explanations = {
       view_file: {
@@ -17934,7 +17934,6 @@ function ChatHistory({
     MemoizedChatEntry,
     {
       entry,
-      index,
       verbosityLevel,
       explainLevel
     },
@@ -18744,7 +18743,7 @@ function ChatInterfaceRenderer({
           progress: void 0
         }
       ),
-      planMode.isActive && /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(
+      planMode.isActive && planMode.currentPhase && planMode.progress !== void 0 && planMode.sessionDuration !== void 0 && /* @__PURE__ */ jsx(Box, { marginBottom: 1, children: /* @__PURE__ */ jsx(
         PlanModeIndicator,
         {
           isActive: planMode.isActive,
@@ -18781,17 +18780,17 @@ function ChatInterfaceRenderer({
           "\u224B ",
           agent.getCurrentModel()
         ] }) }),
-        /* @__PURE__ */ jsx(Box, { marginRight: 2, children: /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx(Box, { marginRight: 2, children: planMode.currentPhase && planMode.progress !== void 0 ? /* @__PURE__ */ jsx(
           PlanModeStatusIndicator,
           {
             isActive: planMode.isActive,
             phase: planMode.currentPhase,
             progress: planMode.progress
           }
-        ) }),
+        ) : /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Plan Mode: Off" }) }),
         /* @__PURE__ */ jsx(MCPStatus, {})
       ] }),
-      contextInfo.tokenUsage && /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(
+      contextInfo.tokenUsage && contextInfo.loadedFiles && /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(
         ContextIndicator,
         {
           state: {
@@ -18799,7 +18798,8 @@ function ChatInterfaceRenderer({
             memoryPressure: contextInfo.memoryPressure,
             loadedFiles: contextInfo.loadedFiles,
             messagesCount: contextInfo.messagesCount,
-            contextHealth: contextInfo.contextHealth,
+            contextHealth: "optimal",
+            // TODO: implement context health check
             fileCount: contextInfo.loadedFiles.length
           },
           compact: true
