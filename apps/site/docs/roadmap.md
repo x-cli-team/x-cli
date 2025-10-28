@@ -7,9 +7,9 @@ sidebar_position: 1
 
 This roadmap is automatically generated from our internal task tracking system.
 
-## Sprint: Implement Interactive Chat Interface with Research-Confirm-Proceed Flow
-
 ## Sprint: Implement Verbosity and Explanation Features
+
+## Sprint: Component Refactoring for Maintainability
 
 ## Sprint: Paste Text Summary Enhancement
 
@@ -36,6 +36,8 @@ Implement a fully automated testimonial collection system with bot-managed PR wo
 ## Sprint: Fix Faulty Tools
 
 ## Sprint: Automate Version Sync and Git Hooks
+
+## Sprint: Implement Interactive Chat Interface with Research-Confirm-Proceed Flow
 
 ## Sprint: UX Refinement - Claude Code Feel
 

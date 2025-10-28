@@ -158,6 +158,7 @@ function ChatInterfaceWithAgent({
       const isEnabled = config?.enabled !== false;
       const showLoadingMessage = config?.showLoadingMessage !== false;
       const showSummaryMessage = config?.showSummaryMessage !== false;
+      const showFileContents = config?.showFileContents === true;
 
       if (!isEnabled) {
         // Auto-read is disabled
@@ -240,11 +241,13 @@ function ChatInterfaceWithAgent({
               const displayTitle = file.title || fileName.replace('.md', '').replace('-', ' ').toUpperCase();
               const icon = file.icon || '📄';
 
-              initialMessages.push({
-                type: 'assistant',
-                content: `${icon} **${displayTitle} (from .agent/${folder.name}/${fileName})**\n\n${content}`,
-                timestamp: new Date(),
-              });
+              if (showFileContents) {
+                initialMessages.push({
+                  type: 'assistant',
+                  content: `${icon} **${displayTitle} (from .agent/${folder.name}/${fileName})**\n\n${content}`,
+                  timestamp: new Date(),
+                });
+              }
               docsRead++;
             } catch (_error) {
               // Silently ignore read errors
