@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@xagent/x-cli",
-  "version": "1.1.57",
+  "version": "1.1.58",
   "description": "An open-source AI agent that brings the power of Grok directly into your terminal.",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -16,10 +16,11 @@
     "xcli": "dist/index.js"
   },
   "files": [
-    "dist",
-    ".xcli",
+    "dist/**/*",
+    ".xcli/**/*",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "docs/assets/logos/**/*"
   ],
   "scripts": {
     "build": "tsup",
@@ -119,13 +120,6 @@
   },
   "homepage": "https://grokcli.dev",
   "icon": "docs/assets/logos/x-cli-logo.svg",
-  "files": [
-    "dist/**/*",
-    ".xcli/**/*",
-    "README.md",
-    "LICENSE",
-    "docs/assets/logos/**/*"
-  ],
   "publishConfig": {
     "access": "public"
   },
