@@ -1,6 +1,7 @@
 #!/bin/bash
 # Smart push script with comprehensive checks and GitHub status monitoring
 # Test comment for PR creation
+# Third test comment to trigger PR
 
 set -e  # Exit on any error
 
