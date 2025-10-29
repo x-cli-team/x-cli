@@ -29,6 +29,7 @@ permissions:
   contents: write
   packages: write
   id-token: write
+  pull-requests: write
 
 jobs:
   release:
@@ -47,11 +48,15 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
-      # Prevent loops if last commit was an automated bump
-      - name: Skip if previous commit was auto-bump
+      # Prevent loops if last commit was an automated bump or merge from release PR
+      - name: Skip if previous commit was auto-bump or merge
         run: |
           if git log -1 --pretty=%B | grep -qiE "^Bump version to "; then
             echo "Auto-bump detected; skipping."
+            exit 78
+          fi
+          if git log -1 --pretty=%B | grep -qi "Merge pull request"; then
+            echo "Merge commit from release PR detected; skipping."
             exit 78
           fi
 
@@ -71,12 +76,31 @@ jobs:
           git add package.json package-lock.json README.md || true
           git commit -m "Bump version to ${NEW_VER#v}"
 
-      - name: Create tag and push
+      - name: Create release branch and PR
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
+          RELEASE_BRANCH="release/v${NEW_VER}"
           echo "NEW_VER=${NEW_VER}" >> $GITHUB_ENV
+          echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
+
+          git checkout -b $RELEASE_BRANCH
+          git push origin $RELEASE_BRANCH
+
+          # Create PR
+          gh pr create --title "Release v${NEW_VER}" --body "Automated release bump to v${NEW_VER}" --base main --head $RELEASE_BRANCH --label "automated"
+
+          # Approve PR
+          PR_NUMBER=$(gh pr list --head $RELEASE_BRANCH --json number --jq '.[0].number')
+          gh pr review $PR_NUMBER --approve
+
+          # Merge PR
+          gh pr merge $PR_NUMBER --merge --delete-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Create tag and push
+        run: |
           git tag "v${NEW_VER}"
-          git push origin HEAD:main
           git push origin "v${NEW_VER}"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
