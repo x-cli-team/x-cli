@@ -265,8 +265,8 @@ Respond with ONLY the commit message, no additional text.`;
       console.log(`❌ git commit: ${commitResult.error || "Commit failed"}`);
       process.exit(1);
     }
-  } catch (error: any) {
-    console.error("❌ Error during commit and push:", error.message);
+  } catch (error: unknown) {
+    console.error("❌ Error during commit and push:", error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
@@ -338,12 +338,12 @@ async function processPromptHeadless(
     for (const message of messages) {
       console.log(JSON.stringify(message));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Output error in OpenAI compatible format
     console.log(
       JSON.stringify({
         role: "assistant",
-        content: `Error: ${error.message}`,
+        content: `Error: ${error instanceof Error ? error.message : String(error)}`,
       })
     );
     process.exit(1);
@@ -375,6 +375,10 @@ program
     "--max-tool-rounds <rounds>",
     "maximum number of tool execution rounds (default: 400)",
     "400"
+  )
+  .option(
+    "-q, --quiet",
+    "suppress startup banner and messages"
   )
   .action(async (message, options) => {
     if (options.directory) {
@@ -427,7 +431,9 @@ program
       }
 
       const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
-      console.log("🤖 Starting X CLI Conversational Assistant...\n");
+      if (!options.quiet) {
+        console.log("🤖 Starting X CLI Conversational Assistant...\n");
+      }
 
       ensureUserSettingsDirectory();
 
@@ -442,7 +448,7 @@ program
         ? message.join(" ")
         : message;
 
-      const app = render(React.createElement(ChatInterface, { agent, initialMessage }));
+      const app = render(React.createElement(ChatInterface, { agent, initialMessage, quiet: options.quiet }));
 
       // Cleanup on exit
       const cleanup = () => {

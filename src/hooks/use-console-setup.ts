@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import pkg from '../../package.json' with { type: 'json' };
 
-export function useConsoleSetup(): void {
+export function useConsoleSetup(quiet = false): void {
   useEffect(() => {
+    if (quiet) return;
+
     // Only clear console on non-Windows platforms or if not PowerShell
     // Windows PowerShell can have issues with console.clear() causing flickering
     const isWindows = process.platform === "win32";
@@ -14,22 +15,7 @@ export function useConsoleSetup(): void {
       console.clear();
     }
 
-    // Add top padding
-    console.log("    ");
-    console.log(" ");
+    // Banner removed - no longer printing X-CLI logo/version
 
-    // Generate welcome text with margin to match Ink paddingX={2}
-    const logoOutput = "X-CLI" + "\n" + pkg.version;
-
-    const logoLines = logoOutput.split("\n");
-    logoLines.forEach((line: string) => {
-      if (line.trim()) {
-        console.log(" " + line); // Add 2 spaces for horizontal margin
-      } else {
-        console.log(line); // Keep empty lines as-is
-      }
-    });
-
-    console.log(" "); // Spacing after logo
-  }, []);
+  }, [quiet]);
 }

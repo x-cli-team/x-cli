@@ -14655,7 +14655,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.63",
+  version: "1.1.64",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -17097,26 +17097,15 @@ function useConfirmations(confirmationService, state) {
     handleRejection
   };
 }
-function useConsoleSetup() {
+function useConsoleSetup(quiet = false) {
   useEffect(() => {
+    if (quiet) return;
     const isWindows = process.platform === "win32";
     const isPowerShell = process.env.ComSpec?.toLowerCase().includes("powershell") || process.env.PSModulePath !== void 0;
     if (!isWindows || !isPowerShell) {
       console.clear();
     }
-    console.log("    ");
-    console.log(" ");
-    const logoOutput = "X-CLI\n" + package_default.version;
-    const logoLines = logoOutput.split("\n");
-    logoLines.forEach((line) => {
-      if (line.trim()) {
-        console.log(" " + line);
-      } else {
-        console.log(line);
-      }
-    });
-    console.log(" ");
-  }, []);
+  }, [quiet]);
 }
 function useSessionLogging(chatHistory) {
   const lastChatHistoryLength = useRef(0);
@@ -18828,7 +18817,8 @@ function ChatInterfaceRenderer({
 }
 function ChatInterfaceWithAgent({
   agent,
-  initialMessage
+  initialMessage,
+  quiet = false
 }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -18838,7 +18828,7 @@ function ChatInterfaceWithAgent({
   const [confirmationOptions, setConfirmationOptions] = useState(null);
   const [showContextTooltip, setShowContextTooltip] = useState(false);
   const processingStartTime = useRef(0);
-  useConsoleSetup();
+  useConsoleSetup(quiet);
   useAutoRead(setChatHistory);
   useEffect(() => {
     setChatHistory([]);
@@ -18931,7 +18921,8 @@ function ChatInterfaceWithAgent({
 }
 function ChatInterface({
   agent,
-  initialMessage
+  initialMessage,
+  quiet = false
 }) {
   const [currentAgent, setCurrentAgent] = useState(
     agent || null
@@ -18946,7 +18937,8 @@ function ChatInterface({
     ChatInterfaceWithAgent,
     {
       agent: currentAgent,
-      initialMessage
+      initialMessage,
+      quiet
     }
   );
 }
@@ -19313,7 +19305,7 @@ Respond with ONLY the commit message, no additional text.`;
       process.exit(1);
     }
   } catch (error) {
-    console.error("\u274C Error during commit and push:", error.message);
+    console.error("\u274C Error during commit and push:", error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
@@ -19367,7 +19359,7 @@ async function processPromptHeadless(prompt, apiKey, baseURL, model, maxToolRoun
     console.log(
       JSON.stringify({
         role: "assistant",
-        content: `Error: ${error.message}`
+        content: `Error: ${error instanceof Error ? error.message : String(error)}`
       })
     );
     process.exit(1);
@@ -19388,6 +19380,9 @@ program.name("grok").description(
   "--max-tool-rounds <rounds>",
   "maximum number of tool execution rounds (default: 400)",
   "400"
+).option(
+  "-q, --quiet",
+  "suppress startup banner and messages"
 ).action(async (message, options) => {
   if (options.directory) {
     try {
@@ -19429,12 +19424,14 @@ program.name("grok").description(
       process.exit(1);
     }
     const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
-    console.log("\u{1F916} Starting X CLI Conversational Assistant...\n");
+    if (!options.quiet) {
+      console.log("\u{1F916} Starting X CLI Conversational Assistant...\n");
+    }
     ensureUserSettingsDirectory();
     checkAutoCompact();
     checkStartupUpdates();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
-    const app = render(React4.createElement(ChatInterface, { agent, initialMessage }));
+    const app = render(React4.createElement(ChatInterface, { agent, initialMessage, quiet: options.quiet }));
     const cleanup = () => {
       app.unmount();
       agent.abortCurrentOperation();

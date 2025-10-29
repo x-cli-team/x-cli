@@ -18,15 +18,18 @@ import { ChatInterfaceRenderer, ContextInfo, PlanMode } from "../../ui/component
 interface ChatInterfaceProps {
   agent?: GrokAgent;
   initialMessage?: string;
+  quiet?: boolean;
 }
 
 // Main chat component that handles input when agent is available
 function ChatInterfaceWithAgent({
   agent,
   initialMessage,
+  quiet = false,
 }: {
   agent: GrokAgent;
   initialMessage?: string;
+  quiet?: boolean;
 }) {
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,7 +43,7 @@ function ChatInterfaceWithAgent({
   const processingStartTime = useRef<number>(0);
 
   // Setup console display and logo
-  useConsoleSetup();
+  useConsoleSetup(quiet);
 
   // Auto-read .agent folder on first run
   useAutoRead(setChatHistory);
@@ -160,6 +163,7 @@ function ChatInterfaceWithAgent({
 export default function ChatInterface({
   agent,
   initialMessage,
+  quiet = false,
 }: ChatInterfaceProps) {
   const [currentAgent, setCurrentAgent] = useState<GrokAgent | null>(
     agent || null
@@ -177,6 +181,7 @@ export default function ChatInterface({
     <ChatInterfaceWithAgent
       agent={currentAgent}
       initialMessage={initialMessage}
+      quiet={quiet}
     />
   );
 }
