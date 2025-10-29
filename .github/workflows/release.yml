@@ -89,11 +89,8 @@ jobs:
           # Create PR
           gh pr create --title "Release v${NEW_VER}" --body "Automated release bump to v${NEW_VER}" --base main --head $RELEASE_BRANCH
 
-          # Approve PR
+          # Get PR number and merge (bypass allows merging without approval)
           PR_NUMBER=$(gh pr list --head $RELEASE_BRANCH --json number --jq '.[0].number')
-          gh pr review $PR_NUMBER --approve
-
-          # Merge PR
           gh pr merge $PR_NUMBER --merge --delete-branch
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
