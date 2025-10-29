@@ -96,7 +96,7 @@ jobs:
           # Merge PR
           gh pr merge $PR_NUMBER --merge --delete-branch
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Create tag and push
         run: |
