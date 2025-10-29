@@ -7,6 +7,18 @@ sidebar_position: 1
 
 This roadmap is automatically generated from our internal task tracking system.
 
+## Sprint Stage 5: Auto-Doc & Polish
+
+## Sprint Stage 4: Adaptive Recovery
+
+## Sprint Stage 3: Execute Stage Integration
+
+## Sprint Stage 2: Research → Recommend Flow
+
+## Sprint Stage 1: Context Loading Foundation
+
+## Sprint: One-Confirm "Research → Recommend → Execute → Auto-Doc" Workflow
+
 ## Sprint: Implement Verbosity and Explanation Features
 
 ## Sprint: Component Refactoring for Maintainability
