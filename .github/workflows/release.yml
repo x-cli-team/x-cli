@@ -87,7 +87,7 @@ jobs:
           git push origin $RELEASE_BRANCH
 
           # Create PR
-          gh pr create --title "Release v${NEW_VER}" --body "Automated release bump to v${NEW_VER}" --base main --head $RELEASE_BRANCH --label "automated"
+          gh pr create --title "Release v${NEW_VER}" --body "Automated release bump to v${NEW_VER}" --base main --head $RELEASE_BRANCH
 
           # Approve PR
           PR_NUMBER=$(gh pr list --head $RELEASE_BRANCH --json number --jq '.[0].number')
