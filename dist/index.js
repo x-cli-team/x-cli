@@ -14655,7 +14655,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.64",
+  version: "1.1.65",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -15183,6 +15183,7 @@ Self-Healing & Optimization:
 
 Git Commands:
   /commit-and-push - AI-generated commit + push to remote
+  /smart-push      - Intelligent staging, commit message generation, and push
 
 Enhanced Input Features:
   \u2191/\u2193 Arrow   - Navigate command history
@@ -16354,6 +16355,181 @@ Operations will now ${newLevel === "off" ? "show no explanations" : newLevel ===
         };
         setChatHistory((prev) => [...prev, errorEntry]);
       }
+      clearInput();
+      return true;
+    }
+    if (trimmedInput === "/smart-push") {
+      const userEntry = {
+        type: "user",
+        content: trimmedInput,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory((prev) => [...prev, userEntry]);
+      setIsProcessing(true);
+      try {
+        const statusResult = await agent.executeBashCommand("git status --porcelain");
+        if (!statusResult.success) {
+          const errorEntry = {
+            type: "assistant",
+            content: "\u274C **Git Error**\n\nUnable to check git status. Are you in a git repository?",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        if (!statusResult.output || statusResult.output.trim() === "") {
+          const noChangesEntry = {
+            type: "assistant",
+            content: "\u{1F4CB} **No Changes to Push**\n\nWorking directory is clean. No commits to push.",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, noChangesEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const addResult = await agent.executeBashCommand("git add .");
+        if (!addResult.success) {
+          const errorEntry = {
+            type: "assistant",
+            content: `\u274C **Failed to stage changes**
+
+${addResult.error || "Unknown error"}`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const addEntry = {
+          type: "tool_result",
+          content: "\u2705 Changes staged successfully",
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `git_add_${Date.now()}`,
+            type: "function",
+            function: {
+              name: "bash",
+              arguments: JSON.stringify({ command: "git add ." })
+            }
+          },
+          toolResult: addResult
+        };
+        setChatHistory((prev) => [...prev, addEntry]);
+        const diffResult = await agent.executeBashCommand("git diff --cached");
+        const commitPrompt = `Generate a concise, professional git commit message for these changes:
+
+Git Status:
+${statusResult.output}
+
+Git Diff (staged changes):
+${diffResult.output || "No staged changes shown"}
+
+Follow conventional commit format (feat:, fix:, docs:, etc.) and keep it under 72 characters.
+Respond with ONLY the commit message, no additional text.`;
+        let commitMessage = "";
+        let streamingEntry = null;
+        let accumulatedCommitContent = "";
+        let lastCommitUpdateTime = Date.now();
+        for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
+          if (chunk.type === "content" && chunk.content) {
+            accumulatedCommitContent += chunk.content;
+            const now = Date.now();
+            if (now - lastCommitUpdateTime >= 150) {
+              commitMessage += accumulatedCommitContent;
+              if (!streamingEntry) {
+                const newEntry = {
+                  type: "assistant",
+                  content: `\u{1F916} Generating commit message...
+
+${commitMessage}`,
+                  timestamp: /* @__PURE__ */ new Date(),
+                  isStreaming: true
+                };
+                setChatHistory((prev) => [...prev, newEntry]);
+                streamingEntry = newEntry;
+              } else {
+                setChatHistory(
+                  (prev) => prev.map(
+                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? {
+                      ...entry,
+                      content: `\u{1F916} Generating commit message...
+
+${commitMessage}`
+                    } : entry
+                  )
+                );
+              }
+              accumulatedCommitContent = "";
+              lastCommitUpdateTime = now;
+            }
+          } else if (chunk.type === "done") {
+            if (streamingEntry) {
+              setChatHistory(
+                (prev) => prev.map(
+                  (entry) => entry.isStreaming ? {
+                    ...entry,
+                    content: `\u2705 Generated commit message: "${commitMessage.trim()}"`,
+                    isStreaming: false
+                  } : entry
+                )
+              );
+            }
+            break;
+          }
+        }
+        const cleanCommitMessage = commitMessage.trim().replace(/^["']|["']$/g, "");
+        const commitCommand = `git commit -m "${cleanCommitMessage}"`;
+        const commitResult = await agent.executeBashCommand(commitCommand);
+        const commitEntry = {
+          type: "tool_result",
+          content: commitResult.success ? `\u2705 **Commit Created**: ${commitResult.output?.split("\n")[0] || "Commit successful"}` : `\u274C **Commit Failed**: ${commitResult.error || "Unknown error"}`,
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `git_commit_${Date.now()}`,
+            type: "function",
+            function: {
+              name: "bash",
+              arguments: JSON.stringify({ command: commitCommand })
+            }
+          },
+          toolResult: commitResult
+        };
+        setChatHistory((prev) => [...prev, commitEntry]);
+        if (commitResult.success) {
+          const pushResult = await agent.executeBashCommand("git push");
+          const pushEntry = {
+            type: "tool_result",
+            content: pushResult.success ? `\u{1F680} **Push Successful**: ${pushResult.output?.split("\n")[0] || "Changes pushed to remote"}` : `\u274C **Push Failed**: ${pushResult.error || "Unknown error"}
+
+Try running \`git push\` manually.`,
+            timestamp: /* @__PURE__ */ new Date(),
+            toolCall: {
+              id: `git_push_${Date.now()}`,
+              type: "function",
+              function: {
+                name: "bash",
+                arguments: JSON.stringify({ command: "git push" })
+              }
+            },
+            toolResult: pushResult
+          };
+          setChatHistory((prev) => [...prev, pushEntry]);
+        }
+      } catch (error) {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C **Smart Push Failed**
+
+${error instanceof Error ? error.message : String(error)}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      setIsProcessing(false);
       clearInput();
       return true;
     }
