@@ -14655,7 +14655,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.65",
+  version: "1.1.67",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -16501,23 +16501,110 @@ ${commitMessage}`
         setChatHistory((prev) => [...prev, commitEntry]);
         if (commitResult.success) {
           const pushResult = await agent.executeBashCommand("git push");
-          const pushEntry = {
-            type: "tool_result",
-            content: pushResult.success ? `\u{1F680} **Push Successful**: ${pushResult.output?.split("\n")[0] || "Changes pushed to remote"}` : `\u274C **Push Failed**: ${pushResult.error || "Unknown error"}
+          if (pushResult.success) {
+            const pushEntry = {
+              type: "tool_result",
+              content: `\u{1F680} **Push Successful**: ${pushResult.output?.split("\n")[0] || "Changes pushed to remote"}`,
+              timestamp: /* @__PURE__ */ new Date(),
+              toolCall: {
+                id: `git_push_${Date.now()}`,
+                type: "function",
+                function: {
+                  name: "bash",
+                  arguments: JSON.stringify({ command: "git push" })
+                }
+              },
+              toolResult: pushResult
+            };
+            setChatHistory((prev) => [...prev, pushEntry]);
+          } else {
+            const statusResult2 = await agent.executeBashCommand("git status");
+            if (statusResult2.output?.includes("Your branch is ahead")) {
+              const branchProtectionEntry = {
+                type: "assistant",
+                content: "\u{1F6E1}\uFE0F **Branch Protection Detected**: Direct pushes to this branch are blocked.\n\n\u{1F504} **Creating PR workflow...**",
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, branchProtectionEntry]);
+              const timestamp = Date.now();
+              const featureBranch = `feature/${(/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/[:-]/g, "").replace("T", "-")}-smart-push`;
+              const createBranchResult = await agent.executeBashCommand(`git checkout -b ${featureBranch}`);
+              if (createBranchResult.success) {
+                const pushBranchResult = await agent.executeBashCommand(`git push -u origin ${featureBranch}`);
+                if (pushBranchResult.success) {
+                  const branchSuccessEntry = {
+                    type: "tool_result",
+                    content: `\u2705 **Feature Branch Created**: \`${featureBranch}\`
+
+\u{1F4CB} **Attempting to create Pull Request...**`,
+                    timestamp: /* @__PURE__ */ new Date()
+                  };
+                  setChatHistory((prev) => [...prev, branchSuccessEntry]);
+                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base main`);
+                  if (prResult.success) {
+                    const prUrl = prResult.output?.match(/https:\/\/github\.com\/[^\s]+/)?.[0];
+                    const prSuccessEntry = {
+                      type: "tool_result",
+                      content: `\u2705 **Pull Request Created Successfully!**
+
+\u{1F517} **PR URL**: ${prUrl || "Check GitHub for the link"}
+
+\u{1F3AF} **Next Steps**:
+\u2022 Review the PR on GitHub
+\u2022 Wait for CI checks to pass
+\u2022 Request approval and merge`,
+                      timestamp: /* @__PURE__ */ new Date()
+                    };
+                    setChatHistory((prev) => [...prev, prSuccessEntry]);
+                  } else {
+                    const prManualEntry = {
+                      type: "assistant",
+                      content: `\u26A0\uFE0F **PR Creation Failed**: GitHub CLI may not be available.
+
+\u{1F4A1} **Create PR Manually**:
+\u2022 Go to GitHub repository
+\u2022 Create PR from \`${featureBranch}\` \u2192 \`main\`
+\u2022 Title: \`${cleanCommitMessage}\``,
+                      timestamp: /* @__PURE__ */ new Date()
+                    };
+                    setChatHistory((prev) => [...prev, prManualEntry]);
+                  }
+                } else {
+                  const pushFailEntry = {
+                    type: "tool_result",
+                    content: `\u274C **Failed to push feature branch**: ${pushBranchResult.error}`,
+                    timestamp: /* @__PURE__ */ new Date()
+                  };
+                  setChatHistory((prev) => [...prev, pushFailEntry]);
+                }
+              } else {
+                const branchFailEntry = {
+                  type: "tool_result",
+                  content: `\u274C **Failed to create feature branch**: ${createBranchResult.error}`,
+                  timestamp: /* @__PURE__ */ new Date()
+                };
+                setChatHistory((prev) => [...prev, branchFailEntry]);
+              }
+            } else {
+              const pushFailEntry = {
+                type: "tool_result",
+                content: `\u274C **Push Failed**: ${pushResult.error || "Unknown error"}
 
 Try running \`git push\` manually.`,
-            timestamp: /* @__PURE__ */ new Date(),
-            toolCall: {
-              id: `git_push_${Date.now()}`,
-              type: "function",
-              function: {
-                name: "bash",
-                arguments: JSON.stringify({ command: "git push" })
-              }
-            },
-            toolResult: pushResult
-          };
-          setChatHistory((prev) => [...prev, pushEntry]);
+                timestamp: /* @__PURE__ */ new Date(),
+                toolCall: {
+                  id: `git_push_${Date.now()}`,
+                  type: "function",
+                  function: {
+                    name: "bash",
+                    arguments: JSON.stringify({ command: "git push" })
+                  }
+                },
+                toolResult: pushResult
+              };
+              setChatHistory((prev) => [...prev, pushFailEntry]);
+            }
+          }
         }
       } catch (error) {
         const errorEntry = {

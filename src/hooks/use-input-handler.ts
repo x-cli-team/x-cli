@@ -1882,23 +1882,103 @@ Respond with ONLY the commit message, no additional text.`;
           // Push to remote
           const pushResult = await agent.executeBashCommand("git push");
 
-          const pushEntry: ChatEntry = {
-            type: "tool_result",
-            content: pushResult.success
-              ? `🚀 **Push Successful**: ${pushResult.output?.split('\n')[0] || "Changes pushed to remote"}`
-              : `❌ **Push Failed**: ${pushResult.error || "Unknown error"}\n\nTry running \`git push\` manually.`,
-            timestamp: new Date(),
-            toolCall: {
-              id: `git_push_${Date.now()}`,
-              type: "function",
-              function: {
-                name: "bash",
-                arguments: JSON.stringify({ command: "git push" }),
+          if (pushResult.success) {
+            const pushEntry: ChatEntry = {
+              type: "tool_result",
+              content: `🚀 **Push Successful**: ${pushResult.output?.split('\n')[0] || "Changes pushed to remote"}`,
+              timestamp: new Date(),
+              toolCall: {
+                id: `git_push_${Date.now()}`,
+                type: "function",
+                function: {
+                  name: "bash",
+                  arguments: JSON.stringify({ command: "git push" }),
+                },
               },
-            },
-            toolResult: pushResult,
-          };
-          setChatHistory((prev) => [...prev, pushEntry]);
+              toolResult: pushResult,
+            };
+            setChatHistory((prev) => [...prev, pushEntry]);
+          } else {
+            // Check if push failed due to branch protection
+            const statusResult = await agent.executeBashCommand("git status");
+            if (statusResult.output?.includes("Your branch is ahead")) {
+              const branchProtectionEntry: ChatEntry = {
+                type: "assistant",
+                content: "🛡️ **Branch Protection Detected**: Direct pushes to this branch are blocked.\n\n🔄 **Creating PR workflow...**",
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, branchProtectionEntry]);
+
+              // Create feature branch
+              const timestamp = Date.now();
+              const featureBranch = `feature/${new Date().toISOString().slice(0,19).replace(/[:-]/g, '').replace('T', '-')}-smart-push`;
+
+              const createBranchResult = await agent.executeBashCommand(`git checkout -b ${featureBranch}`);
+
+              if (createBranchResult.success) {
+                const pushBranchResult = await agent.executeBashCommand(`git push -u origin ${featureBranch}`);
+
+                if (pushBranchResult.success) {
+                  const branchSuccessEntry: ChatEntry = {
+                    type: "tool_result",
+                    content: `✅ **Feature Branch Created**: \`${featureBranch}\`\n\n📋 **Attempting to create Pull Request...**`,
+                    timestamp: new Date(),
+                  };
+                  setChatHistory((prev) => [...prev, branchSuccessEntry]);
+
+                  // Try to create PR with GitHub CLI
+                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base main`);
+
+                  if (prResult.success) {
+                    const prUrl = prResult.output?.match(/https:\/\/github\.com\/[^\s]+/)?.[0];
+                    const prSuccessEntry: ChatEntry = {
+                      type: "tool_result",
+                      content: `✅ **Pull Request Created Successfully!**\n\n🔗 **PR URL**: ${prUrl || 'Check GitHub for the link'}\n\n🎯 **Next Steps**:\n• Review the PR on GitHub\n• Wait for CI checks to pass\n• Request approval and merge`,
+                      timestamp: new Date(),
+                    };
+                    setChatHistory((prev) => [...prev, prSuccessEntry]);
+                  } else {
+                    const prManualEntry: ChatEntry = {
+                      type: "assistant",
+                      content: `⚠️ **PR Creation Failed**: GitHub CLI may not be available.\n\n💡 **Create PR Manually**:\n• Go to GitHub repository\n• Create PR from \`${featureBranch}\` → \`main\`\n• Title: \`${cleanCommitMessage}\``,
+                      timestamp: new Date(),
+                    };
+                    setChatHistory((prev) => [...prev, prManualEntry]);
+                  }
+                } else {
+                  const pushFailEntry: ChatEntry = {
+                    type: "tool_result",
+                    content: `❌ **Failed to push feature branch**: ${pushBranchResult.error}`,
+                    timestamp: new Date(),
+                  };
+                  setChatHistory((prev) => [...prev, pushFailEntry]);
+                }
+              } else {
+                const branchFailEntry: ChatEntry = {
+                  type: "tool_result",
+                  content: `❌ **Failed to create feature branch**: ${createBranchResult.error}`,
+                  timestamp: new Date(),
+                };
+                setChatHistory((prev) => [...prev, branchFailEntry]);
+              }
+            } else {
+              const pushFailEntry: ChatEntry = {
+                type: "tool_result",
+                content: `❌ **Push Failed**: ${pushResult.error || "Unknown error"}\n\nTry running \`git push\` manually.`,
+                timestamp: new Date(),
+                toolCall: {
+                  id: `git_push_${Date.now()}`,
+                  type: "function",
+                  function: {
+                    name: "bash",
+                    arguments: JSON.stringify({ command: "git push" }),
+                  },
+                },
+                toolResult: pushResult,
+              };
+              setChatHistory((prev) => [...prev, pushFailEntry]);
+            }
+          }
         }
 
       } catch (error: unknown) {

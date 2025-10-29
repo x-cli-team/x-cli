@@ -119,6 +119,53 @@ if SMART_PUSH_BYPASS=true git push origin "$BRANCH"; then
     echo "🎉 Smart push completed successfully!"
     [ "$BRANCH" = "main" ] && echo "📊 Monitor at: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
 else
-    echo "❌ Push failed"
-    exit 1
+    # Check if push failed due to branch protection
+    if git status | grep -q "Your branch is ahead"; then
+        echo "🛡️ Branch protection detected - creating PR workflow..."
+
+        # Create feature branch
+        FEATURE_BRANCH="feature/$(date +%Y%m%d-%H%M%S)-auto-pr"
+        echo "🌿 Creating feature branch: $FEATURE_BRANCH"
+        git checkout -b "$FEATURE_BRANCH"
+
+        # Push to feature branch
+        echo "📤 Pushing to feature branch..."
+        if git push -u origin "$FEATURE_BRANCH"; then
+            echo "✅ Successfully pushed to $FEATURE_BRANCH"
+
+            # Create PR if GitHub CLI is available
+            if command_exists gh; then
+                echo "📋 Creating Pull Request..."
+
+                # Get commit message for PR title
+                PR_TITLE=$(git log -1 --pretty=%s)
+                PR_BODY=$(git log -1 --pretty=%b)
+
+                # Create PR
+                if gh pr create --title "$PR_TITLE" --body "$PR_BODY" --head "$FEATURE_BRANCH" --base "$BRANCH"; then
+                    PR_URL=$(gh pr view --json url -q .url)
+                    echo "✅ Pull Request created successfully!"
+                    echo "🔗 PR URL: $PR_URL"
+                    echo ""
+                    echo "🎯 Next steps:"
+                    echo "   • Review and approve the PR on GitHub"
+                    echo "   • Wait for CI checks to pass"
+                    echo "   • Merge when ready"
+                else
+                    echo "❌ Failed to create PR automatically"
+                    echo "💡 Create PR manually: $FEATURE_BRANCH → $BRANCH"
+                fi
+            else
+                echo "⚠️  GitHub CLI not available - create PR manually:"
+                echo "   Branch: $FEATURE_BRANCH → $BRANCH"
+                echo "   Title: $(git log -1 --pretty=%s)"
+            fi
+        else
+            echo "❌ Failed to push to feature branch"
+            exit 1
+        fi
+    else
+        echo "❌ Push failed - check git status and try again"
+        exit 1
+    fi
 fi
