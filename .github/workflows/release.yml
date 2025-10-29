@@ -79,7 +79,7 @@ jobs:
       - name: Create release branch and PR
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
-          RELEASE_BRANCH="release/v${NEW_VER}"
+          RELEASE_BRANCH="release/v${NEW_VER}-$(date +%s)"
           echo "NEW_VER=${NEW_VER}" >> $GITHUB_ENV
           echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
 
