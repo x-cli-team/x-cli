@@ -24,6 +24,7 @@ name: Release
 on:
   push:
     branches: [main]
+    if: false # Temporarily disabled for smart push testing
 
 permissions:
   contents: write
