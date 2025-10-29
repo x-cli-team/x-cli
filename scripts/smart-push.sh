@@ -87,11 +87,21 @@ fi
 
 # Step 2: Pull latest changes
 echo "🔄 Pulling latest changes..."
-if git pull --rebase origin "$BRANCH"; then
+
+# Check for ongoing git operations
+if [[ -d .git/rebase-apply ]] || [[ -d .git/rebase-merge ]] || [[ -f .git/MERGE_HEAD ]]; then
+    echo "⚠️  Git operation in progress - aborting to clean state..."
+    git rebase --abort 2>/dev/null || git merge --abort 2>/dev/null || true
+fi
+
+# Try rebase first, fall back to merge if it fails
+if git pull --rebase origin "$BRANCH" 2>&1; then
     echo "✅ Successfully rebased local changes"
+elif git pull origin "$BRANCH" 2>&1; then
+    echo "⚠️  Rebase failed, fell back to merge"
 else
-    echo "❌ Rebase failed - please resolve conflicts manually"
-    echo "💡 Run: git rebase --continue (after fixing conflicts)"
+    echo "❌ Pull failed completely"
+    echo "💡 Check git status and resolve any conflicts"
     exit 1
 fi
 
@@ -101,23 +111,31 @@ PUSH_OUTPUT=$(git push origin "$BRANCH" 2>&1)
 PUSH_EXIT_CODE=$?
 
 if [ $PUSH_EXIT_CODE -eq 0 ] || echo "$PUSH_OUTPUT" | grep -q "Everything up-to-date"; then
-    echo "✅ Successfully pushed to origin/$BRANCH"
+    # Check if we actually pushed commits (not just "everything up-to-date")
+    if echo "$PUSH_OUTPUT" | grep -q "Everything up-to-date"; then
+        echo "✅ Repository is up to date - no commits to push"
+        echo ""
+        echo "🎉 Smart push completed successfully!"
+        exit 0
+    else
+        echo "✅ Successfully pushed commits to origin/$BRANCH"
 
-    # Get the commit SHA for monitoring
-    COMMIT_SHA=$(git rev-parse HEAD)
+        # Get the commit SHA for monitoring
+        COMMIT_SHA=$(git rev-parse HEAD)
 
-    # Step 4: Monitor GitHub Actions
-    if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
-        wait_for_github_actions "$COMMIT_SHA"
-        github_status=$?
+        # Step 4: Monitor GitHub Actions (only when we actually pushed commits)
+        if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+            wait_for_github_actions "$COMMIT_SHA"
+            github_status=$?
 
-        if [ $github_status -eq 1 ]; then
-            echo ""
-            echo "🔧 GitHub Actions failed. Here's how to fix and retry:"
-            echo "   1. Fix the issues shown above"
-            echo "   2. Commit your fixes: git commit -am 'fix: resolve CI failures'"
-            echo "   3. Re-run smart push: npm run smart-push"
-            exit 1
+            if [ $github_status -eq 1 ]; then
+                echo ""
+                echo "🔧 GitHub Actions failed. Here's how to fix and retry:"
+                echo "   1. Fix the issues shown above"
+                echo "   2. Commit your fixes: git commit -am 'fix: resolve CI failures'"
+                echo "   3. Re-run smart push: npm run smart-push"
+                exit 1
+            fi
         fi
     fi
 
@@ -194,3 +212,4 @@ fi
 # manual test
 # pr test 2
 # test
+# test branch protection PR creation
