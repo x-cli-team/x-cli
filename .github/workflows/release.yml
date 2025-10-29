@@ -84,7 +84,7 @@ jobs:
           git push origin HEAD:main
           git push origin "v${NEW_VER}"
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Configure npm auth
         run: |
@@ -173,3 +173,5 @@ jobs:
           echo "✅ Published @xagent/x-cli v${NEW_VER} to:"
           echo "  📦 NPM: https://www.npmjs.com/package/@xagent/x-cli"
           echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"
+
+# Test commit to verify branch protection bypass works
