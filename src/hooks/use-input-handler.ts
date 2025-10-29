@@ -1910,7 +1910,6 @@ Respond with ONLY the commit message, no additional text.`;
               setChatHistory((prev) => [...prev, branchProtectionEntry]);
 
               // Create feature branch
-              const timestamp = Date.now();
               const featureBranch = `feature/${new Date().toISOString().slice(0,19).replace(/[:-]/g, '').replace('T', '-')}-smart-push`;
 
               const createBranchResult = await agent.executeBashCommand(`git checkout -b ${featureBranch}`);
