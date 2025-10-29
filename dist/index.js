@@ -14655,7 +14655,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.61",
+  version: "1.1.63",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -18839,9 +18839,9 @@ function ChatInterfaceWithAgent({
   const [showContextTooltip, setShowContextTooltip] = useState(false);
   const processingStartTime = useRef(0);
   useConsoleSetup();
+  useAutoRead(setChatHistory);
   useEffect(() => {
     setChatHistory([]);
-    useAutoRead(setChatHistory);
   }, []);
   useSessionLogging(chatHistory);
   const { contextInfo } = useContextInfo(agent);

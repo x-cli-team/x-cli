@@ -42,10 +42,12 @@ function ChatInterfaceWithAgent({
   // Setup console display and logo
   useConsoleSetup();
 
+  // Auto-read .agent folder on first run
+  useAutoRead(setChatHistory);
+
   // Initialize chat history
   useEffect(() => {
     setChatHistory([]);
-    useAutoRead(setChatHistory);
   }, []);
 
   // Session logging
