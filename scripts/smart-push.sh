@@ -100,7 +100,7 @@ echo "📤 Pushing to origin/$BRANCH..."
 PUSH_OUTPUT=$(git push origin "$BRANCH" 2>&1)
 PUSH_EXIT_CODE=$?
 
-if [ $PUSH_EXIT_CODE -eq 0 ]; then
+if [ $PUSH_EXIT_CODE -eq 0 ] || echo "$PUSH_OUTPUT" | grep -q "Everything up-to-date"; then
     echo "✅ Successfully pushed to origin/$BRANCH"
 
     # Get the commit SHA for monitoring
