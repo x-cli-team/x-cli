@@ -1900,8 +1900,10 @@ Respond with ONLY the commit message, no additional text.`;
             setChatHistory((prev) => [...prev, pushEntry]);
           } else {
             // Check if push failed due to branch protection
-            const statusResult = await agent.executeBashCommand("git status");
-            if (statusResult.output?.includes("Your branch is ahead")) {
+            const pushError = pushResult.error || pushResult.output || "";
+            if (pushError.includes("protected branch") ||
+                pushError.includes("Changes must be made through a pull request") ||
+                pushError.includes("GH006")) {
               const branchProtectionEntry: ChatEntry = {
                 type: "assistant",
                 content: "🛡️ **Branch Protection Detected**: Direct pushes to this branch are blocked.\n\n🔄 **Creating PR workflow...**",

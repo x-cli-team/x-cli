@@ -16518,15 +16518,14 @@ ${commitMessage}`
             };
             setChatHistory((prev) => [...prev, pushEntry]);
           } else {
-            const statusResult2 = await agent.executeBashCommand("git status");
-            if (statusResult2.output?.includes("Your branch is ahead")) {
+            const pushError = pushResult.error || pushResult.output || "";
+            if (pushError.includes("protected branch") || pushError.includes("Changes must be made through a pull request") || pushError.includes("GH006")) {
               const branchProtectionEntry = {
                 type: "assistant",
                 content: "\u{1F6E1}\uFE0F **Branch Protection Detected**: Direct pushes to this branch are blocked.\n\n\u{1F504} **Creating PR workflow...**",
                 timestamp: /* @__PURE__ */ new Date()
               };
               setChatHistory((prev) => [...prev, branchProtectionEntry]);
-              const timestamp = Date.now();
               const featureBranch = `feature/${(/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/[:-]/g, "").replace("T", "-")}-smart-push`;
               const createBranchResult = await agent.executeBashCommand(`git checkout -b ${featureBranch}`);
               if (createBranchResult.success) {

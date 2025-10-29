@@ -94,17 +94,20 @@ fi
 
 # Step 3: Push to remote
 echo "📤 Pushing to origin/$BRANCH..."
-if SMART_PUSH_BYPASS=true git push origin "$BRANCH"; then
+PUSH_OUTPUT=$(git push origin "$BRANCH" 2>&1)
+PUSH_EXIT_CODE=$?
+
+if [ $PUSH_EXIT_CODE -eq 0 ]; then
     echo "✅ Successfully pushed to origin/$BRANCH"
-    
+
     # Get the commit SHA for monitoring
     COMMIT_SHA=$(git rev-parse HEAD)
-    
+
     # Step 4: Monitor GitHub Actions
     if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
         wait_for_github_actions "$COMMIT_SHA"
         github_status=$?
-        
+
         if [ $github_status -eq 1 ]; then
             echo ""
             echo "🔧 GitHub Actions failed. Here's how to fix and retry:"
@@ -114,58 +117,69 @@ if SMART_PUSH_BYPASS=true git push origin "$BRANCH"; then
             exit 1
         fi
     fi
-    
+
     echo ""
     echo "🎉 Smart push completed successfully!"
     [ "$BRANCH" = "main" ] && echo "📊 Monitor at: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
 else
     # Check if push failed due to branch protection
-    if git status | grep -q "Your branch is ahead"; then
+    if echo "$PUSH_OUTPUT" | grep -q -E "(protected branch|Changes must be made through a pull request|GH006)"; then
         echo "🛡️ Branch protection detected - creating PR workflow..."
 
-        # Create feature branch
-        FEATURE_BRANCH="feature/$(date +%Y%m%d-%H%M%S)-auto-pr"
-        echo "🌿 Creating feature branch: $FEATURE_BRANCH"
-        git checkout -b "$FEATURE_BRANCH"
+        # Check if we have commits to push
+        if git log --oneline origin/"$BRANCH"..HEAD 2>/dev/null | head -1 | grep -q .; then
+            # Create feature branch
+            FEATURE_BRANCH="feature/$(date +%Y%m%d-%H%M%S)-auto-pr"
+            echo "🌿 Creating feature branch: $FEATURE_BRANCH"
+            git checkout -b "$FEATURE_BRANCH"
 
-        # Push to feature branch
-        echo "📤 Pushing to feature branch..."
-        if git push -u origin "$FEATURE_BRANCH"; then
-            echo "✅ Successfully pushed to $FEATURE_BRANCH"
+            # Push to feature branch
+            echo "📤 Pushing to feature branch..."
+            if git push -u origin "$FEATURE_BRANCH"; then
+                echo "✅ Successfully pushed to $FEATURE_BRANCH"
 
-            # Create PR if GitHub CLI is available
-            if command_exists gh; then
-                echo "📋 Creating Pull Request..."
+                # Create PR if GitHub CLI is available
+                if command_exists gh; then
+                    echo "📋 Creating Pull Request..."
 
-                # Get commit message for PR title
-                PR_TITLE=$(git log -1 --pretty=%s)
-                PR_BODY=$(git log -1 --pretty=%b)
+                    # Get commit messages for PR
+                    PR_TITLE=$(git log -1 --pretty=%s origin/"$BRANCH"..HEAD)
+                    PR_BODY=$(git log --pretty=format:"- %s%n%b" origin/"$BRANCH"..HEAD | head -20)
 
-                # Create PR
-                if gh pr create --title "$PR_TITLE" --body "$PR_BODY" --head "$FEATURE_BRANCH" --base "$BRANCH"; then
-                    PR_URL=$(gh pr view --json url -q .url)
-                    echo "✅ Pull Request created successfully!"
-                    echo "🔗 PR URL: $PR_URL"
-                    echo ""
-                    echo "🎯 Next steps:"
-                    echo "   • Review and approve the PR on GitHub"
-                    echo "   • Wait for CI checks to pass"
-                    echo "   • Merge when ready"
+                    # Create PR
+                    if gh pr create --title "$PR_TITLE" --body "$PR_BODY" --head "$FEATURE_BRANCH" --base "$BRANCH"; then
+                        PR_URL=$(gh pr view --json url -q .url)
+                        echo "✅ Pull Request created successfully!"
+                        echo "🔗 PR URL: $PR_URL"
+                        echo ""
+                        echo "🎯 Next steps:"
+                        echo "   • Review and approve the PR on GitHub"
+                        echo "   • Wait for CI checks to pass"
+                        echo "   • Merge when ready"
+                        echo ""
+                        echo "💡 Or run: gh pr merge $FEATURE_BRANCH --merge"
+                    else
+                        echo "❌ Failed to create PR automatically"
+                        echo "💡 Create PR manually: $FEATURE_BRANCH → $BRANCH"
+                        echo "   Title: $PR_TITLE"
+                    fi
                 else
-                    echo "❌ Failed to create PR automatically"
-                    echo "💡 Create PR manually: $FEATURE_BRANCH → $BRANCH"
+                    echo "⚠️  GitHub CLI not available - create PR manually:"
+                    echo "   Branch: $FEATURE_BRANCH → $BRANCH"
+                    echo "   Title: $(git log -1 --pretty=%s origin/$BRANCH..HEAD)"
                 fi
             else
-                echo "⚠️  GitHub CLI not available - create PR manually:"
-                echo "   Branch: $FEATURE_BRANCH → $BRANCH"
-                echo "   Title: $(git log -1 --pretty=%s)"
+                echo "❌ Failed to push to feature branch"
+                exit 1
             fi
         else
-            echo "❌ Failed to push to feature branch"
-            exit 1
+            echo "ℹ️  No commits to push - repository is up to date"
         fi
     else
-        echo "❌ Push failed - check git status and try again"
+        echo "❌ Push failed:"
+        echo "$PUSH_OUTPUT"
+        echo ""
+        echo "💡 Check your git configuration and try again"
         exit 1
     fi
 fi
