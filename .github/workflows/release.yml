@@ -175,3 +175,4 @@ jobs:
           echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"
 
 # Test commit to verify branch protection bypass works
+# Final test after bypass setup
