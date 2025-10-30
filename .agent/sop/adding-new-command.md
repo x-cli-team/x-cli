@@ -9,25 +9,66 @@
 
 ### Command Types
 
-#### 1. Slash Commands
-Built-in commands starting with `/`:
+#### 1. CLI Commands (Commander.js)
+Top-level commands accessible via `grok <command>`:
+- Implementation: Create in `src/commands/` directory
+- Pattern: `createYourCommand(): Command`
+- Registration: Add to `program.addCommand()` in `src/index.ts`
+- Examples: `grok mcp`, `grok set-name <name>`, `grok toggle-confirmations`
+
+#### 2. Slash Commands
+Built-in commands starting with `/` in chat interface:
 - Implementation: Add to `handleDirectCommand` function
 - Pattern: `if (trimmedInput === "/your-command") { ... }`
 - Registration: Update `commandSuggestions` array
 
-#### 2. Direct Bash Commands  
+#### 3. Direct Bash Commands
 Immediate execution commands:
 - Pattern: Add to `directBashCommands` array
 - Execution: Automatic bash execution
 
-#### 3. Natural Language
+#### 4. Natural Language
 AI-processed commands:
 - Fallback: Processed by `processUserMessage`
 - Tool selection: Automatic based on AI analysis
 
 ### Implementation Steps
 
-#### 1. Add Slash Command
+#### 1. Add CLI Command
+```typescript
+// Create src/commands/your-command.ts
+import { Command } from 'commander';
+import { getSettingsManager } from '../utils/settings-manager.js';
+import chalk from 'chalk';
+
+export function createYourCommand(): Command {
+  const yourCommand = new Command('your-command');
+  yourCommand
+    .description('Description of your command')
+    .argument('<arg>', 'Required argument')
+    .option('-o, --option <value>', 'Optional flag')
+    .action(async (arg: string, options) => {
+      try {
+        // Implementation logic
+        const settingsManager = getSettingsManager();
+        // ... your code ...
+        console.log(chalk.green(`✅ Success: ${arg}`));
+      } catch (error: any) {
+        console.error(chalk.red(`❌ Failed: ${error.message}`));
+        process.exit(1);
+      }
+    });
+
+  return yourCommand;
+}
+
+// Add to src/index.ts
+import { createYourCommand } from "./commands/your-command.js";
+// ...
+program.addCommand(createYourCommand());
+```
+
+#### 2. Add Slash Command
 ```typescript
 // In commandSuggestions array
 { command: "/your-command", description: "Your command description" }
@@ -68,4 +109,4 @@ Create tool in `src/tools/`, then reference in command handler.
 - Dynamic command loading
 - Plugin-based command architecture
 
-*Updated: 2025-10-11*
+*Updated: 2025-01-13*

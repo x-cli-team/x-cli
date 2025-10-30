@@ -1,10 +1,14 @@
 # 📚 .agent Documentation System
 
-*Last synced: 2025-10-29*
+*Last synced: 2025-01-13*
 *Protection: Husky pre-commit hook prevents accidental folder deletion*
 
 ## Overview
 This directory contains AI agent documentation for X-CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
+
+### 🎯 Recent Features
+- **Custom Assistant Name**: Users can set a custom name for the AI assistant via `grok set-name <name>`, stored globally in user settings
+- **Persistent Confirmation System**: File operations and bash commands require user confirmation by default, with `grok toggle-confirmations` to enable/disable
 
 ## 🚀 New: "Research → Recommend → Execute → Auto-Doc" Workflow
 

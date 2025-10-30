@@ -61,6 +61,8 @@
 - Limited built-in documentation capabilities
 
 ## Recent Changes
+- **✅ Custom Assistant Name (2025-01-13)**: Users can set custom AI assistant names via `grok set-name <name>`
+- **✅ Persistent Confirmation System (2025-01-13)**: Code-enforced confirmations for file operations and bash commands with `grok toggle-confirmations`
 - **✅ NPM Automation Fixed (2025-10-17)**: Fully automated NPM publishing workflow operational
 - **✅ Protection System (2025-10-17)**: Comprehensive safeguards against workflow breakage
 - **✅ P1-P3 Advanced Tools (2025-10-16)**: MultiFileEditor, AdvancedSearch, FileTreeOps, CodeAwareEditor, OperationHistory
@@ -98,5 +100,5 @@
 - **✅ GitHub Actions**: Combined release workflow with proper authentication
 - **✅ Protection System**: Comprehensive safeguards and documentation
 
-Last Updated: 2025-10-18T00:00:00.000Z
-Updated By: Post-automation review
+Last Updated: 2025-01-13T00:00:00.000Z
+Updated By: Feature implementation review

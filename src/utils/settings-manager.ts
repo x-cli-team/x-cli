@@ -19,6 +19,8 @@ export interface UserSettings {
   verbosityLevel?: 'quiet' | 'normal' | 'verbose'; // Output verbosity level
   explainLevel?: 'off' | 'brief' | 'detailed'; // Explanation detail level
   interactivityLevel?: 'chat' | 'balanced' | 'repl'; // Interaction mode
+  assistantName?: string; // Custom name for the AI assistant
+  requireConfirmation?: boolean; // Require user confirmation for file operations and commands
 }
 
 /**
@@ -45,6 +47,7 @@ const DEFAULT_USER_SETTINGS: Partial<UserSettings> = {
   ],
   verbosityLevel: 'quiet',
   explainLevel: 'brief',
+  requireConfirmation: true,
 };
 
 /**

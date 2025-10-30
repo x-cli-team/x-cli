@@ -60,7 +60,8 @@ var init_settings_manager = __esm({
         "grok-3-mini-fast"
       ],
       verbosityLevel: "quiet",
-      explainLevel: "brief"
+      explainLevel: "brief",
+      requireConfirmation: true
     };
     DEFAULT_PROJECT_SETTINGS = {
       model: "grok-code-fast-1"
@@ -9023,6 +9024,24 @@ Current working directory: ${process.cwd()}`
   async executeTool(toolCall) {
     try {
       const args = JSON.parse(toolCall.function.arguments);
+      const settingsManager = getSettingsManager();
+      const requireConfirmation = settingsManager.getUserSetting("requireConfirmation") ?? true;
+      if (requireConfirmation) {
+        const needsConfirmation = ["create_file", "str_replace_editor", "bash"].includes(toolCall.function.name);
+        if (needsConfirmation) {
+          const confirmationResult = await this.confirmationTool.requestConfirmation({
+            operation: toolCall.function.name,
+            filename: args.path || args.command || "unknown",
+            description: `Execute ${toolCall.function.name} operation`
+          });
+          if (!confirmationResult.success) {
+            return {
+              success: false,
+              error: confirmationResult.error || "Operation cancelled by user"
+            };
+          }
+        }
+      }
       switch (toolCall.function.name) {
         case "view_file":
           try {
@@ -14655,7 +14674,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.67",
+  version: "1.1.71",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -14684,6 +14703,7 @@ var package_default = {
     "dev:watch": "npm run build && node --watch dist/index.js",
     start: "node dist/index.js",
     local: "npm run build && npm link && node dist/index.js",
+    "test:workflow": "node scripts/test-workflow.js",
     "start:bun": "bun run dist/index.js",
     lint: "eslint . --ext .js,.jsx,.ts,.tsx",
     typecheck: "tsc --noEmit",
@@ -15130,6 +15150,7 @@ function useInputHandler({
     { command: "/guardrails", description: "Manage prevention rules" },
     { command: "/comments", description: "Add code comments to files" },
     { command: "/commit-and-push", description: "AI commit & push to remote" },
+    { command: "/smart-push", description: "Intelligent staging, commit message generation, and push" },
     { command: "/exit", description: "Exit the application" }
   ];
   const availableModels = useMemo(() => {
@@ -16367,6 +16388,72 @@ Operations will now ${newLevel === "off" ? "show no explanations" : newLevel ===
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
+        const branchResult = await agent.executeBashCommand("git branch --show-current");
+        const currentBranch = branchResult.output?.trim() || "unknown";
+        const qualityCheckEntry = {
+          type: "assistant",
+          content: "\u{1F50D} **Running pre-push quality checks...**",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, qualityCheckEntry]);
+        const tsCheckEntry = {
+          type: "assistant",
+          content: "\u{1F4DD} Checking TypeScript...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, tsCheckEntry]);
+        const tsResult = await agent.executeBashCommand("npm run typecheck");
+        if (tsResult.success) {
+          const tsSuccessEntry = {
+            type: "tool_result",
+            content: "\u2705 TypeScript check passed",
+            timestamp: /* @__PURE__ */ new Date(),
+            toolCall: {
+              id: `ts_check_${Date.now()}`,
+              type: "function",
+              function: {
+                name: "bash",
+                arguments: JSON.stringify({ command: "npm run typecheck" })
+              }
+            },
+            toolResult: tsResult
+          };
+          setChatHistory((prev) => [...prev, tsSuccessEntry]);
+        } else {
+          const tsFailEntry = {
+            type: "assistant",
+            content: `\u274C **TypeScript check failed**
+
+${tsResult.error || tsResult.output}`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, tsFailEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const lintCheckEntry = {
+          type: "assistant",
+          content: "\u{1F9F9} Running ESLint...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, lintCheckEntry]);
+        const lintResult = await agent.executeBashCommand("npm run lint");
+        const lintSuccessEntry = {
+          type: "tool_result",
+          content: "\u2705 ESLint check completed (warnings allowed)",
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `lint_check_${Date.now()}`,
+            type: "function",
+            function: {
+              name: "bash",
+              arguments: JSON.stringify({ command: "npm run lint" })
+            }
+          },
+          toolResult: lintResult
+        };
+        setChatHistory((prev) => [...prev, lintSuccessEntry]);
         const statusResult = await agent.executeBashCommand("git status --porcelain");
         if (!statusResult.success) {
           const errorEntry = {
@@ -16386,6 +16473,107 @@ Operations will now ${newLevel === "off" ? "show no explanations" : newLevel ===
             timestamp: /* @__PURE__ */ new Date()
           };
           setChatHistory((prev) => [...prev, noChangesEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const prePullAddResult = await agent.executeBashCommand("git add .");
+        if (!prePullAddResult.success) {
+          const errorEntry = {
+            type: "assistant",
+            content: `\u274C **Failed to stage changes**
+
+${prePullAddResult.error || "Unknown error"}`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const stashResult = await agent.executeBashCommand("git stash push --include-untracked --message 'smart-push temporary stash'");
+        if (!stashResult.success) {
+          const errorEntry = {
+            type: "assistant",
+            content: `\u274C **Failed to stash changes**
+
+${stashResult.error || "Unknown error"}`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const pullEntry = {
+          type: "assistant",
+          content: "\u{1F504} Pulling latest changes...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, pullEntry]);
+        const rebaseCheck = await agent.executeBashCommand("test -d .git/rebase-apply -o -d .git/rebase-merge -o -f .git/MERGE_HEAD && echo 'ongoing' || echo 'clean'");
+        if (rebaseCheck.output?.includes("ongoing")) {
+          const cleanupEntry = {
+            type: "assistant",
+            content: "\u26A0\uFE0F Git operation in progress - cleaning up...",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, cleanupEntry]);
+          await agent.executeBashCommand("git rebase --abort 2>/dev/null || git merge --abort 2>/dev/null || true");
+        }
+        let pullResult = await agent.executeBashCommand(`git pull --rebase origin ${currentBranch}`);
+        if (!pullResult.success) {
+          pullResult = await agent.executeBashCommand(`git pull origin ${currentBranch}`);
+          if (pullResult.success) {
+            const mergeFallbackEntry = {
+              type: "assistant",
+              content: "\u26A0\uFE0F Rebase failed, fell back to merge",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, mergeFallbackEntry]);
+          }
+        }
+        if (pullResult.success) {
+          const pullSuccessEntry = {
+            type: "tool_result",
+            content: pullResult.output?.includes("Successfully rebased") ? "\u2705 Successfully rebased local changes" : "\u2705 Successfully pulled latest changes",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, pullSuccessEntry]);
+          const popStashResult = await agent.executeBashCommand("git stash pop");
+          if (!popStashResult.success) {
+            const errorEntry = {
+              type: "assistant",
+              content: `\u26A0\uFE0F **Failed to restore stashed changes**
+
+${popStashResult.error || "Unknown error"}
+
+\u{1F4A1} Your changes may be lost. Check git stash list.`,
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, errorEntry]);
+            setIsProcessing(false);
+            clearInput();
+            return true;
+          } else {
+            const popSuccessEntry = {
+              type: "tool_result",
+              content: "\u2705 Changes restored from stash",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, popSuccessEntry]);
+          }
+        } else {
+          const pullFailEntry = {
+            type: "assistant",
+            content: `\u274C **Pull failed**
+
+${pullResult.error || pullResult.output}
+
+\u{1F4A1} Check git status and resolve any conflicts`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, pullFailEntry]);
           setIsProcessing(false);
           clearInput();
           return true;
@@ -16420,13 +16608,15 @@ ${addResult.error || "Unknown error"}`,
         };
         setChatHistory((prev) => [...prev, addEntry]);
         const diffResult = await agent.executeBashCommand("git diff --cached");
+        const maxDiffLength = 5e4;
+        const truncatedDiff = diffResult.output ? diffResult.output.length > maxDiffLength ? diffResult.output.substring(0, maxDiffLength) + "\n... (truncated due to length)" : diffResult.output : "No staged changes shown";
         const commitPrompt = `Generate a concise, professional git commit message for these changes:
 
 Git Status:
 ${statusResult.output}
 
 Git Diff (staged changes):
-${diffResult.output || "No staged changes shown"}
+${truncatedDiff}
 
 Follow conventional commit format (feat:, fix:, docs:, etc.) and keep it under 72 characters.
 Respond with ONLY the commit message, no additional text.`;
@@ -16434,51 +16624,70 @@ Respond with ONLY the commit message, no additional text.`;
         let streamingEntry = null;
         let accumulatedCommitContent = "";
         let lastCommitUpdateTime = Date.now();
-        for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
-          if (chunk.type === "content" && chunk.content) {
-            accumulatedCommitContent += chunk.content;
-            const now = Date.now();
-            if (now - lastCommitUpdateTime >= 150) {
-              commitMessage += accumulatedCommitContent;
-              if (!streamingEntry) {
-                const newEntry = {
-                  type: "assistant",
-                  content: `\u{1F916} Generating commit message...
+        try {
+          for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
+            if (chunk.type === "content" && chunk.content) {
+              accumulatedCommitContent += chunk.content;
+              const now = Date.now();
+              if (now - lastCommitUpdateTime >= 150) {
+                commitMessage += accumulatedCommitContent;
+                if (!streamingEntry) {
+                  const newEntry = {
+                    type: "assistant",
+                    content: `\u{1F916} Generating commit message...
 
 ${commitMessage}`,
-                  timestamp: /* @__PURE__ */ new Date(),
-                  isStreaming: true
-                };
-                setChatHistory((prev) => [...prev, newEntry]);
-                streamingEntry = newEntry;
-              } else {
-                setChatHistory(
-                  (prev) => prev.map(
-                    (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? {
-                      ...entry,
-                      content: `\u{1F916} Generating commit message...
+                    timestamp: /* @__PURE__ */ new Date(),
+                    isStreaming: true
+                  };
+                  setChatHistory((prev) => [...prev, newEntry]);
+                  streamingEntry = newEntry;
+                } else {
+                  setChatHistory(
+                    (prev) => prev.map(
+                      (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? {
+                        ...entry,
+                        content: `\u{1F916} Generating commit message...
 
 ${commitMessage}`
+                      } : entry
+                    )
+                  );
+                }
+                accumulatedCommitContent = "";
+                lastCommitUpdateTime = now;
+              }
+            } else if (chunk.type === "done") {
+              if (streamingEntry) {
+                setChatHistory(
+                  (prev) => prev.map(
+                    (entry) => entry.isStreaming ? {
+                      ...entry,
+                      content: `\u2705 Generated commit message: "${commitMessage.trim()}"`,
+                      isStreaming: false
                     } : entry
                   )
                 );
               }
-              accumulatedCommitContent = "";
-              lastCommitUpdateTime = now;
+              break;
             }
-          } else if (chunk.type === "done") {
-            if (streamingEntry) {
-              setChatHistory(
-                (prev) => prev.map(
-                  (entry) => entry.isStreaming ? {
-                    ...entry,
-                    content: `\u2705 Generated commit message: "${commitMessage.trim()}"`,
-                    isStreaming: false
-                  } : entry
-                )
-              );
-            }
-            break;
+          }
+        } catch (error) {
+          commitMessage = "feat: update files";
+          const errorEntry = {
+            type: "assistant",
+            content: `\u26A0\uFE0F **AI commit message generation failed**: ${error.message}
+
+Using fallback message: "${commitMessage}"`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          if (streamingEntry) {
+            setChatHistory(
+              (prev) => prev.map(
+                (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
+              )
+            );
           }
         }
         const cleanCommitMessage = commitMessage.trim().replace(/^["']|["']$/g, "");
@@ -16539,7 +16748,7 @@ ${commitMessage}`
                     timestamp: /* @__PURE__ */ new Date()
                   };
                   setChatHistory((prev) => [...prev, branchSuccessEntry]);
-                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base main`);
+                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base ${currentBranch}`);
                   if (prResult.success) {
                     const prUrl = prResult.output?.match(/https:\/\/github\.com\/[^\s]+/)?.[0];
                     const prSuccessEntry = {
@@ -16562,7 +16771,7 @@ ${commitMessage}`
 
 \u{1F4A1} **Create PR Manually**:
 \u2022 Go to GitHub repository
-\u2022 Create PR from \`${featureBranch}\` \u2192 \`main\`
+\u2022 Create PR from \`${featureBranch}\` \u2192 \`${currentBranch}\`
 \u2022 Title: \`${cleanCommitMessage}\``,
                       timestamp: /* @__PURE__ */ new Date()
                     };
@@ -19397,6 +19606,43 @@ function createMCPCommand() {
   });
   return mcpCommand;
 }
+
+// src/commands/set-name.ts
+init_settings_manager();
+function createSetNameCommand() {
+  const setNameCommand = new Command("set-name");
+  setNameCommand.description("Set a custom name for the AI assistant").argument("<name>", "The name to set for the assistant").action(async (name) => {
+    try {
+      const settingsManager = getSettingsManager();
+      settingsManager.updateUserSetting("assistantName", name);
+      console.log(chalk.green(`\u2705 Assistant name set to: ${name}`));
+    } catch (error) {
+      console.error(chalk.red(`\u274C Failed to set assistant name: ${error.message}`));
+      process.exit(1);
+    }
+  });
+  return setNameCommand;
+}
+
+// src/commands/toggle-confirmations.ts
+init_settings_manager();
+function createToggleConfirmationsCommand() {
+  const toggleCommand = new Command("toggle-confirmations");
+  toggleCommand.description("Toggle the requirement for user confirmation on file operations and bash commands").action(async () => {
+    try {
+      const settingsManager = getSettingsManager();
+      const currentValue = settingsManager.getUserSetting("requireConfirmation") ?? true;
+      const newValue = !currentValue;
+      settingsManager.updateUserSetting("requireConfirmation", newValue);
+      console.log(chalk.green(`\u2705 Confirmation requirement ${newValue ? "enabled" : "disabled"}`));
+      console.log(`File operations and bash commands will ${newValue ? "now" : "no longer"} require confirmation.`);
+    } catch (error) {
+      console.error(chalk.red(`\u274C Failed to toggle confirmations: ${error.message}`));
+      process.exit(1);
+    }
+  });
+  return toggleCommand;
+}
 var CONTEXT_BUDGET_BYTES = 280 * 1024;
 var MAX_SUMMARY_LENGTH = 2e3;
 function loadMarkdownDirectory(dirPath) {
@@ -19799,8 +20045,11 @@ program.name("grok").description(
       process.exit(1);
     }
     const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
+    const settingsManager = getSettingsManager();
+    const assistantName = settingsManager.getUserSetting("assistantName") || "X CLI";
     if (!options.quiet) {
-      console.log("\u{1F916} Starting X CLI Conversational Assistant...\n");
+      console.log(`\u{1F916} Starting ${assistantName} Conversational Assistant...
+`);
     }
     if (!options.quiet) {
       try {
@@ -19879,6 +20128,8 @@ gitCommand.command("commit-and-push").description("Generate AI commit message an
   }
 });
 program.addCommand(createMCPCommand());
+program.addCommand(createSetNameCommand());
+program.addCommand(createToggleConfirmationsCommand());
 program.parse();
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

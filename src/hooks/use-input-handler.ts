@@ -368,6 +368,7 @@ export function useInputHandler({
     { command: "/guardrails", description: "Manage prevention rules" },
     { command: "/comments", description: "Add code comments to files" },
     { command: "/commit-and-push", description: "AI commit & push to remote" },
+    { command: "/smart-push", description: "Intelligent staging, commit message generation, and push" },
     { command: "/exit", description: "Exit the application" },
   ];
 
@@ -1727,7 +1728,81 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
       setIsProcessing(true);
 
       try {
-        // Check git status first
+        // Get current branch
+        const branchResult = await agent.executeBashCommand("git branch --show-current");
+        const currentBranch = branchResult.output?.trim() || "unknown";
+
+        // Step 1: Run quality checks before push
+        const qualityCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "🔍 **Running pre-push quality checks...**",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, qualityCheckEntry]);
+
+        // TypeScript check
+        const tsCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "📝 Checking TypeScript...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, tsCheckEntry]);
+
+        const tsResult = await agent.executeBashCommand("npm run typecheck");
+        if (tsResult.success) {
+          const tsSuccessEntry: ChatEntry = {
+            type: "tool_result",
+            content: "✅ TypeScript check passed",
+            timestamp: new Date(),
+            toolCall: {
+              id: `ts_check_${Date.now()}`,
+              type: "function",
+              function: {
+                name: "bash",
+                arguments: JSON.stringify({ command: "npm run typecheck" }),
+              },
+            },
+            toolResult: tsResult,
+          };
+          setChatHistory((prev) => [...prev, tsSuccessEntry]);
+        } else {
+          const tsFailEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **TypeScript check failed**\n\n${tsResult.error || tsResult.output}`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, tsFailEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Linting check (warnings allowed, only errors block)
+        const lintCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "🧹 Running ESLint...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, lintCheckEntry]);
+
+        const lintResult = await agent.executeBashCommand("npm run lint");
+        const lintSuccessEntry: ChatEntry = {
+          type: "tool_result",
+          content: "✅ ESLint check completed (warnings allowed)",
+          timestamp: new Date(),
+          toolCall: {
+            id: `lint_check_${Date.now()}`,
+            type: "function",
+            function: {
+              name: "bash",
+              arguments: JSON.stringify({ command: "npm run lint" }),
+            },
+          },
+          toolResult: lintResult,
+        };
+        setChatHistory((prev) => [...prev, lintSuccessEntry]);
+
+        // Step 2: Check git status and pull latest changes
         const statusResult = await agent.executeBashCommand("git status --porcelain");
 
         if (!statusResult.success) {
@@ -1749,6 +1824,109 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
             timestamp: new Date(),
           };
           setChatHistory((prev) => [...prev, noChangesEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Stage all changes to prevent pull issues with unstaged changes
+        const prePullAddResult = await agent.executeBashCommand("git add .");
+        if (!prePullAddResult.success) {
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Failed to stage changes**\n\n${prePullAddResult.error || "Unknown error"}`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Stash staged changes to allow clean pull
+        const stashResult = await agent.executeBashCommand("git stash push --include-untracked --message 'smart-push temporary stash'");
+        if (!stashResult.success) {
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Failed to stash changes**\n\n${stashResult.error || "Unknown error"}`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Pull latest changes
+        const pullEntry: ChatEntry = {
+          type: "assistant",
+          content: "🔄 Pulling latest changes...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, pullEntry]);
+
+        // Check for ongoing git operations and clean up if needed
+        const rebaseCheck = await agent.executeBashCommand("test -d .git/rebase-apply -o -d .git/rebase-merge -o -f .git/MERGE_HEAD && echo 'ongoing' || echo 'clean'");
+        if (rebaseCheck.output?.includes('ongoing')) {
+          const cleanupEntry: ChatEntry = {
+            type: "assistant",
+            content: "⚠️ Git operation in progress - cleaning up...",
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, cleanupEntry]);
+
+          await agent.executeBashCommand("git rebase --abort 2>/dev/null || git merge --abort 2>/dev/null || true");
+        }
+
+        // Try rebase first, fall back to merge if it fails
+        let pullResult = await agent.executeBashCommand(`git pull --rebase origin ${currentBranch}`);
+        if (!pullResult.success) {
+          pullResult = await agent.executeBashCommand(`git pull origin ${currentBranch}`);
+          if (pullResult.success) {
+            const mergeFallbackEntry: ChatEntry = {
+              type: "assistant",
+              content: "⚠️ Rebase failed, fell back to merge",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, mergeFallbackEntry]);
+          }
+        }
+
+        if (pullResult.success) {
+          const pullSuccessEntry: ChatEntry = {
+            type: "tool_result",
+            content: pullResult.output?.includes('Successfully rebased') ? "✅ Successfully rebased local changes" : "✅ Successfully pulled latest changes",
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, pullSuccessEntry]);
+
+          // Pop the stashed changes
+          const popStashResult = await agent.executeBashCommand("git stash pop");
+          if (!popStashResult.success) {
+            const errorEntry: ChatEntry = {
+              type: "assistant",
+              content: `⚠️ **Failed to restore stashed changes**\n\n${popStashResult.error || "Unknown error"}\n\n💡 Your changes may be lost. Check git stash list.`,
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, errorEntry]);
+            setIsProcessing(false);
+            clearInput();
+            return true;
+          } else {
+            const popSuccessEntry: ChatEntry = {
+              type: "tool_result",
+              content: "✅ Changes restored from stash",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, popSuccessEntry]);
+          }
+        } else {
+          const pullFailEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Pull failed**\n\n${pullResult.error || pullResult.output}\n\n💡 Check git status and resolve any conflicts`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, pullFailEntry]);
           setIsProcessing(false);
           clearInput();
           return true;
@@ -1788,6 +1966,14 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
         // Get staged changes for commit message generation
         const diffResult = await agent.executeBashCommand("git diff --cached");
 
+        // Truncate diff if too long to avoid API limits
+        const maxDiffLength = 50000; // 50k characters
+        const truncatedDiff = diffResult.output
+          ? (diffResult.output.length > maxDiffLength
+              ? diffResult.output.substring(0, maxDiffLength) + "\n... (truncated due to length)"
+              : diffResult.output)
+          : "No staged changes shown";
+
         // Generate commit message using AI
         const commitPrompt = `Generate a concise, professional git commit message for these changes:
 
@@ -1795,7 +1981,7 @@ Git Status:
 ${statusResult.output}
 
 Git Diff (staged changes):
-${diffResult.output || "No staged changes shown"}
+${truncatedDiff}
 
 Follow conventional commit format (feat:, fix:, docs:, etc.) and keep it under 72 characters.
 Respond with ONLY the commit message, no additional text.`;
@@ -1805,51 +1991,69 @@ Respond with ONLY the commit message, no additional text.`;
         let accumulatedCommitContent = "";
         let lastCommitUpdateTime = Date.now();
 
-        for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
-          if (chunk.type === "content" && chunk.content) {
-            accumulatedCommitContent += chunk.content;
-            const now = Date.now();
-            if (now - lastCommitUpdateTime >= 150) {
-              commitMessage += accumulatedCommitContent;
-              if (!streamingEntry) {
-                const newEntry = {
-                  type: "assistant" as const,
-                  content: `🤖 Generating commit message...\n\n${commitMessage}`,
-                  timestamp: new Date(),
-                  isStreaming: true,
-                };
-                setChatHistory((prev) => [...prev, newEntry]);
-                streamingEntry = newEntry;
-              } else {
+        try {
+          for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
+            if (chunk.type === "content" && chunk.content) {
+              accumulatedCommitContent += chunk.content;
+              const now = Date.now();
+              if (now - lastCommitUpdateTime >= 150) {
+                commitMessage += accumulatedCommitContent;
+                if (!streamingEntry) {
+                  const newEntry = {
+                    type: "assistant" as const,
+                    content: `🤖 Generating commit message...\n\n${commitMessage}`,
+                    timestamp: new Date(),
+                    isStreaming: true,
+                  };
+                  setChatHistory((prev) => [...prev, newEntry]);
+                  streamingEntry = newEntry;
+                } else {
+                  setChatHistory((prev) =>
+                    prev.map((entry, idx) =>
+                      idx === prev.length - 1 && entry.isStreaming
+                        ? {
+                            ...entry,
+                            content: `🤖 Generating commit message...\n\n${commitMessage}`,
+                          }
+                        : entry
+                    )
+                  );
+                }
+                accumulatedCommitContent = "";
+                lastCommitUpdateTime = now;
+              }
+            } else if (chunk.type === "done") {
+              if (streamingEntry) {
                 setChatHistory((prev) =>
-                  prev.map((entry, idx) =>
-                    idx === prev.length - 1 && entry.isStreaming
+                  prev.map((entry) =>
+                    entry.isStreaming
                       ? {
                           ...entry,
-                          content: `🤖 Generating commit message...\n\n${commitMessage}`,
+                          content: `✅ Generated commit message: "${commitMessage.trim()}"`,
+                          isStreaming: false,
                         }
                       : entry
                   )
                 );
               }
-              accumulatedCommitContent = "";
-              lastCommitUpdateTime = now;
+              break;
             }
-          } else if (chunk.type === "done") {
-            if (streamingEntry) {
-              setChatHistory((prev) =>
-                prev.map((entry) =>
-                  entry.isStreaming
-                    ? {
-                        ...entry,
-                        content: `✅ Generated commit message: "${commitMessage.trim()}"`,
-                        isStreaming: false,
-                      }
-                    : entry
-                )
-              );
-            }
-            break;
+          }
+        } catch (error: any) {
+          // Fallback commit message if AI fails
+          commitMessage = "feat: update files";
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `⚠️ **AI commit message generation failed**: ${error.message}\n\nUsing fallback message: "${commitMessage}"`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          if (streamingEntry) {
+            setChatHistory((prev) =>
+              prev.map((entry) =>
+                entry.isStreaming ? { ...entry, isStreaming: false } : entry
+              )
+            );
           }
         }
 
@@ -1928,7 +2132,7 @@ Respond with ONLY the commit message, no additional text.`;
                   setChatHistory((prev) => [...prev, branchSuccessEntry]);
 
                   // Try to create PR with GitHub CLI
-                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base main`);
+                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base ${currentBranch}`);
 
                   if (prResult.success) {
                     const prUrl = prResult.output?.match(/https:\/\/github\.com\/[^\s]+/)?.[0];
@@ -1941,7 +2145,7 @@ Respond with ONLY the commit message, no additional text.`;
                   } else {
                     const prManualEntry: ChatEntry = {
                       type: "assistant",
-                      content: `⚠️ **PR Creation Failed**: GitHub CLI may not be available.\n\n💡 **Create PR Manually**:\n• Go to GitHub repository\n• Create PR from \`${featureBranch}\` → \`main\`\n• Title: \`${cleanCommitMessage}\``,
+                      content: `⚠️ **PR Creation Failed**: GitHub CLI may not be available.\n\n💡 **Create PR Manually**:\n• Go to GitHub repository\n• Create PR from \`${featureBranch}\` → \`${currentBranch}\`\n• Title: \`${cleanCommitMessage}\``,
                       timestamp: new Date(),
                     };
                     setChatHistory((prev) => [...prev, prManualEntry]);

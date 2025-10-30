@@ -8,6 +8,8 @@ import ChatInterface from "./ui/components/chat-interface.js";
 import { getSettingsManager } from "./utils/settings-manager.js";
 import { ConfirmationService } from "./utils/confirmation-service.js";
 import { createMCPCommand } from "./commands/mcp.js";
+import { createSetNameCommand } from "./commands/set-name.js";
+import { createToggleConfirmationsCommand } from "./commands/toggle-confirmations.js";
 import type { ChatCompletionMessageParam } from "openai/resources/chat";
 import pkg from "../package.json" with { type: "json" };
 import { checkForUpdates } from "./utils/version-checker.js";
@@ -432,8 +434,13 @@ program
       }
 
       const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
+
+      // Get the custom assistant name
+      const settingsManager = getSettingsManager();
+      const assistantName = settingsManager.getUserSetting('assistantName') || 'X CLI';
+
       if (!options.quiet) {
-        console.log("🤖 Starting X CLI Conversational Assistant...\n");
+        console.log(`🤖 Starting ${assistantName} Conversational Assistant...\n`);
       }
 
       // Load .agent/ context for intelligent decision making
@@ -548,5 +555,11 @@ gitCommand
 
 // MCP command
 program.addCommand(createMCPCommand());
+
+// Set name command
+program.addCommand(createSetNameCommand());
+
+// Toggle confirmations command
+program.addCommand(createToggleConfirmationsCommand());
 
 program.parse();

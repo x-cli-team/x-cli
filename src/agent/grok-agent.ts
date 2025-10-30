@@ -732,6 +732,27 @@ Current working directory: ${process.cwd()}`,
     try {
       const args = JSON.parse(toolCall.function.arguments);
 
+      // Check if confirmation is required for file operations and bash commands
+      const settingsManager = getSettingsManager();
+      const requireConfirmation = settingsManager.getUserSetting('requireConfirmation') ?? true;
+
+      if (requireConfirmation) {
+        const needsConfirmation = ['create_file', 'str_replace_editor', 'bash'].includes(toolCall.function.name);
+        if (needsConfirmation) {
+          const confirmationResult = await this.confirmationTool.requestConfirmation({
+            operation: toolCall.function.name,
+            filename: args.path || args.command || 'unknown',
+            description: `Execute ${toolCall.function.name} operation`,
+          });
+          if (!confirmationResult.success) {
+            return {
+              success: false,
+              error: confirmationResult.error || 'Operation cancelled by user',
+            };
+          }
+        }
+      }
+
       switch (toolCall.function.name) {
         case "view_file":
           try {
