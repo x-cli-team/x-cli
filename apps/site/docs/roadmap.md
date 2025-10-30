@@ -17,6 +17,8 @@ This roadmap is automatically generated from our internal task tracking system.
 
 ## Sprint Stage 1: Context Loading Foundation
 
+## Sprint: Rename grok-cli to x-cli
+
 ## Sprint: One-Confirm "Research → Recommend → Execute → Auto-Doc" Workflow
 
 ## Sprint: Implement Verbosity and Explanation Features
@@ -31,7 +33,7 @@ This roadmap is automatically generated from our internal task tracking system.
 
 ## Sprint: Documentation Website with Vercel Deployment
 
-Create a comprehensive public documentation + landing site for x-cli using Docusaurus, with automated synchronization from the `.agent` documentation system.
+Create a comprehensive public documentation + landing site for grok-cli using Docusaurus, with automated synchronization from the `.agent` documentation system.
 
 ## Sprint: Automated Testimonial Collection & Auto-Merge System
 
@@ -52,6 +54,8 @@ Implement a fully automated testimonial collection system with bot-managed PR wo
 ## Sprint: Implement Interactive Chat Interface with Research-Confirm-Proceed Flow
 
 ## Sprint: Custom Assistant Name & Confirmation System
+
+## Sprint: Context Metrics Real Data Implementation
 
 ## Sprint: UX Refinement - Claude Code Feel
 

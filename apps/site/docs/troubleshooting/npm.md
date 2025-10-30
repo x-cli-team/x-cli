@@ -10,15 +10,15 @@ title: NPM Publishing Troubleshooting Guide
 
 ```bash
 # Check current published version
-npm view @xagent/x-cli version
+npm view grok-cli-hurry-mode version
 
 # Check if new version exists
-npm view @xagent/x-cli time --json | tail -5
+npm view grok-cli-hurry-mode time --json | tail -5
 ```
 
 ### Check GitHub Actions
 
-1. Go to: https://github.com/x-cli-team/x-cli/actions
+1. Go to: https://github.com/hinetapora/grok-cli-hurry-mode/actions
 2. Look for failed "Release" workflows
 3. Check logs for specific error messages
 
@@ -130,7 +130,7 @@ echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 
 ```json
 {
-  "name": "@xagent/x-cli", // Must remain scoped
+  "name": "grok-cli-hurry-mode", // Must remain unscoped
   "publishConfig": {
     "access": "public" // Must NOT include registry
   }
@@ -183,7 +183,7 @@ NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```bash
 # 1. Check current state
 git status
-npm view @xagent/x-cli version
+npm view grok-cli-hurry-mode version
 
 # 2. Manual version bump
 npm version patch # or minor/major as needed
@@ -205,7 +205,7 @@ git push origin main --follow-tags
 
 ```bash
 # Check what's actually published
-npm view @xagent/x-cli time --json
+npm view grok-cli-hurry-mode time --json
 
 # Check local package.json
 cat package.json | grep version
