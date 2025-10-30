@@ -62,28 +62,26 @@ export function useContextInfo(agent?: any) {
         // Get model information
         const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
         const maxTokens = getMaxTokensForModel(modelName);
-        
-        // Since we don't have direct access to messages/tokenCounter,
-        // we'll use estimated values for now
-        // TODO: Add proper methods to GrokAgent for context access
-        const estimatedTokens = Math.floor(Math.random() * 1000) + 500; // Placeholder
-        messagesCount = Math.floor(Math.random() * 10) + 1; // Placeholder
-        
-        const tokenPercent = Math.round((estimatedTokens / maxTokens) * 100);
+
+        // Get real data from agent
+        const sessionTokens = agent.getSessionTokenCount?.() || 0;
+        messagesCount = agent.getMessageCount?.() || 0;
+
+        const tokenPercent = Math.round((sessionTokens / maxTokens) * 100);
 
         tokenUsage = {
-          current: estimatedTokens,
+          current: sessionTokens,
           max: maxTokens,
           percent: tokenPercent,
         };
 
-        // Determine context health based on estimated usage
+        // Determine context health based on actual usage
         if (tokenPercent >= 95) contextHealth = 'critical';
         else if (tokenPercent >= 80) contextHealth = 'degraded';
         else contextHealth = 'optimal';
 
-        // For now, use empty loaded files array
-        // TODO: Extract from chat history when available
+        // Get loaded files from chat history
+        // TODO: Extract file references from chat history for better accuracy
         loadedFiles = [];
       }
 

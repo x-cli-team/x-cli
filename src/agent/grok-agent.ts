@@ -31,6 +31,8 @@ import { createTokenCounter, TokenCounter } from "../utils/token-counter.js";
 import { loadCustomInstructions } from "../utils/custom-instructions.js";
 import { getSettingsManager } from "../utils/settings-manager.js";
 import { ContextPack } from "../utils/context-loader.js";
+import { ResearchRecommendService } from "../services/research-recommend.js";
+import { ExecutionOrchestrator } from "../services/execution-orchestrator.js";
 
 export interface ChatEntry {
   type: "user" | "assistant" | "tool_result" | "tool_call";
@@ -264,7 +266,112 @@ Current working directory: ${process.cwd()}`,
     return false;
   }
 
+  // Detect if message should use the Research → Recommend → Execute workflow
+  private shouldUseWorkflow(message: string): boolean {
+    const q = message.toLowerCase();
+
+    // Complexity indicators that suggest workflow usage
+    const complexityIndicators = [
+      // Action verbs indicating multi-step tasks
+      /\b(implement|build|create|refactor|optimize|add|update|modify|develop|design)\b/.test(q),
+      /\b(system|feature|component|module|service|api|database)\b/.test(q),
+
+      // Multi-step indicators
+      /\b(and|then|after|finally|also|additionally)\b/.test(q),
+      /\b(step|phase|stage|part|component)\b/.test(q),
+
+      // Size/complexity indicators
+      q.length > 150, // Long requests
+      (q.match(/\b(and|or|but|however|therefore|consequently)\b/g) || []).length >= 2, // Complex logic
+
+      // Technical complexity
+      /\b(authentication|authorization|security|validation|testing|deployment|ci.cd|docker|kubernetes)\b/.test(q),
+      /\b(multiple|several|various|different|complex|advanced)\b/.test(q),
+    ];
+
+    // Use workflow if 2+ complexity indicators are present
+    const indicatorCount = complexityIndicators.filter(Boolean).length;
+    return indicatorCount >= 2;
+  }
+
   async processUserMessage(message: string): Promise<ChatEntry[]> {
+    // Check if this should use the Research → Recommend → Execute workflow
+    if (this.shouldUseWorkflow(message)) {
+      return this.processWithWorkflow(message);
+    }
+
+    // Fall back to standard processing for simple queries
+    return this.processStandard(message);
+  }
+
+  /**
+   * Process complex tasks using the Research → Recommend → Execute workflow
+   */
+  private async processWithWorkflow(message: string): Promise<ChatEntry[]> {
+    const userEntry: ChatEntry = {
+      type: "user",
+      content: message,
+      timestamp: new Date(),
+    };
+    this.chatHistory.push(userEntry);
+    this.logEntry(userEntry);
+    this.messages.push({ role: "user", content: message });
+
+    try {
+      // Load context pack for better recommendations
+      const contextPack = await this.loadContextPack();
+
+      // Initialize workflow services
+      const workflowService = new ResearchRecommendService(this);
+
+      const request = {
+        userTask: message,
+        context: contextPack ? 'Project context loaded' : undefined
+      };
+
+      console.log('🔍 Researching and analyzing...');
+
+      // Phase 1: Research and get approval
+      const { output, approval, revisions } = await workflowService.researchAndGetApproval(request, contextPack);
+
+      if (!approval.approved) {
+        // User rejected the plan
+        const rejectionEntry: ChatEntry = {
+          type: "assistant",
+          content: approval.revised
+            ? `Plan revised ${revisions} time(s) but ultimately rejected by user.`
+            : "Plan rejected by user.",
+          timestamp: new Date(),
+        };
+        this.chatHistory.push(rejectionEntry);
+        return [userEntry, rejectionEntry];
+      }
+
+      console.log('✅ Plan approved. Executing...');
+
+      // Phase 2: Execute the approved plan
+      const orchestrator = new ExecutionOrchestrator(this);
+      const executionResult = await orchestrator.executeWithRecovery(output.plan, workflowService, request);
+
+      // Convert execution results to chat entries
+      return this.workflowResultToChatEntries(userEntry, output, approval, executionResult);
+
+    } catch (error: any) {
+      console.error('[Workflow] Failed:', error);
+      const errorEntry: ChatEntry = {
+        type: "assistant",
+        content: `Workflow failed: ${error.message}`,
+        timestamp: new Date(),
+      };
+      this.chatHistory.push(errorEntry);
+      return [userEntry, errorEntry];
+    }
+  }
+
+  /**
+   * Standard processing for simple queries
+   */
+  private async processStandard(message: string): Promise<ChatEntry[]> {
     // Add user message to conversation
     const userEntry: ChatEntry = {
       type: "user",
@@ -1050,6 +1157,14 @@ Current working directory: ${process.cwd()}`,
     }
   }
 
+  getMessageCount(): number {
+    return this.chatHistory.length;
+  }
+
+  getSessionTokenCount(): number {
+    return this.tokenCounter.countMessageTokens(this.messages as any);
+  }
+
   private logEntry(entry: ChatEntry): void {
     try {
       // Ensure directory exists
@@ -1072,5 +1187,52 @@ Current working directory: ${process.cwd()}`,
       // Silently ignore logging errors to avoid disrupting the app
       console.warn('Failed to log session entry:', error);
     }
+  }
+
+  /**
+   * Load .agent context pack for enhanced recommendations
+   */
+  private async loadContextPack(): Promise<ContextPack | undefined> {
+    try {
+      const contextLoader = await import('../utils/context-loader.js');
+      return await contextLoader.loadContext('.agent');
+    } catch (error) {
+      console.warn('[Workflow] Failed to load context pack:', error);
+      return undefined;
+    }
+  }
+
+  /**
+   * Convert workflow results to chat entries for display
+   */
+  private workflowResultToChatEntries(
+    userEntry: ChatEntry,
+    output: any,
+    approval: any,
+    executionResult: any
+  ): ChatEntry[] {
+    const entries: ChatEntry[] = [userEntry];
+
+    // Add workflow summary entry
+    const summaryEntry: ChatEntry = {
+      type: "assistant",
+      content: `Workflow completed: ${executionResult?.success ? '✅ Success' : '❌ Failed'}\n\n${output?.plan?.summary || 'Task completed'}`,
+      timestamp: new Date(),
+    };
+    entries.push(summaryEntry);
+    this.chatHistory.push(summaryEntry);
+
+    // Add execution details if available
+    if (executionResult?.executionPlan) {
+      const detailsEntry: ChatEntry = {
+        type: "assistant",
+        content: `Executed ${executionResult.executionPlan.completedSteps}/${executionResult.executionPlan.totalSteps} tasks successfully.`,
+        timestamp: new Date(),
+      };
+      entries.push(detailsEntry);
+      this.chatHistory.push(detailsEntry);
+    }
+
+    return entries;
   }
 }

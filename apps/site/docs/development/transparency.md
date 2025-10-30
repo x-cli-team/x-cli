@@ -25,7 +25,7 @@ Our development is organized into focused sprints that deliver specific value to
 
 _October 18, 2025 - COMPLETED_
 
-**Objective**: Create comprehensive public documentation + landing site for grok-cli using Docusaurus
+**Objective**: Create comprehensive public documentation + landing site for x-cli using Docusaurus
 
 **Delivered Features:**
 

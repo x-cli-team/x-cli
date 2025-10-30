@@ -15,9 +15,8 @@ clean_install() {
     pkill -f xcli 2>/dev/null || true
     pkill -f grok 2>/dev/null || true  # Clean up old installations
     
-    # Remove existing installations (both old and new)
+    # Remove existing installations
     npm uninstall -g @xagent/x-cli 2>/dev/null || true
-    npm uninstall -g grok-cli-hurry-mode 2>/dev/null || true
     
     # Force remove directories if they exist
     if command -v node >/dev/null 2>&1; then

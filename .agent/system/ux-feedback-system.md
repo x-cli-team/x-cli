@@ -68,6 +68,20 @@ Context: Dynamic │ Files: 47 indexed │ Index: 2.3 MB │ Session: Restored
 - **Dynamic Updates**: Real-time workspace and session state changes
 - **Background Activity**: Current operations and system state awareness
 
+#### **Context Indicator** (`context-indicator.tsx`) - **NEW Phase 3**
+- **Compact Status Line**: Displays key metrics below input area
+- **Token Usage Display**: Current/max tokens with percentage indicator
+- **File & Message Counts**: Workspace file count and conversation message count
+- **Memory Pressure Warnings**: Shows high memory pressure when applicable
+- **Real-time Updates**: Reflects current session state and context health
+
+```typescript
+// Compact status line format
+🧠 1.2k/128.0k (1%) │ 📁 0 files │ 💬 2 msgs
+```
+
+**Implementation**: Used in `chat-interface-renderer.tsx` to show session metrics below the input prompt when context information is available.
+
 ### 🎨 Design System (`src/ui/colors.ts`)
 
 #### **Color Hierarchy**

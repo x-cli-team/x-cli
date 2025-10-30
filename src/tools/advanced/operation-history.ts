@@ -127,7 +127,7 @@ export class OperationHistoryTool {
           files: fileSnapshots
         },
         metadata: {
-          tool: 'grok-cli',
+          tool: 'x-cli',
           filesAffected: files,
           operationSize: this.determineOperationSize(files, rollbackData),
           ...metadata
@@ -455,7 +455,7 @@ export class OperationHistoryTool {
         }
 
         snapshots.push(snapshot);
-      } catch (error) {
+      } catch (_error) {
         // If we can't snapshot a file, record it as non-existent
         snapshots.push({
           filePath: path.resolve(filePath),
@@ -542,7 +542,7 @@ export class OperationHistoryTool {
   /**
    * Perform redo operation
    */
-  private async performRedo(entry: HistoryEntry): Promise<ToolResult> {
+  private async performRedo(_entry: HistoryEntry): Promise<ToolResult> {
     // For redo, we need to re-apply the changes
     // This is complex because we need to store the "forward" changes as well
     // For now, this is a simplified implementation
@@ -612,7 +612,7 @@ export class OperationHistoryTool {
   /**
    * Undo refactor operation
    */
-  private async undoRefactorOperation(fileSnapshots: FileSnapshot[], customData: any): Promise<ToolResult> {
+  private async undoRefactorOperation(fileSnapshots: FileSnapshot[], _customData: any): Promise<ToolResult> {
     // Refactor operations can be more complex and might need custom undo logic
     return await this.undoFileOperations(fileSnapshots);
   }
@@ -682,7 +682,7 @@ export class OperationHistoryTool {
   /**
    * Determine operation size
    */
-  private determineOperationSize(files: string[], rollbackData: RollbackData): 'small' | 'medium' | 'large' {
+  private determineOperationSize(files: string[], _rollbackData: RollbackData): 'small' | 'medium' | 'large' {
     if (files.length <= 3) return 'small';
     if (files.length <= 10) return 'medium';
     return 'large';
@@ -743,7 +743,7 @@ export class OperationHistoryTool {
         
         this.currentPosition = parsed.currentPosition || this.history.length - 1;
       }
-    } catch (error) {
+    } catch (_error) {
       // If we can't load history, start fresh
       this.history = [];
       this.currentPosition = -1;
@@ -764,7 +764,7 @@ export class OperationHistoryTool {
       };
       
       await ops.promises.writeFile(this.historyFile, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (error) {
+    } catch (_error) {
       // Silently ignore save errors to avoid disrupting operations
     }
   }

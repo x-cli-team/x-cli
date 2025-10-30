@@ -31,7 +31,7 @@ This roadmap is automatically generated from our internal task tracking system.
 
 ## Sprint: Documentation Website with Vercel Deployment
 
-Create a comprehensive public documentation + landing site for grok-cli using Docusaurus, with automated synchronization from the `.agent` documentation system.
+Create a comprehensive public documentation + landing site for x-cli using Docusaurus, with automated synchronization from the `.agent` documentation system.
 
 ## Sprint: Automated Testimonial Collection & Auto-Merge System
 
