@@ -73,6 +73,26 @@ Without smart push, you get:
 error: failed to push some refs
 ```
 
+### 🔧 GitHub Actions Release Workflow
+
+The `.github/workflows/release.yml` handles automated releases on every push to `main`:
+
+**Smart Skip Logic:**
+- Detects merge commits from release PRs (prevents infinite loops)
+- Detects auto-bump commits (avoids duplicate releases)
+- Uses **conditional steps** with outputs (no false "failures")
+- Skips gracefully when conditions met, showing ✅ **Success** not ❌ **Failure**
+
+**Before Fix:** Used `exit 78` → marked as "Process completed with exit code 78" (confusing)
+**After Fix:** Uses `if: steps.check.outputs.should_release == 'true'` → clean skip
+
+**Release Process:**
+1. Bump version patch (e.g., 1.1.70 → 1.1.71)
+2. Create release branch and PR
+3. Auto-merge PR (triggers next workflow → skips cleanly)
+4. Tag release and publish to NPM + GitHub Packages
+5. Create GitHub Release with changelog
+
 ## 🛠️ Configuration Applied
 
 The following Git settings are configured globally:
@@ -113,5 +133,5 @@ git push origin main
 
 ---
 
-**Last Updated**: 2024-10-28  
+**Last Updated**: 2024-10-30  
 **Status**: Active - Required for all Git operations
