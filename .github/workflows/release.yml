@@ -49,18 +49,22 @@ jobs:
           npm install
 
       # Prevent loops if last commit was an automated bump or merge from release PR
-      - name: Skip if previous commit was auto-bump or merge
+      - name: Check if should release
+        id: should-release
         run: |
           if git log -1 --pretty=%B | grep -qiE "^Bump version to "; then
-            echo "Auto-bump detected; skipping."
-            exit 78
-          fi
-          if git log -1 --pretty=%B | grep -qi "Merge pull request"; then
-            echo "Merge commit from release PR detected; skipping."
-            exit 78
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "Auto-bump detected; skipping release."
+          elif git log -1 --pretty=%B | grep -qi "Merge pull request"; then
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "Merge commit from release PR detected; skipping release."
+          else
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "Proceeding with release."
           fi
 
       - name: Bump patch version (no tag yet)
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
@@ -77,6 +81,7 @@ jobs:
           git commit -m "Bump version to ${NEW_VER#v}"
 
       - name: Create release branch and PR
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
           RELEASE_BRANCH="release/v${NEW_VER}-$(date +%s)"
@@ -96,6 +101,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Create tag and push
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           git tag "v${NEW_VER}"
           git push origin "v${NEW_VER}"
@@ -103,24 +109,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Configure npm auth
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build
+        if: steps.should-release.outputs.should_release == 'true'
         run: npm run build
 
       - name: Dry run (sanity check)
+        if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public --dry-run
 
       - name: Publish to npm
+        if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # ---------- Publish to GitHub Packages ----------
       - name: Create scoped package.json for GitHub Packages
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           # Create a temporary package.json with scoped name for GitHub Packages
           cp package.json package.json.backup
@@ -132,6 +143,7 @@ jobs:
           grep '"name":' package.json
 
       - name: Configure GitHub Packages registry
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           # Configure npm to publish scoped packages to GitHub Packages
           echo "@x-cli-team:registry=https://npm.pkg.github.com" > .npmrc
@@ -140,6 +152,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to GitHub Packages
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           echo "Publishing scoped package to GitHub Packages..."
           npm publish
@@ -147,12 +160,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore original package.json
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           # Restore original package.json to avoid affecting future operations
           mv package.json.backup package.json
 
       # ---------- Create GitHub Release ----------
       - name: Create GitHub Release
+        if: steps.should-release.outputs.should_release == 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.NEW_VER }}
@@ -179,11 +194,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Cleanup
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           rm -f .npmrc
           echo "Restored original package.json"
 
       - name: Publish summary
+        if: steps.should-release.outputs.should_release == 'true'
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
           echo "✅ Published @xagent/x-cli v${NEW_VER} to:"
