@@ -47,6 +47,16 @@ A conversational AI CLI tool powered by Grok with **Claude Code-level intelligen
 - **📋 User Approval Workflow**: Complete plan review and confirmation before execution
 - **⚡ Performance Optimized**: Fast exploration (1-15 seconds) with intelligent caching and filtering
 
+### 🚀 **P5: Research → Recommend → Execute → Auto-Doc Workflow** (Latest)
+
+- **🤖 Research Phase**: Intelligent context loading from `.agent/` docs with Issues/Options analysis
+- **💡 Recommend Phase**: Structured decision framework with trade-offs, effort/risk analysis, and confidence scoring
+- **⚡ Execute Phase**: Sequential TODO execution with adaptive recovery, real-time diffs, and safety guarantees
+- **📝 Auto-Doc Phase**: Automatic completion documentation with lesson learning and SOP candidate detection
+- **🛡️ Safety First**: All changes have patches, backups, and git commits; adaptive error recovery
+- **🔄 Resilient**: Handles execution failures gracefully with re-planning capabilities
+- **📚 Knowledge Base**: Builds institutional memory through automatic documentation accumulation
+
 ### 🎨 **P4: UX Refinement - Claude Code Feel**
 
 - **🎭 Enhanced Welcome Banner**: Professional ASCII art with context-aware status display
@@ -1087,7 +1097,7 @@ _Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md)
 ### How to Contribute
 
 1. **Fork** the repository on GitHub
-2. **Clone** your fork locally: `git clone https://github.com/yourusername/x-cli-hurry-mode.git`
+2. **Clone** your fork locally: `git clone https://github.com/yourusername/x-cli.git`
 3. **Create** a feature branch: `git checkout -b feature/your-feature-name`
 4. **Make** your changes and commit them: `git commit -m "feat: add awesome feature"`
 5. **Push** to your fork: `git push origin feature/your-feature-name`

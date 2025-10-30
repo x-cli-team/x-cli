@@ -1,10 +1,54 @@
 # 📚 .agent Documentation System
 
-*Last synced: 2025-10-27*
+*Last synced: 2025-10-29*
 *Protection: Husky pre-commit hook prevents accidental folder deletion*
 
 ## Overview
-This directory contains AI agent documentation for Grok CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
+This directory contains AI agent documentation for X-CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
+
+## 🚀 New: "Research → Recommend → Execute → Auto-Doc" Workflow
+
+X-CLI now features a complete workflow that transforms complex tasks into structured, operator-in-the-loop experiences:
+
+### **Phase 1: Research** 🤔
+- AI analyzes your task using intelligent context loading
+- Loads system docs, SOPs, and recent task history
+- Generates structured Issues/Options/Recommendation/Plan output
+
+### **Phase 2: Recommend** 💡
+- Presents clear decision framework with trade-offs
+- Shows multiple options with effort/risk analysis
+- Recommends optimal approach with confidence scoring
+
+### **Phase 3: Execute** ⚡
+- Sequential TODO execution with real-time progress
+- Automatic diff display and patch generation
+- Safety features: backups, git commits, error recovery
+- Adaptive recovery when execution fails
+
+### **Phase 4: Auto-Doc** 📝
+- Automatic completion documentation in `.agent/tasks/`
+- Lesson learning and SOP candidate detection
+- Complete audit trail with metadata and outcomes
+
+### Usage
+```bash
+# Interactive workflow (recommended)
+xcli "implement user authentication system"
+
+# Headless mode for CI
+xcli --headless "add logging to API endpoints"
+
+# Non-interactive fallback
+xcli --noninteractive "old behavior"
+```
+
+### Benefits
+- **Safety First**: All changes have patches and backups
+- **Resilient**: Adaptive recovery from execution failures
+- **Documented**: Automatic knowledge accumulation
+- **Efficient**: "One-confirm" decision points, then hands-free execution
+- **Contextual**: AI learns from project history and patterns
 
 ## 🚨 Critical Configuration Warnings
 

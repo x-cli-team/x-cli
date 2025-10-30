@@ -7039,10 +7039,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path30) => {
+    const dfs = (filePath, path31) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path30.indexOf(filePath);
-        const cycle = path30.slice(cycleStart).concat([filePath]);
+        const cycleStart = path31.indexOf(filePath);
+        const cycle = path31.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7058,7 +7058,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path30, filePath]);
+            dfs(dependency, [...path31, filePath]);
           }
         }
       }
@@ -9030,10 +9030,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path30 = args.path;
-            let command = `cat "${path30}"`;
+            const path31 = args.path;
+            let command = `cat "${path31}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path30}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path31}"`;
             }
             return await this.bash.execute(command);
           }
@@ -19397,6 +19397,119 @@ function createMCPCommand() {
   });
   return mcpCommand;
 }
+var CONTEXT_BUDGET_BYTES = 280 * 1024;
+var MAX_SUMMARY_LENGTH = 2e3;
+function loadMarkdownDirectory(dirPath) {
+  if (!fs__default.existsSync(dirPath)) {
+    return "";
+  }
+  const files = fs__default.readdirSync(dirPath).filter((file) => file.endsWith(".md")).sort();
+  let content = "";
+  for (const file of files) {
+    const filePath = path7__default.join(dirPath, file);
+    try {
+      const fileContent = fs__default.readFileSync(filePath, "utf-8");
+      content += `
+
+=== ${file} ===
+
+${fileContent}`;
+    } catch (error) {
+      console.warn(`Failed to read ${filePath}:`, error);
+    }
+  }
+  return content;
+}
+function extractDateFromFilename(filename) {
+  const match = filename.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (match) {
+    return new Date(match[1]);
+  }
+  return /* @__PURE__ */ new Date(0);
+}
+function summarizeContent(content, maxLength = MAX_SUMMARY_LENGTH) {
+  if (content.length <= maxLength) {
+    return content;
+  }
+  const truncated = content.substring(0, maxLength);
+  const lastNewline = truncated.lastIndexOf("\n\n");
+  if (lastNewline > maxLength * 0.8) {
+    return truncated.substring(0, lastNewline);
+  }
+  return truncated + "\n\n[...content truncated for context budget...]";
+}
+function loadTaskFiles(tasksDir, maxBudget) {
+  if (!fs__default.existsSync(tasksDir)) {
+    return [];
+  }
+  const files = fs__default.readdirSync(tasksDir).filter((file) => file.endsWith(".md")).map((filename) => {
+    const filePath = path7__default.join(tasksDir, filename);
+    const content = fs__default.readFileSync(filePath, "utf-8");
+    return {
+      filename,
+      content,
+      size: Buffer.byteLength(content, "utf-8"),
+      date: extractDateFromFilename(filename),
+      isSummarized: false
+    };
+  }).sort((a, b) => b.date.getTime() - a.date.getTime());
+  const result = [];
+  let usedBudget = 0;
+  for (const file of files) {
+    let finalContent = file.content;
+    let isSummarized = false;
+    if (usedBudget + file.size > maxBudget) {
+      finalContent = summarizeContent(file.content);
+      const summarizedSize = Buffer.byteLength(finalContent, "utf-8");
+      if (usedBudget + summarizedSize > maxBudget) {
+        continue;
+      }
+      usedBudget += summarizedSize;
+      isSummarized = true;
+    } else {
+      usedBudget += file.size;
+    }
+    result.push({
+      ...file,
+      content: finalContent,
+      isSummarized
+    });
+  }
+  return result;
+}
+function loadContext(agentDir = ".agent") {
+  const systemContent = loadMarkdownDirectory(path7__default.join(agentDir, "system"));
+  const sopContent = loadMarkdownDirectory(path7__default.join(agentDir, "sop"));
+  const systemSize = Buffer.byteLength(systemContent, "utf-8");
+  const sopSize = Buffer.byteLength(sopContent, "utf-8");
+  const taskBudget = Math.max(0, CONTEXT_BUDGET_BYTES - systemSize - sopSize);
+  const tasks = loadTaskFiles(path7__default.join(agentDir, "tasks"), taskBudget);
+  const totalSize = systemSize + sopSize + tasks.reduce((sum, task) => sum + Buffer.byteLength(task.content, "utf-8"), 0);
+  const warnings = [];
+  if (totalSize > CONTEXT_BUDGET_BYTES) {
+    warnings.push(`Context size (${(totalSize / 1024).toFixed(1)}KB) exceeds budget (${CONTEXT_BUDGET_BYTES / 1024}KB)`);
+  }
+  return {
+    system: systemContent,
+    sop: sopContent,
+    tasks,
+    totalSize,
+    warnings
+  };
+}
+function formatContextStatus(pack) {
+  const taskCount = pack.tasks.length;
+  const summarizedCount = pack.tasks.filter((t) => t.isSummarized).length;
+  const sizeKB = (pack.totalSize / 1024).toFixed(1);
+  let status = `[x-cli] Context: loaded system docs, sop docs, ${taskCount} task docs (~${sizeKB} KB).`;
+  if (summarizedCount > 0) {
+    status += ` Summarized ${summarizedCount} older tasks for context budget.`;
+  }
+  if (pack.warnings.length > 0) {
+    status += ` Warnings: ${pack.warnings.join("; ")}`;
+  }
+  return status;
+}
 
 // src/index.ts
 dotenv.config();
@@ -19688,6 +19801,15 @@ program.name("grok").description(
     const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
     if (!options.quiet) {
       console.log("\u{1F916} Starting X CLI Conversational Assistant...\n");
+    }
+    if (!options.quiet) {
+      try {
+        const contextPack = loadContext();
+        const statusMessage = formatContextStatus(contextPack);
+        console.log(statusMessage);
+      } catch (error) {
+        console.warn("\u26A0\uFE0F Failed to load .agent/ context:", error instanceof Error ? error.message : String(error));
+      }
     }
     ensureUserSettingsDirectory();
     checkAutoCompact();

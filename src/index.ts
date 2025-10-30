@@ -11,6 +11,7 @@ import { createMCPCommand } from "./commands/mcp.js";
 import type { ChatCompletionMessageParam } from "openai/resources/chat";
 import pkg from "../package.json" with { type: "json" };
 import { checkForUpdates } from "./utils/version-checker.js";
+import { loadContext, formatContextStatus } from "./utils/context-loader.js";
 
 // Load environment variables
 dotenv.config();
@@ -433,6 +434,17 @@ program
       const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
       if (!options.quiet) {
         console.log("🤖 Starting X CLI Conversational Assistant...\n");
+      }
+
+      // Load .agent/ context for intelligent decision making
+      if (!options.quiet) {
+        try {
+          const contextPack = loadContext();
+          const statusMessage = formatContextStatus(contextPack);
+          console.log(statusMessage);
+        } catch (error) {
+          console.warn("⚠️ Failed to load .agent/ context:", error instanceof Error ? error.message : String(error));
+        }
       }
 
       ensureUserSettingsDirectory();
