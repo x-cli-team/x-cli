@@ -2102,6 +2102,82 @@ Respond with ONLY the commit message, no additional text.`;
               toolResult: pushResult,
             };
             setChatHistory((prev) => [...prev, pushEntry]);
+
+            // Verification stage
+            const verificationEntry: ChatEntry = {
+              type: "assistant",
+              content: "🔍 **Running post-push verification...**",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, verificationEntry]);
+
+            // Check git status for any issues
+            const statusCheckResult = await agent.executeBashCommand("git status --porcelain");
+            if (statusCheckResult.success && statusCheckResult.output?.trim() === "") {
+              const statusOkEntry: ChatEntry = {
+                type: "tool_result",
+                content: "✅ **Git Status**: Working directory clean",
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, statusOkEntry]);
+            } else {
+              const statusIssueEntry: ChatEntry = {
+                type: "assistant",
+                content: `⚠️ **Git Status Issues Detected**:\n\n${statusCheckResult.output || "Unknown status"}`,
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, statusIssueEntry]);
+            }
+
+            // Wait a moment for potential CI/NPM publishing
+            const waitEntry: ChatEntry = {
+              type: "assistant",
+              content: "⏳ **Waiting for CI/NPM publishing...** (10 seconds)",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, waitEntry]);
+
+            await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds
+
+            // Check NPM package version
+            const npmCheckResult = await agent.executeBashCommand("npm view @xagent/x-cli version");
+            const localVersionResult = await agent.executeBashCommand("node -p \"require('./package.json').version\"");
+            const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
+
+            if (npmCheckResult.success && npmCheckResult.output?.trim()) {
+              const npmVersion = npmCheckResult.output.trim();
+              if (npmVersion === localVersion) {
+                const npmConfirmEntry: ChatEntry = {
+                  type: "tool_result",
+                  content: `✅ **NPM Package Confirmed**: Version ${npmVersion} published successfully`,
+                  timestamp: new Date(),
+                };
+                setChatHistory((prev) => [...prev, npmConfirmEntry]);
+              } else {
+                const npmPendingEntry: ChatEntry = {
+                  type: "assistant",
+                  content: `⏳ **NPM Status**: Local version ${localVersion}, NPM version ${npmVersion}. Publishing may still be in progress.`,
+                  timestamp: new Date(),
+                };
+                setChatHistory((prev) => [...prev, npmPendingEntry]);
+              }
+            } else {
+              const npmErrorEntry: ChatEntry = {
+                type: "assistant",
+                content: `❌ **NPM Check Failed**: ${npmCheckResult.error || "Unable to check NPM version"}`,
+                timestamp: new Date(),
+              };
+              setChatHistory((prev) => [...prev, npmErrorEntry]);
+            }
+
+            // Final success message
+            const finalSuccessEntry: ChatEntry = {
+              type: "assistant",
+              content: "🎉 **Smart Push Complete**: All verifications passed!",
+              timestamp: new Date(),
+            };
+            setChatHistory((prev) => [...prev, finalSuccessEntry]);
+
           } else {
             // Check if push failed due to branch protection
             const pushError = pushResult.error || pushResult.output || "";

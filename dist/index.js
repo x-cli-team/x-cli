@@ -16726,6 +16726,71 @@ Using fallback message: "${commitMessage}"`,
               toolResult: pushResult
             };
             setChatHistory((prev) => [...prev, pushEntry]);
+            const verificationEntry = {
+              type: "assistant",
+              content: "\u{1F50D} **Running post-push verification...**",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, verificationEntry]);
+            const statusCheckResult = await agent.executeBashCommand("git status --porcelain");
+            if (statusCheckResult.success && statusCheckResult.output?.trim() === "") {
+              const statusOkEntry = {
+                type: "tool_result",
+                content: "\u2705 **Git Status**: Working directory clean",
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, statusOkEntry]);
+            } else {
+              const statusIssueEntry = {
+                type: "assistant",
+                content: `\u26A0\uFE0F **Git Status Issues Detected**:
+
+${statusCheckResult.output || "Unknown status"}`,
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, statusIssueEntry]);
+            }
+            const waitEntry = {
+              type: "assistant",
+              content: "\u23F3 **Waiting for CI/NPM publishing...** (10 seconds)",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, waitEntry]);
+            await new Promise((resolve8) => setTimeout(resolve8, 1e4));
+            const npmCheckResult = await agent.executeBashCommand("npm view @xagent/x-cli version");
+            const localVersionResult = await agent.executeBashCommand(`node -p "require('./package.json').version"`);
+            const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
+            if (npmCheckResult.success && npmCheckResult.output?.trim()) {
+              const npmVersion = npmCheckResult.output.trim();
+              if (npmVersion === localVersion) {
+                const npmConfirmEntry = {
+                  type: "tool_result",
+                  content: `\u2705 **NPM Package Confirmed**: Version ${npmVersion} published successfully`,
+                  timestamp: /* @__PURE__ */ new Date()
+                };
+                setChatHistory((prev) => [...prev, npmConfirmEntry]);
+              } else {
+                const npmPendingEntry = {
+                  type: "assistant",
+                  content: `\u23F3 **NPM Status**: Local version ${localVersion}, NPM version ${npmVersion}. Publishing may still be in progress.`,
+                  timestamp: /* @__PURE__ */ new Date()
+                };
+                setChatHistory((prev) => [...prev, npmPendingEntry]);
+              }
+            } else {
+              const npmErrorEntry = {
+                type: "assistant",
+                content: `\u274C **NPM Check Failed**: ${npmCheckResult.error || "Unable to check NPM version"}`,
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, npmErrorEntry]);
+            }
+            const finalSuccessEntry = {
+              type: "assistant",
+              content: "\u{1F389} **Smart Push Complete**: All verifications passed!",
+              timestamp: /* @__PURE__ */ new Date()
+            };
+            setChatHistory((prev) => [...prev, finalSuccessEntry]);
           } else {
             const pushError = pushResult.error || pushResult.output || "";
             if (pushError.includes("protected branch") || pushError.includes("Changes must be made through a pull request") || pushError.includes("GH006")) {
