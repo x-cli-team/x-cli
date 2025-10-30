@@ -45,10 +45,10 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix"
+      "eslint --fix --ignore-pattern 'dist/**'"
     ],
     "*.{js,jsx,mjs}": [
-      "eslint --fix"
+      "eslint --fix --ignore-pattern 'dist/**'"
     ],
     "*.{md,mdx}": [
       "prettier --write"
