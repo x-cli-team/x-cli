@@ -15,7 +15,7 @@ import {
   ResearchPlan,
   ApprovalResponse
 } from '../types/research-recommend.js';
-import { GrokAgent } from '../agent/grok-agent.js';
+import { GrokAgent, ChatEntry } from '../agent/grok-agent.js';
 import { ContextPack } from '../utils/context-loader.js';
 import { ExecutionOrchestrator } from './execution-orchestrator.js';
 import { ExecutionResult } from '../types/execution.js';
@@ -43,7 +43,7 @@ export class ResearchRecommendService {
     const prompt = this.buildResearchPrompt(request, contextPack);
 
     try {
-      const response = await this.agent.processUserMessage(prompt, { timeout: this.config.timeout });
+      const response = await this.agent.processUserMessage(prompt);
       return this.parseResearchOutput(response);
     } catch (error) {
       console.error('[ResearchRecommend] Research failed:', error);
@@ -135,7 +135,7 @@ Provide exactly ${this.config.maxOptions} options. Focus on actionable, practica
   /**
    * Parse the AI response into structured output
    */
-  private parseResearchOutput(response: any): ResearchOutput {
+  private parseResearchOutput(response: ChatEntry[]): ResearchOutput {
     // Extract the last assistant message
     let jsonText = '';
     if (Array.isArray(response)) {
@@ -172,6 +172,7 @@ Provide exactly ${this.config.maxOptions} options. Focus on actionable, practica
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validateIssues(issues: any[]): ResearchIssue[] {
     return issues.map(issue => ({
       type: ['fact', 'gap', 'risk'].includes(issue.type) ? issue.type : 'fact',
@@ -181,6 +182,7 @@ Provide exactly ${this.config.maxOptions} options. Focus on actionable, practica
     }));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validateOptions(options: any[]): ResearchOption[] {
     return options.slice(0, this.config.maxOptions).map((option, index) => ({
       id: option.id || (index + 1),
@@ -195,6 +197,7 @@ Provide exactly ${this.config.maxOptions} options. Focus on actionable, practica
     }));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validateRecommendation(rec: any): ResearchRecommendation {
     return {
       optionId: rec?.optionId || 1,
@@ -204,6 +207,7 @@ Provide exactly ${this.config.maxOptions} options. Focus on actionable, practica
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validatePlan(plan: any): ResearchPlan {
     return {
       summary: plan?.summary || 'No summary provided',
