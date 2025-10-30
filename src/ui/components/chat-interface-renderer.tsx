@@ -83,6 +83,7 @@ export interface ChatInterfaceRendererProps {
   availableModels: any[];
   selectedModelIndex: number;
   showModelSelection: boolean;
+  asciiArt?: string;
 
   // Handler functions
   handleConfirmation: (dontAskAgain?: boolean) => void;

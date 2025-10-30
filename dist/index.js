@@ -8519,7 +8519,7 @@ function loadCustomInstructions(workingDirectory = process.cwd()) {
 // src/agent/grok-agent.ts
 init_settings_manager();
 var GrokAgent = class extends EventEmitter {
-  constructor(apiKey, baseURL, model, maxToolRounds) {
+  constructor(apiKey, baseURL, model, maxToolRounds, contextPack) {
     super();
     this.chatHistory = [];
     this.messages = [];
@@ -8562,9 +8562,21 @@ CUSTOM INSTRUCTIONS:
 ${customInstructions}
 
 The above custom instructions should be followed alongside the standard instructions below.` : "";
+    const contextSection = contextPack ? `
+
+PROJECT CONTEXT:
+${contextPack.system}
+
+SOP:
+${contextPack.sop}
+
+TASKS:
+${contextPack.tasks.map((t) => `- ${t.filename}: ${t.content}`).join("\n")}
+
+The above project context should inform your responses and decision making.` : "";
     this.messages.push({
       role: "system",
-      content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}
+      content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}
 
 You have access to these tools:
 
@@ -14674,7 +14686,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.71",
+  version: "1.1.73",
   description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -14702,7 +14714,7 @@ var package_default = {
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     start: "node dist/index.js",
-    local: "npm run build && npm link && node dist/index.js",
+    local: "npm run build > /dev/null 2>&1 && npm link > /dev/null 2>&1 && node dist/index.js",
     "test:workflow": "node scripts/test-workflow.js",
     "start:bun": "bun run dist/index.js",
     lint: "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -14802,7 +14814,7 @@ var package_default = {
   },
   optionalDependencies: {
     "tree-sitter": "^0.21.1",
-    "tree-sitter-javascript": "^0.21.2",
+    "tree-sitter-javascript": "^0.21.4",
     "tree-sitter-python": "^0.21.0",
     "tree-sitter-typescript": "^0.21.2"
   },
@@ -16757,33 +16769,44 @@ ${statusCheckResult.output || "Unknown status"}`,
             };
             setChatHistory((prev) => [...prev, waitEntry]);
             await new Promise((resolve8) => setTimeout(resolve8, 1e4));
-            const npmCheckResult = await agent.executeBashCommand("npm view @xagent/x-cli version");
-            const localVersionResult = await agent.executeBashCommand(`node -p "require('./package.json').version"`);
-            const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
-            if (npmCheckResult.success && npmCheckResult.output?.trim()) {
-              const npmVersion = npmCheckResult.output.trim();
-              if (npmVersion === localVersion) {
-                const npmConfirmEntry = {
-                  type: "tool_result",
-                  content: `\u2705 **NPM Package Confirmed**: Version ${npmVersion} published successfully`,
-                  timestamp: /* @__PURE__ */ new Date()
-                };
-                setChatHistory((prev) => [...prev, npmConfirmEntry]);
+            const localPackageResult = await agent.executeBashCommand(`node -p "require('./package.json').name" 2>/dev/null || echo 'no-package'`);
+            const localName = localPackageResult.success && localPackageResult.output?.trim() !== "no-package" ? localPackageResult.output?.trim() : null;
+            if (localName) {
+              const localVersionResult = await agent.executeBashCommand(`node -p "require('./package.json').version"`);
+              const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
+              const npmCheckResult = await agent.executeBashCommand(`npm view ${localName} version 2>/dev/null || echo 'not-found'`);
+              if (npmCheckResult.success && npmCheckResult.output?.trim() && npmCheckResult.output?.trim() !== "not-found") {
+                const npmVersion = npmCheckResult.output.trim();
+                if (npmVersion === localVersion) {
+                  const npmConfirmEntry = {
+                    type: "tool_result",
+                    content: `\u2705 **NPM Package Confirmed**: ${localName} v${npmVersion} published successfully`,
+                    timestamp: /* @__PURE__ */ new Date()
+                  };
+                  setChatHistory((prev) => [...prev, npmConfirmEntry]);
+                } else {
+                  const npmPendingEntry = {
+                    type: "assistant",
+                    content: `\u23F3 **NPM Status**: Local ${localName} v${localVersion}, NPM v${npmVersion}. Publishing may still be in progress.`,
+                    timestamp: /* @__PURE__ */ new Date()
+                  };
+                  setChatHistory((prev) => [...prev, npmPendingEntry]);
+                }
               } else {
-                const npmPendingEntry = {
+                const npmSkipEntry = {
                   type: "assistant",
-                  content: `\u23F3 **NPM Status**: Local version ${localVersion}, NPM version ${npmVersion}. Publishing may still be in progress.`,
+                  content: `\u2139\uFE0F **NPM Check Skipped**: Package ${localName} not found on NPM (may not be published yet)`,
                   timestamp: /* @__PURE__ */ new Date()
                 };
-                setChatHistory((prev) => [...prev, npmPendingEntry]);
+                setChatHistory((prev) => [...prev, npmSkipEntry]);
               }
             } else {
-              const npmErrorEntry = {
+              const npmSkipEntry = {
                 type: "assistant",
-                content: `\u274C **NPM Check Failed**: ${npmCheckResult.error || "Unable to check NPM version"}`,
+                content: `\u2139\uFE0F **NPM Check Skipped**: No package.json found or not an NPM package`,
                 timestamp: /* @__PURE__ */ new Date()
               };
-              setChatHistory((prev) => [...prev, npmErrorEntry]);
+              setChatHistory((prev) => [...prev, npmSkipEntry]);
             }
             const finalSuccessEntry = {
               type: "assistant",
@@ -17633,15 +17656,63 @@ function useConfirmations(confirmationService, state) {
     handleRejection
   };
 }
-function useConsoleSetup(quiet = false) {
-  useEffect(() => {
-    if (quiet) return;
-    const isWindows = process.platform === "win32";
-    const isPowerShell = process.env.ComSpec?.toLowerCase().includes("powershell") || process.env.PSModulePath !== void 0;
-    if (!isWindows || !isPowerShell) {
-      console.clear();
-    }
-  }, [quiet]);
+
+// src/hooks/use-console-setup.ts
+function printWelcomeBanner(quiet = false) {
+  if (quiet) return;
+  const isTTY = !!process.stdout.isTTY;
+  if (isTTY) {
+    process.stdout.write("\x1B[?25l");
+    process.stdout.write("\x1B[H");
+    process.stdout.write("\x1B[2J");
+    process.stdout.write("\x1B[3J");
+    process.stdout.write("\x1B[H");
+  }
+  const isFancy = process.env.X_CLI_ASCII !== "block";
+  const fancyAscii = String.raw`__/\\\_______/\\\______________________/\\\\\\\\\__/\\\______________/\\\\\\\\\\\_        
+ _\///\\\___/\\\/____________________/\\\////////__\/\\\_____________\/////\\\///__       
+  ___\///\\\\\\/____________________/\\\/___________\/\\\_________________\/\\\_____      
+   _____\//\\\\_______/\\\\\\\\\\\__/\\\_____________\/\\\_________________\/\\\_____     
+    ______\/\\\\______\///////////__\/\\\_____________\/\\\_________________\/\\\_____    
+     ______/\\\\\\___________________\//\\\____________\/\\\_________________\/\\\_____   
+      ____/\\\////\\\__________________\///\\\__________\/\\\_________________\/\\\_____  
+       __/\\\/___\///\\\__________________\////\\\\\\\\\_\/\\\\\\\\\\\\\\\__/\\\\\\\\\\\_ 
+        _\///_______\///______________________\/////////__\///////////////__\///////////__`;
+  const blockAscii = String.raw`\x1b[34m  ████      ████████ ████      ████
+  ████████  ██████████████  ████████
+ ██████████  ██████████████  ████████
+ ██████████  ██████████████  ████████
+  ████████  ██████████████  ████████
+   ████      ████████ ████      ████\x1b[0m`;
+  const asciiArt = (isFancy ? fancyAscii : blockAscii).normalize("NFC");
+  process.stdout.write(asciiArt + "\n");
+  const welcomeBanner = [
+    "",
+    `\x1B[32m  Welcome to X-CLI v${package_default.version} \u26A1\x1B[0m`,
+    "",
+    `\x1B[36m  \u{1F680} Claude Code-level intelligence in your terminal!\x1B[0m`,
+    "",
+    `\x1B[33m  \u2714 Ready. Type your first command or paste code to begin.\x1B[0m`,
+    "",
+    `\x1B[35m  \u{1F4A1} Quick Start Tips:\x1B[0m`,
+    "",
+    `  \u2022 Ask anything: "Create a React component" or "Debug this Python script"`,
+    `  \u2022 Edit files: "Add error handling to app.js"`,
+    `  \u2022 Run commands: "Set up a new Node.js project"`,
+    `  \u2022 Get help: Type "/help" for all commands`,
+    "",
+    `\x1B[35m  \u{1F6E0}\uFE0F  Power Features:\x1B[0m`,
+    "",
+    `  \u2022 Auto-edit mode: Press Shift+Tab to toggle hands-free editing`,
+    `  \u2022 Project memory: Create .grok/GROK.md to customize behavior`,
+    `  \u2022 Documentation: Run "/init-agent" for .agent docs system`,
+    `  \u2022 Error recovery: Run "/heal" after errors to add guardrails`,
+    "",
+    `\x1B[37m  Type your request in natural language. Ctrl+C to clear, 'exit' to quit.\x1B[0m`,
+    ""
+  ].join("\n");
+  process.stdout.write(welcomeBanner);
+  if (isTTY) process.stdout.write("\x1B[?25h");
 }
 function useSessionLogging(chatHistory) {
   const lastChatHistoryLength = useRef(0);
@@ -19354,7 +19425,9 @@ function ChatInterfaceRenderer({
 function ChatInterfaceWithAgent({
   agent,
   initialMessage,
-  quiet = false
+  quiet = false,
+  contextPack,
+  contextStatus
 }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -19364,11 +19437,18 @@ function ChatInterfaceWithAgent({
   const [confirmationOptions, setConfirmationOptions] = useState(null);
   const [showContextTooltip, setShowContextTooltip] = useState(false);
   const processingStartTime = useRef(0);
-  useConsoleSetup(quiet);
   useAutoRead(setChatHistory);
   useEffect(() => {
-    setChatHistory([]);
-  }, []);
+    const initialHistory = [];
+    if (contextStatus) {
+      initialHistory.push({
+        type: "assistant",
+        content: `\u{1F527} ${contextStatus}`,
+        timestamp: /* @__PURE__ */ new Date()
+      });
+    }
+    setChatHistory(initialHistory);
+  }, [contextStatus]);
   useSessionLogging(chatHistory);
   const { contextInfo } = useContextInfo(agent);
   const handleGlobalShortcuts = (str, key) => {
@@ -19458,7 +19538,9 @@ function ChatInterfaceWithAgent({
 function ChatInterface({
   agent,
   initialMessage,
-  quiet = false
+  quiet = false,
+  contextPack,
+  contextStatus
 }) {
   const [currentAgent, setCurrentAgent] = useState(
     agent || null
@@ -19474,7 +19556,9 @@ function ChatInterface({
     {
       agent: currentAgent,
       initialMessage,
-      quiet
+      quiet,
+      contextPack,
+      contextStatus
     }
   );
 }
@@ -19869,18 +19953,6 @@ function checkAutoCompact() {
   } catch {
   }
 }
-async function checkStartupUpdates() {
-  try {
-    const versionInfo = await checkForUpdates();
-    if (versionInfo.isUpdateAvailable) {
-      console.log(`
-\u{1F504} Update available: v${versionInfo.latest} (current: v${versionInfo.current})`);
-      console.log(`   Use '/upgrade' command or run: ${versionInfo.updateCommand}
-`);
-    }
-  } catch {
-  }
-}
 function loadApiKey() {
   const manager = getSettingsManager();
   return manager.getApiKey();
@@ -20109,27 +20181,27 @@ program.name("grok").description(
       console.error("\u274C Error: X CLI requires an interactive terminal. Please run in a TTY environment.");
       process.exit(1);
     }
-    const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
+    let contextPack;
+    let statusMessage;
+    try {
+      contextPack = loadContext();
+      statusMessage = formatContextStatus(contextPack);
+      console.log(statusMessage);
+    } catch (error) {
+      console.warn("\u26A0\uFE0F Failed to load .agent/ context:", error instanceof Error ? error.message : String(error));
+    }
+    const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds, contextPack);
     const settingsManager = getSettingsManager();
     const assistantName = settingsManager.getUserSetting("assistantName") || "X CLI";
     if (!options.quiet) {
       console.log(`\u{1F916} Starting ${assistantName} Conversational Assistant...
 `);
     }
-    if (!options.quiet) {
-      try {
-        const contextPack = loadContext();
-        const statusMessage = formatContextStatus(contextPack);
-        console.log(statusMessage);
-      } catch (error) {
-        console.warn("\u26A0\uFE0F Failed to load .agent/ context:", error instanceof Error ? error.message : String(error));
-      }
-    }
     ensureUserSettingsDirectory();
     checkAutoCompact();
-    checkStartupUpdates();
     const initialMessage = Array.isArray(message) ? message.join(" ") : message;
-    const app = render(React4.createElement(ChatInterface, { agent, initialMessage, quiet: options.quiet }));
+    printWelcomeBanner(options.quiet);
+    const app = render(React4.createElement(ChatInterface, { agent, initialMessage, quiet: options.quiet, contextStatus: statusMessage }));
     const cleanup = () => {
       app.unmount();
       agent.abortCurrentOperation();

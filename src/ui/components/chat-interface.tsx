@@ -14,11 +14,14 @@ import { useConsoleSetup } from "../../hooks/use-console-setup.js";
 import { useSessionLogging } from "../../hooks/use-session-logging.js";
 import { useProcessingTimer } from "../../hooks/use-processing-timer.js";
 import { ChatInterfaceRenderer, ContextInfo, PlanMode } from "../../ui/components/chat-interface-renderer.js";
+import { ContextPack } from "../../utils/context-loader.js";
 
 interface ChatInterfaceProps {
   agent?: GrokAgent;
   initialMessage?: string;
   quiet?: boolean;
+  contextPack?: ContextPack;
+  contextStatus?: string;
 }
 
 // Main chat component that handles input when agent is available
@@ -26,10 +29,14 @@ function ChatInterfaceWithAgent({
   agent,
   initialMessage,
   quiet = false,
+  contextPack: _contextPack,
+  contextStatus,
 }: {
   agent: GrokAgent;
   initialMessage?: string;
   quiet?: boolean;
+  contextPack?: ContextPack;
+  contextStatus?: string;
 }) {
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -50,8 +57,16 @@ function ChatInterfaceWithAgent({
 
   // Initialize chat history
   useEffect(() => {
-    setChatHistory([]);
-  }, []);
+    const initialHistory: ChatEntry[] = [];
+    if (contextStatus) {
+      initialHistory.push({
+        type: 'assistant',
+        content: `🔧 ${contextStatus}`,
+        timestamp: new Date(),
+      });
+    }
+    setChatHistory(initialHistory);
+  }, [contextStatus]);
 
   // Session logging
   useSessionLogging(chatHistory);
@@ -164,6 +179,8 @@ export default function ChatInterface({
   agent,
   initialMessage,
   quiet = false,
+  contextPack,
+  contextStatus,
 }: ChatInterfaceProps) {
   const [currentAgent, setCurrentAgent] = useState<GrokAgent | null>(
     agent || null
@@ -182,6 +199,8 @@ export default function ChatInterface({
       agent={currentAgent}
       initialMessage={initialMessage}
       quiet={quiet}
+      contextPack={contextPack}
+      contextStatus={contextStatus}
     />
   );
 }

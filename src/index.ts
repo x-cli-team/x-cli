@@ -5,6 +5,7 @@ import * as dotenv from "dotenv";
 import path from "path";
 import { GrokAgent } from "./agent/grok-agent.js";
 import ChatInterface from "./ui/components/chat-interface.js";
+import { printWelcomeBanner } from "./hooks/use-console-setup.js";
 import { getSettingsManager } from "./utils/settings-manager.js";
 import { ConfirmationService } from "./utils/confirmation-service.js";
 import { createMCPCommand } from "./commands/mcp.js";
@@ -86,7 +87,7 @@ function checkAutoCompact(): void {
 }
 
 // Check for updates at startup (non-blocking)
-async function checkStartupUpdates(): Promise<void> {
+async function _checkStartupUpdates(): Promise<void> {
   try {
     const versionInfo = await checkForUpdates();
     if (versionInfo.isUpdateAvailable) {
@@ -433,7 +434,18 @@ program
         process.exit(1);
       }
 
-      const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
+      // Load .agent/ context for intelligent decision making
+      let contextPack;
+      let statusMessage;
+      try {
+        contextPack = loadContext();
+        statusMessage = formatContextStatus(contextPack);
+        console.log(statusMessage);
+      } catch (error) {
+        console.warn("⚠️ Failed to load .agent/ context:", error instanceof Error ? error.message : String(error));
+      }
+
+      const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds, contextPack);
 
       // Get the custom assistant name
       const settingsManager = getSettingsManager();
@@ -443,31 +455,23 @@ program
         console.log(`🤖 Starting ${assistantName} Conversational Assistant...\n`);
       }
 
-      // Load .agent/ context for intelligent decision making
-      if (!options.quiet) {
-        try {
-          const contextPack = loadContext();
-          const statusMessage = formatContextStatus(contextPack);
-          console.log(statusMessage);
-        } catch (error) {
-          console.warn("⚠️ Failed to load .agent/ context:", error instanceof Error ? error.message : String(error));
-        }
-      }
-
       ensureUserSettingsDirectory();
 
       // Check if auto-compact should be enabled
       checkAutoCompact();
-
-      // Check for updates (non-blocking)
-      checkStartupUpdates();
 
       // Support variadic positional arguments for multi-word initial message
       const initialMessage = Array.isArray(message)
         ? message.join(" ")
         : message;
 
-      const app = render(React.createElement(ChatInterface, { agent, initialMessage, quiet: options.quiet }));
+      // Print welcome banner before rendering the React UI
+      printWelcomeBanner(options.quiet);
+
+      const app = render(React.createElement(ChatInterface, { agent, initialMessage, quiet: options.quiet, contextStatus: statusMessage }));
+
+      // Check for updates (non-blocking) after render
+      // checkStartupUpdates();
 
       // Cleanup on exit
       const cleanup = () => {

@@ -30,6 +30,7 @@ import { EventEmitter } from "events";
 import { createTokenCounter, TokenCounter } from "../utils/token-counter.js";
 import { loadCustomInstructions } from "../utils/custom-instructions.js";
 import { getSettingsManager } from "../utils/settings-manager.js";
+import { ContextPack } from "../utils/context-loader.js";
 
 export interface ChatEntry {
   type: "user" | "assistant" | "tool_result" | "tool_call";
@@ -96,7 +97,8 @@ export class GrokAgent extends EventEmitter {
     apiKey: string,
     baseURL?: string,
     model?: string,
-    maxToolRounds?: number
+    maxToolRounds?: number,
+    contextPack?: ContextPack
   ) {
     super();
     const manager = getSettingsManager();
@@ -134,10 +136,13 @@ export class GrokAgent extends EventEmitter {
       ? `\n\nCUSTOM INSTRUCTIONS:\n${customInstructions}\n\nThe above custom instructions should be followed alongside the standard instructions below.`
       : "";
 
+    // Load .agent context if provided
+    const contextSection = contextPack ? `\n\nPROJECT CONTEXT:\n${contextPack.system}\n\nSOP:\n${contextPack.sop}\n\nTASKS:\n${contextPack.tasks.map(t => `- ${t.filename}: ${t.content}`).join('\n')}\n\nThe above project context should inform your responses and decision making.` : "";
+
     // Initialize with system message
     this.messages.push({
       role: "system",
-      content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}
+      content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}
 
 You have access to these tools:
 

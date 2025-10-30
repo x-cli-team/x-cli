@@ -29,7 +29,7 @@
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     "start": "node dist/index.js",
-    "local": "npm run build && npm link && node dist/index.js",
+    "local": "npm run build > /dev/null 2>&1 && npm link > /dev/null 2>&1 && node dist/index.js",
     "test:workflow": "node scripts/test-workflow.js",
     "start:bun": "bun run dist/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -129,7 +129,7 @@
   },
   "optionalDependencies": {
     "tree-sitter": "^0.21.1",
-    "tree-sitter-javascript": "^0.21.2",
+    "tree-sitter-javascript": "^0.21.4",
     "tree-sitter-python": "^0.21.0",
     "tree-sitter-typescript": "^0.21.2"
   },

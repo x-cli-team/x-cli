@@ -2139,35 +2139,48 @@ Respond with ONLY the commit message, no additional text.`;
 
             await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds
 
-            // Check NPM package version
-            const npmCheckResult = await agent.executeBashCommand("npm view @xagent/x-cli version");
-            const localVersionResult = await agent.executeBashCommand("node -p \"require('./package.json').version\"");
-            const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
+            // Check NPM package version (only if this is an NPM package)
+            const localPackageResult = await agent.executeBashCommand("node -p \"require('./package.json').name\" 2>/dev/null || echo 'no-package'");
+            const localName = localPackageResult.success && localPackageResult.output?.trim() !== 'no-package' ? localPackageResult.output?.trim() : null;
 
-            if (npmCheckResult.success && npmCheckResult.output?.trim()) {
-              const npmVersion = npmCheckResult.output.trim();
-              if (npmVersion === localVersion) {
-                const npmConfirmEntry: ChatEntry = {
-                  type: "tool_result",
-                  content: `✅ **NPM Package Confirmed**: Version ${npmVersion} published successfully`,
-                  timestamp: new Date(),
-                };
-                setChatHistory((prev) => [...prev, npmConfirmEntry]);
+            if (localName) {
+              const localVersionResult = await agent.executeBashCommand("node -p \"require('./package.json').version\"");
+              const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
+
+              const npmCheckResult = await agent.executeBashCommand(`npm view ${localName} version 2>/dev/null || echo 'not-found'`);
+
+              if (npmCheckResult.success && npmCheckResult.output?.trim() && npmCheckResult.output?.trim() !== 'not-found') {
+                const npmVersion = npmCheckResult.output.trim();
+                if (npmVersion === localVersion) {
+                  const npmConfirmEntry: ChatEntry = {
+                    type: "tool_result",
+                    content: `✅ **NPM Package Confirmed**: ${localName} v${npmVersion} published successfully`,
+                    timestamp: new Date(),
+                  };
+                  setChatHistory((prev) => [...prev, npmConfirmEntry]);
+                } else {
+                  const npmPendingEntry: ChatEntry = {
+                    type: "assistant",
+                    content: `⏳ **NPM Status**: Local ${localName} v${localVersion}, NPM v${npmVersion}. Publishing may still be in progress.`,
+                    timestamp: new Date(),
+                  };
+                  setChatHistory((prev) => [...prev, npmPendingEntry]);
+                }
               } else {
-                const npmPendingEntry: ChatEntry = {
+                const npmSkipEntry: ChatEntry = {
                   type: "assistant",
-                  content: `⏳ **NPM Status**: Local version ${localVersion}, NPM version ${npmVersion}. Publishing may still be in progress.`,
+                  content: `ℹ️ **NPM Check Skipped**: Package ${localName} not found on NPM (may not be published yet)`,
                   timestamp: new Date(),
                 };
-                setChatHistory((prev) => [...prev, npmPendingEntry]);
+                setChatHistory((prev) => [...prev, npmSkipEntry]);
               }
             } else {
-              const npmErrorEntry: ChatEntry = {
+              const npmSkipEntry: ChatEntry = {
                 type: "assistant",
-                content: `❌ **NPM Check Failed**: ${npmCheckResult.error || "Unable to check NPM version"}`,
+                content: `ℹ️ **NPM Check Skipped**: No package.json found or not an NPM package`,
                 timestamp: new Date(),
               };
-              setChatHistory((prev) => [...prev, npmErrorEntry]);
+              setChatHistory((prev) => [...prev, npmSkipEntry]);
             }
 
             // Final success message

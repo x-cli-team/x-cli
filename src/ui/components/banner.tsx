@@ -44,6 +44,7 @@ interface BannerProps {
   workspaceFiles?: number;
   indexSize?: string;
   sessionRestored?: boolean;
+  asciiArt?: string;
 }
 
 export function Banner({ 
