@@ -16,12 +16,13 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import axios from 'axios';
 import { exec, execSync, spawn } from 'child_process';
 import { promisify } from 'util';
-import fs4, { writeFile } from 'fs/promises';
+import fs6, { writeFile } from 'fs/promises';
 import * as ops6 from 'fs-extra';
 import { parse } from '@typescript-eslint/typescript-estree';
 import Fuse from 'fuse.js';
 import { glob } from 'glob';
 import { encoding_for_model, get_encoding } from 'tiktoken';
+import * as readline from 'readline';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { marked } from 'marked';
 import TerminalRenderer from 'marked-terminal';
@@ -336,6 +337,131 @@ var init_config = __esm({
     PREDEFINED_SERVERS = {};
   }
 });
+
+// src/utils/context-loader.ts
+var context_loader_exports = {};
+__export(context_loader_exports, {
+  formatContextStatus: () => formatContextStatus,
+  loadContext: () => loadContext
+});
+function loadMarkdownDirectory(dirPath) {
+  if (!fs__default.existsSync(dirPath)) {
+    return "";
+  }
+  const files = fs__default.readdirSync(dirPath).filter((file) => file.endsWith(".md")).sort();
+  let content = "";
+  for (const file of files) {
+    const filePath = path7__default.join(dirPath, file);
+    try {
+      const fileContent = fs__default.readFileSync(filePath, "utf-8");
+      content += `
+
+=== ${file} ===
+
+${fileContent}`;
+    } catch (error) {
+      console.warn(`Failed to read ${filePath}:`, error);
+    }
+  }
+  return content;
+}
+function extractDateFromFilename(filename) {
+  const match = filename.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (match) {
+    return new Date(match[1]);
+  }
+  return /* @__PURE__ */ new Date(0);
+}
+function summarizeContent(content, maxLength = MAX_SUMMARY_LENGTH) {
+  if (content.length <= maxLength) {
+    return content;
+  }
+  const truncated = content.substring(0, maxLength);
+  const lastNewline = truncated.lastIndexOf("\n\n");
+  if (lastNewline > maxLength * 0.8) {
+    return truncated.substring(0, lastNewline);
+  }
+  return truncated + "\n\n[...content truncated for context budget...]";
+}
+function loadTaskFiles(tasksDir, maxBudget) {
+  if (!fs__default.existsSync(tasksDir)) {
+    return [];
+  }
+  const files = fs__default.readdirSync(tasksDir).filter((file) => file.endsWith(".md")).map((filename) => {
+    const filePath = path7__default.join(tasksDir, filename);
+    const content = fs__default.readFileSync(filePath, "utf-8");
+    return {
+      filename,
+      content,
+      size: Buffer.byteLength(content, "utf-8"),
+      date: extractDateFromFilename(filename),
+      isSummarized: false
+    };
+  }).sort((a, b) => b.date.getTime() - a.date.getTime());
+  const result = [];
+  let usedBudget = 0;
+  for (const file of files) {
+    let finalContent = file.content;
+    let isSummarized = false;
+    if (usedBudget + file.size > maxBudget) {
+      finalContent = summarizeContent(file.content);
+      const summarizedSize = Buffer.byteLength(finalContent, "utf-8");
+      if (usedBudget + summarizedSize > maxBudget) {
+        continue;
+      }
+      usedBudget += summarizedSize;
+      isSummarized = true;
+    } else {
+      usedBudget += file.size;
+    }
+    result.push({
+      ...file,
+      content: finalContent,
+      isSummarized
+    });
+  }
+  return result;
+}
+function loadContext(agentDir = ".agent") {
+  const systemContent = loadMarkdownDirectory(path7__default.join(agentDir, "system"));
+  const sopContent = loadMarkdownDirectory(path7__default.join(agentDir, "sop"));
+  const systemSize = Buffer.byteLength(systemContent, "utf-8");
+  const sopSize = Buffer.byteLength(sopContent, "utf-8");
+  const taskBudget = Math.max(0, CONTEXT_BUDGET_BYTES - systemSize - sopSize);
+  const tasks = loadTaskFiles(path7__default.join(agentDir, "tasks"), taskBudget);
+  const totalSize = systemSize + sopSize + tasks.reduce((sum, task) => sum + Buffer.byteLength(task.content, "utf-8"), 0);
+  const warnings = [];
+  if (totalSize > CONTEXT_BUDGET_BYTES) {
+    warnings.push(`Context size (${(totalSize / 1024).toFixed(1)}KB) exceeds budget (${CONTEXT_BUDGET_BYTES / 1024}KB)`);
+  }
+  return {
+    system: systemContent,
+    sop: sopContent,
+    tasks,
+    totalSize,
+    warnings
+  };
+}
+function formatContextStatus(pack) {
+  const taskCount = pack.tasks.length;
+  const summarizedCount = pack.tasks.filter((t) => t.isSummarized).length;
+  const sizeKB = (pack.totalSize / 1024).toFixed(1);
+  let status = `[x-cli] Context: loaded system docs, sop docs, ${taskCount} task docs (~${sizeKB} KB).`;
+  if (summarizedCount > 0) {
+    status += ` Summarized ${summarizedCount} older tasks for context budget.`;
+  }
+  if (pack.warnings.length > 0) {
+    status += ` Warnings: ${pack.warnings.join("; ")}`;
+  }
+  return status;
+}
+var CONTEXT_BUDGET_BYTES, MAX_SUMMARY_LENGTH;
+var init_context_loader = __esm({
+  "src/utils/context-loader.ts"() {
+    CONTEXT_BUDGET_BYTES = 280 * 1024;
+    MAX_SUMMARY_LENGTH = 2e3;
+  }
+});
 var GrokClient = class {
   constructor(apiKey, model, baseURL) {
     this.currentModel = "grok-code-fast-1";
@@ -629,7 +755,7 @@ var MCPManager = class extends EventEmitter {
       this.transports.set(config2.name, transport);
       const client = new Client(
         {
-          name: "grok-cli",
+          name: "x-cli",
           version: "1.0.0"
         },
         {
@@ -5300,7 +5426,7 @@ var OperationHistoryTool = class {
           files: fileSnapshots
         },
         metadata: {
-          tool: "grok-cli",
+          tool: "x-cli",
           filesAffected: files,
           operationSize: this.determineOperationSize(files, rollbackData),
           ...metadata
@@ -7040,10 +7166,10 @@ var DependencyAnalyzerTool = class {
     const circularDeps = [];
     const visited = /* @__PURE__ */ new Set();
     const visiting = /* @__PURE__ */ new Set();
-    const dfs = (filePath, path31) => {
+    const dfs = (filePath, path32) => {
       if (visiting.has(filePath)) {
-        const cycleStart = path31.indexOf(filePath);
-        const cycle = path31.slice(cycleStart).concat([filePath]);
+        const cycleStart = path32.indexOf(filePath);
+        const cycle = path32.slice(cycleStart).concat([filePath]);
         circularDeps.push({
           cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
           severity: cycle.length <= 2 ? "error" : "warning",
@@ -7059,7 +7185,7 @@ var DependencyAnalyzerTool = class {
       if (node) {
         for (const dependency of node.dependencies) {
           if (graph.nodes.has(dependency)) {
-            dfs(dependency, [...path31, filePath]);
+            dfs(dependency, [...path32, filePath]);
           }
         }
       }
@@ -8518,6 +8644,872 @@ function loadCustomInstructions(workingDirectory = process.cwd()) {
 
 // src/agent/grok-agent.ts
 init_settings_manager();
+var DEFAULT_OPTIONS = {
+  createPatches: true,
+  createBackups: true,
+  gitCommit: true,
+  timeout: 3e5,
+  // 5 minutes per step
+  maxConcurrentSteps: 1
+};
+var ExecutionOrchestrator = class {
+  constructor(agent, options = {}) {
+    this.agent = agent;
+    this.maxRecoveryAttempts = 3;
+    this.recoveryAttempts = /* @__PURE__ */ new Map();
+    this.options = { ...DEFAULT_OPTIONS, ...options };
+  }
+  /**
+   * Execute a research plan's TODO items
+   */
+  async executePlan(plan) {
+    console.log(`\u{1F680} Starting execution of ${plan.todo.length} tasks...`);
+    console.log(`Summary: ${plan.summary}`);
+    const executionPlan = {
+      steps: plan.todo.map((todo, index) => ({
+        id: index + 1,
+        description: todo,
+        status: "pending"
+      })),
+      totalSteps: plan.todo.length,
+      completedSteps: 0,
+      failedSteps: 0,
+      startTime: /* @__PURE__ */ new Date(),
+      summary: plan.summary
+    };
+    try {
+      for (const step of executionPlan.steps) {
+        await this.executeStep(step, executionPlan);
+        if (step.status === "failed") {
+          executionPlan.failedSteps++;
+        } else {
+          executionPlan.completedSteps++;
+        }
+      }
+      executionPlan.endTime = /* @__PURE__ */ new Date();
+      if (this.options.gitCommit && this.isGitRepository()) {
+        try {
+          executionPlan.gitCommitHash = await this.createGitCommit(executionPlan);
+        } catch (error) {
+          console.warn("[Execution] Failed to create git commit:", error);
+        }
+      }
+      const success = executionPlan.failedSteps === 0;
+      console.log(`\u2705 Execution ${success ? "completed" : "finished with errors"}: ${executionPlan.completedSteps}/${executionPlan.totalSteps} steps successful`);
+      return {
+        success,
+        executionPlan
+      };
+    } catch (error) {
+      executionPlan.endTime = /* @__PURE__ */ new Date();
+      console.error("[Execution] Orchestration failed:", error);
+      return {
+        success: false,
+        executionPlan,
+        error: error instanceof Error ? error.message : "Unknown execution error"
+      };
+    }
+  }
+  /**
+   * Execute a single step
+   */
+  async executeStep(step, _executionPlan) {
+    step.status = "running";
+    step.startTime = /* @__PURE__ */ new Date();
+    console.log(`
+[x-cli] #${step.id} ${step.description} \u2026`);
+    try {
+      const beforeState = this.captureFileState();
+      await this.agent.processUserMessage(step.description);
+      await new Promise((resolve8) => setTimeout(resolve8, 1e3));
+      const afterState = this.captureFileState();
+      step.changes = this.calculateChanges(beforeState, afterState);
+      await this.displayChanges(step);
+      if (step.changes && step.changes.length > 0) {
+        step.patchFile = await this.createPatchFile(step);
+        await this.createBackups(step);
+      }
+      step.status = "completed";
+      step.endTime = /* @__PURE__ */ new Date();
+      console.log(`[x-cli] #${step.id} \u2713 Completed`);
+    } catch (error) {
+      step.status = "failed";
+      step.endTime = /* @__PURE__ */ new Date();
+      step.error = error instanceof Error ? error.message : "Unknown error";
+      console.log(`[x-cli] #${step.id} \u2717 Failed: ${step.error}`);
+    }
+  }
+  /**
+   * Capture current file state (simplified - just track modification times)
+   */
+  captureFileState() {
+    const state = /* @__PURE__ */ new Map();
+    try {
+      const walkDir = (dir) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const filePath = path7.join(dir, file);
+          const stat = fs.statSync(filePath);
+          if (stat.isDirectory() && !file.startsWith(".") && file !== "node_modules") {
+            walkDir(filePath);
+          } else if (stat.isFile()) {
+            state.set(filePath, stat.mtime.getTime());
+          }
+        }
+      };
+      walkDir(".");
+    } catch (error) {
+      console.warn("[Execution] Failed to capture file state:", error);
+    }
+    return state;
+  }
+  /**
+   * Calculate file changes between states
+   */
+  calculateChanges(before, after) {
+    const changes = [];
+    for (const [filePath, afterTime] of after) {
+      const beforeTime = before.get(filePath);
+      if (!beforeTime || beforeTime !== afterTime) {
+        changes.push({
+          filePath,
+          changeType: beforeTime ? "modified" : "created"
+        });
+      }
+    }
+    for (const filePath of before.keys()) {
+      if (!after.has(filePath)) {
+        changes.push({
+          filePath,
+          changeType: "deleted"
+        });
+      }
+    }
+    return changes;
+  }
+  /**
+   * Display changes with diffs
+   */
+  async displayChanges(step) {
+    if (!step.changes || step.changes.length === 0) {
+      return;
+    }
+    console.log(`[x-cli] #${step.id} Changes detected:`);
+    for (const change of step.changes) {
+      console.log(`  ${change.changeType.toUpperCase()}: ${change.filePath}`);
+      if (change.changeType === "modified" && fs.existsSync(change.filePath)) {
+        try {
+          if (this.isGitRepository()) {
+            const diff = execSync(`git diff --no-index /dev/null ${change.filePath} 2>/dev/null || git diff ${change.filePath}`, {
+              encoding: "utf-8",
+              timeout: 5e3
+            }).trim();
+            if (diff) {
+              console.log("  Diff:");
+              console.log(diff.split("\n").map((line) => `    ${line}`).join("\n"));
+            }
+          }
+        } catch (_error) {
+        }
+      }
+    }
+  }
+  /**
+   * Create patch file for changes
+   */
+  async createPatchFile(step) {
+    if (!this.options.createPatches || !step.changes || step.changes.length === 0) {
+      return void 0;
+    }
+    try {
+      const patchesDir = path7.join(__require("os").homedir(), ".xcli", "patches");
+      if (!fs.existsSync(patchesDir)) {
+        fs.mkdirSync(patchesDir, { recursive: true });
+      }
+      const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+      const patchFile = path7.join(patchesDir, `step-${step.id}-${timestamp}.patch`);
+      let patchContent = `# Patch for step #${step.id}: ${step.description}
+`;
+      patchContent += `# Generated: ${(/* @__PURE__ */ new Date()).toISOString()}
+
+`;
+      for (const change of step.changes) {
+        if (change.changeType === "modified" && fs.existsSync(change.filePath)) {
+          try {
+            const diff = execSync(`git diff ${change.filePath}`, {
+              encoding: "utf-8",
+              timeout: 5e3
+            });
+            patchContent += `--- a/${change.filePath}
++++ b/${change.filePath}
+${diff}
+`;
+          } catch {
+          }
+        }
+      }
+      fs.writeFileSync(patchFile, patchContent);
+      console.log(`[x-cli] #${step.id} Patch saved: ${patchFile}`);
+      return patchFile;
+    } catch (error) {
+      console.warn(`[Execution] Failed to create patch for step ${step.id}:`, error);
+      return void 0;
+    }
+  }
+  /**
+   * Create backup files
+   */
+  async createBackups(step) {
+    if (!this.options.createBackups || !step.changes) {
+      return;
+    }
+    for (const change of step.changes) {
+      if ((change.changeType === "modified" || change.changeType === "created") && fs.existsSync(change.filePath)) {
+        try {
+          const backupPath = `${change.filePath}.bak`;
+          fs.copyFileSync(change.filePath, backupPath);
+          change.backupPath = backupPath;
+          console.log(`[x-cli] #${step.id} Backup created: ${backupPath}`);
+        } catch (_error) {
+          console.warn(`[Execution] Failed to create backup for ${change.filePath}:`, _error);
+        }
+      }
+    }
+  }
+  /**
+   * Check if current directory is a git repository
+   */
+  isGitRepository() {
+    try {
+      execSync("git rev-parse --git-dir", { stdio: "ignore" });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Create git commit for all changes
+   */
+  async createGitCommit(executionPlan) {
+    try {
+      execSync("git add .", { stdio: "ignore" });
+      const commitMessage = `feat: ${executionPlan.summary}
+
+Executed ${executionPlan.totalSteps} tasks:
+${executionPlan.steps.map((step) => `- ${step.description}`).join("\n")}
+
+Auto-generated by x-cli execution orchestrator`;
+      execSync(`git commit -m "${commitMessage}"`, { stdio: "ignore" });
+      const hash = execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
+      console.log(`\u2705 Git commit created: ${hash.substring(0, 8)}`);
+      return hash;
+    } catch (error) {
+      throw new Error(`Git commit failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+  /**
+   * Detect error patterns in step execution
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  detectError(error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("test") && (errorMessage.includes("fail") || errorMessage.includes("error"))) {
+      return {
+        stepId: -1,
+        // Will be set by caller
+        errorType: "test_failure",
+        errorMessage,
+        stackTrace: error instanceof Error ? error.stack : void 0,
+        affectedFiles: this.findTestFiles(),
+        contextData: { pattern: "test_failure" }
+      };
+    }
+    if (errorMessage.includes("build") && (errorMessage.includes("fail") || errorMessage.includes("error"))) {
+      return {
+        stepId: -1,
+        errorType: "build_failure",
+        errorMessage,
+        stackTrace: error instanceof Error ? error.stack : void 0,
+        affectedFiles: this.findBuildFiles(),
+        contextData: { pattern: "build_failure" }
+      };
+    }
+    if (errorMessage.includes("lint") && (errorMessage.includes("fail") || errorMessage.includes("error"))) {
+      return {
+        stepId: -1,
+        errorType: "lint_failure",
+        errorMessage,
+        stackTrace: error instanceof Error ? error.stack : void 0,
+        affectedFiles: this.findSourceFiles(),
+        contextData: { pattern: "lint_failure" }
+      };
+    }
+    return {
+      stepId: -1,
+      errorType: "runtime_error",
+      errorMessage,
+      stackTrace: error instanceof Error ? error.stack : void 0,
+      affectedFiles: [],
+      contextData: { pattern: "runtime_error" }
+    };
+  }
+  /**
+   * Find test files in the project
+   */
+  findTestFiles() {
+    try {
+      const testFiles = [];
+      const walkDir = (dir) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const filePath = path7.join(dir, file);
+          const stat = fs.statSync(filePath);
+          if (stat.isDirectory() && !file.startsWith(".") && file !== "node_modules") {
+            walkDir(filePath);
+          } else if (stat.isFile() && (file.includes("test") || file.includes("spec"))) {
+            testFiles.push(filePath);
+          }
+        }
+      };
+      walkDir(".");
+      return testFiles.slice(0, 10);
+    } catch {
+      return [];
+    }
+  }
+  /**
+   * Find build configuration files
+   */
+  findBuildFiles() {
+    const buildFiles = ["package.json", "tsconfig.json", "webpack.config.js", "babel.config.js"];
+    return buildFiles.filter((file) => fs.existsSync(file));
+  }
+  /**
+   * Find source files
+   */
+  findSourceFiles() {
+    try {
+      const sourceFiles = [];
+      const walkDir = (dir) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const filePath = path7.join(dir, file);
+          const stat = fs.statSync(filePath);
+          if (stat.isDirectory() && !file.startsWith(".") && file !== "node_modules") {
+            walkDir(filePath);
+          } else if (stat.isFile() && (file.endsWith(".ts") || file.endsWith(".js") || file.endsWith(".tsx") || file.endsWith(".jsx"))) {
+            sourceFiles.push(filePath);
+          }
+        }
+      };
+      walkDir(".");
+      return sourceFiles.slice(0, 20);
+    } catch {
+      return [];
+    }
+  }
+  /**
+   * Present error context to user
+   */
+  presentErrorContext(errorContext, _step) {
+    console.log("\n" + "=".repeat(60));
+    console.log("\u{1F6A8} ISSUE ENCOUNTERED");
+    console.log("=".repeat(60));
+    console.log(`[x-cli] Issue encountered: ${errorContext.errorMessage}`);
+    if (errorContext.affectedFiles.length > 0) {
+      console.log(`Affected files: ${errorContext.affectedFiles.slice(0, 5).join(", ")}`);
+      if (errorContext.affectedFiles.length > 5) {
+        console.log(`... and ${errorContext.affectedFiles.length - 5} more`);
+      }
+    }
+    console.log("\n\u{1F504} Initiating adaptive recovery...");
+  }
+  /**
+   * Handle recovery flow
+   */
+  async handleRecovery(originalRequest, errorContext, executionPlan, researchService) {
+    const attempts = this.recoveryAttempts.get(errorContext.stepId) || 0;
+    if (attempts >= this.maxRecoveryAttempts) {
+      console.log(`\u274C Maximum recovery attempts (${this.maxRecoveryAttempts}) reached for step ${errorContext.stepId}`);
+      return { approved: false, maxRetriesExceeded: true };
+    }
+    this.recoveryAttempts.set(errorContext.stepId, attempts + 1);
+    const recoveryRequest = {
+      userTask: `Recovery from execution error: ${errorContext.errorMessage}
+
+Original task: ${originalRequest.userTask}
+
+Error context:
+- Type: ${errorContext.errorType}
+- Message: ${errorContext.errorMessage}
+- Affected files: ${errorContext.affectedFiles.join(", ")}
+
+Please provide a recovery plan to resolve this issue and continue execution.`,
+      context: `This is a RECOVERY REQUEST for a failed execution step. The original task was part of a larger plan that encountered an error. Focus on fixing the specific issue and providing steps to resolve it.`,
+      constraints: [
+        "Focus on fixing the specific error encountered",
+        "Provide actionable recovery steps",
+        "Consider the broader execution context",
+        "Ensure recovery steps are safe and reversible"
+      ]
+    };
+    try {
+      console.log("\u{1F50D} Analyzing error and generating recovery plan...");
+      const { output, approval } = await researchService.researchAndGetApproval(recoveryRequest);
+      if (approval.approved) {
+        console.log("\u2705 Recovery plan approved. Resuming execution...");
+        return { approved: true, recoveryPlan: output };
+      } else {
+        console.log("\u274C Recovery plan rejected by user.");
+        return { approved: false };
+      }
+    } catch (error) {
+      console.error("[Recovery] Failed to generate recovery plan:", error);
+      return { approved: false };
+    }
+  }
+  /**
+   * Execute with adaptive recovery
+   */
+  async executeWithRecovery(plan, researchService, originalRequest) {
+    console.log(`\u{1F680} Starting execution with adaptive recovery of ${plan.todo.length} tasks...`);
+    console.log(`Summary: ${plan.summary}`);
+    const executionPlan = {
+      steps: plan.todo.map((todo, index) => ({
+        id: index + 1,
+        description: todo,
+        status: "pending"
+      })),
+      totalSteps: plan.todo.length,
+      completedSteps: 0,
+      failedSteps: 0,
+      startTime: /* @__PURE__ */ new Date(),
+      summary: plan.summary
+    };
+    try {
+      for (let i = 0; i < executionPlan.steps.length; i++) {
+        const step = executionPlan.steps[i];
+        try {
+          await this.executeStep(step, executionPlan);
+          if (step.status === "completed") {
+            executionPlan.completedSteps++;
+          } else {
+            const errorContext = this.detectError(step.error);
+            if (errorContext) {
+              errorContext.stepId = step.id;
+              this.presentErrorContext(errorContext, step);
+              const recoveryResult = await this.handleRecovery(
+                originalRequest,
+                errorContext,
+                executionPlan,
+                researchService
+              );
+              if (recoveryResult.approved && recoveryResult.recoveryPlan) {
+                const recoverySteps = recoveryResult.recoveryPlan.plan.todo.map((todo, idx) => ({
+                  id: executionPlan.steps.length + idx + 1,
+                  description: `[RECOVERY] ${todo}`,
+                  status: "pending"
+                }));
+                executionPlan.steps.splice(i + 1, 0, ...recoverySteps);
+                executionPlan.totalSteps += recoverySteps.length;
+                console.log(`\u{1F4CB} Added ${recoverySteps.length} recovery steps. Continuing execution...`);
+                continue;
+              }
+            }
+            executionPlan.failedSteps++;
+          }
+        } catch (error) {
+          const errorContext = this.detectError(error);
+          if (errorContext) {
+            errorContext.stepId = step.id;
+            step.status = "failed";
+            step.error = errorContext.errorMessage;
+            executionPlan.failedSteps++;
+            console.log(`[x-cli] #${step.id} \u2717 Failed: ${errorContext.errorMessage}`);
+          }
+        }
+      }
+      executionPlan.endTime = /* @__PURE__ */ new Date();
+      if (this.options.gitCommit && this.isGitRepository()) {
+        try {
+          executionPlan.gitCommitHash = await this.createGitCommit(executionPlan);
+        } catch (error) {
+          console.warn("[Execution] Failed to create git commit:", error);
+        }
+      }
+      const success = executionPlan.failedSteps === 0;
+      console.log(`\u2705 Execution ${success ? "completed" : "finished with errors"}: ${executionPlan.completedSteps}/${executionPlan.totalSteps} steps successful`);
+      return {
+        success,
+        executionPlan
+      };
+    } catch (error) {
+      executionPlan.endTime = /* @__PURE__ */ new Date();
+      console.error("[Execution] Orchestration failed:", error);
+      return {
+        success: false,
+        executionPlan,
+        error: error instanceof Error ? error.message : "Unknown execution error"
+      };
+    }
+  }
+};
+var DEFAULT_CONFIG = {
+  maxOptions: 3,
+  includeContext: true,
+  timeout: 6e4
+  // 60 seconds
+};
+var ResearchRecommendService = class {
+  constructor(agent, config2 = DEFAULT_CONFIG) {
+    this.agent = agent;
+    this.config = config2;
+  }
+  /**
+   * Perform research and generate recommendation
+   */
+  async researchAndRecommend(request, contextPack) {
+    const prompt = this.buildResearchPrompt(request, contextPack);
+    try {
+      const response = await this.agent.processUserMessage(prompt);
+      return this.parseResearchOutput(response);
+    } catch (error) {
+      console.error("[ResearchRecommend] Research failed:", error);
+      throw new Error(`Research failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+  /**
+   * Build the research prompt
+   */
+  buildResearchPrompt(request, contextPack) {
+    let prompt = `Analyze the following task and provide a structured research output in JSON format.
+
+TASK: ${request.userTask}
+
+`;
+    if (request.constraints && request.constraints.length > 0) {
+      prompt += `CONSTRAINTS:
+${request.constraints.map((c) => `- ${c}`).join("\n")}
+
+`;
+    }
+    if (request.preferences && request.preferences.length > 0) {
+      prompt += `PREFERENCES:
+${request.preferences.map((p) => `- ${p}`).join("\n")}
+
+`;
+    }
+    if (this.config.includeContext && contextPack) {
+      prompt += `CONTEXT INFORMATION:
+System Documentation:
+${contextPack.system}
+
+SOP Documentation:
+${contextPack.sop}
+
+Recent Task Documentation:
+${contextPack.tasks.slice(0, 5).map((t) => `${t.filename}:
+${t.content}`).join("\n\n")}
+
+`;
+    }
+    prompt += `Please provide your analysis in the following JSON structure:
+{
+  "issues": [
+    {
+      "type": "fact|gap|risk",
+      "description": "Description of the issue",
+      "severity": "low|medium|high",
+      "impact": "Impact description (optional)"
+    }
+  ],
+  "options": [
+    {
+      "id": 1,
+      "title": "Option title",
+      "description": "Detailed description",
+      "tradeoffs": {
+        "pros": ["pro1", "pro2"],
+        "cons": ["con1", "con2"]
+      },
+      "effort": "low|medium|high",
+      "risk": "low|medium|high"
+    }
+  ],
+  "recommendation": {
+    "optionId": 1,
+    "reasoning": "Why this option is recommended",
+    "justification": "Detailed justification",
+    "confidence": "low|medium|high"
+  },
+  "plan": {
+    "summary": "Brief summary of the plan",
+    "approach": ["step1", "step2", "step3"],
+    "todo": ["TODO item 1", "TODO item 2"],
+    "estimatedEffort": "Time estimate",
+    "keyConsiderations": ["consideration1", "consideration2"]
+  }
+}
+
+Provide exactly ${this.config.maxOptions} options. Focus on actionable, practical solutions. Be thorough but concise. Respond with ONLY the JSON.`;
+    return prompt;
+  }
+  /**
+   * Parse the AI response into structured output
+   */
+  parseResearchOutput(response) {
+    let jsonText = "";
+    if (Array.isArray(response)) {
+      for (const entry of response) {
+        if (entry.type === "assistant" && entry.content) {
+          jsonText = entry.content.trim();
+          break;
+        }
+      }
+    } else if (typeof response === "string") {
+      jsonText = response;
+    }
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("No JSON found in response");
+    }
+    try {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        issues: this.validateIssues(parsed.issues || []),
+        options: this.validateOptions(parsed.options || []),
+        recommendation: this.validateRecommendation(parsed.recommendation),
+        plan: this.validatePlan(parsed.plan)
+      };
+    } catch (error) {
+      console.error("[ResearchRecommend] JSON parse error:", error);
+      console.error("Raw response:", jsonText);
+      throw new Error("Failed to parse research output JSON");
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validateIssues(issues) {
+    return issues.map((issue) => ({
+      type: ["fact", "gap", "risk"].includes(issue.type) ? issue.type : "fact",
+      description: issue.description || "No description provided",
+      severity: ["low", "medium", "high"].includes(issue.severity) ? issue.severity : "medium",
+      impact: issue.impact
+    }));
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validateOptions(options) {
+    return options.slice(0, this.config.maxOptions).map((option, index) => ({
+      id: option.id || index + 1,
+      title: option.title || `Option ${index + 1}`,
+      description: option.description || "No description provided",
+      tradeoffs: {
+        pros: Array.isArray(option.tradeoffs?.pros) ? option.tradeoffs.pros : [],
+        cons: Array.isArray(option.tradeoffs?.cons) ? option.tradeoffs.cons : []
+      },
+      effort: ["low", "medium", "high"].includes(option.effort) ? option.effort : "medium",
+      risk: ["low", "medium", "high"].includes(option.risk) ? option.risk : "medium"
+    }));
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validateRecommendation(rec) {
+    return {
+      optionId: rec?.optionId || 1,
+      reasoning: rec?.reasoning || "No reasoning provided",
+      justification: rec?.justification || "No justification provided",
+      confidence: ["low", "medium", "high"].includes(rec?.confidence) ? rec.confidence : "medium"
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validatePlan(plan) {
+    return {
+      summary: plan?.summary || "No summary provided",
+      approach: Array.isArray(plan?.approach) ? plan.approach : [],
+      todo: Array.isArray(plan?.todo) ? plan.todo : [],
+      estimatedEffort: plan?.estimatedEffort || "Unknown",
+      keyConsiderations: Array.isArray(plan?.keyConsiderations) ? plan.keyConsiderations : []
+    };
+  }
+  /**
+   * Render research output to console
+   */
+  renderToConsole(output) {
+    console.log("\n" + "=".repeat(50));
+    console.log("\u{1F916} RESEARCH & RECOMMENDATION");
+    console.log("=".repeat(50));
+    this.renderIssues(output.issues);
+    this.renderOptions(output.options);
+    this.renderRecommendation(output.recommendation, output.options);
+    this.renderPlan(output.plan);
+    console.log("=".repeat(50));
+  }
+  renderIssues(issues) {
+    console.log("\n\u{1F4CB} ISSUES");
+    console.log("-".repeat(20));
+    if (issues.length === 0) {
+      console.log("No issues identified.");
+      return;
+    }
+    for (const issue of issues) {
+      const icon = issue.type === "fact" ? "\u{1F4CA}" : issue.type === "gap" ? "\u26A0\uFE0F" : "\u{1F6A8}";
+      const severity = issue.severity ? ` (${issue.severity.toUpperCase()})` : "";
+      console.log(`${icon} ${issue.type.toUpperCase()}${severity}: ${issue.description}`);
+      if (issue.impact) {
+        console.log(`   Impact: ${issue.impact}`);
+      }
+    }
+  }
+  renderOptions(options) {
+    console.log("\n\u{1F3AF} OPTIONS");
+    console.log("-".repeat(20));
+    for (const option of options) {
+      console.log(`
+${option.id}) ${option.title}`);
+      console.log(`   ${option.description}`);
+      console.log(`   Effort: ${option.effort.toUpperCase()} | Risk: ${option.risk.toUpperCase()}`);
+      if (option.tradeoffs.pros.length > 0) {
+        console.log(`   \u2705 Pros: ${option.tradeoffs.pros.join(", ")}`);
+      }
+      if (option.tradeoffs.cons.length > 0) {
+        console.log(`   \u274C Cons: ${option.tradeoffs.cons.join(", ")}`);
+      }
+    }
+  }
+  renderRecommendation(recommendation, options) {
+    console.log("\n\u{1F3AF} RECOMMENDATION");
+    console.log("-".repeat(20));
+    const recommendedOption = options.find((o) => o.id === recommendation.optionId);
+    const optionTitle = recommendedOption ? recommendedOption.title : `Option ${recommendation.optionId}`;
+    console.log(`\u2192 ${optionTitle} (Confidence: ${recommendation.confidence.toUpperCase()})`);
+    console.log(`Reasoning: ${recommendation.reasoning}`);
+    console.log(`Justification: ${recommendation.justification}`);
+  }
+  renderPlan(plan) {
+    console.log("\n\u{1F4DD} PLAN SUMMARY");
+    console.log("-".repeat(20));
+    console.log(`Summary: ${plan.summary}`);
+    console.log(`Estimated Effort: ${plan.estimatedEffort}`);
+    if (plan.approach.length > 0) {
+      console.log("\nApproach:");
+      plan.approach.forEach((step, index) => {
+        console.log(`   ${index + 1}. ${step}`);
+      });
+    }
+    if (plan.todo.length > 0) {
+      console.log("\nTODO:");
+      plan.todo.forEach((item) => {
+        console.log(`   [ ] ${item}`);
+      });
+    }
+    if (plan.keyConsiderations.length > 0) {
+      console.log("\nKey Considerations:");
+      plan.keyConsiderations.forEach((consideration) => {
+        console.log(`   \u2022 ${consideration}`);
+      });
+    }
+  }
+  /**
+   * Prompt user for approval with Y/n/R options
+   */
+  async promptForApproval(_output) {
+    return new Promise((resolve8) => {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      const promptUser = () => {
+        console.log("\nProceed with recommendation? (Y/n) [R=revise]");
+        rl.question("> ", (answer) => {
+          const cleanAnswer = answer.trim().toLowerCase();
+          if (cleanAnswer === "y" || cleanAnswer === "yes" || cleanAnswer === "") {
+            rl.close();
+            resolve8({ approved: true, revised: false });
+          } else if (cleanAnswer === "n" || cleanAnswer === "no") {
+            rl.close();
+            resolve8({ approved: false, revised: false });
+          } else if (cleanAnswer === "r" || cleanAnswer === "revise") {
+            rl.question("Revision note (brief description of changes needed): ", (revisionNote) => {
+              rl.close();
+              resolve8({
+                approved: false,
+                revised: true,
+                revisionNote: revisionNote.trim() || "User requested revision"
+              });
+            });
+          } else {
+            console.log("\u274C Invalid input. Please enter Y (yes), N (no), or R (revise).");
+            promptUser();
+          }
+        });
+      };
+      promptUser();
+    });
+  }
+  /**
+   * Handle revision flow with updated request
+   */
+  async handleRevision(originalRequest, revisionNote, contextPack) {
+    console.log(`\u{1F504} Revising based on: "${revisionNote}"`);
+    console.log("\u{1F50D} Re-researching with revision context...");
+    const revisedRequest = {
+      ...originalRequest,
+      constraints: [
+        ...originalRequest.constraints || [],
+        `REVISION REQUEST: ${revisionNote}`
+      ]
+    };
+    return await this.researchAndRecommend(revisedRequest, contextPack);
+  }
+  /**
+   * Full research and approval workflow with revision support
+   */
+  async researchAndGetApproval(request, contextPack, maxRevisions = 3) {
+    let currentRequest = request;
+    let revisions = 0;
+    while (revisions <= maxRevisions) {
+      console.log("\u{1F50D} Researching and analyzing...");
+      const output = await this.researchAndRecommend(currentRequest, contextPack);
+      this.renderToConsole(output);
+      const approval = await this.promptForApproval(output);
+      if (approval.approved || !approval.revised) {
+        return { output, approval, revisions };
+      }
+      revisions++;
+      if (revisions > maxRevisions) {
+        console.log(`\u274C Maximum revisions (${maxRevisions}) reached.`);
+        return { output, approval, revisions };
+      }
+      console.log(`\u{1F504} Revision ${revisions}/${maxRevisions}`);
+      currentRequest = {
+        ...request,
+        constraints: [
+          ...request.constraints || [],
+          `REVISION ${revisions}: ${approval.revisionNote}`
+        ]
+      };
+    }
+    throw new Error("Unexpected end of revision loop");
+  }
+  /**
+   * Complete workflow: Research → Recommend → Execute with Adaptive Recovery
+   */
+  async researchRecommendExecute(request, contextPack, maxRevisions = 3) {
+    const { output, approval, revisions } = await this.researchAndGetApproval(request, contextPack, maxRevisions);
+    if (!approval.approved) {
+      return { output, approval, revisions };
+    }
+    console.log("\n\u{1F680} Proceeding with execution (with adaptive recovery)...");
+    const orchestrator = new ExecutionOrchestrator(this.agent);
+    const execution = await orchestrator.executeWithRecovery(output.plan, this, request);
+    return {
+      output,
+      approval,
+      revisions,
+      execution
+    };
+  }
+};
+
+// src/agent/grok-agent.ts
 var GrokAgent = class extends EventEmitter {
   constructor(apiKey, baseURL, model, maxToolRounds, contextPack) {
     super();
@@ -8688,7 +9680,83 @@ Current working directory: ${process.cwd()}`
     if (/(20\d{2})/.test(q)) return true;
     return false;
   }
+  // Detect if message should use the Research → Recommend → Execute workflow
+  shouldUseWorkflow(message) {
+    const q = message.toLowerCase();
+    const complexityIndicators = [
+      // Action verbs indicating multi-step tasks
+      /\b(implement|build|create|refactor|optimize|add|update|modify|develop|design)\b/.test(q),
+      /\b(system|feature|component|module|service|api|database)\b/.test(q),
+      // Multi-step indicators
+      /\b(and|then|after|finally|also|additionally)\b/.test(q),
+      /\b(step|phase|stage|part|component)\b/.test(q),
+      // Size/complexity indicators
+      q.length > 150,
+      // Long requests
+      (q.match(/\b(and|or|but|however|therefore|consequently)\b/g) || []).length >= 2,
+      // Complex logic
+      // Technical complexity
+      /\b(authentication|authorization|security|validation|testing|deployment|ci.cd|docker|kubernetes)\b/.test(q),
+      /\b(multiple|several|various|different|complex|advanced)\b/.test(q)
+    ];
+    const indicatorCount = complexityIndicators.filter(Boolean).length;
+    return indicatorCount >= 2;
+  }
   async processUserMessage(message) {
+    if (this.shouldUseWorkflow(message)) {
+      return this.processWithWorkflow(message);
+    }
+    return this.processStandard(message);
+  }
+  /**
+   * Process complex tasks using the Research → Recommend → Execute workflow
+   */
+  async processWithWorkflow(message) {
+    const userEntry = {
+      type: "user",
+      content: message,
+      timestamp: /* @__PURE__ */ new Date()
+    };
+    this.chatHistory.push(userEntry);
+    this.logEntry(userEntry);
+    this.messages.push({ role: "user", content: message });
+    try {
+      const contextPack = await this.loadContextPack();
+      const workflowService = new ResearchRecommendService(this);
+      const request = {
+        userTask: message,
+        context: contextPack ? "Project context loaded" : void 0
+      };
+      console.log("\u{1F50D} Researching and analyzing...");
+      const { output, approval, revisions } = await workflowService.researchAndGetApproval(request, contextPack);
+      if (!approval.approved) {
+        const rejectionEntry = {
+          type: "assistant",
+          content: approval.revised ? `Plan revised ${revisions} time(s) but ultimately rejected by user.` : "Plan rejected by user.",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        this.chatHistory.push(rejectionEntry);
+        return [userEntry, rejectionEntry];
+      }
+      console.log("\u2705 Plan approved. Executing...");
+      const orchestrator = new ExecutionOrchestrator(this);
+      const executionResult = await orchestrator.executeWithRecovery(output.plan, workflowService, request);
+      return this.workflowResultToChatEntries(userEntry, output, approval, executionResult);
+    } catch (error) {
+      console.error("[Workflow] Failed:", error);
+      const errorEntry = {
+        type: "assistant",
+        content: `Workflow failed: ${error.message}`,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      this.chatHistory.push(errorEntry);
+      return [userEntry, errorEntry];
+    }
+  }
+  /**
+   * Standard processing for simple queries
+   */
+  async processStandard(message) {
     const userEntry = {
       type: "user",
       content: message,
@@ -9061,10 +10129,10 @@ Current working directory: ${process.cwd()}`
             return await this.textEditor.view(args.path, range);
           } catch (error) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-            const path31 = args.path;
-            let command = `cat "${path31}"`;
+            const path32 = args.path;
+            let command = `cat "${path32}"`;
             if (args.start_line && args.end_line) {
-              command = `sed -n '${args.start_line},${args.end_line}p' "${path31}"`;
+              command = `sed -n '${args.start_line},${args.end_line}p' "${path32}"`;
             }
             return await this.bash.execute(command);
           }
@@ -9300,6 +10368,12 @@ EOF`;
       this.abortController.abort();
     }
   }
+  getMessageCount() {
+    return this.chatHistory.length;
+  }
+  getSessionTokenCount() {
+    return this.tokenCounter.countMessageTokens(this.messages);
+  }
   logEntry(entry) {
     try {
       const dir = path7__default.dirname(this.sessionLogPath);
@@ -9317,6 +10391,43 @@ EOF`;
     } catch (error) {
       console.warn("Failed to log session entry:", error);
     }
+  }
+  /**
+   * Load .agent context pack for enhanced recommendations
+   */
+  async loadContextPack() {
+    try {
+      const contextLoader = await Promise.resolve().then(() => (init_context_loader(), context_loader_exports));
+      return await contextLoader.loadContext(".agent");
+    } catch (error) {
+      console.warn("[Workflow] Failed to load context pack:", error);
+      return void 0;
+    }
+  }
+  /**
+   * Convert workflow results to chat entries for display
+   */
+  workflowResultToChatEntries(userEntry, output, approval, executionResult) {
+    const entries = [userEntry];
+    const summaryEntry = {
+      type: "assistant",
+      content: `Workflow completed: ${executionResult?.success ? "\u2705 Success" : "\u274C Failed"}
+
+${output?.plan?.summary || "Task completed"}`,
+      timestamp: /* @__PURE__ */ new Date()
+    };
+    entries.push(summaryEntry);
+    this.chatHistory.push(summaryEntry);
+    if (executionResult?.executionPlan) {
+      const detailsEntry = {
+        type: "assistant",
+        content: `Executed ${executionResult.executionPlan.completedSteps}/${executionResult.executionPlan.totalSteps} tasks successfully.`,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      entries.push(detailsEntry);
+      this.chatHistory.push(detailsEntry);
+    }
+    return entries;
   }
 };
 
@@ -9924,7 +11035,7 @@ var CodebaseExplorer = class {
       return files;
     }
     try {
-      const entries = await fs4.readdir(dirPath, { withFileTypes: true });
+      const entries = await fs6.readdir(dirPath, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path7__default.join(dirPath, entry.name);
         const relativePath = path7__default.relative(options.rootPath, fullPath);
@@ -9945,7 +11056,7 @@ var CodebaseExplorer = class {
           files.push(...subFiles);
         } else {
           try {
-            const stats = await fs4.stat(fullPath);
+            const stats = await fs6.stat(fullPath);
             fileInfo.size = stats.size;
             if (fileInfo.size > this.settings.maxFileSize) {
               continue;
@@ -10214,7 +11325,7 @@ var CodebaseExplorer = class {
   async detectProjectType(rootPath, files) {
     const packageJsonPath = path7__default.join(rootPath, "package.json");
     try {
-      const packageJson = await fs4.readFile(packageJsonPath, "utf-8");
+      const packageJson = await fs6.readFile(packageJsonPath, "utf-8");
       const pkg = JSON.parse(packageJson);
       if (pkg.dependencies?.react || pkg.devDependencies?.react) return "react";
       if (pkg.dependencies?.vue || pkg.devDependencies?.vue) return "vue";
@@ -13454,7 +14565,7 @@ var ChangelogGenerator = class {
     }
   }
   async getGitCommits() {
-    const { execSync: execSync2 } = __require("child_process");
+    const { execSync: execSync3 } = __require("child_process");
     try {
       let gitCommand2 = 'git log --pretty=format:"%H|%ad|%an|%s|%b" --date=short';
       if (this.config.sinceVersion) {
@@ -13464,7 +14575,7 @@ var ChangelogGenerator = class {
       } else {
         gitCommand2 += " -n 50";
       }
-      const output = execSync2(gitCommand2, {
+      const output = execSync3(gitCommand2, {
         cwd: this.config.rootPath,
         encoding: "utf-8"
       });
@@ -13699,9 +14810,9 @@ var UpdateAgentDocs = class {
       hasNewFeatures: false
     };
     try {
-      const { execSync: execSync2 } = __require("child_process");
+      const { execSync: execSync3 } = __require("child_process");
       try {
-        const commits = execSync2("git log --oneline -10", {
+        const commits = execSync3("git log --oneline -10", {
           cwd: this.config.rootPath,
           encoding: "utf-8"
         });
@@ -13709,7 +14820,7 @@ var UpdateAgentDocs = class {
       } catch (error) {
       }
       try {
-        const changedFiles = execSync2("git diff --name-only HEAD~5..HEAD", {
+        const changedFiles = execSync3("git diff --name-only HEAD~5..HEAD", {
           cwd: this.config.rootPath,
           encoding: "utf-8"
         });
@@ -14686,8 +15797,8 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.73",
-  description: "An open-source AI agent that brings the power of Grok directly into your terminal.",
+  version: "1.1.74",
+  description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
   types: "dist/index.d.ts",
@@ -14746,10 +15857,10 @@ var package_default = {
     "cli",
     "agent",
     "text-editor",
-    "grok",
-    "ai"
+    "ai",
+    "x-ai"
   ],
-  author: "grok_cli",
+  author: "x-cli-team",
   license: "MIT",
   dependencies: {
     "@modelcontextprotocol/sdk": "^1.17.0",
@@ -14804,7 +15915,7 @@ var package_default = {
   bugs: {
     url: "https://github.com/x-cli-team/x-cli/issues"
   },
-  homepage: "https://grokcli.dev",
+  homepage: "https://x-cli.dev",
   icon: "docs/assets/logos/x-cli-logo.svg",
   publishConfig: {
     access: "public"
@@ -17216,11 +18327,11 @@ function useContextInfo(agent) {
       if (agent) {
         const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
         const maxTokens = getMaxTokensForModel(modelName);
-        const estimatedTokens = Math.floor(Math.random() * 1e3) + 500;
-        messagesCount = Math.floor(Math.random() * 10) + 1;
-        const tokenPercent = Math.round(estimatedTokens / maxTokens * 100);
+        const sessionTokens = agent.getSessionTokenCount?.() || 0;
+        messagesCount = agent.getMessageCount?.() || 0;
+        const tokenPercent = Math.round(sessionTokens / maxTokens * 100);
         tokenUsage = {
-          current: estimatedTokens,
+          current: sessionTokens,
           max: maxTokens,
           percent: tokenPercent
         };
@@ -17658,8 +18769,8 @@ function useConfirmations(confirmationService, state) {
 }
 
 // src/hooks/use-console-setup.ts
-function printWelcomeBanner(quiet = false) {
-  if (quiet) return;
+function printWelcomeBanner(_quiet = false) {
+  if (_quiet) return;
   const isTTY = !!process.stdout.isTTY;
   if (isTTY) {
     process.stdout.write("\x1B[?25l");
@@ -19426,7 +20537,7 @@ function ChatInterfaceWithAgent({
   agent,
   initialMessage,
   quiet = false,
-  contextPack,
+  contextPack: _contextPack,
   contextStatus
 }) {
   const [chatHistory, setChatHistory] = useState([]);
@@ -19792,121 +20903,9 @@ function createToggleConfirmationsCommand() {
   });
   return toggleCommand;
 }
-var CONTEXT_BUDGET_BYTES = 280 * 1024;
-var MAX_SUMMARY_LENGTH = 2e3;
-function loadMarkdownDirectory(dirPath) {
-  if (!fs__default.existsSync(dirPath)) {
-    return "";
-  }
-  const files = fs__default.readdirSync(dirPath).filter((file) => file.endsWith(".md")).sort();
-  let content = "";
-  for (const file of files) {
-    const filePath = path7__default.join(dirPath, file);
-    try {
-      const fileContent = fs__default.readFileSync(filePath, "utf-8");
-      content += `
-
-=== ${file} ===
-
-${fileContent}`;
-    } catch (error) {
-      console.warn(`Failed to read ${filePath}:`, error);
-    }
-  }
-  return content;
-}
-function extractDateFromFilename(filename) {
-  const match = filename.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (match) {
-    return new Date(match[1]);
-  }
-  return /* @__PURE__ */ new Date(0);
-}
-function summarizeContent(content, maxLength = MAX_SUMMARY_LENGTH) {
-  if (content.length <= maxLength) {
-    return content;
-  }
-  const truncated = content.substring(0, maxLength);
-  const lastNewline = truncated.lastIndexOf("\n\n");
-  if (lastNewline > maxLength * 0.8) {
-    return truncated.substring(0, lastNewline);
-  }
-  return truncated + "\n\n[...content truncated for context budget...]";
-}
-function loadTaskFiles(tasksDir, maxBudget) {
-  if (!fs__default.existsSync(tasksDir)) {
-    return [];
-  }
-  const files = fs__default.readdirSync(tasksDir).filter((file) => file.endsWith(".md")).map((filename) => {
-    const filePath = path7__default.join(tasksDir, filename);
-    const content = fs__default.readFileSync(filePath, "utf-8");
-    return {
-      filename,
-      content,
-      size: Buffer.byteLength(content, "utf-8"),
-      date: extractDateFromFilename(filename),
-      isSummarized: false
-    };
-  }).sort((a, b) => b.date.getTime() - a.date.getTime());
-  const result = [];
-  let usedBudget = 0;
-  for (const file of files) {
-    let finalContent = file.content;
-    let isSummarized = false;
-    if (usedBudget + file.size > maxBudget) {
-      finalContent = summarizeContent(file.content);
-      const summarizedSize = Buffer.byteLength(finalContent, "utf-8");
-      if (usedBudget + summarizedSize > maxBudget) {
-        continue;
-      }
-      usedBudget += summarizedSize;
-      isSummarized = true;
-    } else {
-      usedBudget += file.size;
-    }
-    result.push({
-      ...file,
-      content: finalContent,
-      isSummarized
-    });
-  }
-  return result;
-}
-function loadContext(agentDir = ".agent") {
-  const systemContent = loadMarkdownDirectory(path7__default.join(agentDir, "system"));
-  const sopContent = loadMarkdownDirectory(path7__default.join(agentDir, "sop"));
-  const systemSize = Buffer.byteLength(systemContent, "utf-8");
-  const sopSize = Buffer.byteLength(sopContent, "utf-8");
-  const taskBudget = Math.max(0, CONTEXT_BUDGET_BYTES - systemSize - sopSize);
-  const tasks = loadTaskFiles(path7__default.join(agentDir, "tasks"), taskBudget);
-  const totalSize = systemSize + sopSize + tasks.reduce((sum, task) => sum + Buffer.byteLength(task.content, "utf-8"), 0);
-  const warnings = [];
-  if (totalSize > CONTEXT_BUDGET_BYTES) {
-    warnings.push(`Context size (${(totalSize / 1024).toFixed(1)}KB) exceeds budget (${CONTEXT_BUDGET_BYTES / 1024}KB)`);
-  }
-  return {
-    system: systemContent,
-    sop: sopContent,
-    tasks,
-    totalSize,
-    warnings
-  };
-}
-function formatContextStatus(pack) {
-  const taskCount = pack.tasks.length;
-  const summarizedCount = pack.tasks.filter((t) => t.isSummarized).length;
-  const sizeKB = (pack.totalSize / 1024).toFixed(1);
-  let status = `[x-cli] Context: loaded system docs, sop docs, ${taskCount} task docs (~${sizeKB} KB).`;
-  if (summarizedCount > 0) {
-    status += ` Summarized ${summarizedCount} older tasks for context budget.`;
-  }
-  if (pack.warnings.length > 0) {
-    status += ` Warnings: ${pack.warnings.join("; ")}`;
-  }
-  return status;
-}
 
 // src/index.ts
+init_context_loader();
 dotenv.config();
 process.on("SIGTERM", () => {
   if (process.stdin.isTTY && process.stdin.setRawMode) {
