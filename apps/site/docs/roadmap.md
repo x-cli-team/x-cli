@@ -39,7 +39,7 @@ Create a comprehensive public documentation + landing site for grok-cli using Do
 
 Implement a fully automated testimonial collection system with bot-managed PR workflows and safe auto-merge capabilities for community contributions.
 
-## Grok CLI Roadmap: Achieving Claude Code Parity
+## X-CLI Roadmap: Achieving Claude Code Parity
 
 ## Hotfix Sprint: Stop Repaint Storm & CPU Spikes
 

@@ -5,7 +5,7 @@ import { inkColors } from "../colors.js";
 import { ContextStatus } from "./context-status.js";
 
 // Enhanced X CLI ASCII art with color scheme
-export const grokBanner = `
+export const xcliBanner = `
 ██   ██      ██████ ██      ██ 
  ██ ██      ██      ██      ██ 
   ███       ██      ██      ██ 
@@ -14,13 +14,13 @@ export const grokBanner = `
 `;
 
 // Logo-based banner (simplified for terminal)
-export const grokLogo = `
+export const xcliLogo = `
     ⭕ X CLI ⭕
    🔴🟡🟢🔵 v{VERSION}
 `;
 
 // Alternative minimal banner for --quiet mode
-export const grokMini = `
+export const xcliMini = `
 ▄   ▄     ▄▄▄▄▄▄  ▄     ▄
 ██ ██    ██      ██    ██ 
  ███     ██      ██    ██ 
@@ -28,7 +28,7 @@ export const grokMini = `
 `;
 
 // Retro style banner
-export const grokRetro = `
+export const xcliRetro = `
 ╔═══════════════════════════════════════════════════════╗
 ║  ▄▄▄▄   ▄▄▄▄▄   ▄▄▄▄▄   ▄   ▄   ▄▄▄▄▄   ▄     ▄      ║
 ║ ██      ██   █ ██    █ ██ ██  ██      ██    ██       ║
@@ -56,9 +56,9 @@ export function Banner({
 }: BannerProps) {
   const getBannerArt = () => {
     switch (style) {
-      case 'mini': return grokMini;
-      case 'retro': return grokRetro;
-      default: return grokBanner;
+      case 'mini': return xcliMini;
+      case 'retro': return xcliRetro;
+      default: return xcliBanner;
     }
   };
 
@@ -138,7 +138,7 @@ export function showBanner(options?: {
   return <Banner style={style} showContext={true} {...contextProps} />;
 }
 
-// Secret easter egg banner for grok --ascii
+// Secret easter egg banner for x-cli --ascii
 export const easterEggBanner = `
 ${`
   ██████╗ ██████╗  ██████╗ ██╗  ██╗     ██████╗██╗     ██╗

@@ -5711,7 +5711,7 @@ This action cannot be undone.`
           }
         }
         snapshots.push(snapshot);
-      } catch (error) {
+      } catch (_error) {
         snapshots.push({
           filePath: path7.resolve(filePath),
           existed: false
@@ -5802,7 +5802,7 @@ This action cannot be undone.`
   /**
    * Perform redo operation
    */
-  async performRedo(entry) {
+  async performRedo(_entry) {
     return {
       success: false,
       error: "Redo functionality requires storing forward changes - not yet implemented"
@@ -5861,7 +5861,7 @@ ${errors.join("\n")}`;
   /**
    * Undo refactor operation
    */
-  async undoRefactorOperation(fileSnapshots, customData) {
+  async undoRefactorOperation(fileSnapshots, _customData) {
     return await this.undoFileOperations(fileSnapshots);
   }
   /**
@@ -5934,7 +5934,7 @@ ${errors.join("\n")}`;
   /**
    * Determine operation size
    */
-  determineOperationSize(files, rollbackData) {
+  determineOperationSize(files, _rollbackData) {
     if (files.length <= 3) return "small";
     if (files.length <= 10) return "medium";
     return "large";
@@ -5980,7 +5980,7 @@ ${errors.join("\n")}`;
         }));
         this.currentPosition = parsed.currentPosition || this.history.length - 1;
       }
-    } catch (error) {
+    } catch (_error) {
       this.history = [];
       this.currentPosition = -1;
     }
@@ -5997,7 +5997,7 @@ ${errors.join("\n")}`;
         lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
       };
       await ops6.promises.writeFile(this.historyFile, JSON.stringify(data, null, 2), "utf-8");
-    } catch (error) {
+    } catch (_error) {
     }
   }
   /**
@@ -15797,7 +15797,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.74",
+  version: "1.1.75",
   description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -15828,7 +15828,7 @@ var package_default = {
     local: "npm run build > /dev/null 2>&1 && npm link > /dev/null 2>&1 && node dist/index.js",
     "test:workflow": "node scripts/test-workflow.js",
     "start:bun": "bun run dist/index.js",
-    lint: "eslint . --ext .js,.jsx,.ts,.tsx",
+    lint: "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern 'dist/**'",
     typecheck: "tsc --noEmit",
     "install:bun": "bun install",
     preinstall: "echo '\u{1F916} Installing X CLI...'",
@@ -15841,10 +15841,10 @@ var package_default = {
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix"
+      "eslint --fix --ignore-pattern 'dist/**'"
     ],
     "*.{js,jsx,mjs}": [
-      "eslint --fix"
+      "eslint --fix --ignore-pattern 'dist/**'"
     ],
     "*.{md,mdx}": [
       "prettier --write"
@@ -16274,6 +16274,7 @@ function useInputHandler({
     { command: "/comments", description: "Add code comments to files" },
     { command: "/commit-and-push", description: "AI commit & push to remote" },
     { command: "/smart-push", description: "Intelligent staging, commit message generation, and push" },
+    { command: "/context", description: "Show loaded documentation and context status" },
     { command: "/exit", description: "Exit the application" }
   ];
   const availableModels = useMemo(() => {
@@ -16281,6 +16282,36 @@ function useInputHandler({
   }, []);
   const handleDirectCommand = async (input2) => {
     const trimmedInput = input2.trim();
+    if (trimmedInput === "/context") {
+      const contextEntry = {
+        type: "assistant",
+        content: `\u{1F4DA} **Loaded Documentation Context**
+
+The .agent documentation system has been automatically loaded at startup:
+
+**System Documentation:**
+- \u{1F4CB} System Architecture (architecture.md)
+- \u{1F3D7}\uFE0F Critical State (critical-state.md)
+- \u{1F3D7}\uFE0F Installation Guide (installation.md)
+- \u{1F3D7}\uFE0F API Schema (api-schema.md)
+- \u{1F3D7}\uFE0F Auto-Read System (auto-read-system.md)
+
+**SOP Documentation:**
+- \u{1F527} Git Workflow SOP (git-workflow.md)
+- \u{1F4D6} Release Management SOP (release-management.md)
+- \u{1F4D6} Automation Protection SOP (automation-protection.md)
+- \u{1F4D6} NPM Publishing Troubleshooting (npm-publishing-troubleshooting.md)
+
+**Purpose:**
+This documentation provides context for all AI operations, ensuring consistent understanding of project architecture, processes, and standards.
+
+**Auto-Read Status:** \u2705 Active - Loaded automatically on startup`,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory((prev) => [...prev, contextEntry]);
+      clearInput();
+      return true;
+    }
     if (trimmedInput === "/clear") {
       setChatHistory([]);
       setIsProcessing(false);
@@ -16358,6 +16389,36 @@ Examples:
         timestamp: /* @__PURE__ */ new Date()
       };
       setChatHistory((prev) => [...prev, helpEntry]);
+      clearInput();
+      return true;
+    }
+    if (trimmedInput === "/context") {
+      const contextEntry = {
+        type: "assistant",
+        content: `\u{1F4DA} **Loaded Documentation Context**
+
+The .agent documentation system has been automatically loaded at startup:
+
+**System Documentation:**
+- \u{1F4CB} System Architecture (architecture.md)
+- \u{1F3D7}\uFE0F Critical State (critical-state.md)
+- \u{1F3D7}\uFE0F Installation Guide (installation.md)
+- \u{1F3D7}\uFE0F API Schema (api-schema.md)
+- \u{1F3D7}\uFE0F Auto-Read System (auto-read-system.md)
+
+**SOP Documentation:**
+- \u{1F527} Git Workflow SOP (git-workflow.md)
+- \u{1F4D6} Release Management SOP (release-management.md)
+- \u{1F4D6} Automation Protection SOP (automation-protection.md)
+- \u{1F4D6} NPM Publishing Troubleshooting (npm-publishing-troubleshooting.md)
+
+**Purpose:**
+This documentation provides context for all AI operations, ensuring consistent understanding of project architecture, processes, and standards.
+
+**Auto-Read Status:** \u2705 Active - Loaded automatically on startup`,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory((prev) => [...prev, contextEntry]);
       clearInput();
       return true;
     }
@@ -18508,6 +18569,7 @@ function useAutoRead(setChatHistory) {
           timestamp: /* @__PURE__ */ new Date()
         });
       }
+      console.log("\u{1F50D} Auto-reading .agent documentation...");
       const folders = config2?.folders || [
         {
           name: "system",
@@ -18557,6 +18619,7 @@ function useAutoRead(setChatHistory) {
               const content = fs__default.readFileSync(filePath, "utf8");
               const displayTitle = file.title || fileName.replace(".md", "").replace("-", " ").toUpperCase();
               const icon = file.icon || "\u{1F4C4}";
+              console.log(`\u{1F4C4} Loaded: ${folder.name}/${fileName} (${content.length} chars)`);
               if (showFileContents) {
                 initialMessages.push({
                   type: "assistant",
@@ -18568,10 +18631,12 @@ ${content}`,
               }
               docsRead++;
             } catch (_error) {
+              console.log(`\u26A0\uFE0F Failed to read: ${folder.name}/${fileName}`);
             }
           }
         }
       }
+      console.log(`\u2705 Auto-read complete: ${docsRead} documentation files loaded`);
       if (showSummaryMessage && docsRead > 0) {
         initialMessages.push({
           type: "assistant",
@@ -19055,20 +19120,20 @@ function formatTimeAgo(date) {
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   return `${Math.floor(seconds / 86400)}d ago`;
 }
-var grokBanner = `
+var xcliBanner = `
 \u2588\u2588   \u2588\u2588      \u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588      \u2588\u2588 
  \u2588\u2588 \u2588\u2588      \u2588\u2588      \u2588\u2588      \u2588\u2588 
   \u2588\u2588\u2588       \u2588\u2588      \u2588\u2588      \u2588\u2588 
  \u2588\u2588 \u2588\u2588      \u2588\u2588      \u2588\u2588      \u2588\u2588 
 \u2588\u2588   \u2588\u2588      \u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588\u2588\u2588 \u2588\u2588 
 `;
-var grokMini = `
+var xcliMini = `
 \u2584   \u2584     \u2584\u2584\u2584\u2584\u2584\u2584  \u2584     \u2584
 \u2588\u2588 \u2588\u2588    \u2588\u2588      \u2588\u2588    \u2588\u2588 
  \u2588\u2588\u2588     \u2588\u2588      \u2588\u2588    \u2588\u2588 
 \u2588\u2588 \u2588\u2588    \u2588\u2588\u2588\u2588\u2588\u2588  \u2588\u2588    \u2588\u2588 
 `;
-var grokRetro = `
+var xcliRetro = `
 \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557
 \u2551  \u2584\u2584\u2584\u2584   \u2584\u2584\u2584\u2584\u2584   \u2584\u2584\u2584\u2584\u2584   \u2584   \u2584   \u2584\u2584\u2584\u2584\u2584   \u2584     \u2584      \u2551
 \u2551 \u2588\u2588      \u2588\u2588   \u2588 \u2588\u2588    \u2588 \u2588\u2588 \u2588\u2588  \u2588\u2588      \u2588\u2588    \u2588\u2588       \u2551
@@ -19087,11 +19152,11 @@ function Banner({
   const getBannerArt = () => {
     switch (style) {
       case "mini":
-        return grokMini;
+        return xcliMini;
       case "retro":
-        return grokRetro;
+        return xcliRetro;
       default:
-        return grokBanner;
+        return xcliBanner;
     }
   };
   const getContextStatus = () => {

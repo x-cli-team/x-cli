@@ -6,7 +6,7 @@ title: Installation & Setup Guide
 
 ## Overview
 
-Grok CLI is installed globally via npm and includes automated installation scripts to handle common issues.
+X-CLI is installed globally via npm and includes automated installation scripts to handle common issues.
 
 ## Installation Methods
 
@@ -15,7 +15,7 @@ Grok CLI is installed globally via npm and includes automated installation scrip
 Use the provided `install.sh` script for automatic handling of installation issues:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hinetapora/grok-cli-hurry-mode/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/x-cli-team/x-cli/main/install.sh | bash
 ```
 
 The script automatically:
@@ -32,32 +32,32 @@ If automated installation fails, try manual methods:
 #### Standard NPM Install (Recommended)
 
 ```bash
-npm install -g grok-cli-hurry-mode@latest
+npm install -g @xagent/x-cli@latest
 ```
 
 #### Try Without Installing
 
 ```bash
-npx grok-cli-hurry-mode@latest
+npx @xagent/x-cli@latest
 ```
 
 #### Alternative Package Managers
 
 ```bash
 # Yarn
-yarn global add grok-cli-hurry-mode@latest
+yarn global add @xagent/x-cli@latest
 
 # pnpm
-pnpm add -g grok-cli-hurry-mode@latest
+pnpm add -g @xagent/x-cli@latest
 
 # Bun
-bun add -g grok-cli-hurry-mode@latest
+bun add -g @xagent/x-cli@latest
 ```
 
 #### Force Installation (if needed)
 
 ```bash
-npm install -g grok-cli-hurry-mode --force
+npm install -g @xagent/x-cli --force
 ```
 
 ## Post-Installation Setup
@@ -126,7 +126,7 @@ If needed, manually clean before reinstalling:
 pkill -f grok
 
 # Remove installation
-npm uninstall -g grok-cli-hurry-mode
+npm uninstall -g @xagent/x-cli
 
 # Clean cache
 npm cache clean --force
@@ -134,7 +134,7 @@ npm cache clean --force
 
 ### Alternative Installation
 
-Download pre-built binaries from: https://github.com/hinetapora/grok-cli-hurry-mode/releases
+Download pre-built binaries from: https://github.com/x-cli-team/x-cli/releases
 
 ## Requirements
 

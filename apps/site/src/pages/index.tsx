@@ -320,13 +320,13 @@ function Footer() {
           <div className={styles.footerSection}>
             <h3>Credits</h3>
             <ul>
-              <li><a href="https://github.com/superagent-ai/grok-cli">Forked from Superagent.ai</a></li>
+              <li><a href="https://github.com/x-cli-team/x-cli">Original X CLI Repository</a></li>
               <li><a href="https://github.com/homanp">Ismail Pelaseyed</a></li>
             </ul>
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>Copyright © 2025 X CLI. Forked from <a href="https://github.com/superagent-ai/grok-cli">Superagent.ai</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
+          <p>Copyright © 2025 X CLI. Based on <a href="https://github.com/x-cli-team/x-cli">x-cli-team</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
         </div>
       </div>
     </footer>

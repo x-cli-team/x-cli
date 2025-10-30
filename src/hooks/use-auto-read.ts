@@ -80,6 +80,9 @@ export function useAutoRead(
         });
       }
 
+      // Console logging for startup confirmation
+      console.log('🔍 Auto-reading .agent documentation...');
+
       // Process folders in priority order
       const folders = config?.folders || [
         {
@@ -147,6 +150,9 @@ export function useAutoRead(
               const displayTitle = file.title || fileName.replace('.md', '').replace('-', ' ').toUpperCase();
               const icon = file.icon || '📄';
 
+              // Console logging for each file loaded
+              console.log(`📄 Loaded: ${folder.name}/${fileName} (${content.length} chars)`);
+
               if (showFileContents) {
                 initialMessages.push({
                   type: 'assistant',
@@ -157,10 +163,14 @@ export function useAutoRead(
               docsRead++;
             } catch (_error) {
               // Silently ignore read errors
+              console.log(`⚠️ Failed to read: ${folder.name}/${fileName}`);
             }
           }
         }
       }
+
+      // Console summary
+      console.log(`✅ Auto-read complete: ${docsRead} documentation files loaded`);
 
       // Add summary message
       if (showSummaryMessage && docsRead > 0) {

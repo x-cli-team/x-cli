@@ -369,6 +369,7 @@ export function useInputHandler({
     { command: "/comments", description: "Add code comments to files" },
     { command: "/commit-and-push", description: "AI commit & push to remote" },
     { command: "/smart-push", description: "Intelligent staging, commit message generation, and push" },
+    { command: "/context", description: "Show loaded documentation and context status" },
     { command: "/exit", description: "Exit the application" },
   ];
 
@@ -379,6 +380,38 @@ export function useInputHandler({
 
   const handleDirectCommand = async (input: string): Promise<boolean> => {
     const trimmedInput = input.trim();
+
+    if (trimmedInput === "/context") {
+      // Show loaded documentation and context status
+      const contextEntry: ChatEntry = {
+        type: "assistant",
+        content: `📚 **Loaded Documentation Context**
+
+The .agent documentation system has been automatically loaded at startup:
+
+**System Documentation:**
+- 📋 System Architecture (architecture.md)
+- 🏗️ Critical State (critical-state.md)
+- 🏗️ Installation Guide (installation.md)
+- 🏗️ API Schema (api-schema.md)
+- 🏗️ Auto-Read System (auto-read-system.md)
+
+**SOP Documentation:**
+- 🔧 Git Workflow SOP (git-workflow.md)
+- 📖 Release Management SOP (release-management.md)
+- 📖 Automation Protection SOP (automation-protection.md)
+- 📖 NPM Publishing Troubleshooting (npm-publishing-troubleshooting.md)
+
+**Purpose:**
+This documentation provides context for all AI operations, ensuring consistent understanding of project architecture, processes, and standards.
+
+**Auto-Read Status:** ✅ Active - Loaded automatically on startup`,
+        timestamp: new Date(),
+      };
+      setChatHistory((prev) => [...prev, contextEntry]);
+      clearInput();
+      return true;
+    }
 
     if (trimmedInput === "/clear") {
       // Reset chat history
@@ -464,6 +497,38 @@ Examples:
         timestamp: new Date(),
       };
       setChatHistory((prev) => [...prev, helpEntry]);
+      clearInput();
+      return true;
+    }
+
+    if (trimmedInput === "/context") {
+      // Show loaded documentation and context status
+      const contextEntry: ChatEntry = {
+        type: "assistant",
+        content: `📚 **Loaded Documentation Context**
+
+The .agent documentation system has been automatically loaded at startup:
+
+**System Documentation:**
+- 📋 System Architecture (architecture.md)
+- 🏗️ Critical State (critical-state.md)
+- 🏗️ Installation Guide (installation.md)
+- 🏗️ API Schema (api-schema.md)
+- 🏗️ Auto-Read System (auto-read-system.md)
+
+**SOP Documentation:**
+- 🔧 Git Workflow SOP (git-workflow.md)
+- 📖 Release Management SOP (release-management.md)
+- 📖 Automation Protection SOP (automation-protection.md)
+- 📖 NPM Publishing Troubleshooting (npm-publishing-troubleshooting.md)
+
+**Purpose:**
+This documentation provides context for all AI operations, ensuring consistent understanding of project architecture, processes, and standards.
+
+**Auto-Read Status:** ✅ Active - Loaded automatically on startup`,
+        timestamp: new Date(),
+      };
+      setChatHistory((prev) => [...prev, contextEntry]);
       clearInput();
       return true;
     }
