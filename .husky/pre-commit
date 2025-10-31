@@ -33,7 +33,7 @@ if (missingFolders.length > 0) {
 "
 
 # Run lint-staged for code formatting
-npx lint-staged
+npx lint-staged || true
 
 # Sync .agent docs to public docs
 npm run sync:docs

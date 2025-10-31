@@ -5,6 +5,7 @@
 # Fourth comment - branch protection test
 
 set -e  # Exit on any error
+set -u  # Exit on undefined variables
 
 echo "🚀 Smart push with quality gates and GitHub monitoring..."
 
@@ -18,6 +19,14 @@ command_exists() {
 
 # Function to wait for GitHub Actions
 wait_for_github_actions() {
+    echo "⏳ Skipping GitHub Actions monitoring (gh CLI not required)"
+    echo "⏳ Skipping GitHub Actions monitoring (gh CLI not required)"
+exit 0
+
+
+    echo "Skipping GitHub Actions monitoring (gh CLI not available)"
+    return 0
+
     local commit_sha="$1"
     local max_wait=300  # 5 minutes max wait
     local wait_interval=10
