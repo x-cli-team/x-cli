@@ -10,6 +10,7 @@ import { useContextInfo } from "../../hooks/use-context-info.js";
 import { useAutoRead } from "../../hooks/use-auto-read.js";
 import { useStreaming } from "../../hooks/use-streaming.js";
 import { useConfirmations } from "../../hooks/use-confirmations.js";
+import { useIntroduction } from "../../hooks/use-introduction.js";
 import { useConsoleSetup } from "../../hooks/use-console-setup.js";
 import { useSessionLogging } from "../../hooks/use-session-logging.js";
 import { useProcessingTimer } from "../../hooks/use-processing-timer.js";
@@ -85,6 +86,30 @@ function ChatInterfaceWithAgent({
 
   const confirmationService = ConfirmationService.getInstance();
 
+  // Introduction hook for first-time setup
+  const { introductionState, handleIntroductionInput = () => false } = useIntroduction(
+    chatHistory,
+    setChatHistory
+  );
+
+  // Pass introduction input handler to useInputHandler
+  const inputHandlerProps = {
+    agent,
+    chatHistory,
+    setChatHistory,
+    setIsProcessing,
+    setIsStreaming,
+    setTokenCount,
+    setProcessingTime,
+    processingStartTime,
+    isProcessing,
+    isStreaming,
+    isConfirmationActive: !!confirmationOptions,
+    onGlobalShortcut: handleGlobalShortcuts,
+    introductionState,
+    handleIntroductionInput,
+  };
+
   const {
     input,
     cursorPosition,
@@ -98,20 +123,7 @@ function ChatInterfaceWithAgent({
     verbosityLevel,
     explainLevel,
     planMode,
-  } = useInputHandler({
-    agent,
-    chatHistory,
-    setChatHistory,
-    setIsProcessing,
-    setIsStreaming,
-    setTokenCount,
-    setProcessingTime,
-    processingStartTime,
-    isProcessing,
-    isStreaming,
-    isConfirmationActive: !!confirmationOptions,
-    onGlobalShortcut: handleGlobalShortcuts,
-  });
+  } = useInputHandler(inputHandlerProps);
 
   // Use streaming hook for processing initial messages
   useStreaming(agent, initialMessage, setChatHistory, {

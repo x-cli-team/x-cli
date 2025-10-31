@@ -31,9 +31,9 @@ Specialized tools for development environment integration.
 
 **Usage Examples**:
 ```bash
-grok "Read the main.py file"
-grok "Show me the first 50 lines of the log file"
-grok "What's in this screenshot?"
+x-cli "Read the main.py file"
+x-cli "Show me the first 50 lines of the log file"
+x-cli "What's in this screenshot?"
 ```
 
 ### Write
@@ -46,8 +46,8 @@ grok "What's in this screenshot?"
 
 **Usage Examples**:
 ```bash
-grok "Create a new README.md file"
-grok "Write a Python script that processes CSV files"
+x-cli "Create a new README.md file"
+x-cli "Write a Python script that processes CSV files"
 ```
 
 ### Edit
@@ -60,8 +60,8 @@ grok "Write a Python script that processes CSV files"
 
 **Usage Examples**:
 ```bash
-grok "Change all instances of 'oldFunction' to 'newFunction'"
-grok "Update the version number in package.json"
+x-cli "Change all instances of 'oldFunction' to 'newFunction'"
+x-cli "Update the version number in package.json"
 ```
 
 ### Bash
@@ -75,9 +75,9 @@ grok "Update the version number in package.json"
 
 **Usage Examples**:
 ```bash
-grok "Run the test suite"
-grok "Install the dependencies"
-grok "Check git status"
+x-cli "Run the test suite"
+x-cli "Install the dependencies"
+x-cli "Check git status"
 ```
 
 ### Grep
@@ -91,8 +91,8 @@ grok "Check git status"
 
 **Usage Examples**:
 ```bash
-grok "Find all TODO comments in the codebase"
-grok "Search for error handling patterns"
+x-cli "Find all TODO comments in the codebase"
+x-cli "Search for error handling patterns"
 ```
 
 ### Glob
@@ -105,8 +105,8 @@ grok "Search for error handling patterns"
 
 **Usage Examples**:
 ```bash
-grok "Find all TypeScript files"
-grok "List all configuration files"
+x-cli "Find all TypeScript files"
+x-cli "List all configuration files"
 ```
 
 ### LS
@@ -119,8 +119,8 @@ grok "List all configuration files"
 
 **Usage Examples**:
 ```bash
-grok "What files are in the src directory?"
-grok "Show me the project structure"
+x-cli "What files are in the src directory?"
+x-cli "Show me the project structure"
 ```
 
 ---
@@ -138,8 +138,8 @@ grok "Show me the project structure"
 
 **Usage Examples**:
 ```bash
-grok "Refactor the User class across all files"
-grok "Update import statements in the entire project"
+x-cli "Refactor the User class across all files"
+x-cli "Update import statements in the entire project"
 ```
 
 ### WebFetch
@@ -153,8 +153,8 @@ grok "Update import statements in the entire project"
 
 **Usage Examples**:
 ```bash
-grok "Fetch the latest documentation from the API"
-grok "Get information about this GitHub issue"
+x-cli "Fetch the latest documentation from the API"
+x-cli "Get information about this GitHub issue"
 ```
 
 ### WebSearch
@@ -167,8 +167,8 @@ grok "Get information about this GitHub issue"
 
 **Usage Examples**:
 ```bash
-grok "Search for the latest React best practices"
-grok "Find current Node.js security advisories"
+x-cli "Search for the latest React best practices"
+x-cli "Find current Node.js security advisories"
 ```
 
 ### Task
@@ -181,8 +181,8 @@ grok "Find current Node.js security advisories"
 
 **Usage Examples**:
 ```bash
-grok "Research and implement a caching strategy"
-grok "Analyze the codebase architecture and suggest improvements"
+x-cli "Research and implement a caching strategy"
+x-cli "Analyze the codebase architecture and suggest improvements"
 ```
 
 ### TodoWrite
@@ -195,8 +195,8 @@ grok "Analyze the codebase architecture and suggest improvements"
 
 **Usage Examples**:
 ```bash
-grok "Plan and implement the new user authentication feature"
-grok "Break down this complex refactoring task"
+x-cli "Plan and implement the new user authentication feature"
+x-cli "Break down this complex refactoring task"
 ```
 
 ---
@@ -213,8 +213,8 @@ grok "Break down this complex refactoring task"
 
 **Usage Examples**:
 ```bash
-grok "Add a new analysis cell to the notebook"
-grok "Update the data visualization code"
+x-cli "Add a new analysis cell to the notebook"
+x-cli "Update the data visualization code"
 ```
 
 ### BashOutput
@@ -227,8 +227,8 @@ grok "Update the data visualization code"
 
 **Usage Examples**:
 ```bash
-grok "Monitor the build process"
-grok "Check the test runner output"
+x-cli "Monitor the build process"
+x-cli "Check the test runner output"
 ```
 
 ### KillBash
@@ -241,8 +241,8 @@ grok "Check the test runner output"
 
 **Usage Examples**:
 ```bash
-grok "Stop the development server"
-grok "Cancel the long-running test"
+x-cli "Stop the development server"
+x-cli "Cancel the long-running test"
 ```
 
 ---
@@ -285,7 +285,7 @@ All tools include comprehensive error handling:
 ## Tool Configuration
 
 ### Global Settings
-Configure tool behavior in `~/.grok/user-settings.json`:
+Configure tool behavior in `~/.xcli/config.json`:
 
 ```json
 {
@@ -303,7 +303,7 @@ Configure tool behavior in `~/.grok/user-settings.json`:
 ```
 
 ### Project Settings
-Override settings per project in `.grok/settings.json`:
+Override settings per project in `.xcli/settings.json`:
 
 ```json
 {
@@ -345,9 +345,9 @@ All tools implement security best practices:
 For tool-specific help and examples:
 
 ```bash
-grok "How do I use the MultiEdit tool?"
-grok "Show me examples of the Grep tool"
-grok "What can the Task tool do?"
+x-cli "How do I use the MultiEdit tool?"
+x-cli "Show me examples of the Grep tool"
+x-cli "What can the Task tool do?"
 ```
 
 The AI will provide detailed explanations and examples for any tool or capability.

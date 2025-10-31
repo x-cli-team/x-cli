@@ -58,7 +58,7 @@ export default function ApiKeyInput({ onApiKeySet }: ApiKeyInputProps) {
       try {
         const manager = getSettingsManager();
         manager.updateUserSetting('apiKey', apiKey);
-        console.log(`\n✅ API key saved to ~/.grok/user-settings.json`);
+        console.log(`\n✅ API key saved to ~/.xcli/config.json`);
       } catch {
         console.log('\n⚠️ Could not save API key to settings file');
         console.log('API key set for current session only');
@@ -96,7 +96,7 @@ export default function ApiKeyInput({ onApiKeySet }: ApiKeyInputProps) {
       <Box flexDirection="column" marginTop={1}>
         <Text color="gray" dimColor>• Press Enter to submit</Text>
         <Text color="gray" dimColor>• Press Ctrl+C to exit</Text>
-        <Text color="gray" dimColor>Note: API key will be saved to ~/.grok/user-settings.json</Text>
+        <Text color="gray" dimColor>Note: API key will be saved to ~/.xcli/config.json</Text>
       </Box>
 
       {isSubmitting ? (

@@ -64,7 +64,7 @@ export function printWelcomeBanner(_quiet = false): void {
     `\x1b[35m  🛠️  Power Features:\x1b[0m`,
     '',
     `  • Auto-edit mode: Press Shift+Tab to toggle hands-free editing`,
-    `  • Project memory: Create .grok/GROK.md to customize behavior`,
+    `  • Project memory: Create .xcli/GROK.md to customize behavior`,
     `  • Documentation: Run "/init-agent" for .agent docs system`,
     `  • Error recovery: Run "/heal" after errors to add guardrails`,
     '',

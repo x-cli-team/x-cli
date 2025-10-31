@@ -52,31 +52,37 @@ var init_settings_manager = __esm({
   "src/utils/settings-manager.ts"() {
     DEFAULT_USER_SETTINGS = {
       baseURL: "https://api.x.ai/v1",
-      defaultModel: "grok-code-fast-1",
+      defaultModel: "grok-4-fast-non-reasoning",
       models: [
-        "grok-code-fast-1",
+        "grok-4-fast-non-reasoning",
+        "grok-4-fast-reasoning",
+        "grok-4-0709",
         "grok-4-latest",
         "grok-3-latest",
         "grok-3-fast",
-        "grok-3-mini-fast"
+        "grok-3-mini-fast",
+        "grok-3",
+        "grok-2-vision-1212us-east-1",
+        "grok-2-vision-1212eu-west-1",
+        "grok-2-image-1212"
       ],
       verbosityLevel: "quiet",
       explainLevel: "brief",
       requireConfirmation: true
     };
     DEFAULT_PROJECT_SETTINGS = {
-      model: "grok-code-fast-1"
+      model: "grok-4-fast-non-reasoning"
     };
     SettingsManager = class _SettingsManager {
       constructor() {
-        const newUserDir = path7.join(os.homedir(), ".x");
+        const newUserDir = path7.join(os.homedir(), ".xcli");
         const oldUserDir = path7.join(os.homedir(), ".grok");
         if (fs.existsSync(newUserDir) || !fs.existsSync(oldUserDir)) {
-          this.userSettingsPath = path7.join(newUserDir, "user-settings.json");
+          this.userSettingsPath = path7.join(newUserDir, "config.json");
         } else {
           this.userSettingsPath = path7.join(oldUserDir, "user-settings.json");
         }
-        const newProjectDir = path7.join(process.cwd(), ".x");
+        const newProjectDir = path7.join(process.cwd(), ".xcli");
         const oldProjectDir = path7.join(process.cwd(), ".grok");
         if (fs.existsSync(newProjectDir) || !fs.existsSync(oldProjectDir)) {
           this.projectSettingsPath = path7.join(newProjectDir, "settings.json");
@@ -103,7 +109,7 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Load user settings from ~/.x/user-settings.json
+       * Load user settings from ~/.xcli/config.json or ~/.grok/user-settings.json
        */
       loadUserSettings() {
         try {
@@ -123,7 +129,7 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Save user settings to ~/.x/user-settings.json
+       * Save user settings to ~/.xcli/config.json or ~/.grok/user-settings.json
        */
       saveUserSettings(settings) {
         try {
@@ -232,11 +238,16 @@ var init_settings_manager = __esm({
       }
       /**
        * Get the current model with proper fallback logic:
-       * 1. Project-specific model setting
-       * 2. User's default model
-       * 3. System default
+       * 1. Environment variable XCLI_MODEL_DEFAULT
+       * 2. Project-specific model setting
+       * 3. User's default model
+       * 4. System default
        */
       getCurrentModel() {
+        const envModel = process.env.XCLI_MODEL_DEFAULT;
+        if (envModel) {
+          return envModel;
+        }
         const projectModel = this.getProjectSetting("model");
         if (projectModel) {
           return projectModel;
@@ -245,7 +256,22 @@ var init_settings_manager = __esm({
         if (userDefaultModel) {
           return userDefaultModel;
         }
-        return DEFAULT_PROJECT_SETTINGS.model || "grok-code-fast-1";
+        return DEFAULT_PROJECT_SETTINGS.model || "grok-4-fast-non-reasoning";
+      }
+      /**
+       * Get the appropriate model for a task based on its characteristics
+       * Uses reasoning model for deep tasks, retries, or large contexts
+       */
+      pickModel(options = {}) {
+        const { deep = false, retries = 0, ctxTokens = 0 } = options;
+        if (deep || retries > 0 || ctxTokens > 15e4) {
+          const reasoningModel = process.env.XCLI_MODEL_REASONING;
+          if (reasoningModel) {
+            return reasoningModel;
+          }
+          return "grok-4-fast-reasoning";
+        }
+        return this.getCurrentModel();
       }
       /**
        * Set the current model for the project
@@ -464,7 +490,7 @@ var init_context_loader = __esm({
 });
 var GrokClient = class {
   constructor(apiKey, model, baseURL) {
-    this.currentModel = "grok-code-fast-1";
+    this.currentModel = "grok-4-fast-non-reasoning";
     this.client = new OpenAI({
       apiKey,
       baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",
@@ -496,6 +522,9 @@ var GrokClient = class {
         requestPayload.search_parameters = searchOptions.search_parameters;
       }
       const response = await this.client.chat.completions.create(requestPayload);
+      if (response.usage) {
+        this.logTokenUsage(response.usage);
+      }
       return response;
     } catch (error) {
       throw new Error(`Grok API error: ${error.message}`);
@@ -519,8 +548,15 @@ var GrokClient = class {
         requestPayload,
         { signal: abortSignal }
       );
+      let finalUsage = null;
       for await (const chunk of stream) {
+        if (chunk.usage) {
+          finalUsage = chunk.usage;
+        }
         yield chunk;
+      }
+      if (finalUsage) {
+        this.logTokenUsage(finalUsage);
       }
     } catch (error) {
       throw new Error(`Grok API error: ${error.message}`);
@@ -535,6 +571,32 @@ var GrokClient = class {
       search_parameters: searchParameters || { mode: "on" }
     };
     return this.chat([searchMessage], [], void 0, searchOptions);
+  }
+  /**
+   * Log token usage for monitoring and optimization
+   */
+  logTokenUsage(usage) {
+    try {
+      const tokenData = {
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        model: this.currentModel,
+        prompt_tokens: usage.prompt_tokens || 0,
+        completion_tokens: usage.completion_tokens || 0,
+        total_tokens: usage.total_tokens || 0,
+        reasoning_tokens: usage.reasoning_tokens || 0
+      };
+      const logPath = process.env.XCLI_TOKEN_LOG || `${__require("os").homedir()}/.xcli/token-usage.jsonl`;
+      const fs10 = __require("fs");
+      const path32 = __require("path");
+      const dir = path32.dirname(logPath);
+      if (!fs10.existsSync(dir)) {
+        fs10.mkdirSync(dir, { recursive: true });
+      }
+      const logLine = JSON.stringify(tokenData) + "\n";
+      fs10.appendFileSync(logPath, logLine);
+    } catch (error) {
+      console.warn("Failed to log token usage:", error);
+    }
   }
 };
 var StdioTransport = class {
@@ -858,21 +920,21 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "view_file",
-      description: "View contents of a file or list directory contents",
+      description: "View file contents or list directories",
       parameters: {
         type: "object",
         properties: {
           path: {
             type: "string",
-            description: "Path to file or directory to view"
+            description: "File or directory path"
           },
           start_line: {
             type: "number",
-            description: "Starting line number for partial file view (optional)"
+            description: "Optional start line for partial view"
           },
           end_line: {
             type: "number",
-            description: "Ending line number for partial file view (optional)"
+            description: "Optional end line for partial view"
           }
         },
         required: ["path"]
@@ -883,7 +945,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "create_file",
-      description: "Create a new file with specified content",
+      description: "Create new file with content",
       parameters: {
         type: "object",
         properties: {
@@ -904,7 +966,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "str_replace_editor",
-      description: "Replace specific text in a file. Use this for single line edits only",
+      description: "Replace text in file (single line edits)",
       parameters: {
         type: "object",
         properties: {
@@ -950,7 +1012,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "search",
-      description: "Unified search tool for finding text content or files (similar to Cursor's search)",
+      description: "Search for text content or files",
       parameters: {
         type: "object",
         properties: {
@@ -1088,7 +1150,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "ast_parser",
-      description: "Parse source code files to extract AST, symbols, imports, exports, and structural information",
+      description: "Parse source code to extract AST, symbols, imports, exports",
       parameters: {
         type: "object",
         properties: {
@@ -1135,7 +1197,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "symbol_search",
-      description: "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references",
+      description: "Search for symbols across codebase with fuzzy matching",
       parameters: {
         type: "object",
         properties: {
@@ -1188,7 +1250,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "dependency_analyzer",
-      description: "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs",
+      description: "Analyze dependencies, detect circular imports, generate graphs",
       parameters: {
         type: "object",
         properties: {
@@ -1238,7 +1300,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "code_context",
-      description: "Build intelligent code context, analyze relationships, and provide semantic understanding",
+      description: "Build code context, analyze relationships, semantic understanding",
       parameters: {
         type: "object",
         properties: {
@@ -1282,7 +1344,7 @@ var BASE_GROK_TOOLS = [
     type: "function",
     function: {
       name: "refactoring_assistant",
-      description: "Perform safe code refactoring operations including rename, extract, inline, and move operations",
+      description: "Perform safe refactoring: rename, extract, inline, move",
       parameters: {
         type: "object",
         properties: {
@@ -5404,7 +5466,7 @@ var OperationHistoryTool = class {
       ...options
     };
     const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-    this.historyFile = path7.join(homeDir, ".grok", "operation-history.json");
+    this.historyFile = path7.join(homeDir, ".xcli", "operation-history.json");
     this.loadHistory();
     if (this.options.autoCleanup) {
       this.cleanupOldEntries();
@@ -8630,7 +8692,7 @@ function createTokenCounter(model) {
 }
 function loadCustomInstructions(workingDirectory = process.cwd()) {
   try {
-    const instructionsPath = path7.join(workingDirectory, ".grok", "GROK.md");
+    const instructionsPath = path7.join(workingDirectory, ".xcli", "GROK.md");
     if (!fs.existsSync(instructionsPath)) {
       return null;
     }
@@ -9511,6 +9573,7 @@ ${option.id}) ${option.title}`);
 
 // src/agent/grok-agent.ts
 var GrokAgent = class extends EventEmitter {
+  // Limit conversation history
   constructor(apiKey, baseURL, model, maxToolRounds, contextPack) {
     super();
     this.chatHistory = [];
@@ -9523,11 +9586,12 @@ var GrokAgent = class extends EventEmitter {
     this.minRequestInterval = 500;
     // ms
     this.lastRequestTime = 0;
+    this.maxConversationMessages = 20;
     const manager = getSettingsManager();
     const savedModel = manager.getCurrentModel();
-    const modelToUse = model || savedModel || "grok-code-fast-1";
+    const modelToUse = model || savedModel;
     this.maxToolRounds = maxToolRounds || 400;
-    this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
+    this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.xcli/session.log`;
     this.grokClient = new GrokClient(apiKey, modelToUse, baseURL);
     this.textEditor = new TextEditorTool();
     this.morphEditor = process.env.MORPH_API_KEY ? new MorphEditorTool() : null;
@@ -9720,6 +9784,8 @@ Current working directory: ${process.cwd()}`
     this.chatHistory.push(userEntry);
     this.logEntry(userEntry);
     this.messages.push({ role: "user", content: message });
+    this.limitConversationHistory();
+    this.limitConversationHistory();
     try {
       const contextPack = await this.loadContextPack();
       const workflowService = new ResearchRecommendService(this);
@@ -10338,7 +10404,7 @@ EOF`;
   }
   saveSessionLog() {
     try {
-      const sessionDir = path7__default.join(__require("os").homedir(), ".grok");
+      const sessionDir = path7__default.join(__require("os").homedir(), ".xcli");
       if (!fs__default.existsSync(sessionDir)) {
         fs__default.mkdirSync(sessionDir, { recursive: true });
       }
@@ -10402,6 +10468,19 @@ EOF`;
     } catch (error) {
       console.warn("[Workflow] Failed to load context pack:", error);
       return void 0;
+    }
+  }
+  /**
+   * Limit conversation history to prevent unbounded token usage
+   */
+  limitConversationHistory() {
+    if (this.messages.length > this.maxConversationMessages) {
+      const systemMessage = this.messages[0];
+      const recentMessages = this.messages.slice(-this.maxConversationMessages + 1);
+      this.messages = [systemMessage, ...recentMessages];
+    }
+    if (this.chatHistory.length > this.maxConversationMessages) {
+      this.chatHistory = this.chatHistory.slice(-this.maxConversationMessages);
     }
   }
   /**
@@ -12374,7 +12453,7 @@ var DEFAULT_SETTINGS = {
   // 30 seconds
   enableDetailedLogging: true,
   autoSavePlans: true,
-  planSaveDirectory: ".grok/plans"
+  planSaveDirectory: ".xcli/plans"
 };
 var INITIAL_STATE = {
   active: false,
@@ -12611,6 +12690,16 @@ function usePlanMode(settings = {}, agent) {
     // Service accessors
     readOnlyExecutor
   };
+}
+
+// src/services/complexity-detector.ts
+function detectComplexity(input) {
+  const complexPatterns = [
+    /implement|run|build|refactor|sprint|workflow|add feature|create system/i,
+    input.length > 50
+    // Fallback for long queries
+  ];
+  return complexPatterns.some((p) => typeof p === "boolean" ? p : p.test(input));
 }
 var MAX_SUGGESTIONS = 8;
 function filterCommandSuggestions(suggestions, input) {
@@ -12876,7 +12965,7 @@ Documentation for documentation system commands:
 
 ## \u{1F517} Cross-References
 - Main project documentation: ../README.md
-- Configuration: ../.grok/settings.json
+- Configuration: ../.xcli/settings.json
 - Build instructions: ../package.json
 
 ---
@@ -12937,7 +13026,7 @@ Documentation for documentation system commands:
 ### \u2699\uFE0F Configuration (\`src/utils/\`)
 - **Settings Management**: User and project-level config
 - **Model Configuration**: Support for multiple AI models
-- **File Locations**: ~/.grok/ for user, .grok/ for project
+- **File Locations**: ~/.xcli/ for user, .xcli/ for project
 
 ## Build & Distribution
 - **Development**: \`bun run dev\` for live reload
@@ -13016,7 +13105,7 @@ External project documented using X-CLI's .agent system.
 - **Commands**: Slash-based in src/commands/ (limited - only MCP command currently)
 - **Tools**: Modular tools in src/tools/ (extensive tool system)
 - **UI**: Ink components in src/ui/
-- **Settings**: File-based .grok/settings.json + ~/.grok/user-settings.json
+- **Settings**: File-based .xcli/settings.json + ~/.xcli/config.json
 - **Input**: Enhanced terminal input with history in src/hooks/
 
 ## Command System
@@ -13097,14 +13186,14 @@ Updated By: Agent System Generator during /init-agent
 \`\`\`typescript
 {
   baseURL: "https://api.x.ai/v1",
-  defaultModel: "grok-code-fast-1",
+  defaultModel: "grok-4-fast-non-reasoning",
   apiKey: process.env.X_API_KEY
 }
 \`\`\`
 
 ### Available Models
 - **grok-4-latest**: Latest Grok model with enhanced capabilities
-- **grok-code-fast-1**: Optimized for code generation (default)
+- **grok-4-fast-non-reasoning**: Optimized for code generation (default)
 - **grok-3-fast**: Fast general-purpose model
 
 ### Tool Integration Schema
@@ -13244,7 +13333,7 @@ interface Tool {
 - Maintain clear navigation
 
 ## Automation
-- Auto-update triggers configured in .grok/settings.json
+- Auto-update triggers configured in .xcli/settings.json
 - Smart prompts after key file changes
 - Token threshold reminders
 - Integration with git commit hooks
@@ -14877,7 +14966,7 @@ var UpdateAgentDocs = class {
     const configFiles = [
       "package.json",
       "tsconfig.json",
-      ".grok/",
+      ".xcli/",
       "CLAUDE.md",
       ".env",
       ".gitignore",
@@ -15797,7 +15886,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 var package_default = {
   type: "module",
   name: "@xagent/x-cli",
-  version: "1.1.75",
+  version: "1.1.76",
   description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal.",
   main: "dist/index.js",
   module: "dist/index.js",
@@ -16004,6 +16093,13 @@ async function getCachedVersionInfo() {
 
 // src/hooks/use-input-handler.ts
 init_settings_manager();
+var researchRecommendService = {
+  researchRecommendService: () => {
+    console.log("ResearchRecommendService placeholder");
+    return { issues: [], options: [], recommendation: {}, plan: { summary: "", approach: "", todo: [] } };
+  }
+};
+var executionOrchestrator = { execute: () => Promise.resolve({ success: true, message: "Execution placeholder" }) };
 function useInputHandler({
   agent,
   chatHistory,
@@ -16016,7 +16112,8 @@ function useInputHandler({
   isProcessing,
   isStreaming,
   isConfirmationActive = false,
-  onGlobalShortcut
+  onGlobalShortcut,
+  handleIntroductionInput
 }) {
   const [showCommandSuggestions, setShowCommandSuggestions] = useState(false);
   const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
@@ -16195,9 +16292,54 @@ function useInputHandler({
       process.exit(0);
       return;
     }
-    if (userInput.trim()) {
+    if (handleIntroductionInput && handleIntroductionInput(userInput.trim())) {
+      return;
+    }
+    const trimmedInput = userInput.trim();
+    if (trimmedInput) {
       const directCommandResult = await handleDirectCommand(userInput);
       if (!directCommandResult) {
+        const isComplexTask = _interactivityLevel === "balanced" || _interactivityLevel === "repl" && detectComplexity(trimmedInput);
+        if (isComplexTask) {
+          try {
+            const plan = await researchRecommendService.process(trimmedInput, chatHistory);
+            if (plan) {
+              const researchEntry = {
+                type: "assistant",
+                content: `### Research Phase
+
+${JSON.stringify(plan, null, 2)}`,
+                timestamp: /* @__PURE__ */ new Date()
+              };
+              setChatHistory((prev) => [...prev, researchEntry]);
+              const confirmationService = ConfirmationService.getInstance();
+              const approved = await confirmationService.promptApproval(`Proceed with recommendation? (Y/n) [R=revise]
+
+Recommendation: ${plan.recommendation?.reasoning || "Standard plan"}`);
+              if (approved) {
+                const executionResult = await executionOrchestrator.execute(plan);
+                const executionEntry = {
+                  type: "assistant",
+                  content: `### Execution Results
+
+${JSON.stringify(executionResult, null, 2)}`,
+                  timestamp: /* @__PURE__ */ new Date()
+                };
+                setChatHistory((prev) => [...prev, executionEntry]);
+              } else {
+                const reviseEntry = {
+                  type: "assistant",
+                  content: "Plan rejected. Returning to normal mode.",
+                  timestamp: /* @__PURE__ */ new Date()
+                };
+                setChatHistory((prev) => [...prev, reviseEntry]);
+              }
+              return;
+            }
+          } catch (error) {
+            console.error("Workflow error:", error);
+          }
+        }
         await processUserMessage(userInput);
       }
     }
@@ -16379,7 +16521,7 @@ Direct Commands (executed immediately):
   touch <file>- Create empty file
 
 Model Configuration:
-  Edit ~/.grok/models.json to add custom models (Claude, GPT, Gemini, etc.)
+  Edit ~/.xcli/models.json to add custom models (Claude, GPT, Gemini, etc.)
 
 For complex operations, just describe what you want in natural language.
 Examples:
@@ -18335,7 +18477,7 @@ function ApiKeyInput({ onApiKeySet }) {
         const manager = getSettingsManager();
         manager.updateUserSetting("apiKey", apiKey);
         console.log(`
-\u2705 API key saved to ~/.grok/user-settings.json`);
+\u2705 API key saved to ~/.xcli/config.json`);
       } catch {
         console.log("\n\u26A0\uFE0F Could not save API key to settings file");
         console.log("API key set for current session only");
@@ -18361,7 +18503,7 @@ function ApiKeyInput({ onApiKeySet }) {
     /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
       /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Enter to submit" }),
       /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "\u2022 Press Ctrl+C to exit" }),
-      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Note: API key will be saved to ~/.grok/user-settings.json" })
+      /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: "Note: API key will be saved to ~/.xcli/config.json" })
     ] }),
     isSubmitting ? /* @__PURE__ */ jsx(Box, { marginTop: 1, children: /* @__PURE__ */ jsx(Text, { color: "yellow", children: "\u{1F504} Validating API key..." }) }) : null
   ] });
@@ -18386,7 +18528,7 @@ function useContextInfo(agent) {
       let loadedFiles = [];
       let contextHealth = "optimal";
       if (agent) {
-        const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
+        const modelName = agent.getCurrentModel?.() || "grok-4-fast-non-reasoning";
         const maxTokens = getMaxTokensForModel(modelName);
         const sessionTokens = agent.getSessionTokenCount?.() || 0;
         messagesCount = agent.getMessageCount?.() || 0;
@@ -18463,7 +18605,7 @@ function shouldIgnoreDirectory(dirname5) {
 }
 async function getIndexSize() {
   try {
-    const indexPath = path7__default.join(process.cwd(), ".grok", "index.json");
+    const indexPath = path7__default.join(process.cwd(), ".xcli", "index.json");
     if (fs__default.existsSync(indexPath)) {
       const stats = await fs__default.promises.stat(indexPath);
       const mb = stats.size / (1024 * 1024);
@@ -18475,7 +18617,7 @@ async function getIndexSize() {
 }
 async function getSessionFileCount() {
   try {
-    const sessionPath = path7__default.join(os__default.homedir(), ".grok", "session.log");
+    const sessionPath = path7__default.join(os__default.homedir(), ".xcli", "session.log");
     if (fs__default.existsSync(sessionPath)) {
       const content = await fs__default.promises.readFile(sessionPath, "utf8");
       return content.split("\n").filter((line) => line.trim()).length;
@@ -18521,7 +18663,9 @@ function getMemoryPressure() {
 }
 function getMaxTokensForModel(modelName) {
   const modelLimits = {
-    "grok-code-fast-1": 128e3,
+    "grok-4-fast-non-reasoning": 128e3,
+    "grok-4-fast-reasoning": 2e5,
+    "grok-4-0709": 2e5,
     "grok-4-latest": 2e5,
     "grok-3-latest": 2e5,
     "grok-3-fast": 128e3,
@@ -18833,6 +18977,131 @@ function useConfirmations(confirmationService, state) {
   };
 }
 
+// src/hooks/use-introduction.ts
+init_settings_manager();
+function useIntroduction(chatHistory, setChatHistory) {
+  const [introductionState, setIntroductionState] = useState({
+    needsIntroduction: false,
+    isCollectingOperatorName: false,
+    isCollectingAgentName: false,
+    showGreeting: false
+  });
+  useEffect(() => {
+    const checkIntroductionNeeded = () => {
+      try {
+        const settingsManager = getSettingsManager();
+        const userSettings = settingsManager.loadUserSettings();
+        const hasOperatorName = userSettings.operatorName && userSettings.operatorName.trim().length > 0;
+        const hasAgentName = userSettings.agentName && userSettings.agentName.trim().length > 0;
+        if (!hasOperatorName || !hasAgentName) {
+          setIntroductionState({
+            needsIntroduction: true,
+            isCollectingOperatorName: !hasOperatorName,
+            isCollectingAgentName: hasOperatorName && !hasAgentName,
+            showGreeting: false
+          });
+        }
+      } catch (error) {
+        console.warn("Settings manager error, skipping introduction:", error);
+      }
+    };
+    if (chatHistory.length === 0) {
+      checkIntroductionNeeded();
+    }
+  }, [chatHistory.length]);
+  const handleIntroductionInput = (input) => {
+    try {
+      if (!introductionState.needsIntroduction || introductionState.needsIntroduction === void 0) {
+        return false;
+      }
+      const trimmedInput = input.trim();
+      if (!trimmedInput) return false;
+      if (trimmedInput.length < 1 || trimmedInput.length > 50) {
+        const errorEntry = {
+          type: "assistant",
+          content: "Please enter a name between 1 and 50 characters.",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+        return true;
+      }
+      const maliciousPattern = /[<>\"'&]/;
+      if (maliciousPattern.test(trimmedInput)) {
+        const errorEntry = {
+          type: "assistant",
+          content: "Please use only letters, numbers, spaces, and common punctuation.",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+        return true;
+      }
+      const settingsManager = getSettingsManager();
+      if (introductionState.isCollectingOperatorName) {
+        settingsManager.updateUserSetting("operatorName", trimmedInput);
+        setIntroductionState((prev) => ({
+          ...prev,
+          isCollectingOperatorName: false,
+          isCollectingAgentName: true,
+          operatorName: trimmedInput
+        }));
+        const agentNamePrompt = {
+          type: "assistant",
+          content: "Great! And what would you like to call me (your AI assistant)?",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, agentNamePrompt]);
+        return true;
+      } else if (introductionState.isCollectingAgentName) {
+        settingsManager.updateUserSetting("agentName", trimmedInput);
+        setIntroductionState((prev) => ({
+          ...prev,
+          needsIntroduction: false,
+          isCollectingAgentName: false,
+          agentName: trimmedInput,
+          showGreeting: true
+        }));
+        const userSettings = settingsManager.loadUserSettings();
+        const operatorName = userSettings.operatorName || "there";
+        const greeting = {
+          type: "assistant",
+          content: `hi ${operatorName} nice to meet you. lets get started, how can i help?`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, greeting]);
+        return true;
+      }
+    } catch (error) {
+      console.warn("Introduction input error:", error);
+      const errorEntry = {
+        type: "assistant",
+        content: "There was an issue with the introduction. You can continue using the CLI normally.",
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory((prev) => [...prev, errorEntry]);
+      return true;
+    }
+    return false;
+  };
+  const startIntroduction = () => {
+    if (!introductionState.needsIntroduction) return;
+    const introMessage = {
+      type: "assistant",
+      content: "Hello! I'm x-cli. Before we get started, I'd like to know a bit about you.\n\nWhat's your name?",
+      timestamp: /* @__PURE__ */ new Date()
+    };
+    setChatHistory((prev) => [...prev, introMessage]);
+  };
+  useEffect(() => {
+    if (introductionState.needsIntroduction && !introductionState.isCollectingOperatorName && !introductionState.isCollectingAgentName && chatHistory.length === 0) {
+      startIntroduction();
+    }
+  }, [introductionState.needsIntroduction, introductionState.isCollectingOperatorName, introductionState.isCollectingAgentName, chatHistory.length]);
+  return {
+    introductionState,
+    handleIntroductionInput
+  };
+}
+
 // src/hooks/use-console-setup.ts
 function printWelcomeBanner(_quiet = false) {
   if (_quiet) return;
@@ -18880,7 +19149,7 @@ function printWelcomeBanner(_quiet = false) {
     `\x1B[35m  \u{1F6E0}\uFE0F  Power Features:\x1B[0m`,
     "",
     `  \u2022 Auto-edit mode: Press Shift+Tab to toggle hands-free editing`,
-    `  \u2022 Project memory: Create .grok/GROK.md to customize behavior`,
+    `  \u2022 Project memory: Create .xcli/GROK.md to customize behavior`,
     `  \u2022 Documentation: Run "/init-agent" for .agent docs system`,
     `  \u2022 Error recovery: Run "/heal" after errors to add guardrails`,
     "",
@@ -18895,7 +19164,7 @@ function useSessionLogging(chatHistory) {
   useEffect(() => {
     const newEntries = chatHistory.slice(lastChatHistoryLength.current);
     if (newEntries.length > 0) {
-      const sessionFile = path7__default.join(os__default.homedir(), ".grok", "session.log");
+      const sessionFile = path7__default.join(os__default.homedir(), ".xcli", "session.log");
       try {
         const dir = path7__default.dirname(sessionFile);
         if (!fs__default.existsSync(dir)) {
@@ -20461,7 +20730,7 @@ function ChatInterfaceRenderer({
           /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
             "\u2022 ",
             /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Project memory:" }),
-            " Create .grok/GROK.md to customize behavior"
+            " Create .xcli/GROK.md to customize behavior"
           ] }),
           /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
             "\u2022 ",
@@ -20635,6 +20904,26 @@ function ChatInterfaceWithAgent({
     return false;
   };
   const confirmationService = ConfirmationService.getInstance();
+  const { introductionState, handleIntroductionInput = () => false } = useIntroduction(
+    chatHistory,
+    setChatHistory
+  );
+  const inputHandlerProps = {
+    agent,
+    chatHistory,
+    setChatHistory,
+    setIsProcessing,
+    setIsStreaming,
+    setTokenCount,
+    setProcessingTime,
+    processingStartTime,
+    isProcessing,
+    isStreaming,
+    isConfirmationActive: !!confirmationOptions,
+    onGlobalShortcut: handleGlobalShortcuts,
+    introductionState,
+    handleIntroductionInput
+  };
   const {
     input,
     cursorPosition,
@@ -20648,20 +20937,7 @@ function ChatInterfaceWithAgent({
     verbosityLevel,
     explainLevel,
     planMode
-  } = useInputHandler({
-    agent,
-    chatHistory,
-    setChatHistory,
-    setIsProcessing,
-    setIsStreaming,
-    setTokenCount,
-    setProcessingTime,
-    processingStartTime,
-    isProcessing,
-    isStreaming,
-    isConfirmationActive: !!confirmationOptions,
-    onGlobalShortcut: handleGlobalShortcuts
-  });
+  } = useInputHandler(inputHandlerProps);
   useStreaming(agent, initialMessage, setChatHistory, {
     setIsProcessing,
     setIsStreaming,
@@ -21004,7 +21280,7 @@ function checkAutoCompact() {
     if (!settings.autoCompact) {
       return;
     }
-    const sessionLogPath = path7__default.join(__require("os").homedir(), ".grok", "session.log");
+    const sessionLogPath = path7__default.join(__require("os").homedir(), ".xcli", "session.log");
     const thresholds = settings.compactThreshold || { lines: 800, bytes: 2e5 };
     if (__require("fs").existsSync(sessionLogPath)) {
       const stats = __require("fs").statSync(sessionLogPath);
@@ -21030,11 +21306,11 @@ async function saveCommandLineSettings(apiKey, baseURL) {
     const manager = getSettingsManager();
     if (apiKey) {
       manager.updateUserSetting("apiKey", apiKey);
-      console.log("\u2705 API key saved to ~/.grok/user-settings.json");
+      console.log("\u2705 API key saved to ~/.xcli/config.json");
     }
     if (baseURL) {
       manager.updateUserSetting("baseURL", baseURL);
-      console.log("\u2705 Base URL saved to ~/.grok/user-settings.json");
+      console.log("\u2705 Base URL saved to ~/.xcli/config.json");
     }
   } catch (error) {
     console.warn(
@@ -21187,14 +21463,14 @@ async function processPromptHeadless(prompt, apiKey, baseURL, model, maxToolRoun
     process.exit(1);
   }
 }
-program.name("grok").description(
+program.name("x-cli").description(
   "A conversational AI CLI tool powered by Grok with text editor capabilities"
 ).version(package_default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key (or set X_API_KEY env var)").option(
   "-u, --base-url <url>",
   "Grok API base URL (or set GROK_BASE_URL env var)"
 ).option(
   "-m, --model <model>",
-  "AI model to use (e.g., grok-code-fast-1, grok-4-latest) (or set GROK_MODEL env var)"
+  "AI model to use (e.g., grok-4-fast-non-reasoning, grok-4-latest) (or set GROK_MODEL env var)"
 ).option(
   "-p, --prompt <prompt>",
   "process a single prompt and exit (headless mode)"
@@ -21291,7 +21567,7 @@ gitCommand.command("commit-and-push").description("Generate AI commit message an
   "Grok API base URL (or set GROK_BASE_URL env var)"
 ).option(
   "-m, --model <model>",
-  "AI model to use (e.g., grok-code-fast-1, grok-4-latest) (or set GROK_MODEL env var)"
+  "AI model to use (e.g., grok-4-fast-non-reasoning, grok-4-latest) (or set GROK_MODEL env var)"
 ).option(
   "--max-tool-rounds <rounds>",
   "maximum number of tool execution rounds (default: 400)",

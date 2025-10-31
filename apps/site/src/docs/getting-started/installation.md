@@ -65,21 +65,21 @@ npm install -g @xagent/x-cli --force
 ### 1. Verify Installation
 
 ```bash
-grok --version
+x-cli --version
 ```
 
 ### 2. Set API Key
 
 ```bash
 # Environment variable (recommended)
-export X_API_KEY=your_api_key_here
+export GROK_API_KEY=your_api_key_here
 
 # Save permanently to shell profile
-echo 'export X_API_KEY=your_api_key_here' >> ~/.zshrc
+echo 'export GROK_API_KEY=your_api_key_here' >> ~/.zshrc
 source ~/.zshrc
 
 # Or save permanently (bash users)
-echo 'export X_API_KEY=your_api_key_here' >> ~/.bashrc
+echo 'export GROK_API_KEY=your_api_key_here' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -91,20 +91,20 @@ echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # Verify it works
-which grok
-grok --version
+which x-cli
+x-cli --version
 ```
 
 ### 3. Get Started
 
 ```bash
-grok --help
+x-cli --help
 ```
 
 ### 4. First Run
 
 ```bash
-grok
+x-cli
 ```
 
 This launches the interactive chat interface.

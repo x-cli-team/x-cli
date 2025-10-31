@@ -94,6 +94,7 @@ export class GrokAgent extends EventEmitter {
   private readonly minRequestInterval: number = 500; // ms
   private lastRequestTime: number = 0;
   private sessionLogPath: string;
+  private readonly maxConversationMessages: number = 20; // Limit conversation history
 
   constructor(
     apiKey: string,
@@ -105,9 +106,9 @@ export class GrokAgent extends EventEmitter {
     super();
     const manager = getSettingsManager();
     const savedModel = manager.getCurrentModel();
-    const modelToUse = model || savedModel || "grok-code-fast-1";
+    const modelToUse = model || savedModel;
     this.maxToolRounds = maxToolRounds || 400;
-    this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
+    this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.xcli/session.log`;
     this.grokClient = new GrokClient(apiKey, modelToUse, baseURL);
     this.textEditor = new TextEditorTool();
     this.morphEditor = process.env.MORPH_API_KEY ? new MorphEditorTool() : null;
@@ -316,6 +317,8 @@ Current working directory: ${process.cwd()}`,
     this.chatHistory.push(userEntry);
     this.logEntry(userEntry);
     this.messages.push({ role: "user", content: message });
+    this.limitConversationHistory();
+    this.limitConversationHistory();
 
     try {
       // Load context pack for better recommendations
@@ -1119,7 +1122,7 @@ Current working directory: ${process.cwd()}`,
 
   saveSessionLog(): void {
     try {
-      const sessionDir = path.join(require('os').homedir(), '.grok');
+      const sessionDir = path.join(require('os').homedir(), '.xcli');
       if (!fs.existsSync(sessionDir)) {
         fs.mkdirSync(sessionDir, { recursive: true });
       }
@@ -1199,6 +1202,24 @@ Current working directory: ${process.cwd()}`,
     } catch (error) {
       console.warn('[Workflow] Failed to load context pack:', error);
       return undefined;
+    }
+  }
+
+  /**
+   * Limit conversation history to prevent unbounded token usage
+   */
+  private limitConversationHistory(): void {
+    // Keep only the most recent messages to prevent token explosion
+    if (this.messages.length > this.maxConversationMessages) {
+      // Keep system message (first) and most recent messages
+      const systemMessage = this.messages[0];
+      const recentMessages = this.messages.slice(-this.maxConversationMessages + 1);
+      this.messages = [systemMessage, ...recentMessages];
+    }
+
+    if (this.chatHistory.length > this.maxConversationMessages) {
+      // Keep most recent chat entries
+      this.chatHistory = this.chatHistory.slice(-this.maxConversationMessages);
     }
   }
 

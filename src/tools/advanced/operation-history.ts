@@ -94,7 +94,7 @@ export class OperationHistoryTool {
 
     // History file in user's home directory
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
-    this.historyFile = path.join(homeDir, '.grok', 'operation-history.json');
+    this.historyFile = path.join(homeDir, '.xcli', 'operation-history.json');
     
     this.loadHistory();
     

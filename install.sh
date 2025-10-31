@@ -22,10 +22,10 @@ clean_install() {
     if command -v node >/dev/null 2>&1; then
         NODE_PATH=$(dirname $(dirname $(which node)))
         # Clean up old installations
-        if [ -d "$NODE_PATH/lib/node_modules/grok-cli-hurry-mode" ]; then
-            echo "🗑️ Removing old grok-cli installation..."
-            rm -rf "$NODE_PATH/lib/node_modules/grok-cli-hurry-mode" 2>/dev/null || true
-            rm -rf "$NODE_PATH/lib/node_modules/.grok-cli-hurry-mode"* 2>/dev/null || true
+        if [ -d "$NODE_PATH/lib/node_modules/@xagent/x-cli" ]; then
+            echo "🗑️ Removing old x-cli installation..."
+            rm -rf "$NODE_PATH/lib/node_modules/@xagent/x-cli" 2>/dev/null || true
+            rm -rf "$NODE_PATH/lib/node_modules/.@xagent"* 2>/dev/null || true
             rm -f "$NODE_PATH/bin/grok" 2>/dev/null || true
         fi
         # Clean up new installations

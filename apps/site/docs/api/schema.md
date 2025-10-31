@@ -8,14 +8,14 @@ title: API Schema
 ```typescript
 {
 baseURL: "https://api.x.ai/v1",
-defaultModel: "grok-code-fast-1",
+defaultModel: "grok-4-fast-non-reasoning",
 apiKey: process.env.GROK_API_KEY
 }
 ```
 
 ### Available Models
 - **grok-4-latest**: Latest Grok model with enhanced capabilities
-- **grok-code-fast-1**: Optimized for code generation (default)
+- **grok-4-fast-non-reasoning**: Optimized for code generation (default)
 - **grok-3-fast**: Fast general-purpose model
 
 ### Tool Integration Schema

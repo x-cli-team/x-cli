@@ -7,22 +7,21 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "view_file",
-      description: "View contents of a file or list directory contents",
+      description: "View file contents or list directories",
       parameters: {
         type: "object",
         properties: {
           path: {
             type: "string",
-            description: "Path to file or directory to view",
+            description: "File or directory path",
           },
           start_line: {
             type: "number",
-            description:
-              "Starting line number for partial file view (optional)",
+            description: "Optional start line for partial view",
           },
           end_line: {
             type: "number",
-            description: "Ending line number for partial file view (optional)",
+            description: "Optional end line for partial view",
           },
         },
         required: ["path"],
@@ -33,7 +32,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "create_file",
-      description: "Create a new file with specified content",
+      description: "Create new file with content",
       parameters: {
         type: "object",
         properties: {
@@ -54,7 +53,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "str_replace_editor",
-      description: "Replace specific text in a file. Use this for single line edits only",
+      description: "Replace text in file (single line edits)",
       parameters: {
         type: "object",
         properties: {
@@ -103,8 +102,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "search",
-      description:
-        "Unified search tool for finding text content or files (similar to Cursor's search)",
+      description: "Search for text content or files",
       parameters: {
         type: "object",
         properties: {
@@ -246,7 +244,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "ast_parser",
-      description: "Parse source code files to extract AST, symbols, imports, exports, and structural information",
+      description: "Parse source code to extract AST, symbols, imports, exports",
       parameters: {
         type: "object",
         properties: {
@@ -293,7 +291,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "symbol_search",
-      description: "Search for symbols (functions, classes, variables) across the codebase with fuzzy matching and cross-references",
+      description: "Search for symbols across codebase with fuzzy matching",
       parameters: {
         type: "object",
         properties: {
@@ -346,7 +344,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "dependency_analyzer",
-      description: "Analyze import/export dependencies, detect circular dependencies, and generate dependency graphs",
+      description: "Analyze dependencies, detect circular imports, generate graphs",
       parameters: {
         type: "object",
         properties: {
@@ -396,7 +394,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "code_context",
-      description: "Build intelligent code context, analyze relationships, and provide semantic understanding",
+      description: "Build code context, analyze relationships, semantic understanding",
       parameters: {
         type: "object",
         properties: {
@@ -440,7 +438,7 @@ const BASE_GROK_TOOLS: GrokTool[] = [
     type: "function",
     function: {
       name: "refactoring_assistant",
-      description: "Perform safe code refactoring operations including rename, extract, inline, and move operations",
+      description: "Perform safe refactoring: rename, extract, inline, move",
       parameters: {
         type: "object",
         properties: {

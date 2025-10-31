@@ -106,7 +106,7 @@ Documentation for documentation system commands:
 ## 🔗 Cross-References
 
 - Main project documentation: ../README.md
-- Configuration: ../.grok/settings.json
+- Configuration: ../.xcli/settings.json
 - Build instructions: ../package.json
 
 ---

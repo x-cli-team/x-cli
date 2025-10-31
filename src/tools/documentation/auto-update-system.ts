@@ -46,7 +46,7 @@ export class AutoUpdateSystem {
         'src/**/*.ts',
         'README.md',
         '*.config.*',
-        '.grok/**'
+        '.xcli/**'
       ],
       reminderStyle: 'gentle',
       autoPrompt: true,
@@ -57,7 +57,7 @@ export class AutoUpdateSystem {
 
   async loadConfigFromSettings(): Promise<void> {
     try {
-      const settingsPath = path.join(this.rootPath, '.grok', 'settings.json');
+      const settingsPath = path.join(this.rootPath, '.xcli', 'settings.json');
       if (existsSync(settingsPath)) {
         const settings = JSON.parse(await ops.promises.readFile(settingsPath, 'utf-8'));
         if (settings.documentation?.autoUpdate) {
@@ -71,7 +71,7 @@ export class AutoUpdateSystem {
 
   async saveConfigToSettings(): Promise<void> {
     try {
-      const settingsPath = path.join(this.rootPath, '.grok', 'settings.json');
+      const settingsPath = path.join(this.rootPath, '.xcli', 'settings.json');
       let settings = {};
       
       if (existsSync(settingsPath)) {
@@ -86,10 +86,10 @@ export class AutoUpdateSystem {
         }
       };
 
-      // Ensure .grok directory exists
-      const grokDir = path.join(this.rootPath, '.grok');
-      if (!existsSync(grokDir)) {
-        await ops.mkdir(grokDir, { recursive: true });
+      // Ensure .xcli directory exists
+      const xcliDir = path.join(this.rootPath, '.xcli');
+      if (!existsSync(xcliDir)) {
+        await ops.mkdir(xcliDir, { recursive: true });
       }
 
       await ops.promises.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));

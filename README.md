@@ -356,13 +356,13 @@ Add to `~/.xcli/user-settings.json`:
 
 X CLI uses two types of configuration files to manage settings:
 
-### User-Level Settings (`~/.grok/user-settings.json`)
+### User-Level Settings (`~/.xcli/config.json`)
 
 This file stores **global settings** that apply across all projects. These settings rarely change and include:
 
 - **API Key**: Your x.ai API key
 - **Base URL**: Custom API endpoint (if needed)
-- **Default Model**: Your preferred model (e.g., `grok-code-fast-1`)
+- **Default Model**: Your preferred model (e.g., `grok-4-fast-non-reasoning`)
 - **Available Models**: List of models you can use
 
 **Example:**
@@ -371,9 +371,9 @@ This file stores **global settings** that apply across all projects. These setti
 {
   "apiKey": "your_api_key_here",
   "baseURL": "https://api.x.ai/v1",
-  "defaultModel": "grok-code-fast-1",
+  "defaultModel": "grok-4-fast-non-reasoning",
   "models": [
-    "grok-code-fast-1",
+    "grok-4-fast-non-reasoning",
     "grok-4-latest",
     "grok-3-latest",
     "grok-3-fast",
@@ -382,7 +382,7 @@ This file stores **global settings** that apply across all projects. These setti
 }
 ```
 
-### Project-Level Settings (`.grok/settings.json`)
+### Project-Level Settings (`.xcli/settings.json`)
 
 This file stores **project-specific settings** in your current working directory. It includes:
 
@@ -410,7 +410,7 @@ This file stores **project-specific settings** in your current working directory
 1. **Global Defaults**: User-level settings provide your default preferences
 2. **Project Override**: Project-level settings override defaults for specific projects
 3. **Directory-Specific**: When you change directories, project settings are loaded automatically
-4. **Fallback Logic**: Project model → User default model → System default (`grok-code-fast-1`)
+4. **Fallback Logic**: Project model → User default model → System default (`grok-4-fast-non-reasoning`)
 
 This means you can have different models for different projects while maintaining consistent global settings like your API key.
 
@@ -647,7 +647,7 @@ You can specify which AI model to use with the `--model` parameter or `GROK_MODE
 
 ```bash
 # Use x.ai models
-xcli --model grok-code-fast-1
+xcli --model grok-4-fast-non-reasoning
 xcli --model grok-4-latest
 xcli --model grok-3-latest
 xcli --model grok-3-fast
@@ -660,7 +660,7 @@ xcli --model claude-sonnet-4-20250514 --base-url https://api-endpoint.com/v1
 **Method 2: Environment Variable**
 
 ```bash
-export GROK_MODEL=grok-code-fast-1
+export GROK_MODEL=grok-4-fast-non-reasoning
 xcli
 ```
 
@@ -670,11 +670,11 @@ Add to `~/.xcli/user-settings.json`:
 ```json
 {
   "apiKey": "your_api_key_here",
-  "defaultModel": "grok-code-fast-1"
+  "defaultModel": "grok-4-fast-non-reasoning"
 }
 ```
 
-**Model Priority**: `--model` flag > `GROK_MODEL` environment variable > user default model > system default (grok-code-fast-1)
+**Model Priority**: `--model` flag > `GROK_MODEL` environment variable > user default model > system default (grok-4-fast-non-reasoning)
 
 ### Command Line Options
 
@@ -686,7 +686,7 @@ Options:
   -d, --directory <dir>  set working directory
   -k, --api-key <key>    x.ai API key (or set X_API_KEY env var)
   -u, --base-url <url>   x.ai API base URL (or set GROK_BASE_URL env var)
-  -m, --model <model>    AI model to use (e.g., grok-code-fast-1, grok-4-latest) (or set GROK_MODEL env var)
+  -m, --model <model>    AI model to use (e.g., grok-4-fast-non-reasoning, grok-4-latest) (or set GROK_MODEL env var)
   -p, --prompt <prompt>  process a single prompt and exit (headless mode)
   --max-tool-rounds <rounds>  maximum number of tool execution rounds (default: 400)
   -h, --help             display help for command
@@ -1051,7 +1051,7 @@ curl -I https://api.x.ai/v1/models
 - **File operations fail**: Check that the file path exists and is accessible
 - **Bash commands fail**: Ensure you have the necessary permissions
 - **Tool timeouts**: Complex operations may take time; the spinner indicates progress
-- **Slow responses**: Try a different model with `xcli --model grok-code-fast-1`
+- **Slow responses**: Try a different model with `xcli --model grok-4-fast-non-reasoning`
 
 ## 🙏 Credits
 

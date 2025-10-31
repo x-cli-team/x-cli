@@ -3,7 +3,7 @@ import * as path from "path";
 import * as os from "os";
 
 /**
- * User-level settings stored in ~/.x/user-settings.json (or ~/.grok/user-settings.json for backwards compatibility)
+ * User-level settings stored in ~/.xcli/config.json (or ~/.grok/user-settings.json for backwards compatibility)
  * These are global settings that apply across all projects
  */
 export interface UserSettings {
@@ -21,10 +21,12 @@ export interface UserSettings {
   interactivityLevel?: 'chat' | 'balanced' | 'repl'; // Interaction mode
   assistantName?: string; // Custom name for the AI assistant
   requireConfirmation?: boolean; // Require user confirmation for file operations and commands
+  operatorName?: string; // User's name for personalization
+  agentName?: string; // Name for the AI assistant
 }
 
 /**
- * Project-level settings stored in .x/settings.json (or .grok/settings.json for backwards compatibility)
+ * Project-level settings stored in .xcli/settings.json (or .grok/settings.json for backwards compatibility)
  * These are project-specific settings
  */
 export interface ProjectSettings {
@@ -37,13 +39,19 @@ export interface ProjectSettings {
  */
 const DEFAULT_USER_SETTINGS: Partial<UserSettings> = {
   baseURL: "https://api.x.ai/v1",
-  defaultModel: "grok-code-fast-1",
+  defaultModel: "grok-4-fast-non-reasoning",
   models: [
-    "grok-code-fast-1",
+    "grok-4-fast-non-reasoning",
+    "grok-4-fast-reasoning",
+    "grok-4-0709",
     "grok-4-latest",
     "grok-3-latest",
     "grok-3-fast",
     "grok-3-mini-fast",
+    "grok-3",
+    "grok-2-vision-1212us-east-1",
+    "grok-2-vision-1212eu-west-1",
+    "grok-2-image-1212"
   ],
   verbosityLevel: 'quiet',
   explainLevel: 'brief',
@@ -54,7 +62,7 @@ const DEFAULT_USER_SETTINGS: Partial<UserSettings> = {
  * Default values for project settings
  */
 const DEFAULT_PROJECT_SETTINGS: Partial<ProjectSettings> = {
-  model: "grok-code-fast-1",
+  model: "grok-4-fast-non-reasoning",
 };
 
 /**
@@ -67,20 +75,20 @@ export class SettingsManager {
   private projectSettingsPath: string;
 
   private constructor() {
-    // User settings path: try ~/.x first, fallback to ~/.grok for backwards compatibility
-    const newUserDir = path.join(os.homedir(), ".x");
+    // User settings path: try ~/.xcli first, fallback to ~/.grok for backwards compatibility
+    const newUserDir = path.join(os.homedir(), ".xcli");
     const oldUserDir = path.join(os.homedir(), ".grok");
-    
+
     if (fs.existsSync(newUserDir) || !fs.existsSync(oldUserDir)) {
-      this.userSettingsPath = path.join(newUserDir, "user-settings.json");
+      this.userSettingsPath = path.join(newUserDir, "config.json");
     } else {
       this.userSettingsPath = path.join(oldUserDir, "user-settings.json");
     }
 
-    // Project settings path: try .x first, fallback to .grok for backwards compatibility
-    const newProjectDir = path.join(process.cwd(), ".x");
+    // Project settings path: try .xcli first, fallback to .grok for backwards compatibility
+    const newProjectDir = path.join(process.cwd(), ".xcli");
     const oldProjectDir = path.join(process.cwd(), ".grok");
-    
+
     if (fs.existsSync(newProjectDir) || !fs.existsSync(oldProjectDir)) {
       this.projectSettingsPath = path.join(newProjectDir, "settings.json");
     } else {
@@ -109,7 +117,7 @@ export class SettingsManager {
   }
 
   /**
-   * Load user settings from ~/.x/user-settings.json
+   * Load user settings from ~/.xcli/config.json or ~/.grok/user-settings.json
    */
   public loadUserSettings(): UserSettings {
     try {
@@ -134,7 +142,7 @@ export class SettingsManager {
   }
 
   /**
-   * Save user settings to ~/.x/user-settings.json
+   * Save user settings to ~/.xcli/config.json or ~/.grok/user-settings.json
    */
   public saveUserSettings(settings: Partial<UserSettings>): void {
     try {
@@ -271,11 +279,18 @@ export class SettingsManager {
 
   /**
    * Get the current model with proper fallback logic:
-   * 1. Project-specific model setting
-   * 2. User's default model
-   * 3. System default
+   * 1. Environment variable XCLI_MODEL_DEFAULT
+   * 2. Project-specific model setting
+   * 3. User's default model
+   * 4. System default
    */
   public getCurrentModel(): string {
+    // First check environment variable for default model
+    const envModel = process.env.XCLI_MODEL_DEFAULT;
+    if (envModel) {
+      return envModel;
+    }
+
     const projectModel = this.getProjectSetting("model");
     if (projectModel) {
       return projectModel;
@@ -286,7 +301,33 @@ export class SettingsManager {
       return userDefaultModel;
     }
 
-    return DEFAULT_PROJECT_SETTINGS.model || "grok-code-fast-1";
+    return DEFAULT_PROJECT_SETTINGS.model || "grok-4-fast-non-reasoning";
+  }
+
+  /**
+   * Get the appropriate model for a task based on its characteristics
+   * Uses reasoning model for deep tasks, retries, or large contexts
+   */
+  public pickModel(options: { deep?: boolean; retries?: number; ctxTokens?: number } = {}): string {
+    const { deep = false, retries = 0, ctxTokens = 0 } = options;
+
+    // Use reasoning model for:
+    // - Deep tasks requiring complex reasoning
+    // - Tasks that have been retried (indicating complexity)
+    // - Tasks with very large context (>150K tokens)
+    if (deep || retries > 0 || ctxTokens > 150_000) {
+      // First check for reasoning model environment variable
+      const reasoningModel = process.env.XCLI_MODEL_REASONING;
+      if (reasoningModel) {
+        return reasoningModel;
+      }
+
+      // Default to grok-4-fast-reasoning for complex tasks
+      return "grok-4-fast-reasoning";
+    }
+
+    // Use default model for standard tasks
+    return this.getCurrentModel();
   }
 
   /**

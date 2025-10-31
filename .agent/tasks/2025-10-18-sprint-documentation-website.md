@@ -2,7 +2,7 @@
 
 ## 🧭 Sprint Overview
 
-**Objective**: Create a comprehensive public documentation + landing site for grok-cli using Docusaurus, with automated synchronization from the `.agent` documentation system.
+**Objective**: Create a comprehensive public documentation + landing site for x-cli using Docusaurus, with automated synchronization from the `.agent` documentation system.
 
 **Duration**: 1-2 days  
 **Priority**: Medium (Developer Experience)  
@@ -11,7 +11,7 @@
 ## 🎯 Problem Statement
 
 ### Current Documentation Gaps
-- **No public landing page** - Users discover grok-cli through NPM or GitHub only
+- **No public landing page** - Users discover x-cli through NPM or GitHub only
 - **Scattered documentation** - README is comprehensive but not discoverable
 - **No community hub** - No central place for users to find help and resources
 - **Poor SEO** - Documentation not indexed or searchable

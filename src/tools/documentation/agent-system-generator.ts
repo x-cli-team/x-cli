@@ -148,7 +148,7 @@ Documentation for documentation system commands:
 
 ## 🔗 Cross-References
 - Main project documentation: ../README.md
-- Configuration: ../.grok/settings.json
+- Configuration: ../.xcli/settings.json
 - Build instructions: ../package.json
 
 ---
@@ -221,7 +221,7 @@ Documentation for documentation system commands:
 ### ⚙️ Configuration (\`src/utils/\`)
 - **Settings Management**: User and project-level config
 - **Model Configuration**: Support for multiple AI models
-- **File Locations**: ~/.grok/ for user, .grok/ for project
+- **File Locations**: ~/.xcli/ for user, .xcli/ for project
 
 ## Build & Distribution
 - **Development**: \`bun run dev\` for live reload
@@ -303,7 +303,7 @@ External project documented using X-CLI's .agent system.
 - **Commands**: Slash-based in src/commands/ (limited - only MCP command currently)
 - **Tools**: Modular tools in src/tools/ (extensive tool system)
 - **UI**: Ink components in src/ui/
-- **Settings**: File-based .grok/settings.json + ~/.grok/user-settings.json
+- **Settings**: File-based .xcli/settings.json + ~/.xcli/config.json
 - **Input**: Enhanced terminal input with history in src/hooks/
 
 ## Command System
@@ -385,14 +385,14 @@ Updated By: Agent System Generator during /init-agent
 \`\`\`typescript
 {
   baseURL: "https://api.x.ai/v1",
-  defaultModel: "grok-code-fast-1",
+  defaultModel: "grok-4-fast-non-reasoning",
   apiKey: process.env.X_API_KEY
 }
 \`\`\`
 
 ### Available Models
 - **grok-4-latest**: Latest Grok model with enhanced capabilities
-- **grok-code-fast-1**: Optimized for code generation (default)
+- **grok-4-fast-non-reasoning**: Optimized for code generation (default)
 - **grok-3-fast**: Fast general-purpose model
 
 ### Tool Integration Schema
@@ -535,7 +535,7 @@ interface Tool {
 - Maintain clear navigation
 
 ## Automation
-- Auto-update triggers configured in .grok/settings.json
+- Auto-update triggers configured in .xcli/settings.json
 - Smart prompts after key file changes
 - Token threshold reminders
 - Integration with git commit hooks

@@ -60,7 +60,7 @@ export function useContextInfo(agent?: any) {
 
       if (agent) {
         // Get model information
-        const modelName = agent.getCurrentModel?.() || "grok-code-fast-1";
+        const modelName = agent.getCurrentModel?.() || "grok-4-fast-non-reasoning";
         const maxTokens = getMaxTokensForModel(modelName);
 
         // Get real data from agent
@@ -160,7 +160,7 @@ function shouldIgnoreDirectory(dirname: string): boolean {
 
 async function getIndexSize(): Promise<string> {
   try {
-    const indexPath = path.join(process.cwd(), '.grok', 'index.json');
+    const indexPath = path.join(process.cwd(), '.xcli', 'index.json');
     if (fs.existsSync(indexPath)) {
       const stats = await fs.promises.stat(indexPath);
       const mb = stats.size / (1024 * 1024);
@@ -174,7 +174,7 @@ async function getIndexSize(): Promise<string> {
 
 async function getSessionFileCount(): Promise<number> {
   try {
-    const sessionPath = path.join(os.homedir(), '.grok', 'session.log');
+    const sessionPath = path.join(os.homedir(), '.xcli', 'session.log');
     if (fs.existsSync(sessionPath)) {
       const content = await fs.promises.readFile(sessionPath, 'utf8');
       return content.split('\n').filter(line => line.trim()).length;
@@ -231,7 +231,9 @@ function getMemoryPressure(): 'low' | 'medium' | 'high' {
 // Helper functions for agent context data
 function getMaxTokensForModel(modelName: string): number {
   const modelLimits: Record<string, number> = {
-    "grok-code-fast-1": 128000,
+    "grok-4-fast-non-reasoning": 128000,
+    "grok-4-fast-reasoning": 200000,
+    "grok-4-0709": 200000,
     "grok-4-latest": 200000,
     "grok-3-latest": 200000,
     "grok-3-fast": 128000,

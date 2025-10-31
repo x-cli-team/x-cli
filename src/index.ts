@@ -68,7 +68,7 @@ function checkAutoCompact(): void {
       return;
     }
 
-    const sessionLogPath = path.join(require('os').homedir(), '.grok', 'session.log');
+    const sessionLogPath = path.join(require('os').homedir(), '.xcli', 'session.log');
     const thresholds = settings.compactThreshold || { lines: 800, bytes: 200000 };
 
     if (require('fs').existsSync(sessionLogPath)) {
@@ -122,11 +122,11 @@ async function saveCommandLineSettings(
     // Update with command line values
     if (apiKey) {
       manager.updateUserSetting("apiKey", apiKey);
-      console.log("✅ API key saved to ~/.grok/user-settings.json");
+      console.log("✅ API key saved to ~/.xcli/config.json");
     }
     if (baseURL) {
       manager.updateUserSetting("baseURL", baseURL);
-      console.log("✅ Base URL saved to ~/.grok/user-settings.json");
+      console.log("✅ Base URL saved to ~/.xcli/config.json");
     }
   } catch (error) {
     console.warn(
@@ -355,7 +355,7 @@ async function processPromptHeadless(
 }
 
 program
-  .name("grok")
+  .name("x-cli")
   .description(
     "A conversational AI CLI tool powered by Grok with text editor capabilities"
   )
@@ -369,7 +369,7 @@ program
   )
   .option(
     "-m, --model <model>",
-    "AI model to use (e.g., grok-code-fast-1, grok-4-latest) (or set GROK_MODEL env var)"
+    "AI model to use (e.g., grok-4-fast-non-reasoning, grok-4-latest) (or set GROK_MODEL env var)"
   )
   .option(
     "-p, --prompt <prompt>",
@@ -511,7 +511,7 @@ gitCommand
   )
   .option(
     "-m, --model <model>",
-    "AI model to use (e.g., grok-code-fast-1, grok-4-latest) (or set GROK_MODEL env var)"
+    "AI model to use (e.g., grok-4-fast-non-reasoning, grok-4-latest) (or set GROK_MODEL env var)"
   )
   .option(
     "--max-tool-rounds <rounds>",

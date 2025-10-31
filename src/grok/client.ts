@@ -47,7 +47,7 @@ export interface GrokResponse {
 
 export class GrokClient {
   private client: OpenAI;
-  private currentModel: string = "grok-code-fast-1";
+  private currentModel: string = "grok-4-fast-non-reasoning";
   private defaultMaxTokens: number;
 
   constructor(apiKey: string, model?: string, baseURL?: string) {
@@ -95,6 +95,11 @@ export class GrokClient {
       const response =
         await this.client.chat.completions.create(requestPayload);
 
+      // Log token usage for monitoring and optimization
+      if (response.usage) {
+        this.logTokenUsage(response.usage);
+      }
+
       return response as GrokResponse;
     } catch (error: any) {
       throw new Error(`Grok API error: ${error.message}`);
@@ -129,8 +134,18 @@ export class GrokClient {
         { signal: abortSignal }
       )) as any;
 
+      let finalUsage: any = null;
       for await (const chunk of stream) {
+        // Capture usage data from final chunk if available
+        if (chunk.usage) {
+          finalUsage = chunk.usage;
+        }
         yield chunk;
+      }
+
+      // Log token usage for streaming responses
+      if (finalUsage) {
+        this.logTokenUsage(finalUsage);
       }
     } catch (error: any) {
       throw new Error(`Grok API error: ${error.message}`);
@@ -151,5 +166,40 @@ export class GrokClient {
     };
 
     return this.chat([searchMessage], [], undefined, searchOptions);
+  }
+
+  /**
+   * Log token usage for monitoring and optimization
+   */
+  private logTokenUsage(usage: any): void {
+    try {
+      const tokenData = {
+        timestamp: new Date().toISOString(),
+        model: this.currentModel,
+        prompt_tokens: usage.prompt_tokens || 0,
+        completion_tokens: usage.completion_tokens || 0,
+        total_tokens: usage.total_tokens || 0,
+        reasoning_tokens: usage.reasoning_tokens || 0,
+      };
+
+      // Store in local JSON file for analysis (as specified in investigation)
+      const logPath = process.env.XCLI_TOKEN_LOG || `${require('os').homedir()}/.xcli/token-usage.jsonl`;
+
+      // Ensure directory exists
+      const fs = require('fs');
+      const path = require('path');
+      const dir = path.dirname(logPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      // Append to JSONL file
+      const logLine = JSON.stringify(tokenData) + '\n';
+      fs.appendFileSync(logPath, logLine);
+
+    } catch (error) {
+      // Silently ignore logging errors to not disrupt API calls
+      console.warn('Failed to log token usage:', error);
+    }
   }
 }
