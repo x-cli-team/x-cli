@@ -107,7 +107,11 @@ echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 **Critical Settings** (DO NOT CHANGE):
 ```json
 {
+<<<<<<< Updated upstream
 "name": "@xagent/x-cli", // Must remain scoped
+=======
+"name": "grok-cli-hurry-mode", // Must remain unscoped
+>>>>>>> Stashed changes
 "publishConfig": {
 "access": "public" // Must NOT include registry
 }

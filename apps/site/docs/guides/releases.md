@@ -44,7 +44,11 @@ The system handles:
 ### Package Configuration (Sacred)
 ```json
 {
+<<<<<<< Updated upstream
 "name": "@xagent/x-cli", // NEVER change - breaks publishing
+=======
+"name": "grok-cli-hurry-mode", // NEVER change - breaks publishing
+>>>>>>> Stashed changes
 "publishConfig": {
 "access": "public" // Must NOT include registry override
 }

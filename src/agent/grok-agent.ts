@@ -359,7 +359,7 @@ Current working directory: ${process.cwd()}`,
       // Convert execution results to chat entries
       return this.workflowResultToChatEntries(userEntry, output, approval, executionResult);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[Workflow] Failed:', error);
       const errorEntry: ChatEntry = {
         type: "assistant",
@@ -431,7 +431,7 @@ Current working directory: ${process.cwd()}`,
             role: "assistant",
             content: assistantMessage.content || "",
             tool_calls: assistantMessage.tool_calls,
-          } as any);
+          }
 
           // Create initial tool call entries to show tools are being executed
           assistantMessage.tool_calls.forEach((toolCall) => {
@@ -484,6 +484,7 @@ Current working directory: ${process.cwd()}`,
                 ? result.output || "Success"
                 : result.error || "Error",
               tool_call_id: toolCall.id,
+} as ToolMessage);
             });
           }
 
@@ -527,7 +528,7 @@ Current working directory: ${process.cwd()}`,
       }
 
       return newEntries;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorEntry: ChatEntry = {
         type: "assistant",
         content: `Sorry, I encountered an error: ${error.message}`,
@@ -709,8 +710,8 @@ Current working directory: ${process.cwd()}`,
         this.messages.push({
           role: "assistant",
           content: accumulatedMessage.content || "",
-          tool_calls: accumulatedMessage.tool_calls,
-        } as any);
+          tool_calls: accumulatedMessage.tool_calls || [],
+        }
 
         // Handle tool calls if present
         if (accumulatedMessage.tool_calls?.length > 0) {
@@ -815,7 +816,7 @@ Current working directory: ${process.cwd()}`,
       }
 
       yield { type: "done" };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Check if this was a cancellation
       if (this.abortController?.signal.aborted) {
         yield {
@@ -876,7 +877,7 @@ Current working directory: ${process.cwd()}`,
                 ? [args.start_line, args.end_line]
                 : undefined;
             return await this.textEditor.view(args.path, range);
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
             // Fallback to bash cat/head/tail
             const path = args.path;
@@ -890,7 +891,7 @@ Current working directory: ${process.cwd()}`,
         case "create_file":
           try {
             return await this.textEditor.create(args.path, args.content);
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.warn(`create_file tool failed, falling back to bash: ${error.message}`);
             // Fallback to bash echo/redirect
             const command = `cat > "${args.path}" << 'EOF'\n${args.content}\nEOF`;
@@ -905,7 +906,7 @@ Current working directory: ${process.cwd()}`,
               args.new_str,
               args.replace_all
             );
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.warn(`str_replace_editor tool failed, falling back to bash: ${error.message}`);
             // Fallback to bash sed for replacement
             const escapedOld = args.old_str.replace(/[\/&]/g, '\\$&');
@@ -952,7 +953,7 @@ Current working directory: ${process.cwd()}`,
               fileTypes: args.file_types,
               includeHidden: args.include_hidden,
             });
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.warn(`search tool failed, falling back to bash: ${error.message}`);
             // Fallback to bash grep/find
             let command = `grep -r "${args.query}" .`;
@@ -1070,7 +1071,7 @@ Current working directory: ${process.cwd()}`,
             error: `Unknown tool: ${toolCall.function.name}`,
           };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: `Tool execution error: ${error.message}`,
@@ -1108,7 +1109,7 @@ Current working directory: ${process.cwd()}`,
         success: true,
         output: output || "Success",
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: `MCP tool execution error: ${error.message}`,

@@ -12,7 +12,11 @@ This roadmap is automatically generated from our internal task tracking system.
 ## Sprint Stage 3: Execute Stage Integration
 ## Sprint Stage 2: Research → Recommend Flow
 ## Sprint Stage 1: Context Loading Foundation
+<<<<<<< Updated upstream
 ## Sprint: Rename grok-cli to x-cli ✅ COMPLETED
+=======
+## Sprint: Rename grok-cli to x-cli
+>>>>>>> Stashed changes
 ## Sprint: One-Confirm "Research → Recommend → Execute → Auto-Doc" Workflow
 ## Sprint: Implement Verbosity and Explanation Features
 ## Sprint: Component Refactoring for Maintainability

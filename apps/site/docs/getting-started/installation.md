@@ -114,7 +114,11 @@ npm cache clean --force
 ```
 
 ### Alternative Installation
+<<<<<<< Updated upstream
 Download pre-built binaries from: https://github.com/x-cli-team/x-cli/releases
+=======
+Download pre-built binaries from: https://github.com/hinetapora/grok-cli-hurry-mode/releases
+>>>>>>> Stashed changes
 
 ## Requirements
 - Node.js (latest LTS recommended)

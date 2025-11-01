@@ -37,7 +37,11 @@ This document outlines the protection measures in place to prevent accidental br
 **Critical Elements**:
 ```json
 {
+<<<<<<< Updated upstream
 "name": "@xagent/x-cli", // NEVER change - breaks publishing
+=======
+"name": "grok-cli-hurry-mode", // NEVER change - breaks publishing
+>>>>>>> Stashed changes
 "publishConfig": {
 "access": "public" // NEVER add registry override
 }
