@@ -29,7 +29,7 @@
     "dev:node": "tsx src/index.ts",
     "dev:watch": "npm run build && node --watch dist/index.js",
     "start": "node dist/index.js",
-    "local": "npm run build > /dev/null 2>&1 && npm link > /dev/null 2>&1 && node dist/index.js",
+    "local": "node scripts/local.js",
     "test:workflow": "node scripts/test-workflow.js",
     "start:bun": "bun run dist/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern 'dist/**'",

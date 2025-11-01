@@ -9,14 +9,7 @@ import { ToolResult } from "../types/index.js";
 import { PasteEvent } from "../services/paste-detection.js";
 import { usePlanMode } from "./use-plan-mode.js";
 import { detectComplexity } from "../services/complexity-detector.js";
-const researchRecommendService = {
-  researchRecommendService: () => {
-    console.log("ResearchRecommendService placeholder");
-    return { issues: [], options: [], recommendation: {}, plan: { summary: "", approach: "", todo: [] } };
-  }
-};
-// import { executionOrchestrator } from "../services/execution-orchestrator.js";
-const executionOrchestrator = { execute: () => Promise.resolve({ success: true, message: "Execution placeholder" }) };
+// TODO: Implement ResearchRecommendService and executionOrchestrator when needed
 
 import { filterCommandSuggestions } from "../ui/components/command-suggestions.js";
 import { loadModelConfig, updateCurrentModel } from "../utils/model-config.js";
@@ -297,62 +290,7 @@ export function useInputHandler({
     if (trimmedInput) {
       const directCommandResult = await handleDirectCommand(userInput);
       if (!directCommandResult) {
-        // Check for complex task and route to workflow if needed
-        const isComplexTask = _interactivityLevel === 'balanced' || _interactivityLevel === 'repl' && detectComplexity(trimmedInput);
-        if (isComplexTask) {
-          try {
-            // TODO: Implement ResearchRecommendService
-const plan = { 
-  issues: [], 
-  options: [], 
-  recommendation: { option: 1, reasoning: "Mock plan" }, 
-  plan: { 
-    summary: "Mock summary", 
-    approach: "Mock approach", 
-    todo: [{ id: 1, description: "Mock task" }] 
-  } 
-} as any;
-            if (plan) {
-              // Add research phase to chat history
-              const researchEntry: ChatEntry = {
-                type: "assistant",
-                content: `### Research Phase\n\n${JSON.stringify(plan, null, 2)}`,
-                timestamp: new Date(),
-              };
-              setChatHistory((prev) => [...prev, researchEntry]);
-
-              // Prompt for approval
-              const confirmationService = ConfirmationService.getInstance();
-              // TODO: Implement confirmation service
-const approved = true; // Temporary bypass for smart-push
-              
-              if (approved) {
-                // Execute the plan
-                // TODO: Implement execution orchestrator
-const executionResult = { success: true, completed: plan.plan.todo.length } as any;
-                const executionEntry: ChatEntry = {
-                  type: "assistant",
-                  content: `### Execution Results\n\n${JSON.stringify(executionResult, null, 2)}`,
-                  timestamp: new Date(),
-                };
-                setChatHistory((prev) => [...prev, executionEntry]);
-              } else {
-                const reviseEntry: ChatEntry = {
-                  type: "assistant",
-                  content: "Plan rejected. Returning to normal mode.",
-                  timestamp: new Date(),
-                };
-                setChatHistory((prev) => [...prev, reviseEntry]);
-              }
-              return;
-            }
-          } catch (error) {
-            console.error('Workflow error:', error);
-            // Fallback to normal processing if workflow fails
-          }
-        }
-        
-        // Normal processing for simple tasks or workflow fallback
+        // Normal processing
         await processUserMessage(userInput);
       }
     }

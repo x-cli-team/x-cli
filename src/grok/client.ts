@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat";
+import fs from "fs";
+import path from "path";
 
 export type GrokMessage = ChatCompletionMessageParam;
 
@@ -50,7 +52,7 @@ export class GrokClient {
   private currentModel: string = "grok-4-fast-non-reasoning";
   private defaultMaxTokens: number;
 
-  constructor(apiKey: string, model?: string, baseURL?: string) {
+  constructor(apiKey: string = process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY, model?: string, baseURL?: string) {
     this.client = new OpenAI({
       apiKey,
       baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",
@@ -183,11 +185,9 @@ export class GrokClient {
       };
 
       // Store in local JSON file for analysis (as specified in investigation)
-      const logPath = process.env.XCLI_TOKEN_LOG || `${require('os').homedir()}/.xcli/token-usage.jsonl`;
+      const logPath = process.env.XCLI_TOKEN_LOG || `${process.env.HOME}/.xcli/token-usage.jsonl`;
 
       // Ensure directory exists
-      const fs = require('fs');
-      const path = require('path');
       const dir = path.dirname(logPath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
