@@ -18,6 +18,9 @@ import { createTokenCounter, TokenCounter } from "../utils/token-counter.js";
 // The policy documentation belongs in .agent docs, not in source code
 
 export class GrokAgent extends EventEmitter {
+  private abortController?: AbortController;
+  private mcpInitialized: boolean = false;
+  private grokClient?: GrokClient | undefined;
   // ... all your existing constructor and properties ...
 
   // Add the missing methods that TypeScript is complaining about
@@ -54,7 +57,7 @@ export class GrokAgent extends EventEmitter {
   }
 
   private isGrokModel(): boolean {
-    const currentModel = this.grokClient.getCurrentModel();
+    const currentModel = this.grokClient?.getCurrentModel() || "";
     return currentModel.toLowerCase().includes("grok");
   }
 

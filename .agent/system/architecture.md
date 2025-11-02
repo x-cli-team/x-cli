@@ -5,10 +5,12 @@
 
 ## Technology Stack
 - **Language**: TypeScript (ES Modules)
-- **Runtime**: Node.js (Bun recommended)
+- **Runtime**: Node.js (Bun optimized for development)
 - **UI**: Ink (React for terminal)
 - **Build**: TypeScript compiler + tsup for dual builds
-- **Package Manager**: Bun/NPM
+- **Package Manager**: Bun (development), NPM (distribution/CI)
+- **Linting**: ESLint with TypeScript support and auto-fix
+- **Performance**: 4x faster dependency installs via Bun
 
 ## Core Architecture
 
@@ -68,9 +70,12 @@
 - **Context Management**: Session memory and workspace indexing coordination
 
 ## Build & Distribution
-- **Development**: `bun run dev` for live reload
-- **Production**: `npm run build` → dist/ directory
-- **Installation**: NPM global package
+- **Development**: `bun run dev` for live reload (4x faster than npm)
+- **Production**: `bun run build` → dist/ directory (optimized TypeScript compilation)
+- **Linting**: `bun run lint` with auto-fix support (ESLint + TypeScript)
+- **Installation**: NPM global package (universal compatibility)
+- **CI/CD**: GitHub Actions with npm (stable workflow, proven reliability)
+- **Migration**: Seamless switch from npm to Bun for development (Nov 2025)
 
 ## Extension Points
 - **Tool System**: Add new tools in src/tools/

@@ -71,8 +71,9 @@ var GrokClient;
 var init_client = __esm({
   "src/grok/client.ts"() {
     GrokClient = class {
-      constructor(apiKey2 = process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY, model, baseURL) {
+      constructor(apiKey2, model, baseURL) {
         this.currentModel = "grok-4-fast-non-reasoning";
+        apiKey2 = apiKey2 || process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY;
         this.client = new OpenAI({
           apiKey: apiKey2,
           baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",
@@ -16205,7 +16206,7 @@ var init_package = __esm({
     package_default = {
       type: "module",
       name: "@xagent/x-cli",
-      version: "1.1.79",
+      version: "1.1.80",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal.",
       main: "dist/index.js",
       module: "dist/index.js",
@@ -21794,7 +21795,7 @@ var require_package = __commonJS({
     module.exports = {
       type: "module",
       name: "@xagent/x-cli",
-      version: "1.1.79",
+      version: "1.1.80",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal.",
       main: "dist/index.js",
       module: "dist/index.js",

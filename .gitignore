@@ -3,11 +3,11 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# Ignore yarn lockfiles as we support both npm and Bun
+# Package manager lock files - keep Bun, ignore others
+package-lock.json
 yarn.lock
-# Ignore Bun lockfiles (allowing fresh dependency resolution)
-bun.lockb
-bun.lock
+# Keep bun.lock for dependency version locking
+# bun.lockb
 
 # Build outputs
 # dist/  # Temporarily commit dist for version fix
