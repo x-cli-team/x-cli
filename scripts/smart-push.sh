@@ -17,59 +17,87 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Spinner function for visual feedback during long operations
+show_spinner() {
+    local pid=$1
+    local message="$2"
+    local delay=0.1
+    local spinstr='|/-\'
+    while kill -0 $pid 2>/dev/null; do
+        local temp=${spinstr#?}
+        printf "\r$message %c " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+    done
+    printf "\r"
+}
+
 # Function to wait for GitHub Actions
 wait_for_github_actions() {
-    echo "⏳ Skipping GitHub Actions monitoring (gh CLI not required)"
-    echo "⏳ Skipping GitHub Actions monitoring (gh CLI not required)"
-exit 0
-
-
-    echo "Skipping GitHub Actions monitoring (gh CLI not available)"
-    return 0
+    if ! command_exists gh; then
+        echo "⏳ GitHub CLI not available - skipping workflow monitoring"
+        echo "💡 Install gh CLI for automatic workflow monitoring"
+        return 0
+    fi
 
     local commit_sha="$1"
     local max_wait=300  # 5 minutes max wait
-    local wait_interval=10
+    local wait_interval=5
     local elapsed=0
     
-    echo "⏳ Monitoring GitHub Actions for commit $commit_sha..."
+    echo "🔍 Monitoring GitHub Actions for commit ${commit_sha:0:7}..."
+    
+    # Initial wait for workflows to start
+    printf "⏳ Waiting for workflows to start"
+    (sleep 10) &
+    show_spinner $! "⏳ Waiting for workflows to start"
+    echo "✓ Initial wait complete"
     
     while [ $elapsed -lt $max_wait ]; do
-        if command_exists gh; then
-            # Get workflow runs for this commit
-            local status=$(gh run list --commit "$commit_sha" --json status,conclusion --limit 5 2>/dev/null || echo "[]")
+        # Get workflow runs for this commit
+        local status=$(gh run list --commit "$commit_sha" --json status,conclusion,name --limit 5 2>/dev/null || echo "[]")
+        
+        if [ "$status" != "[]" ] && [ "$status" != "" ]; then
+            # Check if any runs are still in progress
+            local in_progress=$(echo "$status" | jq -r '.[] | select(.status == "in_progress" or .status == "queued") | .name' 2>/dev/null || echo "")
+            local failed=$(echo "$status" | jq -r '.[] | select(.conclusion == "failure") | .name' 2>/dev/null || echo "")
+            local completed=$(echo "$status" | jq -r '.[] | select(.conclusion == "success") | .name' 2>/dev/null || echo "")
             
-            if [ "$status" != "[]" ] && [ "$status" != "" ]; then
-                # Check if any runs are still in progress
-                local in_progress=$(echo "$status" | jq -r '.[] | select(.status == "in_progress" or .status == "queued") | .status' 2>/dev/null || echo "")
-                local failed=$(echo "$status" | jq -r '.[] | select(.conclusion == "failure") | .conclusion' 2>/dev/null || echo "")
-                
-                if [ -z "$in_progress" ]; then
-                    if [ -z "$failed" ]; then
-                        echo "✅ All GitHub Actions passed!"
-                        return 0
-                    else
-                        echo "❌ Some GitHub Actions failed"
-                        gh run list --commit "$commit_sha" --limit 5
-                        echo ""
-                        echo "💡 Fix the failing checks and try pushing again"
-                        return 1
-                    fi
+            if [ -n "$completed" ]; then
+                echo "✅ Completed workflows: $(echo "$completed" | tr '\n' ', ' | sed 's/,$//')"
+            fi
+            
+            if [ -z "$in_progress" ]; then
+                if [ -z "$failed" ]; then
+                    echo "🎉 All GitHub Actions passed successfully!"
+                    echo "🔗 View details: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
+                    return 0
+                else
+                    echo "❌ Failed workflows: $(echo "$failed" | tr '\n' ', ' | sed 's/,$//')"
+                    gh run list --commit "$commit_sha" --limit 5
+                    echo ""
+                    echo "💡 Fix the failing checks and try pushing again"
+                    return 1
                 fi
+            else
+                # Show spinner for in-progress workflows
+                printf "\r🔄 Running: $(echo "$in_progress" | tr '\n' ', ' | sed 's/,$//')"
+                (sleep $wait_interval) &
+                show_spinner $! "🔄 Running: $(echo "$in_progress" | tr '\n' ', ' | sed 's/,$//')"
             fi
         else
-            echo "⚠️  GitHub CLI not available - skipping workflow monitoring"
-            return 0
+            printf "🔍 Waiting for workflows to appear"
+            (sleep $wait_interval) &
+            show_spinner $! "🔍 Waiting for workflows to appear"
         fi
         
-        printf "."
-        sleep $wait_interval
         elapsed=$((elapsed + wait_interval))
     done
     
     echo ""
     echo "⏰ GitHub Actions monitoring timed out after 5 minutes"
     echo "💡 Check manually: gh run list --commit $commit_sha"
+    echo "🔗 Monitor: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
     return 0  # Don't fail on timeout
 }
 
@@ -152,25 +180,80 @@ if [ $PUSH_EXIT_CODE -eq 0 ] || echo "$PUSH_OUTPUT" | grep -q "Everything up-to-
     if [ "$BRANCH" = "main" ]; then
         echo "📦 Verifying NPM package publication..."
         
-        # Wait a moment for NPM to process
-        sleep 5
-        
         # Get current version from package.json
         CURRENT_VERSION=$(node -pe "require('./package.json').version")
         PACKAGE_NAME=$(node -pe "require('./package.json').name")
         
-        # Check if version exists on NPM
-        if npm view "$PACKAGE_NAME@$CURRENT_VERSION" version >/dev/null 2>&1; then
-            echo "✅ NPM package $PACKAGE_NAME@$CURRENT_VERSION verified on registry"
+        echo "🔍 Checking for $PACKAGE_NAME@$CURRENT_VERSION..."
+        
+        # NPM verification with spinner and retry logic
+        verification_success=false
+        max_attempts=6
+        
+        for attempt in $(seq 1 $max_attempts); do
+            if [ $attempt -eq 1 ]; then
+                printf "⏳ Waiting for NPM registry propagation"
+                # Initial wait in background
+                (sleep 5) &
+                show_spinner $! "⏳ Waiting for NPM registry propagation"
+                echo "✓ Initial wait complete"
+            fi
+            
+            printf "🔎 Attempt $attempt/$max_attempts: Checking NPM registry"
+            
+            # Check NPM in background to show spinner
+            (npm view "$PACKAGE_NAME@$CURRENT_VERSION" version >/dev/null 2>&1) &
+            npm_check_pid=$!
+            show_spinner $npm_check_pid "🔎 Attempt $attempt/$max_attempts: Checking NPM registry"
+            
+            # Wait for the background process to complete
+            wait $npm_check_pid
+            npm_check_result=$?
+            
+            if [ $npm_check_result -eq 0 ]; then
+                echo "✅ NPM package $PACKAGE_NAME@$CURRENT_VERSION verified on registry!"
+                echo "🔗 Package URL: https://www.npmjs.com/package/$PACKAGE_NAME/v/$CURRENT_VERSION"
+                echo "📋 Install command: npm install -g $PACKAGE_NAME@$CURRENT_VERSION"
+                verification_success=true
+                break
+            else
+                if [ $attempt -lt $max_attempts ]; then
+                    echo "❌ Not available yet, waiting 10 seconds..."
+                    printf "⏳ Waiting"
+                    (sleep 10) &
+                    show_spinner $! "⏳ Waiting"
+                    echo ""
+                else
+                    echo "❌ Package not available after $max_attempts attempts"
+                    echo "💡 This is normal - NPM can take 5-15 minutes to propagate"
+                    echo "💡 Manual check: npm view $PACKAGE_NAME@$CURRENT_VERSION"
+                    echo "💡 Monitor: https://www.npmjs.com/package/$PACKAGE_NAME"
+                fi
+            fi
+        done
+        
+        if [ "$verification_success" = true ]; then
+            echo "🎊 NPM verification completed successfully!"
         else
-            echo "⏳ NPM package not yet available (may take a few minutes)"
-            echo "💡 Monitor: npm view $PACKAGE_NAME@$CURRENT_VERSION"
+            echo "⚠️  NPM verification incomplete (but push was successful)"
         fi
     fi
     
     echo ""
     echo "🎉 Smart push completed successfully!"
-    [ "$BRANCH" = "main" ] && echo "📊 Monitor at: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
+    echo "📋 Summary:"
+    echo "   ✓ Branch: $BRANCH"
+    echo "   ✓ TypeScript & ESLint checks passed"
+    echo "   ✓ Git push successful"
+    if [ "$BRANCH" = "main" ]; then
+        echo "   ✓ GitHub Actions monitoring completed"
+        if [ "$verification_success" = true ]; then
+            echo "   ✓ NPM package verification successful"
+        else
+            echo "   ⏳ NPM package verification pending"
+        fi
+        echo "📊 Monitor: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
+    fi
 else
     # Check if push failed due to branch protection
     if echo "$PUSH_OUTPUT" | grep -q -E "(protected branch|Changes must be made through a pull request|GH006)"; then
