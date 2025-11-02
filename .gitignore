@@ -3,8 +3,8 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# Package manager lock files - keep Bun, ignore others
-package-lock.json
+# Package manager lock files - keep Bun for dev, package-lock.json for CI
+bun.lockb
 yarn.lock
 # Keep bun.lock for dependency version locking
 # bun.lockb
