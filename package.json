@@ -41,7 +41,9 @@
     "dev:site": "cd apps/site && npm run start",
     "build:site": "cd apps/site && npm run build",
     "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
-    "smart-push": "./scripts/smart-push.sh"
+    "smart-push": "./scripts/smart-push.sh",
+    "push": "echo '🚨 BLOCKED: Use npm run smart-push instead' && echo '💡 Direct git push bypasses automation' && exit 1",
+    "git-push": "echo '🚨 BLOCKED: Use npm run smart-push instead' && echo '💡 Direct git push bypasses automation' && exit 1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

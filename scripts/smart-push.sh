@@ -28,10 +28,55 @@
 # 💡 WHY REQUIRED: Main branch pushes trigger automated NPM publishing
 #    Missing main pushes = No NPM releases = Broken deployment
 #
+# 🚨 BYPASS DETECTION: This script detects and prevents common bypass attempts:
+#    • Checks for --no-verify flag usage
+#    • Validates git hooks are properly installed
+#    • Ensures pre-push protections are active
+#    • Blocks force push attempts
+#    • Prevents direct git push usage when smart-push is required
+#
 # Smart push script with comprehensive checks and GitHub status monitoring
 
 set -e  # Exit on any error
 set -u  # Exit on undefined variables
+
+# Step 0: Bypass Detection and Protection Validation
+echo "🛡️  Validating git protections and checking for bypass attempts..."
+
+# Check if git hooks are properly installed
+if [ ! -f ".husky/pre-push" ]; then
+    echo "⚠️  WARNING: Pre-push hook missing - installing protection..."
+    npm run prepare
+fi
+
+# Verify pre-push hook is executable
+if [ ! -x ".husky/pre-push" ]; then
+    echo "🔧 Making pre-push hook executable..."
+    chmod +x .husky/pre-push
+fi
+
+# Check for bypass attempts in recent git commands
+if git reflog --oneline -10 | grep -q -- "--no-verify\|--force\|-f "; then
+    echo "🚨 WARNING: Recent bypass attempts detected in git history!"
+    echo "⚠️  Previous commands used --no-verify or --force flags"
+    echo "💡 This may indicate automation protections were bypassed"
+    echo ""
+fi
+
+# Validate that we're not being run with dangerous flags
+for arg in "$@"; do
+    case "$arg" in
+        --no-verify|--force|-f|--force-with-lease)
+            echo "🚨 CRITICAL: Bypass attempt detected!"
+            echo "❌ Smart-push was called with bypass flag: $arg"
+            echo "💡 Bypass flags defeat the purpose of smart-push"
+            echo "🔧 Remove the flag and run: npm run smart-push"
+            exit 1
+            ;;
+    esac
+done
+
+echo "✅ Protection validation passed"
 
 echo "🚀 Smart push with quality gates and GitHub monitoring..."
 
