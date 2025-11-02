@@ -21,6 +21,7 @@
     "package.json"
   ],
   "scripts": {
+    "local": "bun --watch src/index.ts",
     "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsx watch src/index.ts",
     "lint": "eslint src --ext .ts",
@@ -35,7 +36,7 @@
   },
   "lint-staged": {
     ".agent/**/*.{md,mdx}": "prettier --write",
-    "apps/site/docs/**/*.{md,mdx}": [],
+    "apps/site/docs/**/*.{md,mdx}": "prettier --write",
     "*.{ts,tsx}": [
       "eslint --fix --ignore-pattern 'dist/**'"
     ],
@@ -121,7 +122,7 @@
   },
   "optionalDependencies": {
     "tree-sitter": "^0.21.1",
-    "tree-sitter-javascript": "^0.21.4",
+    "tree-sitter-javascript": "^0.23.4",
     "tree-sitter-python": "^0.21.0",
     "tree-sitter-typescript": "^0.21.2"
   },
