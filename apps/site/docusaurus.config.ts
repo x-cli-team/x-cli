@@ -54,7 +54,7 @@ const config: Config = {
       tagName: 'meta',
       attributes: {
         property: 'og:image',
-        content: 'https://xcli.org/img/grok-welcome.png',
+        content: 'https://xcli.org/img/xcli-welcome.png',
       },
     },
     {
@@ -101,7 +101,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/grok-welcome.png',
+    image: 'img/xcli-welcome.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
