@@ -167,7 +167,7 @@ dev-workflow.md
 # Coding agents and development directories
 .claude/
 .grok/
-.agent/
+
 .archive/
 .x/
 .husky/
@@ -202,7 +202,7 @@ page.tsx
 src/image.png
 
 # Large assets and site-specific files
-apps/site/.agent/
+apps/site/
 apps/site/.grok/
 apps/site/*.mp4
 apps/site/grok-video-*.mp4
