@@ -857,13 +857,45 @@ Every push to the `main` branch automatically:
 
 ### What You Need to Do
 
-**Nothing!** Just push your changes to main:
+**⚠️ CRITICAL: Use Smart Push Script Only! ⚠️**
+
+**🚨 FOR AI AGENTS: NEVER use direct git push to main!**
 
 ```bash
+# ✅ CORRECT METHOD - Always use smart push:
 git add .
 git commit -m "your feature/fix"
-git push origin main
-# ✨ Automation handles the rest!
+npm run smart-push
+# ✨ Automation handles quality checks + NPM publishing!
+```
+
+**🚫 NEVER DO THIS:**
+
+```bash
+git push origin main  # ❌ Bypasses quality gates!
+git push             # ❌ Missing automation checks!
+```
+
+**💡 Why Smart Push Required:**
+
+- Runs TypeScript & ESLint quality checks
+- Monitors GitHub Actions workflow status
+- Verifies NPM package publication
+- Handles branch protection with automatic PRs
+- Provides real-time feedback and error recovery
+
+**📋 Complete Development Workflow:**
+
+```bash
+# 1. Create feature branch for development
+git checkout -b feature/my-changes
+# 2. Make changes and commits
+git add . && git commit -m "implement feature"
+# 3. Switch to main and merge
+git checkout main
+git merge feature/my-changes
+# 4. Smart push to trigger NPM publish
+npm run smart-push
 ```
 
 ### 🚨 Critical Dependencies

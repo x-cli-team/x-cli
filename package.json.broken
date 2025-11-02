@@ -13,18 +13,30 @@
     }
   },
   "bin": {
-    "grok": "./dist/index.js"
+    "xcli": "dist/index.js"
   },
   "files": [
-    "dist",
+    "dist/**/*",
+    ".xcli/**/*",
     "README.md",
-    "package.json"
+    "LICENSE",
+    "docs/assets/logos/**/*"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts",
-    "dev": "tsx watch src/index.ts",
-    "lint": "eslint src --ext .ts",
+    "build": "tsup",
+    "build:tsc": "tsc",
+    "dev": "npm run build && node dist/index.js --prompt 'Development test: Hello X-CLI!'",
+    "dev:node": "tsx src/index.ts",
+    "dev:watch": "npm run build && node --watch dist/index.js",
+    "start": "node dist/index.js",
+    "local": "node scripts/local.js",
+    "test:workflow": "node scripts/test-workflow.js",
+    "start:bun": "bun run dist/index.js",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern 'dist/**'",
     "typecheck": "tsc --noEmit",
+    "install:bun": "bun install",
+    "preinstall": "echo '🤖 Installing X CLI...'",
+    "postinstall": "echo '==================================================' && echo '✅ X CLI installed successfully!' && echo '==================================================' && echo '🚀 Try: xcli --help' && echo '💡 If \"command not found\", add to PATH:' && node -e \"const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shell=isMac?'zshrc':'bashrc';console.log((isMac?'🍎 Mac':'🐧 Linux')+': echo \\'export PATH=\\\"$(npm config get prefix)/bin:$PATH\\\"\\' >> ~/.'+shell+' && source ~/.'+shell);}\" && echo '📖 Docs: https://github.com/hinetapora/x-cli-hurry-mode#installation' && echo '🔑 Set API key: export GROK_API_KEY=your_key_here' && echo '==================================================' && echo '🔧 Auto-setup PATH? Press Enter to add (or Ctrl+C to skip)' && read -t 10 && node -e \"const fs=require('fs');const p=process.platform;const isMac=p==='darwin';const isLinux=p==='linux';if(isMac||isLinux){const shellFile=isMac?'.zshrc':'.bashrc';const rcPath=process.env.HOME+'/'+shellFile;const pathCmd='export PATH=\\\"$(npm config get prefix)/bin:$PATH\\\"';try{const content=fs.readFileSync(rcPath,'utf8');if(!content.includes(pathCmd)){fs.appendFileSync(rcPath,'\\n'+pathCmd+'\\n');console.log('✅ Added to ~/'+shellFile+' - restart terminal');}else{console.log('ℹ️ Already in ~/'+shellFile);}}catch(e){console.log('⚠️ Could not modify ~/'+shellFile+' - add manually');}}\" && echo '🔍 Verifying: ' && xcli --version 2>/dev/null || echo '⚠️ xcli not in PATH yet - follow above steps'",
     "prepare": "husky install",
     "dev:site": "cd apps/site && npm run start",
     "build:site": "cd apps/site && npm run build",
@@ -33,9 +45,12 @@
     "push": "echo '🚨 BLOCKED: Use npm run smart-push instead' && echo '💡 Direct git push bypasses automation' && exit 1",
     "git-push": "echo '🚨 BLOCKED: Use npm run smart-push instead' && echo '💡 Direct git push bypasses automation' && exit 1"
   },
-  "lint-staged": {
-    ".agent/**/*.{md,mdx}": "prettier --write",
-    "apps/site/docs/**/*.{md,mdx}": [],
+  "lint-staged": {\n    ".agent/**/*.{md,mdx}": "prettier --write",\n    "apps/site/docs/**/*.{md,mdx}": [],\n    ".agent/**/*.{md,mdx}": "prettier --write",\n    "apps/site/docs/**/*.{md,mdx}": [],
+      ".agent/**/*.{md,mdx}": "prettier --write",
+      "apps/site/docs/**/*.{md,mdx}": [],
+      ".agent/**/*.{md,mdx}": "prettier --write",
+      "apps/site/docs/**/*.{md,mdx}": [],
+    },
     "*.{ts,tsx}": [
       "eslint --fix --ignore-pattern 'dist/**'"
     ],

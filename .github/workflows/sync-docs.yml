@@ -1,0 +1,22 @@
+name: Auto-Sync Documentation
+on:
+  push:
+    paths:
+      - '.agent/**'
+      - 'apps/site/src/scripts/sync-agent-docs.js'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run sync:docs
+      - run: npm run prettier -- --write apps/site/docs/
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-sync from .agent/"
+          file_pattern: apps/site/docs/
