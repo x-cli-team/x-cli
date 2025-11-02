@@ -4,6 +4,37 @@ title: Development Workflow Guide
 
 # Development Workflow Guide
 
+## CRITICAL GIT WORKFLOW WARNING FOR AI AGENTS
+
+** NEVER USE DIRECT GIT PUSH TO MAIN BRANCH:**
+
+```bash
+git push origin main # FORBIDDEN - Bypasses automation
+git push # DANGEROUS - Missing quality gates
+```
+
+** ALWAYS USE SMART PUSH SCRIPT:**
+
+```bash
+npm run smart-push # REQUIRED for main branch
+./scripts/smart-push.sh # Alternative method
+```
+
+** WHY CRITICAL:**
+
+- Main branch pushes trigger automated NPM publishing
+- Missing pushes = No NPM releases = Broken deployment pipeline
+- Direct pushes bypass TypeScript/ESLint checks and GitHub Actions monitoring
+- Smart push handles automated version bumps and prevents conflicts
+
+** CORRECT DEVELOPMENT WORKFLOW:**
+
+1. Work on feature branch: `git checkout -b feature/name`
+2. Make commits on feature branch
+3. Switch to main: `git checkout main`
+4. Merge feature: `git merge feature/name`
+5. **Smart push**: `npm run smart-push` (triggers NPM publish)
+
 ## Package Manager Migration (2025-11-02)
 
 ### Overview
