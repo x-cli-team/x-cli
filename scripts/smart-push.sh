@@ -1,8 +1,34 @@
 #!/bin/bash
+# ⚠️  CRITICAL SMART PUSH SCRIPT FOR X-CLI AUTOMATION ⚠️
+#
+# 🎯 PURPOSE: This is the ONLY safe way to push to main branch
+# 
+# 🚨 FOR AI AGENTS: ALWAYS use this script for main branch pushes:
+#    npm run smart-push  OR  ./scripts/smart-push.sh
+#
+# 🚫 NEVER use direct git push commands for main:
+#    ❌ git push origin main  (bypasses quality gates)
+#    ❌ git push              (missing automation checks)
+#
+# ✅ CORRECT WORKFLOW:
+#    1. Work on feature branch: git checkout -b feature/name
+#    2. Make commits on feature branch
+#    3. Switch to main: git checkout main  
+#    4. Merge feature: git merge feature/name
+#    5. Smart push: npm run smart-push  # Triggers NPM publish
+#
+# 🔄 WHAT THIS SCRIPT DOES:
+#    • Runs TypeScript & ESLint quality checks
+#    • Pulls latest changes with smart rebase/merge
+#    • Pushes to remote with error handling
+#    • Monitors GitHub Actions workflow status
+#    • Verifies NPM package publication (main branch only)
+#    • Handles branch protection with automatic PR creation
+#
+# 💡 WHY REQUIRED: Main branch pushes trigger automated NPM publishing
+#    Missing main pushes = No NPM releases = Broken deployment
+#
 # Smart push script with comprehensive checks and GitHub status monitoring
-# Test comment for PR creation
-# Third test comment to trigger PR
-# Fourth comment - branch protection test
 
 set -e  # Exit on any error
 set -u  # Exit on undefined variables

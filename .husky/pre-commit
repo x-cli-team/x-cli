@@ -1,6 +1,31 @@
 #!/usr/bin/env sh
 . "$(dirname "$0")/_/husky.sh"
 
+# ⚠️  CRITICAL GIT WORKFLOW WARNING FOR AI AGENTS ⚠️
+# 
+# THIS REPO USES AUTOMATED NPM PUBLISHING ON MAIN BRANCH PUSHES
+# 
+# 🚨 PUSH STRATEGY REQUIREMENTS:
+# 1. ONLY push to main branch for releases (triggers NPM publish)
+# 2. ALWAYS use feature branches for development work  
+# 3. NEVER use 'git push origin main' directly
+# 4. ALWAYS use smart-push script: 'npm run smart-push' or './scripts/smart-push.sh'
+# 5. ALWAYS merge feature branches to main (don't push commits directly to main)
+#
+# 📋 CORRECT WORKFLOW:
+#   git checkout -b feature/my-changes
+#   [make changes and commits]
+#   git checkout main
+#   git merge feature/my-changes  
+#   npm run smart-push  # This triggers NPM publish
+#
+# 💡 WHY: Every push to main triggers automated version bump + NPM publish
+# 💡 Missing pushes to main = No NPM releases = Broken deployment pipeline
+# 💡 Direct pushes to main = Bypass quality gates and monitoring
+#
+# 🔧 If you pushed to wrong branch: merge to main and use smart-push
+#
+
 # Critical folder protection check
 node -e "
 const fs = require('fs');
