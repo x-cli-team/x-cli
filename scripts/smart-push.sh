@@ -78,7 +78,7 @@ echo "🔍 Running pre-push quality checks..."
 
 # TypeScript check
 echo "📝 Checking TypeScript..."
-if npm run typecheck; then
+if bun run typecheck; then
     echo "✅ TypeScript check passed"
 else
     echo "❌ TypeScript check failed"
@@ -87,7 +87,7 @@ fi
 
 # Linting check (warnings allowed, only errors block)
 echo "🧹 Running ESLint..."
-if npm run lint || [ $? -eq 1 ]; then
+if bun run lint || [ $? -eq 1 ]; then
     echo "✅ ESLint check completed (warnings allowed)"
 else
     echo "❌ ESLint check failed with critical errors"
@@ -148,6 +148,26 @@ if [ $PUSH_EXIT_CODE -eq 0 ] || echo "$PUSH_OUTPUT" | grep -q "Everything up-to-
         fi
     fi
 
+    # Step 5: Verify NPM package publication (for main branch)
+    if [ "$BRANCH" = "main" ]; then
+        echo "📦 Verifying NPM package publication..."
+        
+        # Wait a moment for NPM to process
+        sleep 5
+        
+        # Get current version from package.json
+        CURRENT_VERSION=$(node -pe "require('./package.json').version")
+        PACKAGE_NAME=$(node -pe "require('./package.json').name")
+        
+        # Check if version exists on NPM
+        if npm view "$PACKAGE_NAME@$CURRENT_VERSION" version >/dev/null 2>&1; then
+            echo "✅ NPM package $PACKAGE_NAME@$CURRENT_VERSION verified on registry"
+        else
+            echo "⏳ NPM package not yet available (may take a few minutes)"
+            echo "💡 Monitor: npm view $PACKAGE_NAME@$CURRENT_VERSION"
+        fi
+    fi
+    
     echo ""
     echo "🎉 Smart push completed successfully!"
     [ "$BRANCH" = "main" ] && echo "📊 Monitor at: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
@@ -188,6 +208,7 @@ else
                         echo "   • Merge when ready"
                         echo ""
                         echo "💡 Or run: gh pr merge $FEATURE_BRANCH --merge"
+                        echo "📦 After merge, NPM package will be published automatically"
                     else
                         echo "❌ Failed to create PR automatically"
                         echo "💡 Create PR manually: $FEATURE_BRANCH → $BRANCH"
