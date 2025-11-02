@@ -11,6 +11,19 @@ npm view grok-cli-hurry-mode version
 npm view grok-cli-hurry-mode time --json | tail -5
 ```
 
+### Development Environment (Updated 2025-11-02)
+**Primary Package Manager**: Bun (recommended for development)
+```bash
+# Development commands
+bun install      # Install dependencies
+bun run build    # Build project
+bun run lint     # Run linting
+```
+
+**CI/CD Pipeline**: Still uses npm for consistency with GitHub Actions
+- Publishing workflow continues to use npm for reliability
+- Local development now optimized with Bun for faster iteration
+
 ### Check GitHub Actions
 1. Go to: https://github.com/hinetapora/grok-cli-hurry-mode/actions
 2. Look for failed "Release" workflows
@@ -135,6 +148,7 @@ NPM_TOKEN=npm_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   run: |
     rm -rf node_modules package-lock.json
     npm install
+    # Note: Development uses Bun, but CI uses npm for consistency
 
 # 3. Git Auth (CRITICAL for push)
 - name: Create tag and push
@@ -160,9 +174,10 @@ npm view grok-cli-hurry-mode version
 # 2. Manual version bump
 npm version patch  # or minor/major as needed
 
-# 3. Build and test
-npm run build
-npm run local  # Test locally
+# 3. Build and test (use development tools)
+bun run build    # Faster with Bun
+bun run lint     # Verify code quality
+npm run local    # Test locally (npm for consistency)
 
 # 4. Manual publish
 npm publish --access public

@@ -52,7 +52,8 @@ export class GrokClient {
   private currentModel: string = "grok-4-fast-non-reasoning";
   private defaultMaxTokens: number;
 
-  constructor(apiKey: string = process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY, model?: string, baseURL?: string) {
+  constructor(apiKey?: string, model?: string, baseURL?: string) {
+    apiKey = apiKey || process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY;
     this.client = new OpenAI({
       apiKey,
       baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",

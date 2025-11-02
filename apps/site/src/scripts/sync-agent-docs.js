@@ -22,6 +22,7 @@ const SYNC_MAP = {
   'sop/release-management.md': 'guides/releases.md',
   'sop/automation-protection.md': 'guides/automation.md',
   'sop/npm-publishing-troubleshooting.md': 'troubleshooting/npm.md',
+  'sop/development-workflow.md': 'guides/development-workflow.md',
 };
 
 function addFrontmatter(content, title, sidebarPosition) {
@@ -33,7 +34,10 @@ function addFrontmatter(content, title, sidebarPosition) {
     '',
   ].filter(Boolean).join('\n');
   
-  return frontmatter + content;
+  // Remove existing frontmatter from content if present
+  const cleanContent = content.replace(/^---[\s\S]*?---\s*/, '');
+  
+  return frontmatter + cleanContent;
 }
 
 function rewriteLinks(content) {
@@ -56,14 +60,15 @@ function filterContent(content, filePath) {
   filtered = filtered.replace(/Last Updated: \d{4}-\d{2}-\d{2}T[\d:.]+Z/g, '');
   filtered = filtered.replace(/Updated By: .*/g, '');
   
-  // Remove emojis for clean X.AI-inspired look - but preserve line breaks
-  filtered = filtered.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+  // Remove all emojis for clean X.AI-inspired look - but preserve line structure
+  // Enhanced emoji removal - covers all ranges and specific symbols
+  filtered = filtered.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]/gu, '');
+  
+  // Remove specific emoji variants that might not be caught above
+  filtered = filtered.replace(/[🛡️🚨⚠️❌🔧🎯⚡🔍🌐📊🤖💻🏗️🛠️📦🔄📝💡🆕🔗📖🌍⚙️💬🧠📄🔎🌳📋🎨🔥🚀✅📚]/g, '');
   
   // Remove emoji shortcodes like :emoji:
   filtered = filtered.replace(/:[a-z_+-]+:/g, '');
-  
-  // Remove common emoji patterns in markdown (🚀 ✅ 📚 etc) - but preserve line structure
-  filtered = filtered.replace(/[🚀✅📚🔧🎯⚡🔍🌐📊🤖💻🏗️🛠️📦🔄📝💡🆕🔗📖🌍⚙️💬🧠📄🔎🌳📋🛡️🎨🔥💻]/g, '');
   
   // Clean up multiple spaces but preserve line breaks
   filtered = filtered.replace(/ +/g, ' ');
@@ -148,9 +153,21 @@ function syncAgentDocs() {
       const title = titleMatch ? titleMatch[1].trim() : path.basename(target, '.md');
       content = addFrontmatter(content, title);
       
-      // Write to target
+      // Only write if content has changed
       ensureDir(targetPath);
-      fs.writeFileSync(targetPath, content);
+      
+      let shouldWrite = true;
+      if (fs.existsSync(targetPath)) {
+        const existingContent = fs.readFileSync(targetPath, 'utf8');
+        shouldWrite = existingContent !== content;
+      }
+      
+      if (shouldWrite) {
+        fs.writeFileSync(targetPath, content);
+        console.log(`✅ Updated ${target}`);
+      } else {
+        console.log(`⏭️  No changes for ${target}`);
+      }
     } else {
       console.warn(`⚠️  Source file not found: ${sourcePath}`);
     }
@@ -159,7 +176,20 @@ function syncAgentDocs() {
   // Generate dynamic content
   console.log('📊 Generating roadmap...');
   const roadmapContent = generateRoadmap();
-  fs.writeFileSync(path.join(DOCS_DIR, 'roadmap.md'), roadmapContent);
+  const roadmapPath = path.join(DOCS_DIR, 'roadmap.md');
+  
+  let shouldWriteRoadmap = true;
+  if (fs.existsSync(roadmapPath)) {
+    const existingRoadmap = fs.readFileSync(roadmapPath, 'utf8');
+    shouldWriteRoadmap = existingRoadmap !== roadmapContent;
+  }
+  
+  if (shouldWriteRoadmap) {
+    fs.writeFileSync(roadmapPath, roadmapContent);
+    console.log('✅ Updated roadmap.md');
+  } else {
+    console.log('⏭️  No changes for roadmap.md');
+  }
   
   // Create flat sidebar config like X.AI docs (no categories)
   const sidebarConfig = {
@@ -171,6 +201,7 @@ function syncAgentDocs() {
       'api/schema',
       'guides/releases',
       'guides/automation',
+      'guides/development-workflow',
       'troubleshooting/npm',
       'roadmap',
     ],

@@ -1,7 +1,13 @@
 # 📚 .agent Documentation System
 
-*Last synced: 2025-01-13*
+*Last synced: 2025-11-02*
 *Protection: Husky pre-commit hook prevents accidental folder deletion*
+
+## 🔄 Recent Updates (November 2025)
+- **Package Manager Migration**: Switched to Bun for development (npm for distribution)
+- **Tooling Optimization**: 4x faster installs, improved TypeScript compilation
+- **Lint System Overhaul**: Fixed parsing errors, streamlined configuration
+- **Development Workflow**: New SOP for Bun-optimized development process
 
 ## Overview
 This directory contains AI agent documentation for X-CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
@@ -115,9 +121,11 @@ Standard operating procedures and workflows:
 - Development patterns and conventions
 - Deployment and maintenance procedures
 - Code review and testing guidelines
+- **development-workflow.md** - Bun-optimized development process and package management (NEW)
 - **ux-feedback-system-maintenance.md** - UX system maintenance and extension guidelines
 - **automation-protection.md** - Critical automation system protection
 - **release-management.md** - Automated publishing workflow procedures
+- **npm-publishing-troubleshooting.md** - Complete NPM publishing failure diagnosis and recovery
 
 ### 🚨 incidents/
 Documented failures with root cause analysis:

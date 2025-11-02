@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
     "api/schema",
     "guides/releases",
     "guides/automation",
+    "guides/development-workflow",
     "troubleshooting/npm",
     "roadmap"
   ]

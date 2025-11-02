@@ -8,6 +8,8 @@ title: Installation & Setup Guide
 
 Grok CLI is installed globally via npm and includes automated installation scripts to handle common issues.
 
+**Development Note (Updated 2025-11-02)**: The project now uses Bun for development workflows, while maintaining npm compatibility for user installation and CI/CD pipelines.
+
 ## Installation Methods
 
 ### Automated Installation (Recommended)
@@ -50,8 +52,11 @@ yarn global add @xagent/x-cli@latest
 # pnpm
 pnpm add -g @xagent/x-cli@latest
 
-# Bun
+# Bun (Recommended for speed)
 bun add -g @xagent/x-cli@latest
+
+# Bun alternative (latest)
+bun x @xagent/x-cli@latest
 ```
 
 #### Force Installation (if needed)
