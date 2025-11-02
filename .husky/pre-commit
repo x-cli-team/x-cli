@@ -58,10 +58,10 @@ if (missingFolders.length > 0) {
 "
 
 # Run lint-staged for code formatting
-npx lint-staged || true
+npx lint-staged --config package.json .agent/**/*.{md,mdx} && npx lint-staged --config package.json -- '*.{ts,js,md,mdx}' --ignore-path .gitignore || true
 
 # Sync .agent docs to public docs
-npm run sync:docs
+
 
 # TODO: Add session learnings capture here
 # This could log agent interactions, learnings, or changes made during the session
