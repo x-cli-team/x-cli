@@ -1,6 +1,6 @@
 <!-- Test comment for PR creation -->
 
-## 1.1.85 – Logo Assets & NPM Publication Complete
+## 1.1.86 – Logo Assets & NPM Publication Complete
 
 ✅ **Live on NPM**: [one-shot](https://www.npmjs.com/package/one-shot) - Fully published and ready for global installation
 
