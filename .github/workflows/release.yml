@@ -5,7 +5,7 @@
 #
 # DO NOT MODIFY without understanding the full dependency chain:
 # - GitHub Secrets: PAT_TOKEN, NPM_TOKEN (required)
-# - Package name: "one-shot"
+# - Package name: "@xagent/one-shot"
 # - Git hooks: .husky/pre-commit + scripts/check-version.cjs
 # - NPM authentication: Direct .npmrc creation (not npm config)
 # - Dependency management: Clean install to avoid Rollup cache issues
@@ -123,7 +123,7 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public --dry-run
 
-      - name: Publish to npm (primary package one-shot)
+      - name: Publish to npm (primary package @xagent/one-shot)
         if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public
         env:
@@ -151,7 +151,7 @@ jobs:
           mv package.json.primary package.json
 
           echo "✅ Successfully published both packages:"
-          echo "  📦 one-shot@$NEW_VER (primary)"
+          echo "  📦 @xagent/one-shot@$NEW_VER (primary)"
           echo "  📦 @xagent/x-cli@$NEW_VER (legacy)"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -162,7 +162,7 @@ jobs:
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
           # Array of packages to verify
-          PACKAGES=("one-shot" "@xagent/x-cli")
+          PACKAGES=("@xagent/one-shot" "@xagent/x-cli")
 
           echo "🔍 Verifying publication of both packages at version $PACKAGE_VERSION..."
           sleep 10
@@ -202,7 +202,7 @@ jobs:
 
           echo ""
           echo "🎉 Successfully verified both packages:"
-          echo "  📦 one-shot@$PACKAGE_VERSION (primary)"
+          echo "  📦 @xagent/one-shot@$PACKAGE_VERSION (primary)"
           echo "  📦 @xagent/x-cli@$PACKAGE_VERSION (legacy)"
 
       # ---------- Publish to GitHub Packages ----------
@@ -257,9 +257,9 @@ jobs:
             ### Installation
             ```bash
             # Primary package (recommended)
-            npm install -g one-shot@${{ env.NEW_VER }}
+            npm install -g @xagent/one-shot@${{ env.NEW_VER }}
             # or
-            npx one-shot@${{ env.NEW_VER }}
+            npx @xagent/one-shot@${{ env.NEW_VER }}
 
             # Legacy package (for backwards compatibility)
             npm install -g @xagent/x-cli@${{ env.NEW_VER }}
@@ -286,7 +286,7 @@ jobs:
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
           echo "✅ Published both packages v${NEW_VER} to:"
-          echo "  📦 NPM (primary): https://www.npmjs.com/package/one-shot"
+          echo "  📦 NPM (primary): https://www.npmjs.com/package/@xagent/one-shot"
           echo "  📦 NPM (legacy): https://www.npmjs.com/package/@xagent/x-cli"
           echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"
 

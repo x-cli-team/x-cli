@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@xagent/x-cli",
-  "version": "1.1.85",
+  "version": "1.1.86",
   "description": "An open-source AI agent that brings advanced AI capabilities directly into your terminal. (Legacy package name - use 'one-shot' for new installations)",
   "main": "dist/index.js",
   "module": "dist/index.js",
