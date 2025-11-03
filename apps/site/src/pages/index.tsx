@@ -5,7 +5,7 @@ import TestimonialsSection from '@site/src/components/TestimonialsSection';
 export default function Page() {
   return (
     <>
-      <XCliHero />
+      <GrokOneShotHero />
       <OpenSourceSection />
       <FeaturesSection />
       <CollaborationSection />
@@ -16,7 +16,7 @@ export default function Page() {
   );
 }
 
-function XCliHero() {
+function GrokOneShotHero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   return (
@@ -63,8 +63,8 @@ function XCliHero() {
             alignItems: 'center',
             marginBottom: '1.5rem'
           }}>
-            <ChipBtn variant="outline" label="npx -y @xagent/x-cli@latest" showCopyIcon={true} />
-            <ChipBtn variant="outline" label="npm install -g @xagent/x-cli@latest" showCopyIcon={true} />
+            <ChipBtn variant="outline" label="npx -y @xagent/one-shot@latest" showCopyIcon={true} />
+            <ChipBtn variant="outline" label="npm install -g @xagent/one-shot@latest" showCopyIcon={true} />
           </div>
         </div>
 
@@ -75,7 +75,7 @@ function XCliHero() {
               <NavLink href="/docs/overview">Docs</NavLink>
               <NavLink href="/docs/roadmap">Roadmap</NavLink>
               <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
-              <NavLink href="https://github.com/x-cli-team/x-cli">GitHub</NavLink>
+              <NavLink href="https://github.com/x-cli-team/grok-one-shot">GitHub</NavLink>
               <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
             </div>
           </div>
@@ -93,7 +93,7 @@ function XCliHero() {
             <div className={styles.heroCardOverlay}></div>
             <div className={styles.heroCardContent}>
               <div className={styles.heroCardText}>
-                <h3 className={styles.heroCardTitle}>X CLI</h3>
+                <h3 className={styles.heroCardTitle}>Grok One-Shot</h3>
                 <p className={styles.heroCardDescription}>Open source terminal AI assistant with Claude Code's signature Plan Mode. Shift+Tab twice for read-only exploration and AI-powered implementation planning. Community-driven project built by developers, for developers.</p>
                 
                 <div className={styles.featureGrid}>

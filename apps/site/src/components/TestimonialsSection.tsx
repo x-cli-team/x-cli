@@ -17,7 +17,7 @@ const SAMPLE_TESTIMONIALS: Testimonial[] = [
     name: "Alex Chen",
     title: "Senior Software Engineer",
     company: "TechCorp",
-    quote: "X-CLI transformed my development workflow. The AI assistance is incredible and it never leaves my terminal.",
+    quote: "Grok One-Shot transformed my development workflow. The AI assistance is incredible and it never leaves my terminal.",
     link: "https://github.com/alexchen",
     avatar: "https://github.com/alexchen.png",
     featured: true,

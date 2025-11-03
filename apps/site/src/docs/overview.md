@@ -6,7 +6,7 @@ title: 📚 .agent Documentation System
 
 ## Overview
 
-This directory contains AI agent documentation for X-CLI. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
+This directory contains AI agent documentation for Grok One-Shot. This system helps AI agents understand the project context efficiently without scanning the entire codebase.
 
 ## 🚨 Critical Configuration Warnings
 
@@ -16,7 +16,7 @@ This directory contains AI agent documentation for X-CLI. This system helps AI a
 
 ### 🔒 Protected NPM Publishing Settings
 
-- **`package.json` name**: Must remain `"@xagent/x-cli"` (unscoped). Changing to scoped (e.g., `@username/@xagent/x-cli`) will break NPM publishing unless you have token access for that scope.
+- **`package.json` name**: Must remain `"@xagent/one-shot"` (scoped). The legacy `@xagent/x-cli` package is maintained for backwards compatibility.
 - **`package.json` publishConfig**: Must not include `"registry": "https://npm.pkg.github.com/"`. Publishing should go to npmjs.com, not GitHub Packages.
 - **NPM_TOKEN secret**: Must be a valid automation token from the NPM account owning `@xagent/x-cli`.
 

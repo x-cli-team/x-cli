@@ -6,7 +6,7 @@ title: 📦 Installation & Setup Guide
 
 ## Overview
 
-X-CLI is installed globally via npm and includes automated installation scripts to handle common issues.
+Grok One-Shot is installed globally via npm and includes automated installation scripts to handle common issues.
 
 ## Installation Methods
 
@@ -15,7 +15,7 @@ X-CLI is installed globally via npm and includes automated installation scripts 
 Use the provided `install.sh` script for automatic handling of installation issues:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hinetapora/@xagent/x-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/x-cli-team/grok-one-shot/main/install.sh | bash
 ```
 
 The script automatically:

@@ -14,9 +14,9 @@ let failed = false;
 
 // Check for required tags
 const requiredChecks = [
-  { pattern: /<meta property="og:title" content="([^"]*)"/, expected: 'X CLI', name: 'og:title' },
+  { pattern: /<meta property="og:title" content="([^"]*)"/, expected: 'Grok One-Shot', name: 'og:title' },
   { pattern: /<meta property="og:description" content="([^"]*)"/, expected: 'Claude Code-level intelligence in your terminal', name: 'og:description' },
-  { pattern: /<meta property="og:image" content="([^"]*)"/, expected: 'https://xcli.org/img/xcli-welcome.png', name: 'og:image' },
+  { pattern: /<meta property="og:image" content="([^"]*)"/, expected: 'https://grok-one-shot.dev/img/grok-one-shot-welcome.png', name: 'og:image' },
   { pattern: /<meta name="twitter:card" content="([^"]*)"/, expected: 'summary_large_image', name: 'twitter:card' },
 ];
 
