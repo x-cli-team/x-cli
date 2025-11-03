@@ -156,12 +156,12 @@ function OpenSourceSection() {
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>Open Source</h2>
         <p className={styles.sectionDescription}>
-          Built by developers, for developers. X CLI is completely open source and community-driven.
+          Built by developers, for developers. Grok One-Shot is completely open source and community-driven.
         </p>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
             <h3>MIT Licensed</h3>
-            <p>Free to use, modify, and distribute. Build on top of X CLI for your own projects.</p>
+            <p>Free to use, modify, and distribute. Build on top of Grok One-Shot for your own projects.</p>
           </div>
           <div className={styles.featureCard}>
             <h3>Community Driven</h3>
@@ -326,7 +326,7 @@ function Footer() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>Copyright © 2025 X CLI. Based on <a href="https://github.com/x-cli-team/x-cli">x-cli-team</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
+          <p>Copyright © 2025 Grok One-Shot. Based on <a href="https://github.com/x-cli-team/x-cli">x-cli-team</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
         </div>
       </div>
     </footer>
@@ -410,9 +410,9 @@ function LogoMark() {
   return (
     <div className={styles.logo}>
       <div className={styles.logoIcon}>
-        X
+        G
       </div>
-      <span className={styles.logoText}>x-cli</span>
+      <span className={styles.logoText}>Grok One-Shot</span>
     </div>
   );
 }

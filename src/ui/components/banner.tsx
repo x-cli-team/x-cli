@@ -4,7 +4,7 @@ import pkg from '../../../package.json' with { type: 'json' };
 import { inkColors } from "../colors.js";
 import { ContextStatus } from "./context-status.js";
 
-// Enhanced X CLI ASCII art with color scheme
+// Enhanced Grok One-Shot ASCII art with color scheme
 export const xcliBanner = `
 ██   ██      ██████ ██      ██ 
  ██ ██      ██      ██      ██ 
@@ -15,7 +15,7 @@ export const xcliBanner = `
 
 // Logo-based banner (simplified for terminal)
 export const xcliLogo = `
-    ⭕ X CLI ⭕
+    ⭕ Grok One-Shot ⭕
    🔴🟡🟢🔵 v{VERSION}
 `;
 
@@ -91,7 +91,7 @@ export function Banner({
       {/* Welcome Message */}
       <Box marginTop={1}>
         <Text color={inkColors.muted}>Welcome to </Text>
-        <Text color={inkColors.primary} bold>X CLI</Text>
+        <Text color={inkColors.primary} bold>Grok One-Shot</Text>
         <Text color={inkColors.muted}> </Text>
         <Text color={inkColors.warning}>v{pkg.version}</Text>
         <Text color={inkColors.muted}> ⚡</Text>
@@ -129,7 +129,7 @@ export function showBanner(options?: {
   if (quiet) {
     return (
       <Box>
-        <Text color={inkColors.primary} bold>X CLI</Text>
+        <Text color={inkColors.primary} bold>Grok One-Shot</Text>
         <Text color={inkColors.muted}> v{pkg.version} ready ⚡</Text>
       </Box>
     );

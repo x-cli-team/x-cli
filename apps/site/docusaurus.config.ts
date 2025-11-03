@@ -106,10 +106,10 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'X CLI',
+      title: 'Grok One-Shot',
       logo: {
-        alt: 'X CLI Logo',
-        src: 'img/x-cli-logo.svg',
+        alt: 'Grok One-Shot Logo',
+        src: 'img/logo.svg',
       },
       items: [
         {
@@ -211,7 +211,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} X CLI. Built with Docusaurus. Forked from <a href="https://github.com/x-cli-team/x-cli" target="_blank" rel="noopener noreferrer">x-cli-team</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Grok One-Shot. Built with Docusaurus. Forked from <a href="https://github.com/x-cli-team/x-cli" target="_blank" rel="noopener noreferrer">x-cli-team</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
     },
     prism: {
       theme: prismThemes.github,
