@@ -56,7 +56,9 @@ export function PlanDisplay({
           <Text color="gray" dimColor>{plan.description}</Text>
           <Box marginTop={1}>
             <Text color="cyan">📅 Created: {plan.createdAt.toLocaleDateString()}</Text>
-            <Text color="cyan" marginLeft={3}>📋 Version: {plan.version}</Text>
+            <Box marginLeft={3}>
+              <Text color="cyan">📋 Version: {plan.version}</Text>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -172,7 +174,9 @@ function StrategySection({ strategy, options, selected, onSelect }: StrategySect
           
           {strategy.principles && strategy.principles.length > 0 && (
             <>
-              <Text bold color="cyan" marginTop={1}>📋 Key Principles</Text>
+              <Box marginTop={1}>
+                <Text bold color="cyan">📋 Key Principles</Text>
+              </Box>
               {strategy.principles.map((principle: string, index: number) => (
                 <Text key={index} color="gray">• {principle}</Text>
               ))}
@@ -184,7 +188,9 @@ function StrategySection({ strategy, options, selected, onSelect }: StrategySect
       {/* Strategy Options */}
       {options.length > 0 && (
         <Box flexDirection="column">
-          <Text bold color="yellow" marginBottom={1}>⚡ Strategy Options</Text>
+          <Box marginBottom={1}>
+            <Text bold color="yellow">⚡ Strategy Options</Text>
+          </Box>
           {options.map((option, index) => (
             <StrategyOptionCard 
               key={option.id}
@@ -224,14 +230,22 @@ function StrategyOptionCard({ option, selected, onSelect, index }: StrategyOptio
         </Box>
 
         {/* Approach */}
-        <Text color="white" marginY={1}>{option.approach}</Text>
+        <Box marginY={1}>
+          <Text color="white">{option.approach}</Text>
+        </Box>
 
         {/* Metrics */}
         <Box marginBottom={1}>
           <Text color={riskColor}>Risk: {option.riskLevel.toUpperCase()}</Text>
-          <Text color="cyan" marginLeft={3}>Effort: {option.effortEstimate}h</Text>
-          <Text color="magenta" marginLeft={3}>Complexity: {option.complexity}/10</Text>
-          <Text color="blue" marginLeft={3}>Confidence: {Math.round(option.confidence * 100)}%</Text>
+          <Box marginLeft={3}>
+            <Text color="cyan">Effort: {option.effortEstimate}h</Text>
+          </Box>
+          <Box marginLeft={3}>
+            <Text color="magenta">Complexity: {option.complexity}/10</Text>
+          </Box>
+          <Box marginLeft={3}>
+            <Text color="blue">Confidence: {Math.round(option.confidence * 100)}%</Text>
+          </Box>
         </Box>
 
         {/* Pros */}
@@ -265,7 +279,9 @@ interface ActionPlanSectionProps {
 function ActionPlanSection({ steps }: ActionPlanSectionProps) {
   return (
     <Box flexDirection="column">
-      <Text bold color="blue" marginBottom={1}>📋 Implementation Steps</Text>
+      <Box marginBottom={1}>
+        <Text bold color="blue">📋 Implementation Steps</Text>
+      </Box>
       {steps.map((step, index) => (
         <StepCard key={step.id} step={step} index={index + 1} />
       ))}
@@ -289,13 +305,13 @@ function StepCard({ step, index }: StepCardProps) {
           <Text bold color={typeColor}>
             {index}. {step.title}
           </Text>
-          <Text color="gray" marginLeft={2}>
+          <Text color="gray">
             ({step.type} • {step.effort}h)
           </Text>
         </Box>
 
         {/* Description */}
-        <Text color="white" marginY={1}>{step.description}</Text>
+        <Text color="white">{step.description}</Text>
 
         {/* Skills & Files */}
         <Box>
@@ -303,7 +319,7 @@ function StepCard({ step, index }: StepCardProps) {
             <Text color="cyan">Skills: {step.skills.join(', ')}</Text>
           )}
           {step.affectedFiles.length > 0 && (
-            <Text color="yellow" marginLeft={3}>
+            <Text color="yellow">
               Files: {step.affectedFiles.slice(0, 2).join(', ')}
               {step.affectedFiles.length > 2 && ` +${step.affectedFiles.length - 2} more`}
             </Text>
@@ -380,16 +396,16 @@ function RiskCard({ risk, index }: RiskCardProps) {
           <Text bold color={severityColor}>
             {index}. {risk.title}
           </Text>
-          <Text color="gray" marginLeft={2}>
+          <Text color="gray">
             ({risk.category} • Impact: {risk.impact}/5)
           </Text>
         </Box>
         
-        <Text color="white" marginY={1}>{risk.description}</Text>
+        <Text color="white">{risk.description}</Text>
         
         <Box>
           <Text color="cyan">Probability: {Math.round(risk.probability * 100)}%</Text>
-          <Text color="magenta" marginLeft={3}>Risk Score: {risk.score.toFixed(1)}</Text>
+          <Text color="magenta">Risk Score: {risk.score.toFixed(1)}</Text>
         </Box>
       </Box>
     </Box>
@@ -431,7 +447,7 @@ function TimelineSection({ effort }: TimelineSectionProps) {
             <Text bold color="cyan">📊 Effort Breakdown</Text>
             {Object.entries(effort.breakdownByType).map(([type, hours]) => (
               <Text key={type} color="gray">
-                {type}: {hours}h
+                {type}: {String(hours)}h
               </Text>
             ))}
           </Box>
@@ -451,7 +467,9 @@ function ApprovalControls({ onApprove, onReject, onRevise }: ApprovalControlsPro
   return (
     <Box borderStyle="double" borderColor="yellow" padding={1}>
       <Box flexDirection="column">
-        <Text bold color="yellow" marginBottom={1}>🤔 Plan Approval</Text>
+        <Box marginBottom={1}>
+          <Text bold color="yellow">🤔 Plan Approval</Text>
+        </Box>
         
         <Box flexDirection="column">
           <Text color="green">✅ [A]pprove - Proceed with this implementation plan</Text>
@@ -460,7 +478,7 @@ function ApprovalControls({ onApprove, onReject, onRevise }: ApprovalControlsPro
           <Text color="gray">❓ [?] - Show detailed help for approval process</Text>
         </Box>
 
-        <Text color="yellow" marginTop={1} dimColor>
+        <Text color="yellow" dimColor>
           Press the corresponding key to make your choice...
         </Text>
       </Box>

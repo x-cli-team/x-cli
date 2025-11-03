@@ -99,7 +99,7 @@ export class PlanApprovalManager {
         break;
       case 'revision_requested':
         if (feedback) {
-          await this.handleRevisionRequest(session, feedback);
+          await this.processRevisionRequest(session, feedback);
         }
         break;
     }
@@ -136,7 +136,19 @@ export class PlanApprovalManager {
   /**
    * Handle revision request
    */
-  private async handleRevisionRequest(session: ApprovalSession, feedback: string): Promise<ImplementationPlan> {
+  async handleRevisionRequest(sessionId: string, feedback: string): Promise<ImplementationPlan> {
+    const session = this.activeSessions.get(sessionId);
+    if (!session) {
+      throw new Error(`No active approval session found: ${sessionId}`);
+    }
+    
+    return this.processRevisionRequest(session, feedback);
+  }
+
+  /**
+   * Process revision request (internal method)
+   */
+  private async processRevisionRequest(session: ApprovalSession, feedback: string): Promise<ImplementationPlan> {
     if (session.revisionCount >= session.maxRevisions) {
       throw new Error(`Maximum revisions (${session.maxRevisions}) reached for session ${session.sessionId}`);
     }

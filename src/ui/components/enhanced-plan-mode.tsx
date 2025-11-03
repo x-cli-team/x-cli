@@ -147,10 +147,14 @@ export function EnhancedPlanMode({
         const result = await approvalManager.processApproval(sessionId, 'rejected', feedbackInput);
         onApproval(result);
       } else if (approvalState === 'feedback_revision') {
-        const revisedPlan = await approvalManager.handleRevisionRequest(sessionId, feedbackInput);
-        setRevisionCount(prev => prev + 1);
-        onPlanRevision(revisedPlan);
-        setApprovalState('presentation');
+        const result = await approvalManager.processApproval(sessionId, 'revision_requested', feedbackInput);
+        if (result.decision === 'revision_requested') {
+          // Generate revised plan using the public method
+          const revisedPlan = await approvalManager.handleRevisionRequest(sessionId, feedbackInput);
+          setRevisionCount(prev => prev + 1);
+          onPlanRevision(revisedPlan);
+          setApprovalState('presentation');
+        }
       }
 
       setFeedbackInput('');
@@ -273,7 +277,9 @@ function FeedbackInput({ type, value, onChange, onSubmit, onCancel }: FeedbackIn
     <Box borderStyle="double" borderColor="yellow" padding={1} marginY={1}>
       <Box flexDirection="column">
         <Text bold color="yellow">📝 {title}</Text>
-        <Text color="gray" marginBottom={1}>{placeholder}</Text>
+        <Box marginBottom={1}>
+          <Text color="gray">{placeholder}</Text>
+        </Box>
         
         {/* Input Field */}
         <Box borderStyle="single" borderColor="cyan" padding={1} marginBottom={1}>
@@ -294,7 +300,9 @@ function FeedbackInput({ type, value, onChange, onSubmit, onCancel }: FeedbackIn
         {/* Controls */}
         <Box>
           <Text color="green">Enter: Submit</Text>
-          <Text color="red" marginLeft={3}>Esc: Cancel</Text>
+          <Box marginLeft={3}>
+            <Text color="red">Esc: Cancel</Text>
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -338,17 +346,23 @@ function HelpSection({ onClose }: HelpSectionProps) {
           <Text color="gray">• Number keys (1-9) to select different strategy options</Text>
           <Text color="gray">• A/R/M keys for Approve/Reject/Modify actions</Text>
 
-          <Text bold color="cyan" marginTop={1}>Approval Actions:</Text>
+          <Box marginTop={1}>
+            <Text bold color="cyan">Approval Actions:</Text>
+          </Box>
           <Text color="green">• [A]pprove: Accept the plan and proceed to implementation</Text>
           <Text color="red">• [R]eject: Decline the plan with feedback for improvement</Text>
           <Text color="blue">• [M]odify: Request specific changes to improve the plan</Text>
 
-          <Text bold color="cyan" marginTop={1}>Strategy Selection:</Text>
+          <Box marginTop={1}>
+            <Text bold color="cyan">Strategy Selection:</Text>
+          </Box>
           <Text color="gray">• Multiple strategies may be presented with trade-offs</Text>
           <Text color="gray">• Recommended strategies are marked with 🌟</Text>
           <Text color="gray">• Consider risk level, effort, and complexity when choosing</Text>
 
-          <Text bold color="cyan" marginTop={1}>Plan Sections:</Text>
+          <Box marginTop={1}>
+            <Text bold color="cyan">Plan Sections:</Text>
+          </Box>
           <Text color="gray">• Strategy: Implementation approach and alternatives</Text>
           <Text color="gray">• Action Plan: Detailed steps with effort estimates</Text>
           <Text color="gray">• Risks: Potential issues and mitigation strategies</Text>
