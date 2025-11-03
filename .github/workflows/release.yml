@@ -141,7 +141,7 @@ jobs:
           cp package-legacy.json package.json
 
           # Update version to match current version
-          NEW_VER=$(node -pe "require('./package.json.primary').version")
+          NEW_VER=$(node -e "console.log(JSON.parse(require('fs').readFileSync('./package.json.primary', 'utf8')).version)")
           sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VER\"/" package.json
 
           echo "Publishing @xagent/x-cli@$NEW_VER..."
