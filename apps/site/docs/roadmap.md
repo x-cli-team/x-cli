@@ -7,6 +7,14 @@ sidebar_position: 1
 
 This roadmap is automatically generated from our internal task tracking system.
 
+## Sprint: Intelligent Text Paste Processing - Claude Code Parity
+
+## Sprint: Enhanced Plan Mode - Complete Claude Code Parity
+
+## 📝 Sprint: Automatic .agent Documentation Updates
+
+## 2025-11-03-deep-codebase-intelligence-sprint-plan.md
+
 ## Sprint: Paste Text Summary Enhancement
 
 ## Sprint: Git Integration Enhancement

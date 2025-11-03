@@ -115,11 +115,26 @@ The context metrics displayed below the input prompt now show **real, accurate d
 - **TodoTool** - Task management and progress tracking
 - **ConfirmationTool** - User confirmation for dangerous operations
 
+
+## Recent Major Changes
+
+### November 2025
+- ✅ **Plan Mode Implementation Complete**: Revolutionary multi-strategy planning with interactive approval workflow
+- ✅ **Automatic Documentation System**: Git hooks now automatically update .agent docs on commits
+- 🚧 **Intelligent Text Paste Processing**: Enhanced paste detection and context-aware processing
+- 🚧 **Vector Search Engine**: Preparation for semantic code search implementation
+
+### Key Capabilities Added
+- Enhanced Plan Mode with strategy comparison and risk assessment
+- Automated documentation workflow with git hook integration
+- Improved paste detection for code snippets and error logs
+- Foundation for Claude Code competitive parity features
+
 ## Automation Status
 - **✅ NPM Publishing**: Fully automated on every push to main
 - **✅ Version Management**: Auto-bump patch versions with README sync
 - **✅ GitHub Actions**: Combined release workflow with proper authentication
 - **✅ Protection System**: Comprehensive safeguards and documentation
 
-Last Updated: 2025-01-13T00:00:00.000Z
+Last Updated: 2025-11-03T21:21:57.436Z
 Updated By: Feature implementation review
