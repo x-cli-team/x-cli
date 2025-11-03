@@ -132,7 +132,10 @@ export class PasteDetectionService {
    */
   private countLines(content: string): number {
     if (!content) return 0;
-    return content.split('\n').length;
+    // Count actual lines: split by any line ending and handle trailing newlines correctly
+    const lines = content.split(/\r\n|\r|\n/);
+    // If last element is empty due to trailing newline, don't count it as an extra line
+    return lines[lines.length - 1] === '' ? lines.length - 1 : lines.length;
   }
 
   /**

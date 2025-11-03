@@ -296,14 +296,8 @@ export function useEnhancedInput({
       setCursorPositionState(result.position);
       setOriginalInput(result.text);
 
-      // Check for paste events (large amounts of text input at once)
-      if (onPasteDetected && inputChar.length > 1) {
-        const pasteService = getPasteDetectionService();
-        const pasteEvent = pasteService.detectPaste(previousInput, result.text);
-        if (pasteEvent) {
-          onPasteDetected(pasteEvent);
-        }
-      }
+      // Note: Paste detection is handled in setInput(), not here
+      // This avoids duplicate detection events
     }
   }, [disabled, onSpecialKey, input, cursorPosition, multiline, handleSubmit, navigateHistory, setOriginalInput]);
 

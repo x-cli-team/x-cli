@@ -6,7 +6,7 @@ import { ConfirmationService } from "../utils/confirmation-service.js";
 import { useEnhancedInput, Key } from "./use-enhanced-input.js";
 import { GrokToolCall } from "../grok/client.js";
 import { ToolResult } from "../types/index.js";
-import { PasteEvent } from "../services/paste-detection.js";
+import { PasteEvent, getPasteDetectionService } from "../services/paste-detection.js";
 import { usePlanMode } from "./use-plan-mode.js";
 import { detectComplexity } from "../services/complexity-detector.js";
 // TODO: Implement ResearchRecommendService and executionOrchestrator when needed
@@ -297,10 +297,10 @@ export function useInputHandler({
   };
 
   const handlePasteDetected = (pasteEvent: PasteEvent) => {
-    // Create a user entry with paste summary for display
+    // Show paste summary immediately as visual feedback
     const userEntry: ChatEntry = {
       type: "user",
-      content: pasteEvent.content,           // Full content for AI
+      content: pasteEvent.content,           // Full content for AI (when submitted)
       displayContent: pasteEvent.summary,    // Summary for UI display
       timestamp: new Date(),
       isPasteSummary: true,
@@ -311,11 +311,12 @@ export function useInputHandler({
       },
     };
 
-    // Add the paste summary to chat history
+    // Add the paste summary to chat history for immediate visual feedback
     setChatHistory((prev) => [...prev, userEntry]);
 
-    // Process the full pasted content with the AI
-    processUserMessage(pasteEvent.content);
+    // DON'T process the content - just show the summary
+    // The pasted content remains in the input field for user review
+    // When user presses Enter, it will be processed normally
   };
 
   const handleInputChange = (newInput: string) => {
@@ -342,6 +343,7 @@ export function useInputHandler({
     onSpecialKey: handleSpecialKey,
     onPasteDetected: handlePasteDetected,
     disabled: isConfirmationActive,
+    multiline: true, // Enable multiline mode to handle pasted content properly
   });
 
   // Hook up the actual input handling
@@ -2427,12 +2429,33 @@ Respond with ONLY the commit message, no additional text.`;
   };
 
   const processUserMessage = async (userInput: string) => {
-    const userEntry: ChatEntry = {
-      type: "user",
-      content: userInput,
-      timestamp: new Date(),
-    };
-    setChatHistory((prev) => [...prev, userEntry]);
+    // Check if this input should be displayed as a paste summary
+    const pasteService = getPasteDetectionService();
+    const shouldSummarize = pasteService.shouldSummarize(userInput);
+    
+    // Check if we already have a paste summary for this content in recent history
+    const recentEntry = chatHistory[chatHistory.length - 1];
+    const isAlreadyShowingPasteSummary = recentEntry && 
+      recentEntry.isPasteSummary && 
+      recentEntry.content === userInput;
+    
+    // Only add new chat entry if we haven't already shown the paste summary
+    if (!isAlreadyShowingPasteSummary) {
+      const userEntry: ChatEntry = {
+        type: "user",
+        content: userInput,
+        displayContent: shouldSummarize ? pasteService.createPasteSummary(userInput, pasteService.getCurrentCounter() + 1) : userInput,
+        timestamp: new Date(),
+        isPasteSummary: shouldSummarize,
+      };
+      
+      // Increment paste counter if this was a paste
+      if (shouldSummarize) {
+        pasteService.detectPaste("", userInput); // This will increment the counter
+      }
+      
+      setChatHistory((prev) => [...prev, userEntry]);
+    }
 
     setIsProcessing(true);
     clearInput();

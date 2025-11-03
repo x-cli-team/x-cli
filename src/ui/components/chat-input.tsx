@@ -17,9 +17,18 @@ export function ChatInput({
   const beforeCursor = input.slice(0, cursorPosition);
   // afterCursor removed - not used in single line mode
 
-  // Handle multiline input display
-  const lines = input.split("\n");
+  // Handle multiline input display - support different line endings
+  const lines = input.split(/\r\n|\r|\n/);
   const isMultiline = lines.length > 1;
+  
+  // Limit display to reasonable number of lines to prevent terminal overflow
+  const MAX_DISPLAY_LINES = 10;
+  const shouldTruncateDisplay = lines.length > MAX_DISPLAY_LINES;
+  
+  // Optional debug logging
+  if (shouldTruncateDisplay) {
+    console.log(`📄 Large paste detected: ${lines.length} lines, showing truncated view`);
+  }
 
   // Calculate cursor position across lines
   let currentLineIndex = 0;
@@ -48,43 +57,42 @@ export function ChatInput({
       <Box
         borderStyle="round"
         borderColor={borderColor}
+        paddingX={1}
         paddingY={0}
         marginTop={1}
+        flexDirection="column"
       >
-        {lines.map((line, index) => {
-          const isCurrentLine = index === currentLineIndex;
-          const promptChar = index === 0 ? "❯ " : "  "; // First line gets "❯ ", continuation lines get "  " to align
-
-          if (isCurrentLine) {
-            const beforeCursorInLine = line.slice(0, currentCharIndex);
-            const cursorChar =
-              line.slice(currentCharIndex, currentCharIndex + 1) || " ";
-            const afterCursorInLine = line.slice(currentCharIndex + 1);
-
-            return (
-              <Box key={index}>
-                <Text color={promptColor}>{promptChar}</Text>
-                <Text>
-                  {beforeCursorInLine}
-                  {showCursor && (
-                    <Text backgroundColor="white" color="black">
-                      {cursorChar}
-                    </Text>
-                  )}
-                  {!showCursor && cursorChar !== " " && cursorChar}
-                  {afterCursorInLine}
-                </Text>
-              </Box>
-            );
-          } else {
-            return (
-              <Box key={index}>
-                <Text color={promptColor}>{promptChar}</Text>
-                <Text>{line}</Text>
-              </Box>
-            );
-          }
-        })}
+        <Text>
+          {shouldTruncateDisplay ? (
+            // Show truncated view for very large pastes
+            `❯ [Large paste: ${lines.length} lines, ${input.length} chars]
+  First few lines:
+  ${lines.slice(0, 3).map(line => `  ${line}`).join('\n')}
+  ...
+  Last few lines:
+  ${lines.slice(-2).map(line => `  ${line}`).join('\n')}
+  
+  Press Enter to submit or edit to modify.`
+          ) : (
+            // Normal multiline display for reasonable sizes
+            lines.map((line, index) => {
+              const isCurrentLine = index === currentLineIndex;
+              const promptChar = index === 0 ? "❯ " : "  ";
+              
+              let lineText = promptChar + line;
+              
+              // Add cursor if this is the current line
+              if (isCurrentLine && showCursor) {
+                const cursorPos = promptChar.length + currentCharIndex;
+                lineText = lineText.slice(0, cursorPos) + 
+                          "█" + 
+                          lineText.slice(cursorPos + 1);
+              }
+              
+              return index === lines.length - 1 ? lineText : lineText + "\n";
+            }).join("")
+          )}
+        </Text>
       </Box>
     );
   }
