@@ -61,7 +61,8 @@ if (missingFolders.length > 0) {
 npx lint-staged --config package.json .agent/**/*.{md,mdx} && npx lint-staged --config package.json -- '*.{ts,js,md,mdx}' --ignore-path .gitignore || true
 
 # Sync .agent docs to public docs
-
+echo "📝 Checking for .agent documentation updates..."
+npm run update-agent-docs-auto 2>/dev/null || echo "📝 Documentation update skipped (not required)"
 
 # TODO: Add session learnings capture here
 # This could log agent interactions, learnings, or changes made during the session
