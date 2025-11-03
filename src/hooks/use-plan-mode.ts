@@ -19,6 +19,7 @@ import {
 import { CodebaseExplorer } from '../services/codebase-explorer.js';
 import { PlanGenerator } from '../services/plan-generator.js';
 import { ReadOnlyToolExecutor } from '../services/read-only-tool-executor.js';
+import { PlanApprovalManager, ApprovalResult } from '../services/plan-approval-manager.js';
 import { GrokAgent } from '../agent/grok-agent.js';
 
 // Default plan mode settings
@@ -58,6 +59,9 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
   );
   const [readOnlyExecutor] = useState(() => 
     agent ? new ReadOnlyToolExecutor(agent) : null
+  );
+  const [approvalManager] = useState(() => 
+    agent && planGenerator ? new PlanApprovalManager(agent, planGenerator) : null
   );
 
   // Emit events for state changes
@@ -226,7 +230,7 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
     }
   }, [codebaseExplorer, state.active, changePhase, updateExplorationData, mergedSettings, planGenerator]);
 
-  // Generate implementation plan
+  // Generate implementation plan with strategy options
   const generatePlan = useCallback(async (userRequest: string) => {
     if (!planGenerator || !state.explorationData) {
       console.warn('[PlanMode] Cannot generate plan: generator not available or no exploration data');
@@ -250,6 +254,27 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
       return false;
     }
   }, [planGenerator, state.explorationData, changePhase, setImplementationPlan]);
+
+  // Handle plan approval result
+  const handlePlanApproval = useCallback((result: ApprovalResult) => {
+    if (result.decision === 'approved') {
+      setState(prev => ({ ...prev, userApproval: true, phase: 'approved' }));
+      emitEvent('plan-approved', { plan: state.currentPlan!, timestamp: new Date() });
+    } else if (result.decision === 'rejected') {
+      setState(prev => ({ ...prev, userApproval: false, phase: 'rejected' }));
+      emitEvent('plan-rejected', { 
+        plan: state.currentPlan!, 
+        reason: result.feedback || 'User rejected plan', 
+        timestamp: new Date() 
+      });
+    }
+  }, [state.currentPlan, emitEvent]);
+
+  // Handle plan revision
+  const handlePlanRevision = useCallback((revisedPlan: ImplementationPlan) => {
+    setImplementationPlan(revisedPlan);
+    // Stay in presentation phase for revised plan review
+  }, [setImplementationPlan]);
 
   // Execute tool in read-only mode
   const executeReadOnlyTool = useCallback(async (toolName: string, args: any) => {
@@ -338,6 +363,10 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
     generatePlan,
     executeReadOnlyTool,
     
+    // Enhanced approval workflow
+    handlePlanApproval,
+    handlePlanRevision,
+    
     // Utilities
     onEvent,
     isInPhase,
@@ -347,6 +376,8 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
     currentPlan: state.currentPlan,
     
     // Service accessors
-    readOnlyExecutor
+    readOnlyExecutor,
+    approvalManager,
+    planGenerator
   };
 }

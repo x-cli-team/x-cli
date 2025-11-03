@@ -15,6 +15,26 @@ This release includes corrected logo assets and complete automated publishing pi
 
 # Grok One-Shot
 
+<div align="center">
+
+```bash
+┌─────────────────────────────────────────────────────────────────┐
+│                        🚀 Quick Start                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  # 1. Set your API key (secure local environment variable)     │
+│  export X_API_KEY="your_xai_api_key_here"                      │
+│                                                                 │
+│  # 2. Run instantly (no installation required!)               │
+│  npx @xagent/one-shot                                          │
+│                                                                 │
+│  🔐 Tip: Never commit API keys to git. Use local env vars!     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+</div>
+
 [![NPM Version](https://img.shields.io/npm/v/@xagent/one-shot?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/one-shot)
 [![GitHub Release](https://img.shields.io/github/v/release/x-cli-team/x-cli?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/x-cli/releases)
 [![Downloads](https://img.shields.io/npm/dm/@xagent/one-shot?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/one-shot)

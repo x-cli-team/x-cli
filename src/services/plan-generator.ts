@@ -43,6 +43,20 @@ interface PlanGenerationContext {
   keyComponents: string[];
 }
 
+interface StrategyOption {
+  id: string;
+  title: string;
+  approach: string;
+  pros: string[];
+  cons: string[];
+  riskLevel: 'low' | 'medium' | 'high';
+  effortEstimate: number;
+  complexity: number;
+  confidence: number;
+  recommended: boolean;
+  tradeoffs: string[];
+}
+
 export class PlanGenerator {
   constructor(private agent: GrokAgent) {}
 
@@ -102,17 +116,18 @@ export class PlanGenerator {
   }
 
   /**
-   * Generate high-level implementation strategy
+   * Generate multiple implementation strategies with trade-off analysis
    */
   private async generateImplementationStrategy(
     options: PlanGenerationOptions,
     context: PlanGenerationContext
   ): Promise<ImplementationStrategy> {
-    const strategyPrompt = this.buildStrategyPrompt(options, context);
+    const strategyPrompt = this.buildEnhancedStrategyPrompt(options, context);
     
-    // Use AI to generate strategy
+    // Use AI to generate multiple strategy options
     const strategyResponse = await this.generateWithAI(strategyPrompt);
     
+    // Extract the primary strategy (we can extend this to support multiple options)
     return {
       approach: this.extractApproach(strategyResponse, options.userRequest),
       principles: this.extractPrinciples(strategyResponse, context),
@@ -120,6 +135,15 @@ export class PlanGenerator {
       architectureDecisions: this.generateArchitectureDecisions(context, strategyResponse),
       integrationPoints: this.identifyIntegrationPoints(options.explorationData, strategyResponse)
     };
+  }
+
+  /**
+   * Generate multiple strategy options for user selection
+   */
+  async generateStrategyOptions(options: PlanGenerationOptions, context: PlanGenerationContext): Promise<StrategyOption[]> {
+    const optionsPrompt = this.buildStrategyOptionsPrompt(options, context);
+    const response = await this.generateWithAI(optionsPrompt);
+    return this.parseStrategyOptions(response, context);
   }
 
   /**
@@ -199,9 +223,9 @@ export class PlanGenerator {
   }
 
   /**
-   * Build strategy generation prompt
+   * Build enhanced strategy generation prompt
    */
-  private buildStrategyPrompt(options: PlanGenerationOptions, context: PlanGenerationContext): string {
+  private buildEnhancedStrategyPrompt(options: PlanGenerationOptions, context: PlanGenerationContext): string {
     return `
 As an expert software architect, analyze this implementation request and provide a comprehensive strategy.
 
@@ -228,6 +252,53 @@ Please provide:
 5. **Integration considerations** (how this fits with existing code)
 
 Focus on practical, actionable guidance that considers the existing codebase structure and patterns.
+
+**Enhanced Analysis Requirements:**
+- Consider integration challenges with existing architecture
+- Evaluate performance implications of different approaches
+- Assess maintainability and future extensibility
+- Include security considerations where relevant
+- Provide clear reasoning for recommendations
+`;
+  }
+
+  /**
+   * Build strategy options generation prompt
+   */
+  private buildStrategyOptionsPrompt(options: PlanGenerationOptions, context: PlanGenerationContext): string {
+    return `
+As an expert software architect, generate 2-3 alternative implementation strategies for this request:
+
+**User Request:** ${options.userRequest}
+
+**Project Context:**
+- Type: ${context.projectType}
+- Language: ${context.primaryLanguage}
+- Complexity: ${context.complexity}/10
+- Has Tests: ${context.hasTests}
+- Architecture Patterns: ${context.architecturePatterns.join(', ')}
+- Key Components: ${context.keyComponents.join(', ')}
+
+For EACH strategy option, provide:
+
+**Option 1: [Strategy Name]**
+- **Approach**: Brief description of the implementation approach
+- **Pros**: 3-4 advantages of this approach
+- **Cons**: 2-3 potential drawbacks or challenges
+- **Risk Level**: Low/Medium/High with brief justification
+- **Effort**: Estimated hours (be realistic)
+- **Complexity**: Implementation complexity 1-10
+- **Best For**: What scenarios this approach works best for
+
+**Option 2: [Strategy Name]**
+[Same format as Option 1]
+
+**Option 3: [Strategy Name]** (if applicable)
+[Same format as Option 1]
+
+**Recommendation**: Which option you recommend and why, considering the project context.
+
+Make each option distinctly different in approach (e.g., incremental vs. complete rewrite, different architectural patterns, etc.).
 `;
   }
 
@@ -671,6 +742,198 @@ Provide 8-15 steps total, balancing thoroughness with practicality.
         affectedFiles: [],
         acceptanceCriteria: ['Core functionality works correctly'],
         order: 3
+      }
+    ];
+  }
+
+  /**
+   * Parse strategy options from AI response
+   */
+  private parseStrategyOptions(response: string, context: PlanGenerationContext): StrategyOption[] {
+    const options: StrategyOption[] = [];
+    let optionCounter = 1;
+
+    // Look for option sections
+    const optionMatches = response.match(/\*\*Option\s+\d+:\s*([^*]+)\*\*([\s\S]*?)(?=\*\*Option\s+\d+:|$)/g);
+    
+    if (optionMatches) {
+      optionMatches.forEach((optionText, index) => {
+        const option = this.parseIndividualStrategyOption(optionText, `option_${optionCounter}`, context);
+        if (option) {
+          options.push(option);
+          optionCounter++;
+        }
+      });
+    }
+
+    // Add fallback options if parsing fails
+    if (options.length === 0) {
+      options.push(...this.generateFallbackStrategyOptions(context));
+    }
+
+    // Mark the first option as recommended if none are explicitly marked
+    if (options.length > 0 && !options.some(o => o.recommended)) {
+      options[0].recommended = true;
+    }
+
+    return options;
+  }
+
+  /**
+   * Parse individual strategy option
+   */
+  private parseIndividualStrategyOption(optionText: string, id: string, context: PlanGenerationContext): StrategyOption | null {
+    const titleMatch = optionText.match(/\*\*Option\s+\d+:\s*([^*]+)\*\*/);
+    if (!titleMatch) return null;
+
+    const title = titleMatch[1].trim();
+    const approach = this.extractFieldFromOption(optionText, 'Approach') || 'Standard implementation approach';
+    const pros = this.extractListFromOption(optionText, 'Pros');
+    const cons = this.extractListFromOption(optionText, 'Cons');
+    const riskLevel = this.extractRiskLevel(optionText);
+    const effort = this.extractEffortFromOption(optionText);
+    const complexity = this.extractComplexityFromOption(optionText, context);
+
+    return {
+      id,
+      title,
+      approach,
+      pros,
+      cons,
+      riskLevel,
+      effortEstimate: effort,
+      complexity,
+      confidence: this.calculateStrategyConfidence(pros, cons, riskLevel),
+      recommended: false, // Will be set later based on recommendation section
+      tradeoffs: this.generateTradeoffs(pros, cons)
+    };
+  }
+
+  /**
+   * Extract field value from strategy option text
+   */
+  private extractFieldFromOption(text: string, field: string): string {
+    const regex = new RegExp(`\\*\\*${field}\\*\\*:?\\s*([^\\n*]+)`, 'i');
+    const match = text.match(regex);
+    return match ? match[1].trim() : '';
+  }
+
+  /**
+   * Extract list items from strategy option text
+   */
+  private extractListFromOption(text: string, field: string): string[] {
+    const items: string[] = [];
+    const fieldRegex = new RegExp(`\\*\\*${field}\\*\\*:?\\s*([\\s\\S]*?)(?=\\*\\*[A-Za-z]+\\*\\*|$)`, 'i');
+    const fieldMatch = text.match(fieldRegex);
+    
+    if (fieldMatch) {
+      const lines = fieldMatch[1].split('\n');
+      for (const line of lines) {
+        const cleaned = line.trim().replace(/^[-*•]\s*/, '');
+        if (cleaned.length > 5) {
+          items.push(cleaned);
+        }
+      }
+    }
+
+    return items;
+  }
+
+  /**
+   * Extract risk level from strategy option text
+   */
+  private extractRiskLevel(text: string): 'low' | 'medium' | 'high' {
+    const riskText = this.extractFieldFromOption(text, 'Risk Level').toLowerCase();
+    if (riskText.includes('low')) return 'low';
+    if (riskText.includes('high')) return 'high';
+    return 'medium';
+  }
+
+  /**
+   * Extract effort estimate from strategy option text
+   */
+  private extractEffortFromOption(text: string): number {
+    const effortText = this.extractFieldFromOption(text, 'Effort');
+    const hours = effortText.match(/(\d+)\s*hours?/i);
+    return hours ? parseInt(hours[1]) : 8; // Default fallback
+  }
+
+  /**
+   * Extract complexity rating from strategy option text
+   */
+  private extractComplexityFromOption(text: string, context: PlanGenerationContext): number {
+    const complexityText = this.extractFieldFromOption(text, 'Complexity');
+    const rating = complexityText.match(/(\d+)/);
+    return rating ? parseInt(rating[1]) : context.complexity; // Use project complexity as fallback
+  }
+
+  /**
+   * Calculate confidence score for strategy
+   */
+  private calculateStrategyConfidence(pros: string[], cons: string[], riskLevel: 'low' | 'medium' | 'high'): number {
+    let confidence = 0.7; // Base confidence
+
+    // Adjust based on pros/cons ratio
+    if (pros.length > cons.length) confidence += 0.1;
+    if (cons.length > pros.length * 1.5) confidence -= 0.1;
+
+    // Adjust based on risk level
+    switch (riskLevel) {
+      case 'low': confidence += 0.1; break;
+      case 'high': confidence -= 0.2; break;
+    }
+
+    return Math.max(0.3, Math.min(0.95, confidence));
+  }
+
+  /**
+   * Generate tradeoffs from pros and cons
+   */
+  private generateTradeoffs(pros: string[], cons: string[]): string[] {
+    const tradeoffs: string[] = [];
+    
+    // Create balanced tradeoff statements
+    if (pros.length > 0 && cons.length > 0) {
+      tradeoffs.push(`Higher ${pros[0].toLowerCase()} but ${cons[0].toLowerCase()}`);
+    }
+    
+    if (pros.length > 1 && cons.length > 1) {
+      tradeoffs.push(`${pros[1]} vs. ${cons[1].toLowerCase()}`);
+    }
+
+    return tradeoffs;
+  }
+
+  /**
+   * Generate fallback strategy options
+   */
+  private generateFallbackStrategyOptions(context: PlanGenerationContext): StrategyOption[] {
+    return [
+      {
+        id: 'incremental',
+        title: 'Incremental Implementation',
+        approach: 'Build the feature incrementally with small, safe changes',
+        pros: ['Lower risk', 'Easier testing', 'Faster feedback'],
+        cons: ['Takes longer', 'May require more refactoring'],
+        riskLevel: 'low',
+        effortEstimate: 12,
+        complexity: Math.max(3, context.complexity - 2),
+        confidence: 0.8,
+        recommended: true,
+        tradeoffs: ['Safety vs. speed', 'Incremental progress vs. comprehensive solution']
+      },
+      {
+        id: 'comprehensive',
+        title: 'Comprehensive Solution',
+        approach: 'Implement a complete solution that addresses all requirements at once',
+        pros: ['Complete solution', 'Better architecture', 'More efficient'],
+        cons: ['Higher risk', 'Complex testing', 'Longer development'],
+        riskLevel: 'medium',
+        effortEstimate: 20,
+        complexity: Math.min(8, context.complexity + 1),
+        confidence: 0.6,
+        recommended: false,
+        tradeoffs: ['Completeness vs. complexity', 'Efficiency vs. risk']
       }
     ];
   }
