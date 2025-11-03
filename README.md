@@ -35,6 +35,31 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 - **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
 - **📚 [Releases](https://github.com/x-cli-team/x-cli/releases)** - Version history and changelogs
 
+## Featured In
+
+<!-- AUTO-GENERATED: DO NOT EDIT -->
+
+- **[superagent-ai/grok-cli](https://github.com/superagent-ai/grok-cli)** – Submitted via [Issue #XX](https://github.com/superagent-ai/grok-cli/issues/XX)  
+  ![submitted](https://img.shields.io/badge/status-submitted-blue?style=flat&logo=github)
+
+- **[RMNCLDYO/grok-ai-toolkit](https://github.com/RMNCLDYO/grok-ai-toolkit)** – Submitted via [Issue #XX](https://github.com/RMNCLDYO/grok-ai-toolkit/issues/XX)  
+  ![submitted](https://img.shields.io/badge/status-submitted-blue?style=flat&logo=github)
+
+- **[coldcanuk/grok-cli](https://github.com/coldcanuk/grok-cli)** – Submitted via [Issue #XX](https://github.com/coldcanuk/grok-cli/issues/XX)  
+  ![submitted](https://img.shields.io/badge/status-submitted-blue?style=flat&logo=github)
+
+- **[HyperCoherence/Grok4Git](https://github.com/HyperCoherence/Grok4Git)** – Submitted via [Issue #XX](https://github.com/HyperCoherence/Grok4Git/issues/XX)  
+  ![submitted](https://img.shields.io/badge/status-submitted-blue?style=flat&logo=github)
+
+- **[MustCodeAl/awesome-ai-cli](https://github.com/MustCodeAl/awesome-ai-cli)** – Submitted via [Issue #XX](https://github.com/MustCodeAl/awesome-ai-cli/issues/XX)  
+  ![submitted](https://img.shields.io/badge/status-submitted-blue?style=flat&logo=github)
+
+- **[xai-org/xai-cookbook](https://github.com/xai-org/xai-cookbook)** – Submitted via [Issue #XX](https://github.com/xai-org/xai-cookbook/issues/XX)  
+  ![submitted](https://img.shields.io/badge/status-submitted-blue?style=flat&logo=github)
+
+- **[milisp/awesome-grok](https://github.com/milisp/awesome-grok)** – **Merged!**  
+  ![featured](https://img.shields.io/badge/featured%20in-grok--one--shot-00d26a?style=flat&logo=github)
+
 ## 🆕 What's New in v1.0+
 
 ### 🎯 **P0: Plan Mode - Claude Code Parity** (Latest)
