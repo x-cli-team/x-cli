@@ -2,7 +2,7 @@
 
 ## 1.1.85 – Logo Assets & NPM Publication Complete
 
-✅ **Live on NPM**: [@xagent/x-cli](https://www.npmjs.com/package/@xagent/x-cli) - Fully published and ready for global installation
+✅ **Live on NPM**: [one-shot](https://www.npmjs.com/package/one-shot) - Fully published and ready for global installation
 
 This release includes corrected logo assets and complete automated publishing pipeline.
 
@@ -15,9 +15,9 @@ This release includes corrected logo assets and complete automated publishing pi
 
 # X CLI
 
-[![NPM Version](https://img.shields.io/npm/v/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
+[![NPM Version](https://img.shields.io/npm/v/one-shot?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/one-shot)
 [![GitHub Release](https://img.shields.io/github/v/release/x-cli-team/x-cli?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/x-cli/releases)
-[![Downloads](https://img.shields.io/npm/dm/@xagent/x-cli?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/x-cli)
+[![Downloads](https://img.shields.io/npm/dm/one-shot?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/one-shot)
 [![License](https://img.shields.io/github/license/x-cli-team/x-cli?style=for-the-badge&color=green)](https://github.com/x-cli-team/x-cli/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-xAI_Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/channels/1315720379607679066/1315822328139223064)
 
@@ -29,7 +29,7 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 
 ## 🔗 Quick Links
 
-- **📦 [NPM Package](https://www.npmjs.com/package/@xagent/x-cli)** - Install globally with `npm install -g @xagent/x-cli`
+- **📦 [NPM Package](https://www.npmjs.com/package/one-shot)** - Install globally with `npm install -g one-shot`
 - **🐙 [GitHub Repository](https://github.com/x-cli-team/x-cli)** - Source code, issues, and contributions
 - **🎯 [Competitive Parity Analysis](./.agent/parity/)** - Strategic analysis vs Claude Code, Cursor IDE, and OpenAI Codex
 - **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
@@ -164,7 +164,7 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 
 ### 🌍 **Installation & Setup**
 
-- **📦 Global Installation**: Install anywhere with `npm install -g @xagent/x-cli`
+- **📦 Global Installation**: Install anywhere with `npm install -g one-shot`
 - **⚙️ Flexible Configuration**: Environment variables, user settings, or project-specific configs
 - **🔄 CI/CD Ready**: Headless mode perfect for automation and scripting
 
@@ -183,7 +183,7 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 ┌────────────────────────────────────┐
 │ 🚀 One-Command Start │
 ├────────────────────────────────────┤
-│ npx -y @xagent/x-cli@latest │
+│ npx -y one-shot@latest │
 ├────────────────────────────────────┤
 │ Always latest version • Zero setup │
 └────────────────────────────────────┘
@@ -193,7 +193,7 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 **Option 1: Run without installing (Recommended)**
 
 ```bash
-npx -y @xagent/x-cli@latest
+npx -y one-shot@latest
 ```
 
 _Always gets the latest version, no local installation needed_
@@ -201,20 +201,20 @@ _Always gets the latest version, no local installation needed_
 **Option 2: Global installation**
 
 ```bash
-npm install -g @xagent/x-cli@latest
+npm install -g one-shot@latest
 ```
 
 **Option 3: Alternative package managers**
 
 ```bash
 # Using Yarn
-yarn global add @xagent/x-cli@latest
+yarn global add one-shot@latest
 
 # Using pnpm
-pnpm add -g @xagent/x-cli@latest
+pnpm add -g one-shot@latest
 
 # Using bun
-bun add -g @xagent/x-cli@latest
+bun add -g one-shot@latest
 ```
 
 ### 🛠️ PATH Setup (If `xcli` command not found)
@@ -253,13 +253,13 @@ which xcli      # Should show installation path
 **Try without installing:**
 
 ```bash
-X_API_KEY=your_api_key_here npx -y @xagent/x-cli@latest --help
+X_API_KEY=your_api_key_here npx -y one-shot@latest --help
 ```
 
 **Or install globally:**
 
 ```bash
-npm install -g @xagent/x-cli@latest && \
+npm install -g one-shot@latest && \
 echo 'export X_API_KEY=your_api_key_here' >> ~/.zshrc && \
 source ~/.zshrc && \
 xcli --help
@@ -448,7 +448,7 @@ The **`.agent` folder** is the most powerful feature of X CLI, enabling **self-d
 
 ### 🏗️ **How It Works**
 
-When you run `npx -y @xagent/x-cli@latest`, the CLI automatically detects and reads `.agent/` documentation:
+When you run `npx -y one-shot@latest`, the CLI automatically detects and reads `.agent/` documentation:
 
 1. **Auto-Discovery**: Scans for `.agent/` folder in current directory
 2. **Configuration Loading**: Reads `.xcli/auto-read-config.json` (distributed) or `.agent/auto-read-config.json` (project override)
@@ -850,7 +850,7 @@ Every push to the `main` branch automatically:
 1. **🔄 Bumps version** (patch increment: 1.0.X → 1.0.X+1)
 2. **📝 Updates README** with new version number
 3. **🏗️ Builds the project** with fresh dependencies
-4. **📦 Publishes to NPM** at https://www.npmjs.com/package/@xagent/x-cli
+4. **📦 Publishes to NPM** at https://www.npmjs.com/package/one-shot
 5. **🏷️ Creates git tag** (e.g., `v1.0.87`)
 
 **⏱️ Timeline**: ~3-5 minutes from push to NPM availability
@@ -911,7 +911,7 @@ npm run smart-push
 
 ```json
 {
-  "name": "@xagent/x-cli", // ⚠️ NEVER change - breaks publishing
+  "name": "one-shot", // ⚠️ NEVER change - breaks publishing
   "publishConfig": {
     "access": "public" // ⚠️ Must NOT include registry override
   }
@@ -946,7 +946,7 @@ git push origin main --follow-tags
 ### 📊 Monitoring
 
 - **GitHub Actions**: https://github.com/x-cli-team/x-cli/actions
-- **NPM Package**: https://www.npmjs.com/package/@xagent/x-cli
+- **NPM Package**: https://www.npmjs.com/package/one-shot
 - **Release History**: Check git tags or NPM version history
 
 ### 🛠️ Troubleshooting
@@ -995,7 +995,7 @@ This project is based on [xcli-cli](https://github.com/superagent-ai/xcli-cli) b
 
 ```bash
 # Check if xcli is installed
-npm list -g @xagent/x-cli
+npm list -g one-shot
 
 # If installed but not in PATH, add npm global bin to PATH:
 echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
@@ -1009,7 +1009,7 @@ xcli --version
 
 ```bash
 # Option 1: Use npx (no installation needed)
-npx @xagent/x-cli@latest
+npx one-shot@latest
 
 # Option 2: Fix npm permissions (macOS/Linux)
 sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}
@@ -1026,8 +1026,8 @@ source ~/.zshrc
 ```bash
 # Clear npm cache and reinstall
 npm cache clean --force
-npm uninstall -g @xagent/x-cli
-npm install -g @xagent/x-cli@latest
+npm uninstall -g one-shot
+npm install -g one-shot@latest
 ```
 
 **🚨 Outdated version**
@@ -1035,10 +1035,10 @@ npm install -g @xagent/x-cli@latest
 ```bash
 # Check current version
 xcli --version
-npm view @xagent/x-cli version
+npm view one-shot version
 
 # Update to latest
-npm update -g @xagent/x-cli@latest
+npm update -g one-shot@latest
 ```
 
 ### Tool Execution Errors
@@ -1095,7 +1095,7 @@ This project is built upon the excellent foundation of the original [X-CLI](http
 
 X CLI extends the original with advanced file operations, enhanced tool systems, and comprehensive automation while maintaining the core vision of bringing AI-powered terminal intelligence to developers.
 
-**🚀 Now live on NPM**: Install globally with `npm install -g @xagent/x-cli` and start using `xcli` immediately!
+**🚀 Now live on NPM**: Install globally with `npm install -g one-shot` and start using `xcli` immediately!
 
 ## 👥 Contributors
 

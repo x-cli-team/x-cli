@@ -5,7 +5,7 @@
 #
 # DO NOT MODIFY without understanding the full dependency chain:
 # - GitHub Secrets: PAT_TOKEN, NPM_TOKEN (required)
-# - Package name: "@xagent/x-cli" (NEVER change)
+# - Package name: "one-shot"
 # - Git hooks: .husky/pre-commit + scripts/check-version.cjs
 # - NPM authentication: Direct .npmrc creation (not npm config)
 # - Dependency management: Clean install to avoid Rollup cache issues
@@ -218,9 +218,9 @@ jobs:
 
             ### Installation
             ```bash
-            npm install -g @xagent/x-cli@${{ env.NEW_VER }}
+            npm install -g one-shot@${{ env.NEW_VER }}
             # or
-            npx @xagent/x-cli@${{ env.NEW_VER }}
+            npx one-shot@${{ env.NEW_VER }}
             ```
 
             ### What's New
@@ -241,8 +241,8 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
-          echo "✅ Published @xagent/x-cli v${NEW_VER} to:"
-          echo "  📦 NPM: https://www.npmjs.com/package/@xagent/x-cli"
+          echo "✅ Published one-shot v${NEW_VER} to:"
+          echo "  📦 NPM: https://www.npmjs.com/package/one-shot"
           echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"
 
 # Test commit to verify branch protection bypass works
