@@ -123,33 +123,33 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public --dry-run
 
-      - name: Publish to npm (primary package: one-shot)
+      - name: Publish to npm (primary package one-shot)
         if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish to npm (legacy package: @xagent/x-cli)
+      - name: Publish to npm (legacy package @xagent/x-cli)
         if: steps.should-release.outputs.should_release == 'true'
         run: |
           echo "📦 Publishing legacy package @xagent/x-cli for backwards compatibility..."
-          
+
           # Backup current package.json
           cp package.json package.json.primary
-          
+
           # Use legacy package.json
           cp package-legacy.json package.json
-          
+
           # Update version to match current version
           NEW_VER=$(node -pe "require('./package.json.primary').version")
           sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VER\"/" package.json
-          
+
           echo "Publishing @xagent/x-cli@$NEW_VER..."
           npm publish --access public
-          
+
           # Restore primary package.json
           mv package.json.primary package.json
-          
+
           echo "✅ Successfully published both packages:"
           echo "  📦 one-shot@$NEW_VER (primary)"
           echo "  📦 @xagent/x-cli@$NEW_VER (legacy)"
@@ -160,13 +160,13 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          
+
           # Array of packages to verify
           PACKAGES=("one-shot" "@xagent/x-cli")
-          
+
           echo "🔍 Verifying publication of both packages at version $PACKAGE_VERSION..."
           sleep 10
-          
+
           # Verify each package
           for PACKAGE_NAME in "${PACKAGES[@]}"; do
             echo "📦 Verifying $PACKAGE_NAME..."
@@ -199,7 +199,7 @@ jobs:
               fi
             done
           done
-          
+
           echo ""
           echo "🎉 Successfully verified both packages:"
           echo "  📦 one-shot@$PACKAGE_VERSION (primary)"
@@ -260,7 +260,7 @@ jobs:
             npm install -g one-shot@${{ env.NEW_VER }}
             # or
             npx one-shot@${{ env.NEW_VER }}
-            
+
             # Legacy package (for backwards compatibility)
             npm install -g @xagent/x-cli@${{ env.NEW_VER }}
             # or  
