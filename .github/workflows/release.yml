@@ -123,49 +123,87 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public --dry-run
 
-      - name: Publish to npm
+      - name: Publish to npm (primary package: one-shot)
         if: steps.should-release.outputs.should_release == 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Verify NPM publication
+      - name: Publish to npm (legacy package: @xagent/x-cli)
         if: steps.should-release.outputs.should_release == 'true'
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          echo "📦 Publishing legacy package @xagent/x-cli for backwards compatibility..."
+          
+          # Backup current package.json
+          cp package.json package.json.primary
+          
+          # Use legacy package.json
+          cp package-legacy.json package.json
+          
+          # Update version to match current version
+          NEW_VER=$(node -pe "require('./package.json.primary').version")
+          sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VER\"/" package.json
+          
+          echo "Publishing @xagent/x-cli@$NEW_VER..."
+          npm publish --access public
+          
+          # Restore primary package.json
+          mv package.json.primary package.json
+          
+          echo "✅ Successfully published both packages:"
+          echo "  📦 one-shot@$NEW_VER (primary)"
+          echo "  📦 @xagent/x-cli@$NEW_VER (legacy)"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify NPM publication (both packages)
+        if: steps.should-release.outputs.should_release == 'true'
+        run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "🔍 Verifying publication of $PACKAGE_NAME@$PACKAGE_VERSION..."
-
-          # Wait for NPM registry to update
+          
+          # Array of packages to verify
+          PACKAGES=("one-shot" "@xagent/x-cli")
+          
+          echo "🔍 Verifying publication of both packages at version $PACKAGE_VERSION..."
           sleep 10
-
-          # Retry verification up to 3 times
-          for i in {1..3}; do
-            if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version >/dev/null 2>&1; then
-              echo "✅ Successfully verified $PACKAGE_NAME@$PACKAGE_VERSION on NPM registry"
-              
-              # Additional verification: check publishConfig
-              PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version 2>/dev/null)
-              if [ "$PUBLISHED_VERSION" = "$PACKAGE_VERSION" ]; then
-                echo "✅ Version match confirmed: $PUBLISHED_VERSION"
-                echo "🔗 Package URL: https://www.npmjs.com/package/$PACKAGE_NAME/v/$PACKAGE_VERSION"
+          
+          # Verify each package
+          for PACKAGE_NAME in "${PACKAGES[@]}"; do
+            echo "📦 Verifying $PACKAGE_NAME..."
+            
+            # Retry verification up to 3 times per package
+            for i in {1..3}; do
+              if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version >/dev/null 2>&1; then
+                echo "✅ Successfully verified $PACKAGE_NAME@$PACKAGE_VERSION on NPM registry"
+                
+                # Additional verification: check publishConfig
+                PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version 2>/dev/null)
+                if [ "$PUBLISHED_VERSION" = "$PACKAGE_VERSION" ]; then
+                  echo "✅ Version match confirmed: $PUBLISHED_VERSION"
+                  echo "🔗 Package URL: https://www.npmjs.com/package/$PACKAGE_NAME/v/$PACKAGE_VERSION"
+                else
+                  echo "⚠️ Version mismatch: expected $PACKAGE_VERSION, got $PUBLISHED_VERSION"
+                  exit 1
+                fi
+                
+                break
               else
-                echo "⚠️ Version mismatch: expected $PACKAGE_VERSION, got $PUBLISHED_VERSION"
-                exit 1
+                echo "⏳ Attempt $i for $PACKAGE_NAME: Package not yet available, waiting 15 seconds..."
+                sleep 15
+                
+                if [ $i -eq 3 ]; then
+                  echo "❌ Failed to verify $PACKAGE_NAME publication after 3 attempts"
+                  echo "💡 Manual check: npm view $PACKAGE_NAME@$PACKAGE_VERSION"
+                  exit 1
+                fi
               fi
-              
-              break
-            else
-              echo "⏳ Attempt $i: Package not yet available, waiting 15 seconds..."
-              sleep 15
-              
-              if [ $i -eq 3 ]; then
-                echo "❌ Failed to verify package publication after 3 attempts"
-                echo "💡 Manual check: npm view $PACKAGE_NAME@$PACKAGE_VERSION"
-                exit 1
-              fi
-            fi
+            done
           done
+          
+          echo ""
+          echo "🎉 Successfully verified both packages:"
+          echo "  📦 one-shot@$PACKAGE_VERSION (primary)"
+          echo "  📦 @xagent/x-cli@$PACKAGE_VERSION (legacy)"
 
       # ---------- Publish to GitHub Packages ----------
       - name: Create scoped package.json for GitHub Packages
@@ -218,9 +256,15 @@ jobs:
 
             ### Installation
             ```bash
+            # Primary package (recommended)
             npm install -g one-shot@${{ env.NEW_VER }}
             # or
             npx one-shot@${{ env.NEW_VER }}
+            
+            # Legacy package (for backwards compatibility)
+            npm install -g @xagent/x-cli@${{ env.NEW_VER }}
+            # or  
+            npx @xagent/x-cli@${{ env.NEW_VER }}
             ```
 
             ### What's New
@@ -241,8 +285,9 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
-          echo "✅ Published one-shot v${NEW_VER} to:"
-          echo "  📦 NPM: https://www.npmjs.com/package/one-shot"
+          echo "✅ Published both packages v${NEW_VER} to:"
+          echo "  📦 NPM (primary): https://www.npmjs.com/package/one-shot"
+          echo "  📦 NPM (legacy): https://www.npmjs.com/package/@xagent/x-cli"
           echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"
 
 # Test commit to verify branch protection bypass works

@@ -249,64 +249,99 @@ if [ $PUSH_EXIT_CODE -eq 0 ] || echo "$PUSH_OUTPUT" | grep -q "Everything up-to-
 
     # Step 5: Verify NPM package publication (for main branch)
     if [ "$BRANCH" = "main" ]; then
-        echo "📦 Verifying NPM package publication..."
+        echo "📦 Verifying NPM package publication (both packages)..."
         
         # Get current version from package.json
         CURRENT_VERSION=$(node -pe "require('./package.json').version")
-        PACKAGE_NAME=$(node -pe "require('./package.json').name")
+        PRIMARY_PACKAGE=$(node -pe "require('./package.json').name")
+        LEGACY_PACKAGE="@xagent/x-cli"
         
-        echo "🔍 Checking for $PACKAGE_NAME@$CURRENT_VERSION..."
+        echo "🔍 Checking both packages at version $CURRENT_VERSION..."
+        echo "  📦 Primary: $PRIMARY_PACKAGE"
+        echo "  📦 Legacy: $LEGACY_PACKAGE"
         
-        # NPM verification with spinner and retry logic
-        verification_success=false
+        # NPM verification with spinner and retry logic for both packages
+        primary_success=false
+        legacy_success=false
         max_attempts=6
         
-        for attempt in $(seq 1 $max_attempts); do
-            if [ $attempt -eq 1 ]; then
-                printf "⏳ Waiting for NPM registry propagation"
-                # Initial wait in background
-                (sleep 5) &
-                show_spinner $! "⏳ Waiting for NPM registry propagation"
-                echo "✓ Initial wait complete"
-            fi
+        # Initial wait for registry propagation
+        printf "⏳ Waiting for NPM registry propagation"
+        (sleep 5) &
+        show_spinner $! "⏳ Waiting for NPM registry propagation"
+        echo "✓ Initial wait complete"
+        
+        # Verify both packages
+        for PACKAGE_NAME in "$PRIMARY_PACKAGE" "$LEGACY_PACKAGE"; do
+            echo ""
+            echo "🔍 Verifying $PACKAGE_NAME..."
             
-            printf "🔎 Attempt $attempt/$max_attempts: Checking NPM registry"
-            
-            # Check NPM in background to show spinner
-            (npm view "$PACKAGE_NAME@$CURRENT_VERSION" version >/dev/null 2>&1) &
-            npm_check_pid=$!
-            show_spinner $npm_check_pid "🔎 Attempt $attempt/$max_attempts: Checking NPM registry"
-            
-            # Wait for the background process to complete
-            wait $npm_check_pid
-            npm_check_result=$?
-            
-            if [ $npm_check_result -eq 0 ]; then
-                echo "✅ NPM package $PACKAGE_NAME@$CURRENT_VERSION verified on registry!"
-                echo "🔗 Package URL: https://www.npmjs.com/package/$PACKAGE_NAME/v/$CURRENT_VERSION"
-                echo "📋 Install command: npm install -g $PACKAGE_NAME@$CURRENT_VERSION"
-                verification_success=true
-                break
-            else
-                if [ $attempt -lt $max_attempts ]; then
-                    echo "❌ Not available yet, waiting 10 seconds..."
-                    printf "⏳ Waiting"
-                    (sleep 10) &
-                    show_spinner $! "⏳ Waiting"
-                    echo ""
+            for attempt in $(seq 1 $max_attempts); do
+                printf "🔎 Attempt $attempt/$max_attempts: Checking $PACKAGE_NAME"
+                
+                # Check NPM in background to show spinner
+                (npm view "$PACKAGE_NAME@$CURRENT_VERSION" version >/dev/null 2>&1) &
+                npm_check_pid=$!
+                show_spinner $npm_check_pid "🔎 Attempt $attempt/$max_attempts: Checking $PACKAGE_NAME"
+                
+                # Wait for the background process to complete
+                wait $npm_check_pid
+                npm_check_result=$?
+                
+                if [ $npm_check_result -eq 0 ]; then
+                    echo "✅ NPM package $PACKAGE_NAME@$CURRENT_VERSION verified on registry!"
+                    echo "🔗 Package URL: https://www.npmjs.com/package/$PACKAGE_NAME/v/$CURRENT_VERSION"
+                    echo "📋 Install command: npm install -g $PACKAGE_NAME@$CURRENT_VERSION"
+                    
+                    # Mark success for the respective package
+                    if [ "$PACKAGE_NAME" = "$PRIMARY_PACKAGE" ]; then
+                        primary_success=true
+                    else
+                        legacy_success=true
+                    fi
+                    break
                 else
-                    echo "❌ Package not available after $max_attempts attempts"
-                    echo "💡 This is normal - NPM can take 5-15 minutes to propagate"
-                    echo "💡 Manual check: npm view $PACKAGE_NAME@$CURRENT_VERSION"
-                    echo "💡 Monitor: https://www.npmjs.com/package/$PACKAGE_NAME"
+                    if [ $attempt -lt $max_attempts ]; then
+                        echo "❌ Not available yet, waiting 10 seconds..."
+                        printf "⏳ Waiting"
+                        (sleep 10) &
+                        show_spinner $! "⏳ Waiting"
+                        echo ""
+                    else
+                        echo "❌ Package $PACKAGE_NAME not available after $max_attempts attempts"
+                        echo "💡 This is normal - NPM can take 5-15 minutes to propagate"
+                        echo "💡 Manual check: npm view $PACKAGE_NAME@$CURRENT_VERSION"
+                        echo "💡 Monitor: https://www.npmjs.com/package/$PACKAGE_NAME"
+                    fi
                 fi
-            fi
+            done
         done
         
-        if [ "$verification_success" = true ]; then
-            echo "🎊 NPM verification completed successfully!"
+        # Overall verification status
+        if [ "$primary_success" = true ] && [ "$legacy_success" = true ]; then
+            verification_success=true
         else
+            verification_success=false
+        fi
+        
+        if [ "$verification_success" = true ]; then
+            echo ""
+            echo "🎊 NPM verification completed successfully for both packages!"
+            echo "  ✅ $PRIMARY_PACKAGE@$CURRENT_VERSION"
+            echo "  ✅ $LEGACY_PACKAGE@$CURRENT_VERSION"
+        else
+            echo ""
             echo "⚠️  NPM verification incomplete (but push was successful)"
+            if [ "$primary_success" = true ]; then
+                echo "  ✅ $PRIMARY_PACKAGE@$CURRENT_VERSION verified"
+            else
+                echo "  ⏳ $PRIMARY_PACKAGE@$CURRENT_VERSION pending"
+            fi
+            if [ "$legacy_success" = true ]; then
+                echo "  ✅ $LEGACY_PACKAGE@$CURRENT_VERSION verified"
+            else
+                echo "  ⏳ $LEGACY_PACKAGE@$CURRENT_VERSION pending"
+            fi
         fi
     fi
     
@@ -319,9 +354,9 @@ if [ $PUSH_EXIT_CODE -eq 0 ] || echo "$PUSH_OUTPUT" | grep -q "Everything up-to-
     if [ "$BRANCH" = "main" ]; then
         echo "   ✓ GitHub Actions monitoring completed"
         if [ "$verification_success" = true ]; then
-            echo "   ✓ NPM package verification successful"
+            echo "   ✓ NPM packages verification successful (both packages)"
         else
-            echo "   ⏳ NPM package verification pending"
+            echo "   ⏳ NPM packages verification pending"
         fi
         echo "📊 Monitor: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
     fi
