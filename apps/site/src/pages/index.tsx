@@ -326,7 +326,7 @@ function Footer() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>Copyright © 2025 Grok One-Shot. Based on <a href="https://github.com/x-cli-team/x-cli">x-cli-team</a> by <a href="https://github.com/homanp">Ismail Pelaseyed</a>.</p>
+          <p>Copyright © 2025 Grok One-Shot.</p>
         </div>
       </div>
     </footer>
