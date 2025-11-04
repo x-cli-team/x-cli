@@ -188,9 +188,10 @@ try {
           printWelcomeBanner(options.quiet);
         }
 
+        const initialMessage = Array.isArray(message) ? message.join(" ") : (message || "");
         const app = render(React.createElement(ChatInterface, { 
           agent, 
-          initialMessage: Array.isArray(message) ? message.join(" ") : (message || ""),
+          initialMessage,
           quiet: options.quiet,
           contextStatus: statusMessage 
         }));

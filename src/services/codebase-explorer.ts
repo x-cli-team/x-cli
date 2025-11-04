@@ -1,13 +1,14 @@
 /**
  * Codebase Explorer Service
  * 
- * Provides comprehensive codebase analysis capabilities for Plan Mode.
+ * Provides comprehensive codebase analysis capabilities with incremental indexing.
  * Safely explores project structure, dependencies, and patterns without
- * making any modifications.
+ * making any modifications. Enhanced with change detection for efficient updates.
  */
 
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
 import { 
   ExplorationData, 
   ProjectStructure, 
@@ -33,6 +34,10 @@ interface ExplorationOptions {
   ignorePatterns?: string[];
   /** Focus on specific paths */
   focusPaths?: string[];
+  /** Enable incremental indexing */
+  incremental?: boolean;
+  /** Force complete reindexing */
+  forceReindex?: boolean;
 }
 
 interface FileInfo {
@@ -42,6 +47,8 @@ interface FileInfo {
   extension: string;
   isDirectory: boolean;
   relativePath: string;
+  lastModified?: number;
+  checksum?: string;
 }
 
 interface LanguageStats {
@@ -52,7 +59,18 @@ interface LanguageStats {
   };
 }
 
+interface IndexCache {
+  files: Map<string, FileInfo>;
+  lastIndexed: number;
+  explorationData?: ExplorationData;
+}
+
 export class CodebaseExplorer {
+  private indexCache: IndexCache = {
+    files: new Map(),
+    lastIndexed: 0
+  };
+
   private readonly defaultIgnorePatterns = [
     'node_modules',
     '.git',
@@ -128,48 +146,86 @@ export class CodebaseExplorer {
   constructor(private settings: PlanModeSettings) {}
 
   /**
-   * Explore the codebase and gather comprehensive analysis data
+   * Explore the codebase with incremental indexing support
    */
   async exploreCodebase(options: ExplorationOptions): Promise<ExplorationData> {
     const startTime = Date.now();
-    const exploredPaths: string[] = [];
     
     try {
-      // Collect file system information
-      const files = await this.scanDirectory(options.rootPath, options);
-      exploredPaths.push(...files.map(f => f.path));
+      // Check if we can use incremental indexing
+      const useIncremental = options.incremental && !options.forceReindex && this.hasValidCache();
+      
+      let files: FileInfo[];
+      let changedFiles: FileInfo[] = [];
+      
+      if (useIncremental) {
+        console.log(`[CodebaseExplorer] Using incremental indexing`);
+        const changes = await this.detectChanges(options.rootPath, options);
+        files = Array.from(this.indexCache.files.values());
+        changedFiles = changes.changedFiles;
+        
+        // Update cache with changes
+        this.updateCacheWithChanges(changes);
+        
+        // If too many changes, fallback to full scan
+        if (changedFiles.length > files.length * 0.3) {
+          console.log(`[CodebaseExplorer] Too many changes (${changedFiles.length}), performing full scan`);
+          files = await this.scanDirectory(options.rootPath, options);
+          this.updateCache(files);
+        }
+      } else {
+        console.log(`[CodebaseExplorer] Performing full codebase scan`);
+        files = await this.scanDirectory(options.rootPath, options);
+        this.updateCache(files);
+      }
 
-      // Analyze project structure
-      const projectStructure = await this.analyzeProjectStructure(options.rootPath, files);
-      
-      // Build component map
-      const componentMap = await this.buildComponentMap(files);
-      
-      // Analyze dependencies
-      const dependencies = await this.analyzeDependencies(files);
-      
-      // Calculate complexity metrics
-      const complexity = await this.calculateComplexityMetrics(files);
-      
-      // Detect architecture patterns
-      const architecturePatterns = await this.detectArchitecturePatterns(files, projectStructure);
-      
-      // Generate insights
-      const insights = await this.generateInsights(files, projectStructure, complexity);
+      const exploredPaths = files.map(f => f.path);
 
-      const explorationData: ExplorationData = {
-        exploredPaths,
-        projectStructure,
-        keyComponents: componentMap,
-        dependencies,
-        complexity,
-        architecturePatterns,
-        insights
-      };
+      // Only re-analyze if we have significant changes or no cached data
+      let explorationData: ExplorationData;
+      
+      if (!useIncremental || changedFiles.length > 0 || !this.indexCache.explorationData) {
+        console.log(`[CodebaseExplorer] Analyzing ${useIncremental ? changedFiles.length : files.length} files`);
+        
+        // Analyze project structure
+        const projectStructure = await this.analyzeProjectStructure(options.rootPath, files);
+        
+        // Build component map
+        const componentMap = await this.buildComponentMap(files);
+        
+        // Analyze dependencies
+        const dependencies = await this.analyzeDependencies(files);
+        
+        // Calculate complexity metrics
+        const complexity = await this.calculateComplexityMetrics(files);
+        
+        // Detect architecture patterns
+        const architecturePatterns = await this.detectArchitecturePatterns(files, projectStructure);
+        
+        // Generate insights
+        const insights = await this.generateInsights(files, projectStructure, complexity);
+
+        explorationData = {
+          exploredPaths,
+          projectStructure,
+          keyComponents: componentMap,
+          dependencies,
+          complexity,
+          architecturePatterns,
+          insights
+        };
+        
+        // Cache the results
+        this.indexCache.explorationData = explorationData;
+      } else {
+        console.log(`[CodebaseExplorer] Using cached exploration data`);
+        explorationData = this.indexCache.explorationData;
+        explorationData.exploredPaths = exploredPaths; // Update paths
+      }
 
       const duration = Date.now() - startTime;
       console.log(`[CodebaseExplorer] Exploration completed in ${duration}ms`);
-      console.log(`[CodebaseExplorer] Analyzed ${files.length} files across ${exploredPaths.length} paths`);
+      console.log(`[CodebaseExplorer] Analyzed ${files.length} files (${changedFiles.length} changed)`);
 
       return explorationData;
     } catch (error) {
@@ -211,7 +267,9 @@ export class CodebaseExplorer {
           size: 0,
           extension: path.extname(entry.name),
           isDirectory: entry.isDirectory(),
-          relativePath
+          relativePath,
+          lastModified: 0,
+          checksum: undefined
         };
 
         if (entry.isDirectory()) {
@@ -224,10 +282,16 @@ export class CodebaseExplorer {
           try {
             const stats = await fs.stat(fullPath);
             fileInfo.size = stats.size;
+            fileInfo.lastModified = stats.mtimeMs;
             
             // Skip files that are too large
             if (fileInfo.size > this.settings.maxFileSize) {
               continue;
+            }
+            
+            // Calculate checksum for source files for change detection
+            if (this.isSourceFile(fileInfo)) {
+              fileInfo.checksum = await this.calculateFileChecksum(fullPath);
             }
             
             files.push(fileInfo);
@@ -713,5 +777,143 @@ export class CodebaseExplorer {
     }
     
     return importance;
+  }
+
+  // Incremental indexing methods
+
+  /**
+   * Check if we have a valid cache for incremental updates
+   */
+  private hasValidCache(): boolean {
+    return this.indexCache.files.size > 0 && 
+           this.indexCache.lastIndexed > 0 &&
+           (Date.now() - this.indexCache.lastIndexed) < 24 * 60 * 60 * 1000; // 24 hours
+  }
+
+  /**
+   * Update cache with new file information
+   */
+  private updateCache(files: FileInfo[]): void {
+    this.indexCache.files.clear();
+    for (const file of files) {
+      this.indexCache.files.set(file.relativePath, file);
+    }
+    this.indexCache.lastIndexed = Date.now();
+  }
+
+  /**
+   * Detect changes since last indexing
+   */
+  private async detectChanges(rootPath: string, options: ExplorationOptions): Promise<{
+    changedFiles: FileInfo[];
+    addedFiles: FileInfo[];
+    removedFiles: string[];
+  }> {
+    const currentFiles = await this.scanDirectory(rootPath, options);
+    const cachedFiles = this.indexCache.files;
+    
+    const changedFiles: FileInfo[] = [];
+    const addedFiles: FileInfo[] = [];
+    const removedFiles: string[] = [];
+
+    // Check for new and changed files
+    for (const file of currentFiles) {
+      const cached = cachedFiles.get(file.relativePath);
+      
+      if (!cached) {
+        addedFiles.push(file);
+      } else if (this.hasFileChanged(file, cached)) {
+        changedFiles.push(file);
+      }
+    }
+
+    // Check for removed files
+    for (const [relativePath] of cachedFiles) {
+      if (!currentFiles.some(f => f.relativePath === relativePath)) {
+        removedFiles.push(relativePath);
+      }
+    }
+
+    console.log(`[CodebaseExplorer] Change detection: ${addedFiles.length} added, ${changedFiles.length} changed, ${removedFiles.length} removed`);
+
+    return {
+      changedFiles: [...changedFiles, ...addedFiles],
+      addedFiles,
+      removedFiles
+    };
+  }
+
+  /**
+   * Check if a file has changed since last indexing
+   */
+  private hasFileChanged(current: FileInfo, cached: FileInfo): boolean {
+    if (current.size !== cached.size) return true;
+    if (current.lastModified !== cached.lastModified) return true;
+    if (current.checksum && cached.checksum && current.checksum !== cached.checksum) return true;
+    return false;
+  }
+
+  /**
+   * Update cache with detected changes
+   */
+  private updateCacheWithChanges(changes: {
+    changedFiles: FileInfo[];
+    addedFiles: FileInfo[];
+    removedFiles: string[];
+  }): void {
+    // Add new and changed files to cache
+    for (const file of changes.changedFiles) {
+      this.indexCache.files.set(file.relativePath, file);
+    }
+
+    // Remove deleted files from cache
+    for (const relativePath of changes.removedFiles) {
+      this.indexCache.files.delete(relativePath);
+    }
+
+    this.indexCache.lastIndexed = Date.now();
+
+    // Clear cached exploration data if we have significant changes
+    if (changes.changedFiles.length > 0 || changes.removedFiles.length > 0) {
+      this.indexCache.explorationData = undefined;
+    }
+  }
+
+  /**
+   * Calculate SHA-256 checksum for a file
+   */
+  private async calculateFileChecksum(filePath: string): Promise<string> {
+    try {
+      const content = await fs.readFile(filePath);
+      return crypto.createHash('sha256').update(content).digest('hex');
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Clear the index cache
+   */
+  clearCache(): void {
+    this.indexCache = {
+      files: new Map(),
+      lastIndexed: 0,
+      explorationData: undefined
+    };
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats(): {
+    filesIndexed: number;
+    lastIndexed: Date | null;
+    hasExplorationData: boolean;
+  } {
+    return {
+      filesIndexed: this.indexCache.files.size,
+      lastIndexed: this.indexCache.lastIndexed > 0 ? new Date(this.indexCache.lastIndexed) : null,
+      hasExplorationData: !!this.indexCache.explorationData
+    };
   }
 }

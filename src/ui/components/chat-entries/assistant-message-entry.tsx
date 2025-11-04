@@ -32,13 +32,13 @@ export function AssistantMessageEntry({ entry, verbosityLevel: _verbosityLevel }
     <Box flexDirection="column" marginTop={1}>
       <Box flexDirection="row" alignItems="flex-start">
         <Text color="white">⏺ </Text>
-        <Box flexDirection="column" flexGrow={1}>
+        <Box flexDirection="column" width="100%">
           {entry.toolCalls ? (
-            // If there are tool calls, just show plain text
-            <Text color="white">{processedContent.trim()}</Text>
+            // If there are tool calls, just show plain text  
+            <Text color="#FFFFFF" wrap="wrap" dimColor={false}>{processedContent.trim()}</Text>
           ) : (
-            // If no tool calls, render as markdown
-            <MarkdownRenderer content={processedContent.trim()} />
+            // Use bright white text like Claude Code - explicit hex color to override any defaults
+            <Text color="#FFFFFF" wrap="wrap" dimColor={false}>{processedContent.trim()}</Text>
           )}
           {entry.isStreaming && <Text color="cyan">█</Text>}
           {isTruncated && (

@@ -264,6 +264,25 @@ class IntelligentMultiEdit {
 - **Enterprise Features**: Enterprise-specific capabilities and integrations
 - **Quality Assurance**: Superior code quality and reliability features
 
+## 🛠️ Recent Critical Fixes
+
+### Response Truncation Bug (Resolved - November 2024)
+**Issue**: AI responses were frequently truncated mid-sentence, severely impacting user experience  
+**Root Cause**: Throttling logic in `useInputHandler` prevented final content chunks from being processed when they arrived rapidly (< 150ms apart)  
+**Solution**: Added force parameter to bypass throttling on stream completion  
+**Impact**: ✅ **Critical UX issue resolved** - Now matches Claude Code's response reliability
+
+**Technical Details**:
+- **File Modified**: `src/hooks/use-input-handler.ts`
+- **Key Fix**: `flushUpdates(true)` on "done" event to bypass throttling
+- **Prevention**: Added comprehensive documentation and code warnings
+- **Documentation**: `.agent/technical/streaming-architecture.md`
+
+**Lessons Learned**:
+- Performance optimizations must never compromise correctness
+- Streaming systems require force mechanisms for critical operations
+- Short, rapid responses expose timing vulnerabilities in throttling logic
+
 ---
 
 *This gap analysis serves as the strategic foundation for Grok CLI's competitive development roadmap and sprint planning priorities.*

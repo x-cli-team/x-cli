@@ -3,6 +3,8 @@ export { SymbolSearchTool } from "./symbol-search.js";
 export { DependencyAnalyzerTool } from "./dependency-analyzer.js";
 export { CodeContextTool } from "./code-context.js";
 export { RefactoringAssistantTool } from "./refactoring-assistant.js";
+export { VectorSearchTool } from "./vector-search-tool.js";
+export { AutonomousTaskTool } from "./autonomous-task-tool.js";
 
 // Export types
 export type {
@@ -56,3 +58,17 @@ export type {
   MoveRequest,
   InlineRequest
 } from "./refactoring-assistant.js";
+
+export type {
+  VectorSearchConfig,
+  CodeSymbol,
+  SearchResult,
+  IndexStats
+} from "../../services/vector-search-engine.js";
+
+export type {
+  TaskStep,
+  TaskPlan,
+  ExecutionContext,
+  AutonomousTaskConfig
+} from "../../services/autonomous-executor.js";

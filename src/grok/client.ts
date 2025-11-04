@@ -60,7 +60,7 @@ export class GrokClient {
       timeout: 360000,
     });
     const envMax = Number(process.env.GROK_MAX_TOKENS);
-    this.defaultMaxTokens = Number.isFinite(envMax) && envMax > 0 ? envMax : 1536;
+    this.defaultMaxTokens = Number.isFinite(envMax) && envMax > 0 ? envMax : 8192;
     if (model) {
       this.currentModel = model;
     }

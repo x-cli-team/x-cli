@@ -24,6 +24,8 @@ import {
   DependencyAnalyzerTool,
   CodeContextTool,
   RefactoringAssistantTool,
+  VectorSearchTool,
+  AutonomousTaskTool,
 } from "../tools/index.js";
 import { ToolResult } from "../types/index.js";
 import { EventEmitter } from "events";
@@ -82,6 +84,8 @@ export class GrokAgent extends EventEmitter {
   private dependencyAnalyzer: DependencyAnalyzerTool;
   private codeContext: CodeContextTool;
   private refactoringAssistant: RefactoringAssistantTool;
+  private vectorSearch: VectorSearchTool;
+  private autonomousTask: AutonomousTaskTool;
   private chatHistory: ChatEntry[] = [];
   private messages: GrokMessage[] = [];
   private tokenCounter: TokenCounter;
@@ -127,6 +131,8 @@ export class GrokAgent extends EventEmitter {
     this.dependencyAnalyzer = new DependencyAnalyzerTool();
     this.codeContext = new CodeContextTool();
     this.refactoringAssistant = new RefactoringAssistantTool();
+    this.vectorSearch = new VectorSearchTool();
+    this.autonomousTask = new AutonomousTaskTool();
     this.tokenCounter = createTokenCounter(modelToUse);
 
     // Initialize MCP servers if configured
@@ -665,6 +671,7 @@ Current working directory: ${process.cwd()}`,
           // Stream content as it comes
           if (chunk.choices[0].delta?.content) {
             accumulatedContent += chunk.choices[0].delta.content;
+            
 
             // Update token count in real-time including accumulated content and any tool calls
             const currentOutputTokens =
@@ -690,8 +697,13 @@ Current working directory: ${process.cwd()}`,
                 tokenCount: inputTokens + totalOutputTokens,
               };
             }
+          }
+
+          // Check for stream completion
+          if (chunk.choices[0].finish_reason) {
+            break;
+          }
         }
-      }
 
         // Add assistant entry to history
         const assistantEntry: ChatEntry = {
@@ -1055,6 +1067,12 @@ Current working directory: ${process.cwd()}`,
 
         case "refactoring_assistant":
           return await this.refactoringAssistant.execute(args);
+
+        case "vector_search":
+          return await this.vectorSearch.execute(args);
+
+        case "autonomous_task":
+          return await this.autonomousTask.execute(args);
 
         default:
           // Check if this is an MCP tool

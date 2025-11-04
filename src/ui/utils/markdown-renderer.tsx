@@ -14,10 +14,10 @@ export function MarkdownRenderer({ content }: { content: string }) {
     const result = marked.parse(content);
     // Handle both sync and async results
     const rendered = typeof result === 'string' ? result : content;
-    return <Text>{rendered}</Text>;
+    return <Text wrap="wrap" dimColor={false}>{rendered}</Text>;
   } catch (error) {
     // Fallback to plain text if markdown parsing fails
     console.error('Markdown rendering error:', error);
-    return <Text>{content}</Text>;
+    return <Text wrap="wrap" dimColor={false}>{content}</Text>;
   }
 }

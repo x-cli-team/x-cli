@@ -239,6 +239,92 @@ const BASE_GROK_TOOLS: GrokTool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "vector_search",
+      description: "Semantic code search using natural language queries. Find code patterns, functions, and logic using descriptions like \"authentication\", \"error handling\", \"database connections\".",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Natural language search query (e.g., \"find authentication logic\", \"error handling patterns\")"
+          },
+          action: {
+            type: "string",
+            enum: ["search", "index", "incremental", "stats", "clear"],
+            description: "Action to perform: search (default), index, incremental, stats, or clear",
+            default: "search"
+          },
+          rootPath: {
+            type: "string",
+            description: "Root path for codebase indexing (defaults to current directory)"
+          },
+          limit: {
+            type: "integer",
+            description: "Maximum number of search results to return",
+            default: 10,
+            minimum: 1,
+            maximum: 50
+          },
+          forceReindex: {
+            type: "boolean",
+            description: "Force complete reindexing (clears existing index first)",
+            default: false
+          }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "autonomous_task",
+      description: "Execute complex multi-step coding tasks autonomously using AI-powered planning and execution. Handles refactoring, feature implementation, bug fixes, and more.",
+      parameters: {
+        type: "object",
+        properties: {
+          goal: {
+            type: "string",
+            description: "The high-level goal to accomplish (e.g., \"refactor authentication to use JWT\", \"add user profile feature\", \"fix memory leak in data processing\")"
+          },
+          description: {
+            type: "string",
+            description: "Additional details about the task requirements and constraints"
+          },
+          action: {
+            type: "string",
+            enum: ["execute", "status", "history", "cancel"],
+            description: "Action to perform: execute (default), status, history, or cancel",
+            default: "execute"
+          },
+          taskId: {
+            type: "string",
+            description: "Task ID for status check or cancellation"
+          },
+          rootPath: {
+            type: "string",
+            description: "Root path for task execution (defaults to current directory)"
+          },
+          maxSteps: {
+            type: "integer",
+            description: "Maximum number of execution steps (default: 50)",
+            default: 50,
+            minimum: 1,
+            maximum: 200
+          },
+          timeoutMs: {
+            type: "integer",
+            description: "Task timeout in milliseconds (default: 300000 = 5 minutes)",
+            default: 300000,
+            minimum: 10000,
+            maximum: 1800000
+          }
+        }
+      }
+    }
+  },
   // Intelligence tools
   {
     type: "function",

@@ -2469,9 +2469,15 @@ Respond with ONLY the commit message, no additional text.`;
       let pendingToolResults: Array<{ toolCall: GrokToolCall; toolResult: ToolResult }> = [];
       let lastUpdateTime = Date.now();
 
-      const flushUpdates = () => {
+      // ⚠️ CRITICAL: This throttling logic can cause response truncation if modified incorrectly
+      // See .agent/technical/streaming-architecture.md for detailed explanation
+      const flushUpdates = (force = false) => {
         const now = Date.now();
-        if (now - lastUpdateTime < 150) return; // Throttle to ~6-7 FPS
+        // IMPORTANT: The force parameter is essential to prevent truncation
+        // When force=true, we MUST bypass throttling to ensure content completeness
+        if (!force && now - lastUpdateTime < 150) {
+          return; // Throttle to ~6-7 FPS for performance, but NEVER when forced
+        }
 
         // Update token count if changed
         if (lastTokenCount !== 0) {
@@ -2491,11 +2497,13 @@ Respond with ONLY the commit message, no additional text.`;
             streamingEntry = newStreamingEntry;
           } else {
             setChatHistory((prev) =>
-              prev.map((entry, idx) =>
-                idx === prev.length - 1 && entry.isStreaming
-                  ? { ...entry, content: entry.content + accumulatedContent }
-                  : entry
-              )
+              prev.map((entry, idx) => {
+                if (idx === prev.length - 1 && entry.isStreaming) {
+                  const newContent = entry.content + accumulatedContent;
+                  return { ...entry, content: newContent };
+                }
+                return entry;
+              })
             );
           }
           accumulatedContent = "";
@@ -2587,8 +2595,10 @@ Respond with ONLY the commit message, no additional text.`;
             break;
 
           case "done":
-            // Flush all remaining updates
-            flushUpdates();
+            // ⚠️ CRITICAL: MUST use flushUpdates(true) to prevent response truncation
+            // This ensures final content chunks are processed even if throttling is active
+            // See .agent/technical/streaming-architecture.md for details about the truncation bug
+            flushUpdates(true);
             break;
         }
 
@@ -2596,8 +2606,9 @@ Respond with ONLY the commit message, no additional text.`;
         flushUpdates();
       }
 
-      // Final flush and cleanup
-      flushUpdates();
+      // ⚠️ CRITICAL: Final flush MUST be forced to prevent any remaining content from being lost
+      // This is the last chance to display accumulated content that may have been throttled
+      flushUpdates(true);
       if (streamingEntry) {
         setChatHistory((prev) =>
           prev.map((entry) =>

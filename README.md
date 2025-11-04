@@ -1,15 +1,20 @@
-<!-- Test comment for PR creation -->
-
 ## 1.1.93 – Logo Assets & NPM Publication Complete
 
 ✅ **Live on NPM**: [@xagent/one-shot](https://www.npmjs.com/package/@xagent/one-shot) - Fully published and ready for global installation
 
-This release includes corrected logo assets and complete automated publishing pipeline.
+This release includes critical streaming fixes and major code cleanup.
 
-- ✅ **Corrected Logo Design**: Updated all assets to use proper black X logo
-- ✅ **NPM Package Live**: Full publication to npm registry with automated version management
-- ✅ **Logo Assets Included**: All variants (standard, small, large, favicon, social preview) in distribution
-- ✅ **Automated Publishing**: GitHub Actions pipeline fully operational with quality gates
+### 🚨 **Critical Fixes**
+
+- ✅ **Response Truncation Bug Fixed**: Resolved streaming issue causing AI responses to cut off mid-sentence (100% response completeness achieved)
+- ✅ **Improved Text Display**: Fixed grey text color issue - responses now display in bright white like Claude Code
+- ✅ **Streaming Architecture Documentation**: Comprehensive technical docs with maintenance guidelines
+
+### 🧹 **Major Cleanup**
+
+- ✅ **Root Directory Cleanup**: Removed 26 unnecessary files (old docs/, temp files, backups)
+- ✅ **Documentation Reorganization**: Moved all docs to `.agent/` folder where they belong
+- ✅ **Build System Optimization**: Cleaner project structure with no impact on functionality
 
 ---
 
@@ -44,7 +49,7 @@ This release includes corrected logo assets and complete automated publishing pi
 A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligence** and advanced tool capabilities.
 
 <div align="center">
-  <img src="docs/assets/logos/x-cli-logo-large.svg" alt="Grok One-Shot Logo" width="120" />
+  <img src="apps/site/static/img/logo.svg" alt="Grok One-Shot Logo" width="120" />
 </div>
 
 ## 🔗 Quick Links

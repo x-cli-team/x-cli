@@ -42,7 +42,7 @@ export function useStreaming(
 
           const flushUpdates = () => {
             const now = Date.now();
-            if (now - lastUpdateTime < 150) return; // Throttle to ~6-7 FPS to reduce re-render frequency
+            if (now - lastUpdateTime < 50) return; // Reduced throttle for better responsiveness
 
             // Batch all chat history updates into a single setState call
             setChatHistory((prev) => {
@@ -67,7 +67,8 @@ export function useStreaming(
                 } else {
                   const lastIdx = newHistory.length - 1;
                   if (lastIdx >= 0 && newHistory[lastIdx].isStreaming) {
-                    newHistory[lastIdx] = { ...newHistory[lastIdx], content: newHistory[lastIdx].content + accumulatedContent };
+                    const newContent = newHistory[lastIdx].content + accumulatedContent;
+                    newHistory[lastIdx] = { ...newHistory[lastIdx], content: newContent };
                   }
                 }
                 accumulatedContent = "";
@@ -168,8 +169,13 @@ export function useStreaming(
             flushUpdates();
           }
 
-          // Final flush and cleanup
+          // Final flush and cleanup - ensure all content is displayed
           flushUpdates();
+          // Force one more flush after a short delay to catch any remaining content
+          setTimeout(() => {
+            flushUpdates();
+          }, 10);
+          
           if (streamingEntry) {
             setChatHistory((prev) =>
               prev.map((entry) =>

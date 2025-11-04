@@ -20,5 +20,7 @@ export {
   SymbolSearchTool,
   DependencyAnalyzerTool,
   CodeContextTool,
-  RefactoringAssistantTool
+  RefactoringAssistantTool,
+  VectorSearchTool,
+  AutonomousTaskTool
 } from "./intelligence/index.js";

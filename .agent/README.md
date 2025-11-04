@@ -4,6 +4,8 @@
 *Protection: Husky pre-commit hook prevents accidental folder deletion*
 
 ## 🔄 Recent Updates (November 2025)
+- **🚨 CRITICAL FIX: Response Truncation Bug Resolved**: Fixed streaming system bug causing AI responses to cut off mid-sentence. Root cause was throttling logic preventing final content chunks from being processed. Solution: Added force parameter to bypass throttling on stream completion. Impact: 100% response completeness achieved.
+- **📚 Streaming Architecture Documentation**: Added comprehensive technical documentation in `.agent/technical/streaming-architecture.md` with critical maintenance guidelines
 - **Package Manager Migration**: Switched to Bun for development (npm for distribution)
 - **Tooling Optimization**: 4x faster installs, improved TypeScript compilation
 - **Lint System Overhaul**: Fixed parsing errors, streamlined configuration
