@@ -84,8 +84,10 @@ export class VectorSearchEngine {
     this.codebaseExplorer = new CodebaseExplorer({
       maxExplorationDepth: 10,
       maxFileSize: this.config.maxFileSize,
-      agentName: 'VSE',
-      cacheEnabled: this.config.cacheEnabled
+      planGenerationTimeout: 30000,
+      enableDetailedLogging: false,
+      autoSavePlans: false,
+      planSaveDirectory: '/tmp'
     });
     this.incrementalIndexer = new IncrementalIndexer();
 
@@ -359,17 +361,19 @@ export class VectorSearchEngine {
       const lines = fileContent.split('\n');
 
       for (const astSymbol of astSymbols) {
+        const startLine = astSymbol.startPosition.row;
+        const endLine = astSymbol.endPosition.row;
         const symbol: CodeSymbol = {
-          id: `${filePath}:${astSymbol.name}:${astSymbol.line}`,
+          id: `${filePath}:${astSymbol.name}:${startLine}`,
           name: astSymbol.name,
           type: this.mapSymbolType(astSymbol.type),
           filePath,
-          startLine: astSymbol.line,
-          endLine: astSymbol.line + (astSymbol.length || 1),
-          content: this.extractSymbolContent(lines, astSymbol.line, astSymbol.length || 1),
-          context: this.extractContext(lines, astSymbol.line),
-          signature: astSymbol.signature,
-          description: astSymbol.description
+          startLine,
+          endLine,
+          content: this.extractSymbolContent(lines, startLine, endLine - startLine + 1),
+          context: this.extractContext(lines, startLine),
+          signature: this.buildSignature(astSymbol),
+          description: `${astSymbol.type} in ${astSymbol.scope}`
         };
         symbols.push(symbol);
       }
@@ -435,7 +439,7 @@ export class VectorSearchEngine {
 
   private generatePlaceholderEmbedding(symbol: CodeSymbol | {content: string}): Float32Array {
     // Simple hash-based embedding for development
-    const text = symbol.content + (symbol.name || '') + (symbol.type || '');
+    const text = symbol.content + ('name' in symbol ? symbol.name || '' : '') + ('type' in symbol ? symbol.type || '' : '');
     const embedding = new Float32Array(384); // Standard embedding dimension
     
     for (let i = 0; i < 384; i++) {
@@ -492,6 +496,18 @@ export class VectorSearchEngine {
     }
     
     console.log(`🗑️  VSE: Evicted ${toRemove} symbols to free memory`);
+  }
+
+  /**
+   * Build signature string from symbol info
+   */
+  private buildSignature(astSymbol: SymbolInfo): string {
+    if (astSymbol.type === 'function' || astSymbol.type === 'method') {
+      const params = astSymbol.parameters?.map(p => `${p.name}: ${p.type}`).join(', ') || '';
+      const returnType = astSymbol.returnType || 'void';
+      return `${astSymbol.name}(${params}): ${returnType}`;
+    }
+    return astSymbol.name;
   }
 
   /**

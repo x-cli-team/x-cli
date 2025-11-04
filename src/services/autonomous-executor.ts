@@ -94,8 +94,10 @@ export class AutonomousExecutor {
     this.codebaseExplorer = new CodebaseExplorer({
       maxExplorationDepth: 10,
       maxFileSize: 1024 * 1024,
-      agentName: 'AutonomousExecutor',
-      cacheEnabled: true
+      planGenerationTimeout: 30000,
+      enableDetailedLogging: false,
+      autoSavePlans: false,
+      planSaveDirectory: '/tmp'
     });
 
     this.multiFileEditor = new MultiFileEditorTool();

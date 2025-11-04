@@ -273,7 +273,8 @@ const BASE_GROK_TOOLS: GrokTool[] = [
             description: "Force complete reindexing (clears existing index first)",
             default: false
           }
-        }
+        },
+        required: ["query"]
       }
     }
   },
@@ -321,7 +322,8 @@ const BASE_GROK_TOOLS: GrokTool[] = [
             minimum: 10000,
             maximum: 1800000
           }
-        }
+        },
+        required: ["goal", "description"]
       }
     }
   },

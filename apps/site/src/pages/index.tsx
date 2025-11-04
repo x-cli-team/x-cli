@@ -59,9 +59,9 @@ function GrokOneShotHero() {
           <div style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: '1rem',
+            gap: '2rem',
             alignItems: 'center',
-            marginBottom: '1.5rem'
+            marginBottom: '8.5rem'
           }}>
             <ChipBtn variant="outline" label="npx -y @xagent/one-shot@latest" showCopyIcon={true} />
             <ChipBtn variant="outline" label="npm install -g @xagent/one-shot@latest" showCopyIcon={true} />

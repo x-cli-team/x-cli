@@ -20,7 +20,6 @@ export type {
 export type {
   SymbolReference,
   SymbolUsage,
-  SearchResult,
   CrossReference
 } from "./symbol-search.js";
 
