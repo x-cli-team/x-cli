@@ -1,4 +1,4 @@
-## 1.1.96 – Logo Assets & NPM Publication Complete
+## 1.1.97 – Logo Assets & NPM Publication Complete
 
 ✅ **Live on NPM**: [@xagent/one-shot](https://www.npmjs.com/package/@xagent/one-shot) - Fully published and ready for global installation
 
