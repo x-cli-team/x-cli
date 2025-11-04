@@ -217,7 +217,7 @@ jobs:
           cp package.json package.json.backup
 
           # Update package name to be scoped (required for GitHub Packages)
-          sed -i 's/"name": "@xagent\/x-cli"/"name": "@x-cli-team\/x-cli"/' package.json
+          sed -i 's/"name": "@xagent\/one-shot"/"name": "@x-cli-team\/x-cli"/' package.json
 
           echo "Created scoped package.json for GitHub Packages:"
           grep '"name":' package.json
@@ -226,6 +226,7 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true'
         run: |
           # Configure npm to publish scoped packages to GitHub Packages
+          rm -f .npmrc
           echo "@x-cli-team:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
         env:
