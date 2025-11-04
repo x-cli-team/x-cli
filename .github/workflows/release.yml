@@ -48,19 +48,23 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
-      # Prevent loops if last commit was an automated bump or merge from release PR
+      # Prevent loops if last commit was an automated bump, but allow GitHub releases for release PR merges
       - name: Check if should release
         id: should-release
         run: |
-          if git log -1 --pretty=%B | grep -qiE "^Bump version to "; then
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MSG" | grep -qiE "^Bump version to "; then
             echo "should_release=false" >> $GITHUB_OUTPUT
             echo "Auto-bump detected; skipping release."
-          elif git log -1 --pretty=%B | grep -qi "Merge pull request"; then
+          elif echo "$COMMIT_MSG" | grep -qi "Merge pull request.*release/"; then
+            echo "should_release=github_release_only" >> $GITHUB_OUTPUT
+            echo "Release PR merge detected; creating GitHub release only."
+          elif echo "$COMMIT_MSG" | grep -qi "Merge pull request"; then
             echo "should_release=false" >> $GITHUB_OUTPUT
-            echo "Merge commit from release PR detected; skipping release."
+            echo "Non-release merge commit detected; skipping release."
           else
             echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "Proceeding with release."
+            echo "Proceeding with full release."
           fi
 
       - name: Bump patch version (no tag yet)
@@ -241,15 +245,24 @@ jobs:
           # Restore original package.json to avoid affecting future operations
           mv package.json.backup package.json
 
+      # Get current version for GitHub release (needed for release PR merges)
+      - name: Get current version
+        id: get-version
+        if: steps.should-release.outputs.should_release == 'github_release_only'
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          echo "NEW_VER=${CURRENT_VERSION}" >> $GITHUB_ENV
+
       # ---------- Create GitHub Release ----------
       - name: Create GitHub Release
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'github_release_only'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.NEW_VER }}
-          name: Release v${{ env.NEW_VER }}
+          tag_name: v${{ steps.get-version.outputs.version || env.NEW_VER }}
+          name: Release v${{ steps.get-version.outputs.version || env.NEW_VER }}
           body: |
-            ## 🚀 X-CLI v${{ env.NEW_VER }}
+            ## 🚀 X-CLI v${{ steps.get-version.outputs.version || env.NEW_VER }}
 
             ### Changes
             Automated release triggered by push to main branch.
@@ -257,14 +270,14 @@ jobs:
             ### Installation
             ```bash
             # Primary package (recommended)
-            npm install -g @xagent/one-shot@${{ env.NEW_VER }}
+            npm install -g @xagent/one-shot@${{ steps.get-version.outputs.version || env.NEW_VER }}
             # or
-            npx @xagent/one-shot@${{ env.NEW_VER }}
+            npx @xagent/one-shot@${{ steps.get-version.outputs.version || env.NEW_VER }}
 
             # Legacy package (for backwards compatibility)
-            npm install -g @xagent/x-cli@${{ env.NEW_VER }}
+            npm install -g @xagent/x-cli@${{ steps.get-version.outputs.version || env.NEW_VER }}
             # or  
-            npx @xagent/x-cli@${{ env.NEW_VER }}
+            npx @xagent/x-cli@${{ steps.get-version.outputs.version || env.NEW_VER }}
             ```
 
             ### What's New

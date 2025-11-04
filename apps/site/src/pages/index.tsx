@@ -61,7 +61,7 @@ function GrokOneShotHero() {
             justifyContent: 'center',
             gap: '2rem',
             alignItems: 'center',
-            marginBottom: '8.5rem'
+            marginBottom: '10.5rem'
           }}>
             <ChipBtn variant="outline" label="npx -y @xagent/one-shot@latest" showCopyIcon={true} />
             <ChipBtn variant="outline" label="npm install -g @xagent/one-shot@latest" showCopyIcon={true} />
@@ -94,16 +94,16 @@ function GrokOneShotHero() {
             <div className={styles.heroCardContent}>
               <div className={styles.heroCardText}>
                 <h3 className={styles.heroCardTitle}>Grok One-Shot</h3>
-                <p className={styles.heroCardDescription}>Open source terminal AI assistant with Claude Code's signature Plan Mode. Shift+Tab twice for read-only exploration and AI-powered implementation planning. Community-driven project built by developers, for developers.</p>
+                <p className={styles.heroCardDescription}>Revolutionary open source terminal AI that surpasses Claude Code with blazing-fast evolution, native x.ai integration, and 95% cost savings. Experience Plan Mode excellence with Shift+Tab twice activation, plus cutting-edge features that ship weekly. The future of AI-powered development, today.</p>
                 
                 <div className={styles.featureGrid}>
                   <div className={styles.featureItem}>
                     <strong className={styles.featureLabel}>Modalities</strong>
-                    <span className={styles.featureValue}>🗣️ → 📝</span>
+                    <span className={styles.featureValue}>🗣️ 📝 🖼️ 🌐</span>
                   </div>
                   <div className={styles.featureItem}>
                     <strong className={styles.featureLabel}>Tools Available</strong>
-                    <span className={styles.featureValue}>15+</span>
+                    <span className={styles.featureValue}>25+</span>
                   </div>
                 </div>
 
@@ -114,6 +114,11 @@ function GrokOneShotHero() {
                     <li>Multi-file transactions</li>
                     <li>Web integration</li>
                     <li>MCP protocol support</li>
+                    <li>AST code analysis</li>
+                    <li>Symbol search & references</li>
+                    <li>Context-aware tooltips</li>
+                    <li>Auto-documentation system</li>
+                    <li>Task management workflows</li>
                   </ul>
                 </div>
               </div>

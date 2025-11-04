@@ -111,11 +111,14 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
 }
 
 .featureList li {
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   font-size: 0.875rem;
   display: flex;
   align-items: center;
@@ -594,6 +597,10 @@
 .bottomIcon {
   color: rgba(255, 255, 255, 0.9);
   user-select: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .chipBtn {
