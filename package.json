@@ -32,6 +32,7 @@
     "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
     "update-agent-docs-auto": "tsx ./scripts/update-agent-docs-auto.mjs",
     "docs-workflow-test": "npm run update-agent-docs-auto && npm run sync:docs",
+    "prettier": "prettier",
     "smart-push": "./scripts/smart-push.sh",
     "push": "echo '🚨 BLOCKED: Use npm run smart-push instead' && echo '💡 Direct git push bypasses automation' && exit 1",
     "git-push": "echo '🚨 BLOCKED: Use npm run smart-push instead' && echo '💡 Direct git push bypasses automation' && exit 1"
