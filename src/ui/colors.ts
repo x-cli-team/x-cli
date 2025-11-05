@@ -1,7 +1,83 @@
 /**
  * Centralized color palette for consistent UI styling
  * Based on Claude Code's design principles and terminal compatibility
+ * Now with adaptive terminal theme detection
  */
+
+/**
+ * Detects terminal background and returns appropriate text color
+ */
+function detectTerminalTheme(): 'light' | 'dark' | 'auto' {
+  // Check environment variables that terminals set
+  const colorFgBg = process.env.COLORFGBG;
+  const termBackground = process.env.TERM_BACKGROUND;
+  const grokTextColor = process.env.GROK_TEXT_COLOR;
+  
+  // Allow manual override
+  if (grokTextColor) {
+    return grokTextColor.toLowerCase().includes('light') ? 'light' : 'dark';
+  }
+  
+  // Check COLORFGBG (format: "foreground;background")
+  if (colorFgBg) {
+    const parts = colorFgBg.split(';');
+    if (parts.length >= 2) {
+      const bg = parseInt(parts[1]);
+      // Background colors 0-7 are dark, 8-15 are light
+      return bg >= 8 ? 'light' : 'dark';
+    }
+  }
+  
+  // Check TERM_BACKGROUND
+  if (termBackground) {
+    return termBackground.toLowerCase() === 'light' ? 'light' : 'dark';
+  }
+  
+  // Check terminal type hints
+  const term = process.env.TERM || '';
+  const termProgram = process.env.TERM_PROGRAM || '';
+  
+  // Some terminals default to light themes
+  if (termProgram.includes('Apple_Terminal') || 
+      termProgram.includes('Terminal.app') ||
+      term.includes('xterm-256color')) {
+    // Default to dark for safety, but could be made smarter
+    return 'dark';
+  }
+  
+  // Default to dark theme (safer assumption)
+  return 'dark';
+}
+
+/**
+ * Get adaptive text color based on terminal theme
+ */
+function getAdaptiveTextColor(): string {
+  const theme = detectTerminalTheme();
+  
+  // Debug info (can be enabled with GROK_DEBUG_COLORS=1)
+  if (process.env.GROK_DEBUG_COLORS) {
+    console.error(`[Color Debug] Theme: ${theme}, COLORFGBG: ${process.env.COLORFGBG}, TERM_BACKGROUND: ${process.env.TERM_BACKGROUND}, TERM_PROGRAM: ${process.env.TERM_PROGRAM}`);
+  }
+  
+  switch (theme) {
+    case 'light':
+      return 'black';
+    case 'dark':
+      return 'white';
+    default:
+      // Auto mode - try to be smart
+      return 'white'; // Most terminals are dark by default
+  }
+}
+
+/**
+ * Export for testing/debugging
+ */
+export const colorUtils = {
+  detectTerminalTheme,
+  getAdaptiveTextColor,
+};
 
 export const colors = {
   // Primary colors
@@ -16,7 +92,7 @@ export const colors = {
   
   // UI colors
   muted: '#6B7280',         // Gray - secondary text
-  text: '#FFFFFF',          // White - primary text
+  text: '#000000',          // Black - primary text (force visible)
   background: '#000000',    // Black - background
   
   // Spinner and progress colors
@@ -44,7 +120,7 @@ export const inkColors = {
   info: 'blue',
   muted: 'gray',
   accent: 'magenta',
-  text: 'black',
+  text: process.env.FORCE_TEXT_COLOR || getAdaptiveTextColor(), // Adaptive text color
   
   // Bright variants
   primaryBright: 'cyanBright',

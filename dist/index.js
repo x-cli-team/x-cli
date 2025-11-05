@@ -1164,7 +1164,8 @@ var init_tools = __esm({
                 description: "Force complete reindexing (clears existing index first)",
                 default: false
               }
-            }
+            },
+            required: ["query"]
           }
         }
       },
@@ -1212,7 +1213,8 @@ var init_tools = __esm({
                 minimum: 1e4,
                 maximum: 18e5
               }
-            }
+            },
+            required: ["goal", "description"]
           }
         }
       },
@@ -9678,8 +9680,10 @@ var init_vector_search_engine = __esm({
         this.codebaseExplorer = new CodebaseExplorer({
           maxExplorationDepth: 10,
           maxFileSize: this.config.maxFileSize,
-          agentName: "VSE",
-          cacheEnabled: this.config.cacheEnabled
+          planGenerationTimeout: 3e4,
+          enableDetailedLogging: false,
+          autoSavePlans: false,
+          planSaveDirectory: "/tmp"
         });
         this.incrementalIndexer = new IncrementalIndexer();
         this.indexStats = {
@@ -9887,17 +9891,19 @@ var init_vector_search_engine = __esm({
           const fileContent = await promises.readFile(filePath, "utf-8");
           const lines = fileContent.split("\n");
           for (const astSymbol of astSymbols) {
+            const startLine = astSymbol.startPosition.row;
+            const endLine = astSymbol.endPosition.row;
             const symbol = {
-              id: `${filePath}:${astSymbol.name}:${astSymbol.line}`,
+              id: `${filePath}:${astSymbol.name}:${startLine}`,
               name: astSymbol.name,
               type: this.mapSymbolType(astSymbol.type),
               filePath,
-              startLine: astSymbol.line,
-              endLine: astSymbol.line + (astSymbol.length || 1),
-              content: this.extractSymbolContent(lines, astSymbol.line, astSymbol.length || 1),
-              context: this.extractContext(lines, astSymbol.line),
-              signature: astSymbol.signature,
-              description: astSymbol.description
+              startLine,
+              endLine,
+              content: this.extractSymbolContent(lines, startLine, endLine - startLine + 1),
+              context: this.extractContext(lines, startLine),
+              signature: this.buildSignature(astSymbol),
+              description: `${astSymbol.type} in ${astSymbol.scope}`
             };
             symbols.push(symbol);
           }
@@ -9948,7 +9954,7 @@ var init_vector_search_engine = __esm({
         return this.generatePlaceholderEmbedding({ content: query });
       }
       generatePlaceholderEmbedding(symbol) {
-        const text = symbol.content + (symbol.name || "") + (symbol.type || "");
+        const text = symbol.content + ("name" in symbol ? symbol.name || "" : "") + ("type" in symbol ? symbol.type || "" : "");
         const embedding = new Float32Array(384);
         for (let i = 0; i < 384; i++) {
           embedding[i] = Math.sin(this.hashCode(text + i) / 1e6);
@@ -9993,6 +9999,17 @@ var init_vector_search_engine = __esm({
           this.embeddingCache.delete(symbolId);
         }
         console.log(`\u{1F5D1}\uFE0F  VSE: Evicted ${toRemove} symbols to free memory`);
+      }
+      /**
+       * Build signature string from symbol info
+       */
+      buildSignature(astSymbol) {
+        if (astSymbol.type === "function" || astSymbol.type === "method") {
+          const params = astSymbol.parameters?.map((p) => `${p.name}: ${p.type}`).join(", ") || "";
+          const returnType = astSymbol.returnType || "void";
+          return `${astSymbol.name}(${params}): ${returnType}`;
+        }
+        return astSymbol.name;
       }
       /**
        * Remove all symbols for a specific file
@@ -10326,8 +10343,10 @@ var init_autonomous_executor = __esm({
         this.codebaseExplorer = new CodebaseExplorer({
           maxExplorationDepth: 10,
           maxFileSize: 1024 * 1024,
-          agentName: "AutonomousExecutor",
-          cacheEnabled: true
+          planGenerationTimeout: 3e4,
+          enableDetailedLogging: false,
+          autoSavePlans: false,
+          planSaveDirectory: "/tmp"
         });
         this.multiFileEditor = new MultiFileEditorTool();
         this.astParser = new ASTParserTool();
@@ -18619,7 +18638,7 @@ var init_package = __esm({
     package_default = {
       type: "module",
       name: "@xagent/one-shot",
-      version: "1.1.92",
+      version: "1.1.99",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal with automatic documentation updates.",
       main: "dist/index.js",
       module: "dist/index.js",
@@ -18650,6 +18669,7 @@ var init_package = __esm({
         "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
         "update-agent-docs-auto": "tsx ./scripts/update-agent-docs-auto.mjs",
         "docs-workflow-test": "npm run update-agent-docs-auto && npm run sync:docs",
+        prettier: "prettier",
         "smart-push": "./scripts/smart-push.sh",
         push: "echo '\u{1F6A8} BLOCKED: Use npm run smart-push instead' && echo '\u{1F4A1} Direct git push bypasses automation' && exit 1",
         "git-push": "echo '\u{1F6A8} BLOCKED: Use npm run smart-push instead' && echo '\u{1F4A1} Direct git push bypasses automation' && exit 1"
@@ -20399,6 +20419,260 @@ Operations will now ${newLevel === "off" ? "show no explanations" : newLevel ===
       clearInput();
       return true;
     }
+    if (trimmedInput === "/safe-push") {
+      const userEntry = {
+        type: "user",
+        content: trimmedInput,
+        timestamp: /* @__PURE__ */ new Date()
+      };
+      setChatHistory((prev) => [...prev, userEntry]);
+      setIsProcessing(true);
+      try {
+        const startEntry = {
+          type: "assistant",
+          content: "\u{1F680} **Safe Push - Automated Workflow**\n\nRunning quality checks and git operations...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, startEntry]);
+        const tsCheckEntry = {
+          type: "assistant",
+          content: "\u{1F4DD} **Step 1/5**: Checking TypeScript...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, tsCheckEntry]);
+        const tsResult = await agent.executeBashCommand("npm run typecheck");
+        const tsResultEntry = {
+          type: "tool_result",
+          content: tsResult.success ? "\u2705 TypeScript check passed" : `\u274C TypeScript errors: ${tsResult.error}`,
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `ts_check_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run typecheck" }) }
+          },
+          toolResult: tsResult
+        };
+        setChatHistory((prev) => [...prev, tsResultEntry]);
+        if (!tsResult.success) {
+          const errorEntry = {
+            type: "assistant",
+            content: `\u274C **Safe Push Failed: TypeScript Errors**
+
+**Error Details:**
+\`\`\`
+${tsResult.error || "TypeScript compilation failed"}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the TypeScript errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/safe-push\` again** to retry the workflow
+
+\u{1F4A1} **Common fixes:**
+\u2022 Add missing type annotations
+\u2022 Import missing types/modules
+\u2022 Fix property name typos
+\u2022 Check function signatures`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const lintCheckEntry = {
+          type: "assistant",
+          content: "\u{1F9F9} **Step 2/5**: Running ESLint...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, lintCheckEntry]);
+        const lintResult = await agent.executeBashCommand("npm run lint");
+        const lintResultEntry = {
+          type: "tool_result",
+          content: lintResult.success ? "\u2705 ESLint check completed" : `\u274C **Safe Push Failed: ESLint Critical Errors**
+
+**Error Details:**
+\`\`\`
+${lintResult.error || "ESLint found critical errors"}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the ESLint errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/safe-push\` again** to retry the workflow
+
+\u{1F4A1} **Common fixes:**
+\u2022 Remove unused variables/imports
+\u2022 Fix indentation and spacing
+\u2022 Add missing semicolons
+\u2022 Fix naming conventions
+\u2022 Use \`eslint --fix\` for auto-fixable issues`,
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `lint_check_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run lint" }) }
+          },
+          toolResult: lintResult
+        };
+        setChatHistory((prev) => [...prev, lintResultEntry]);
+        const statusCheckEntry = {
+          type: "assistant",
+          content: "\u{1F4CB} **Step 3/5**: Checking git status...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, statusCheckEntry]);
+        const statusResult = await agent.executeBashCommand("git status --porcelain");
+        const hasChanges = statusResult.success && statusResult.output?.trim();
+        if (!hasChanges) {
+          const noChangesEntry = {
+            type: "assistant",
+            content: "\u2139\uFE0F **No Changes to Commit**: Working tree is clean. Nothing to push!",
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, noChangesEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const stageEntry = {
+          type: "assistant",
+          content: "\u{1F4E6} **Step 4/5**: Staging changes...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, stageEntry]);
+        const addResult = await agent.executeBashCommand("git add .");
+        const addResultEntry = {
+          type: "tool_result",
+          content: addResult.success ? "\u2705 Changes staged successfully" : `\u274C Failed to stage: ${addResult.error}`,
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `git_add_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "git add ." }) }
+          },
+          toolResult: addResult
+        };
+        setChatHistory((prev) => [...prev, addResultEntry]);
+        if (!addResult.success) {
+          const stagingErrorEntry = {
+            type: "assistant",
+            content: `\u274C **Safe Push Failed: Git Staging Error**
+
+**Error Details:**
+\`\`\`
+${addResult.error || "Failed to stage changes"}
+\`\`\`
+
+**Next Steps:**
+1. **Check git status**: Run \`git status\` to see what's wrong
+2. **Check file permissions**: Ensure files are writable
+3. **Check .gitignore**: Make sure files aren't being ignored
+4. **Manual staging**: Try \`git add <specific-file>\` for individual files
+
+\u{1F4A1} **Common causes:**
+\u2022 File permission issues
+\u2022 Large files exceeding git limits
+\u2022 Corrupted git repository
+\u2022 Disk space issues`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, stagingErrorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const commitEntry = {
+          type: "assistant",
+          content: "\u{1F4BE} **Step 5/5**: Creating commit...",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, commitEntry]);
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 16).replace("T", " ");
+        const commitMsg = `feat: update files - ${timestamp}`;
+        const commitResult = await agent.executeBashCommand(`git commit -m "${commitMsg}"`);
+        const commitResultEntry = {
+          type: "tool_result",
+          content: commitResult.success ? `\u2705 Commit created: "${commitMsg}"` : `\u274C **Safe Push Failed: Git Commit Error**
+
+**Error Details:**
+\`\`\`
+${commitResult.error || "Git commit failed"}
+\`\`\`
+
+**Next Steps:**
+1. **Check git config**: Ensure user.name and user.email are set
+2. **Check staged files**: Run \`git status\` to verify staged changes  
+3. **Manual commit**: Try \`git commit\` manually with your own message
+4. **Reset staging**: Use \`git reset\` if needed to unstage problematic files
+
+\u{1F4A1} **Common causes:**
+\u2022 Missing git configuration (name/email)
+\u2022 Empty commit (no staged changes)
+\u2022 Commit message formatting issues
+\u2022 Git hooks blocking the commit`,
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `git_commit_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: `git commit -m "${commitMsg}"` }) }
+          },
+          toolResult: commitResult
+        };
+        setChatHistory((prev) => [...prev, commitResultEntry]);
+        if (!commitResult.success) {
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+        const pushEntry = {
+          type: "assistant",
+          content: "\u{1F680} **Pushing to remote...**",
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, pushEntry]);
+        const pushResult = await agent.executeBashCommand("git push");
+        const pushResultEntry = {
+          type: "tool_result",
+          content: pushResult.success ? "\u{1F389} **Safe Push Completed Successfully!**" : `\u274C **Safe Push Failed: Git Push Error**
+
+**Error Details:**
+\`\`\`
+${pushResult.error || "Git push failed"}
+\`\`\`
+
+**Next Steps:**
+1. **Pull latest changes**: Run \`git pull --rebase\` to get remote updates
+2. **Resolve conflicts**: If there are merge conflicts, resolve them manually
+3. **Try again**: Run \`/safe-push\` again after resolving issues
+4. **Alternative**: Use \`npm run smart-push\` for complex scenarios
+
+\u{1F4A1} **Common causes:**
+\u2022 Remote has new commits (fetch first)
+\u2022 Branch protection rules
+\u2022 Authentication issues
+\u2022 Network connectivity problems`,
+          timestamp: /* @__PURE__ */ new Date(),
+          toolCall: {
+            id: `git_push_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "git push" }) }
+          },
+          toolResult: pushResult
+        };
+        setChatHistory((prev) => [...prev, pushResultEntry]);
+      } catch (error) {
+        const errorEntry = {
+          type: "assistant",
+          content: `\u274C **Safe Push Failed**: ${error instanceof Error ? error.message : String(error)}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+      setIsProcessing(false);
+      clearInput();
+      return true;
+    }
     if (trimmedInput === "/smart-push") {
       const userEntry = {
         type: "user",
@@ -21978,6 +22252,44 @@ var init_use_processing_timer = __esm({
 });
 
 // src/ui/colors.ts
+function detectTerminalTheme() {
+  const colorFgBg = process.env.COLORFGBG;
+  const termBackground = process.env.TERM_BACKGROUND;
+  const grokTextColor = process.env.GROK_TEXT_COLOR;
+  if (grokTextColor) {
+    return grokTextColor.toLowerCase().includes("light") ? "light" : "dark";
+  }
+  if (colorFgBg) {
+    const parts = colorFgBg.split(";");
+    if (parts.length >= 2) {
+      const bg = parseInt(parts[1]);
+      return bg >= 8 ? "light" : "dark";
+    }
+  }
+  if (termBackground) {
+    return termBackground.toLowerCase() === "light" ? "light" : "dark";
+  }
+  const term = process.env.TERM || "";
+  const termProgram = process.env.TERM_PROGRAM || "";
+  if (termProgram.includes("Apple_Terminal") || termProgram.includes("Terminal.app") || term.includes("xterm-256color")) {
+    return "dark";
+  }
+  return "dark";
+}
+function getAdaptiveTextColor() {
+  const theme = detectTerminalTheme();
+  if (process.env.GROK_DEBUG_COLORS) {
+    console.error(`[Color Debug] Theme: ${theme}, COLORFGBG: ${process.env.COLORFGBG}, TERM_BACKGROUND: ${process.env.TERM_BACKGROUND}, TERM_PROGRAM: ${process.env.TERM_PROGRAM}`);
+  }
+  switch (theme) {
+    case "light":
+      return "black";
+    case "dark":
+      return "white";
+    default:
+      return "white";
+  }
+}
 function getSpinnerColor(operation) {
   switch (operation.toLowerCase()) {
     case "search":
@@ -22011,7 +22323,8 @@ var init_colors = __esm({
       info: "blue",
       muted: "gray",
       accent: "magenta",
-      text: "white",
+      text: process.env.FORCE_TEXT_COLOR || getAdaptiveTextColor(),
+      // Adaptive text color
       // Bright variants
       primaryBright: "cyanBright",
       successBright: "greenBright",
@@ -22375,14 +22688,14 @@ var init_user_message_entry = __esm({
 function AssistantMessageEntry({ entry, verbosityLevel: _verbosityLevel }) {
   const { content: processedContent, isTruncated } = handleLongContent(entry.content);
   return /* @__PURE__ */ jsx(Box, { flexDirection: "column", marginTop: 1, children: /* @__PURE__ */ jsxs(Box, { flexDirection: "row", alignItems: "flex-start", children: [
-    /* @__PURE__ */ jsx(Text, { color: "white", children: "\u23FA " }),
+    /* @__PURE__ */ jsx(Text, { color: inkColors.text, children: "\u23FA " }),
     /* @__PURE__ */ jsxs(Box, { flexDirection: "column", width: "100%", children: [
       entry.toolCalls ? (
         // If there are tool calls, just show plain text  
-        /* @__PURE__ */ jsx(Text, { color: "#FFFFFF", wrap: "wrap", dimColor: false, children: processedContent.trim() })
+        /* @__PURE__ */ jsx(Text, { color: inkColors.text, wrap: "wrap", dimColor: false, children: processedContent.trim() })
       ) : (
         // Use bright white text like Claude Code - explicit hex color to override any defaults
-        /* @__PURE__ */ jsx(Text, { color: "#FFFFFF", wrap: "wrap", dimColor: false, children: processedContent.trim() })
+        /* @__PURE__ */ jsx(Text, { color: inkColors.text, wrap: "wrap", dimColor: false, children: processedContent.trim() })
       ),
       entry.isStreaming && /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u2588" }),
       isTruncated && /* @__PURE__ */ jsx(Text, { color: "yellow", italic: true, children: "[Response truncated for performance - full content in session log]" })
@@ -22392,6 +22705,7 @@ function AssistantMessageEntry({ entry, verbosityLevel: _verbosityLevel }) {
 var handleLongContent;
 var init_assistant_message_entry = __esm({
   "src/ui/components/chat-entries/assistant-message-entry.tsx"() {
+    init_colors();
     handleLongContent = (content, maxLength = 5e3) => {
       if (content.length <= maxLength) {
         return { content, isTruncated: false };
@@ -24215,7 +24529,7 @@ var require_package = __commonJS({
     module.exports = {
       type: "module",
       name: "@xagent/one-shot",
-      version: "1.1.92",
+      version: "1.1.99",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal with automatic documentation updates.",
       main: "dist/index.js",
       module: "dist/index.js",
@@ -24246,6 +24560,7 @@ var require_package = __commonJS({
         "sync:docs": "cd apps/site && node src/scripts/sync-agent-docs.js",
         "update-agent-docs-auto": "tsx ./scripts/update-agent-docs-auto.mjs",
         "docs-workflow-test": "npm run update-agent-docs-auto && npm run sync:docs",
+        prettier: "prettier",
         "smart-push": "./scripts/smart-push.sh",
         push: "echo '\u{1F6A8} BLOCKED: Use npm run smart-push instead' && echo '\u{1F4A1} Direct git push bypasses automation' && exit 1",
         "git-push": "echo '\u{1F6A8} BLOCKED: Use npm run smart-push instead' && echo '\u{1F4A1} Direct git push bypasses automation' && exit 1"

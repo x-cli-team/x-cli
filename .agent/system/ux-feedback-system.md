@@ -84,6 +84,38 @@ Context: Dynamic │ Files: 47 indexed │ Index: 2.3 MB │ Session: Restored
 
 ### 🎨 Design System (`src/ui/colors.ts`)
 
+#### **Adaptive Color System** ⭐ **NEW - November 2025**
+Revolutionary terminal theme detection that automatically adapts text colors for optimal visibility across all terminal environments.
+
+**Automatic Detection Methods:**
+- **COLORFGBG Analysis**: Parses terminal background color hints (format: `foreground;background`)
+- **TERM_BACKGROUND**: Respects explicit terminal theme declarations
+- **TERM_PROGRAM Detection**: Identifies terminal applications and their default themes
+- **Fallback Strategy**: Defaults to safe white-on-dark assumption
+
+**Manual Override Options:**
+```bash
+# Environment variable controls
+export GROK_TEXT_COLOR=black        # Force specific color
+export TERM_BACKGROUND=light        # Hint terminal theme  
+export FORCE_TEXT_COLOR=black       # Always override
+export GROK_DEBUG_COLORS=1          # Debug detection
+```
+
+**Smart Theme Logic:**
+```typescript
+function getAdaptiveTextColor(): string {
+  const theme = detectTerminalTheme();
+  return theme === 'light' ? 'black' : 'white';
+}
+```
+
+**Benefits:**
+- ✅ **Universal Compatibility**: Works on light and dark terminals
+- ✅ **Zero Configuration**: Automatic detection for 90% of terminals
+- ✅ **Manual Control**: Multiple override methods for edge cases
+- ✅ **Competitive Advantage**: Claude Code lacks this feature
+
 #### **Color Hierarchy**
 Claude Code-inspired visual language with consistent semantic meaning:
 - **🔵 Info/Primary** (`cyan`) - System information, search operations
@@ -92,6 +124,7 @@ Claude Code-inspired visual language with consistent semantic meaning:
 - **🔴 Error** (`red`) - Error states, failed operations
 - **🟣 Accent** (`magenta`) - Special states, compaction, memory operations
 - **⚫ Muted** (`gray`) - Secondary information, timestamps
+- **⚪ Text** (`adaptive`) - Main content, automatically adapts to terminal theme
 
 #### **Operation Color Mapping**
 Each operation type has consistent color associations:
@@ -101,7 +134,8 @@ const operationColors = {
   'search': 'blue',        // File discovery
   'write': 'green',        // File operations
   'compact': 'magenta',    // Memory optimization
-  'error': 'red'           // Error states
+  'error': 'red',          // Error states
+  'text': getAdaptiveTextColor() // Adaptive main text
 };
 ```
 

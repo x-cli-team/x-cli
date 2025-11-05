@@ -1,9 +1,13 @@
 # 📚 .agent Documentation System
 
-*Last synced: 2025-11-02*
+*Last synced: 2025-11-05*
 *Protection: Husky pre-commit hook prevents accidental folder deletion*
 
 ## 🔄 Recent Updates (November 2025)
+- **⭐ NEW: Adaptive Terminal Color System**: Revolutionary terminal theme detection that automatically adapts text colors for optimal visibility across all terminal environments. Includes multiple manual override options via environment variables.
+- **⭐ NEW: /safe-push Command**: Stable automated git workflow with 5-step quality checks (TypeScript, ESLint, git operations) integrated directly into CLI with real-time feedback. Replaces crash-prone smart-push.
+- **🎨 Universal Text Visibility**: Fixed white text invisibility on light terminals by implementing adaptive color detection using COLORFGBG, TERM_BACKGROUND, and TERM_PROGRAM environment variables.
+- **🛡️ CLI Stability Improvements**: Eliminated smart-push crashes by creating simplified workflow that doesn't overwhelm the CLI interface with complex shell operations.
 - **🚨 CRITICAL FIX: Response Truncation Bug Resolved**: Fixed streaming system bug causing AI responses to cut off mid-sentence. Root cause was throttling logic preventing final content chunks from being processed. Solution: Added force parameter to bypass throttling on stream completion. Impact: 100% response completeness achieved.
 - **📚 Streaming Architecture Documentation**: Added comprehensive technical documentation in `.agent/technical/streaming-architecture.md` with critical maintenance guidelines
 - **Package Manager Migration**: Switched to Bun for development (npm for distribution)

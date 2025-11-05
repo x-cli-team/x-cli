@@ -19,19 +19,35 @@ git push -u origin main  # ❌ BLOCKED by pre-push hook
 
 ## ✅ Correct Push Methods
 
-### Method 1: Git Alias (Recommended)
+### Method 1: CLI Safe Push (Recommended) ⭐ **NEW**
+```bash
+/safe-push
+```
+**Benefits:**
+- ✅ Stable CLI integration with real-time feedback
+- ✅ 5-step automated workflow with quality checks
+- ✅ No crashes or complex shell operations
+- ✅ TypeScript and ESLint validation
+- ✅ Auto-generated commit messages with timestamps
+
+### Method 2: Git Alias  
 ```bash
 git pushup
 ```
 
-### Method 2: NPM Script  
+### Method 3: NPM Script  
 ```bash
 npm run smart-push
 ```
 
-### Method 3: Direct Script
+### Method 4: Direct Script
 ```bash
 ./scripts/smart-push.sh
+```
+
+### ⚠️ Legacy Smart Push (CLI)
+```bash
+/smart-push  # Not recommended - can crash CLI
 ```
 
 ## ❌ NEVER Use Regular Push
@@ -40,7 +56,29 @@ npm run smart-push
 git push origin main
 ```
 
-## 🔧 How Smart Push Works
+## 🔧 How Safe Push Works ⭐ **NEW**
+
+The `/safe-push` CLI command provides a simplified, stable workflow:
+
+**5-Step Process:**
+1. **📝 TypeScript Check** - Runs `npm run typecheck` (fails on errors)
+2. **🧹 ESLint Check** - Runs `npm run lint` (continues with warnings)
+3. **📋 Git Status** - Checks for changes (skips if clean)
+4. **📦 Stage Changes** - Runs `git add .` 
+5. **🚀 Commit & Push** - Auto-commit with timestamp + `git push`
+
+**Sample Auto-Commit Message:**
+```
+feat: update files - 2025-11-05 08:45
+```
+
+**Error Handling:**
+- ✅ Stops immediately on TypeScript errors
+- ✅ Shows clear error messages and next steps
+- ✅ Skips operation if no changes to commit
+- ✅ Real-time progress feedback in CLI
+
+## 🔧 How Traditional Smart Push Works
 
 1. **Pulls with rebase** to get automated version bumps from GitHub Actions
 2. **Rebases local changes** on top of remote changes

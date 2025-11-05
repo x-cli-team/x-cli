@@ -1795,7 +1795,291 @@ Auto-compact automatically enables compact mode when conversations exceed thresh
       return true;
     }
 
-    // Add smart-push command
+    // Add safe-push command
+    if (trimmedInput === "/safe-push") {
+      const userEntry: ChatEntry = {
+        type: "user",
+        content: trimmedInput,
+        timestamp: new Date(),
+      };
+      setChatHistory((prev) => [...prev, userEntry]);
+
+      setIsProcessing(true);
+
+      try {
+        // Step 1: Quality Checks
+        const startEntry: ChatEntry = {
+          type: "assistant",
+          content: "🚀 **Safe Push - Automated Workflow**\n\nRunning quality checks and git operations...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, startEntry]);
+
+        // TypeScript check
+        const tsCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "📝 **Step 1/5**: Checking TypeScript...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, tsCheckEntry]);
+
+        const tsResult = await agent.executeBashCommand("npm run typecheck");
+        const tsResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: tsResult.success ? "✅ TypeScript check passed" : `❌ TypeScript errors: ${tsResult.error}`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `ts_check_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run typecheck" }) },
+          },
+          toolResult: tsResult,
+        };
+        setChatHistory((prev) => [...prev, tsResultEntry]);
+
+        if (!tsResult.success) {
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Safe Push Failed: TypeScript Errors**
+
+**Error Details:**
+\`\`\`
+${tsResult.error || 'TypeScript compilation failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the TypeScript errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/safe-push\` again** to retry the workflow
+
+💡 **Common fixes:**
+• Add missing type annotations
+• Import missing types/modules
+• Fix property name typos
+• Check function signatures`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Lint check
+        const lintCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "🧹 **Step 2/5**: Running ESLint...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, lintCheckEntry]);
+
+        const lintResult = await agent.executeBashCommand("npm run lint");
+        const lintResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: lintResult.success ? "✅ ESLint check completed" : `❌ **Safe Push Failed: ESLint Critical Errors**
+
+**Error Details:**
+\`\`\`
+${lintResult.error || 'ESLint found critical errors'}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the ESLint errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/safe-push\` again** to retry the workflow
+
+💡 **Common fixes:**
+• Remove unused variables/imports
+• Fix indentation and spacing
+• Add missing semicolons
+• Fix naming conventions
+• Use \`eslint --fix\` for auto-fixable issues`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `lint_check_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run lint" }) },
+          },
+          toolResult: lintResult,
+        };
+        setChatHistory((prev) => [...prev, lintResultEntry]);
+
+        // Git status check
+        const statusCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "📋 **Step 3/5**: Checking git status...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, statusCheckEntry]);
+
+        const statusResult = await agent.executeBashCommand("git status --porcelain");
+        const hasChanges = statusResult.success && statusResult.output?.trim();
+
+        if (!hasChanges) {
+          const noChangesEntry: ChatEntry = {
+            type: "assistant",
+            content: "ℹ️ **No Changes to Commit**: Working tree is clean. Nothing to push!",
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, noChangesEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Stage changes
+        const stageEntry: ChatEntry = {
+          type: "assistant",
+          content: "📦 **Step 4/5**: Staging changes...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, stageEntry]);
+
+        const addResult = await agent.executeBashCommand("git add .");
+        const addResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: addResult.success ? "✅ Changes staged successfully" : `❌ Failed to stage: ${addResult.error}`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_add_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "git add ." }) },
+          },
+          toolResult: addResult,
+        };
+        setChatHistory((prev) => [...prev, addResultEntry]);
+
+        if (!addResult.success) {
+          const stagingErrorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Safe Push Failed: Git Staging Error**
+
+**Error Details:**
+\`\`\`
+${addResult.error || 'Failed to stage changes'}
+\`\`\`
+
+**Next Steps:**
+1. **Check git status**: Run \`git status\` to see what's wrong
+2. **Check file permissions**: Ensure files are writable
+3. **Check .gitignore**: Make sure files aren't being ignored
+4. **Manual staging**: Try \`git add <specific-file>\` for individual files
+
+💡 **Common causes:**
+• File permission issues
+• Large files exceeding git limits
+• Corrupted git repository
+• Disk space issues`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, stagingErrorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Commit with a simple message
+        const commitEntry: ChatEntry = {
+          type: "assistant",
+          content: "💾 **Step 5/5**: Creating commit...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, commitEntry]);
+
+        const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        const commitMsg = `feat: update files - ${timestamp}`;
+        const commitResult = await agent.executeBashCommand(`git commit -m "${commitMsg}"`);
+        
+        const commitResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: commitResult.success ? `✅ Commit created: "${commitMsg}"` : `❌ **Safe Push Failed: Git Commit Error**
+
+**Error Details:**
+\`\`\`
+${commitResult.error || 'Git commit failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Check git config**: Ensure user.name and user.email are set
+2. **Check staged files**: Run \`git status\` to verify staged changes  
+3. **Manual commit**: Try \`git commit\` manually with your own message
+4. **Reset staging**: Use \`git reset\` if needed to unstage problematic files
+
+💡 **Common causes:**
+• Missing git configuration (name/email)
+• Empty commit (no staged changes)
+• Commit message formatting issues
+• Git hooks blocking the commit`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_commit_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: `git commit -m "${commitMsg}"` }) },
+          },
+          toolResult: commitResult,
+        };
+        setChatHistory((prev) => [...prev, commitResultEntry]);
+
+        if (!commitResult.success) {
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Push to remote
+        const pushEntry: ChatEntry = {
+          type: "assistant",
+          content: "🚀 **Pushing to remote...**",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, pushEntry]);
+
+        const pushResult = await agent.executeBashCommand("git push");
+        const pushResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: pushResult.success ? "🎉 **Safe Push Completed Successfully!**" : `❌ **Safe Push Failed: Git Push Error**
+
+**Error Details:**
+\`\`\`
+${pushResult.error || 'Git push failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Pull latest changes**: Run \`git pull --rebase\` to get remote updates
+2. **Resolve conflicts**: If there are merge conflicts, resolve them manually
+3. **Try again**: Run \`/safe-push\` again after resolving issues
+4. **Alternative**: Use \`npm run smart-push\` for complex scenarios
+
+💡 **Common causes:**
+• Remote has new commits (fetch first)
+• Branch protection rules
+• Authentication issues
+• Network connectivity problems`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_push_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "git push" }) },
+          },
+          toolResult: pushResult,
+        };
+        setChatHistory((prev) => [...prev, pushResultEntry]);
+
+      } catch (error: unknown) {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ **Safe Push Failed**: ${error instanceof Error ? error.message : String(error)}`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+
+      setIsProcessing(false);
+      clearInput();
+      return true;
+    }
+
+    // Add smart-push command (problematic - use /safe-push instead)
     if (trimmedInput === "/smart-push") {
       const userEntry: ChatEntry = {
         type: "user",

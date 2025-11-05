@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Text } from "ink";
 import { ChatEntry } from "../../../agent/grok-agent.js";
 import { MarkdownRenderer } from "../../utils/markdown-renderer.js";
+import { inkColors } from "../../colors.js";
 
 interface AssistantMessageEntryProps {
   entry: ChatEntry;
@@ -31,14 +32,14 @@ export function AssistantMessageEntry({ entry, verbosityLevel: _verbosityLevel }
   return (
     <Box flexDirection="column" marginTop={1}>
       <Box flexDirection="row" alignItems="flex-start">
-        <Text color="white">⏺ </Text>
+        <Text color={inkColors.text}>⏺ </Text>
         <Box flexDirection="column" width="100%">
           {entry.toolCalls ? (
             // If there are tool calls, just show plain text  
-            <Text color="#FFFFFF" wrap="wrap" dimColor={false}>{processedContent.trim()}</Text>
+            <Text color={inkColors.text} wrap="wrap" dimColor={false}>{processedContent.trim()}</Text>
           ) : (
             // Use bright white text like Claude Code - explicit hex color to override any defaults
-            <Text color="#FFFFFF" wrap="wrap" dimColor={false}>{processedContent.trim()}</Text>
+            <Text color={inkColors.text} wrap="wrap" dimColor={false}>{processedContent.trim()}</Text>
           )}
           {entry.isStreaming && <Text color="cyan">█</Text>}
           {isTruncated && (
