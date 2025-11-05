@@ -324,15 +324,11 @@ Current working directory: ${process.cwd()}`,
     this.messages.push({ role: "user", content: message });
 
     try {
-      // Load context pack for better recommendations
-      const contextPack = await this.loadContextPack();
-
       // Initialize workflow services
       const workflowService = new ResearchRecommendService(this);
 
       const request = {
-        userTask: message,
-        context: contextPack ? 'Project context loaded' : undefined
+        userTask: message
       };
 
       console.log('🔍 Researching and analyzing...');
@@ -1207,18 +1203,6 @@ Current working directory: ${process.cwd()}`,
     }
   }
 
-  /**
-   * Load .agent context pack for enhanced recommendations
-   */
-  private async loadContextPack(): Promise<ContextPack | undefined> {
-    try {
-      const contextLoader = await import('../utils/context-loader.js');
-      return await contextLoader.loadContext('.agent');
-    } catch (error) {
-      console.warn('[Workflow] Failed to load context pack:', error);
-      return undefined;
-    }
-  }
 
   /**
    * Convert workflow results to chat entries for display
