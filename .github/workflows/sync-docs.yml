@@ -1,6 +1,8 @@
 name: Auto-Sync Documentation
 on:
   push:
+    branches:
+      - main # Only run on main branch after merge, not on PR branches
     paths:
       - ".agent/**"
       - "apps/site/src/scripts/sync-agent-docs.js"
