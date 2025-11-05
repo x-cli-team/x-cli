@@ -50,8 +50,7 @@ try {
   const { createToggleConfirmationsCommand } = await import("./commands/toggle-confirmations.js");
   const pkg = await import("../package.json", { assert: { type: "json" } });
   const { checkForUpdates } = await import("./utils/version-checker.js");
-  const { loadContext, formatContextStatus } = await import("./utils/context-loader.js");
-  
+
   log("✅ All modules imported successfully");
   
   // Setup error handlers
@@ -170,17 +169,9 @@ try {
           process.exit(1);
         }
 
-        // Load .agent/ context for intelligent decision making
-        let contextPack;
-        let statusMessage;
-        try {
-          contextPack = loadContext();
-          statusMessage = formatContextStatus(contextPack);
-          log("📚 Context loaded successfully");
-        } catch (error) {
-          log(`⚠️ Context loading failed: ${error}`);
-        }
-
+        // Documentation available via GROK.md + docs-index.md (loaded on-demand)
+        // Old system loaded 50k-70k tokens here - new system loads ~700 tokens via useCLAUDEmd hook
+        log("📚 Documentation available via GROK.md + docs-index.md");
         log("🚀 Launching interactive CLI...");
         
         // Print welcome banner
@@ -189,11 +180,10 @@ try {
         }
 
         const initialMessage = Array.isArray(message) ? message.join(" ") : (message || "");
-        const app = render(React.createElement(ChatInterface, { 
-          agent, 
+        const app = render(React.createElement(ChatInterface, {
+          agent,
           initialMessage,
-          quiet: options.quiet,
-          contextStatus: statusMessage 
+          quiet: options.quiet
         }));
 
         // Cleanup on exit

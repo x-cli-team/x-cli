@@ -2,17 +2,19 @@ name: Auto-Sync Documentation
 on:
   push:
     paths:
-      - '.agent/**'
-      - 'apps/site/src/scripts/sync-agent-docs.js'
+      - ".agent/**"
+      - "apps/site/src/scripts/sync-agent-docs.js"
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - run: npm ci
       - run: npm run sync:docs
       - run: npm run prettier -- --write apps/site/docs/

@@ -92,6 +92,7 @@ export class GrokAgent extends EventEmitter {
   private abortController: AbortController | null = null;
   private mcpInitialized: boolean = false;
   private maxToolRounds: number;
+  private contextPack?: ContextPack;
   private lastToolExecutionTime: number = 0;
   private activeToolCalls: number = 0;
   private readonly maxConcurrentToolCalls: number = 2;
@@ -111,6 +112,7 @@ export class GrokAgent extends EventEmitter {
     const savedModel = manager.getCurrentModel();
     const modelToUse = model || savedModel || "grok-code-fast-1";
     this.maxToolRounds = maxToolRounds || 400;
+    this.contextPack = contextPack;
     this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
     this.grokClient = new GrokClient(apiKey, modelToUse, baseURL);
     this.textEditor = new TextEditorTool();
@@ -145,7 +147,7 @@ export class GrokAgent extends EventEmitter {
       : "";
 
     // Load .agent context if provided
-    const contextSection = contextPack ? `\n\nPROJECT CONTEXT:\n${contextPack.system}\n\nSOP:\n${contextPack.sop}\n\nTASKS:\n${contextPack.tasks.map(t => `- ${t.filename}: ${t.content}`).join('\n')}\n\nThe above project context should inform your responses and decision making.` : "";
+    const contextSection = this.contextPack ? `\n\nPROJECT CONTEXT:\n${this.contextPack.system}\n\nSOP:\n${this.contextPack.sop}\n\nTASKS:\n${this.contextPack.tasks.map((t: { filename: string; content: string }) => `- ${t.filename}: ${t.content}`).join('\n')}\n\nThe above project context should inform your responses and decision making.` : "";
 
     // Initialize with system message
     this.messages.push({
@@ -324,21 +326,17 @@ Current working directory: ${process.cwd()}`,
     this.messages.push({ role: "user", content: message });
 
     try {
-      // Load context pack for better recommendations
-      const contextPack = await this.loadContextPack();
-
       // Initialize workflow services
       const workflowService = new ResearchRecommendService(this);
 
       const request = {
-        userTask: message,
-        context: contextPack ? 'Project context loaded' : undefined
+        userTask: message
       };
 
       console.log('🔍 Researching and analyzing...');
 
       // Phase 1: Research and get approval
-      const { output, approval, revisions } = await workflowService.researchAndGetApproval(request, contextPack);
+      const { output, approval, revisions } = await workflowService.researchAndGetApproval(request, this.contextPack);
 
       if (!approval.approved) {
         // User rejected the plan
@@ -1207,18 +1205,6 @@ Current working directory: ${process.cwd()}`,
     }
   }
 
-  /**
-   * Load .agent context pack for enhanced recommendations
-   */
-  private async loadContextPack(): Promise<ContextPack | undefined> {
-    try {
-      const contextLoader = await import('../utils/context-loader.js');
-      return await contextLoader.loadContext('.agent');
-    } catch (error) {
-      console.warn('[Workflow] Failed to load context pack:', error);
-      return undefined;
-    }
-  }
 
   /**
    * Convert workflow results to chat entries for display

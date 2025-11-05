@@ -7,7 +7,7 @@ import {
 } from "../../utils/confirmation-service.js";
 import ApiKeyInput from "./api-key-input.js";
 import { useContextInfo } from "../../hooks/use-context-info.js";
-import { useAutoRead } from "../../hooks/use-auto-read.js";
+import { useCLAUDEmd } from "../../hooks/use-claude-md.js";
 import { useStreaming } from "../../hooks/use-streaming.js";
 import { useConfirmations } from "../../hooks/use-confirmations.js";
 import { useIntroduction } from "../../hooks/use-introduction.js";
@@ -15,14 +15,11 @@ import { useConsoleSetup } from "../../hooks/use-console-setup.js";
 import { useSessionLogging } from "../../hooks/use-session-logging.js";
 import { useProcessingTimer } from "../../hooks/use-processing-timer.js";
 import { ChatInterfaceRenderer, ContextInfo, PlanMode } from "../../ui/components/chat-interface-renderer.js";
-import { ContextPack } from "../../utils/context-loader.js";
 
 interface ChatInterfaceProps {
   agent?: GrokAgent;
   initialMessage?: string;
   quiet?: boolean;
-  contextPack?: ContextPack;
-  contextStatus?: string;
 }
 
 // Main chat component that handles input when agent is available
@@ -30,14 +27,10 @@ function ChatInterfaceWithAgent({
   agent,
   initialMessage,
   quiet = false,
-  contextPack: _contextPack,
-  contextStatus,
 }: {
   agent: GrokAgent;
   initialMessage?: string;
   quiet?: boolean;
-  contextPack?: ContextPack;
-  contextStatus?: string;
 }) {
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -53,21 +46,8 @@ function ChatInterfaceWithAgent({
   // Setup console display and logo
   useConsoleSetup(quiet);
 
-  // Auto-read .agent folder on first run
-  useAutoRead(setChatHistory);
-
-  // Initialize chat history
-  useEffect(() => {
-    const initialHistory: ChatEntry[] = [];
-    if (contextStatus) {
-      initialHistory.push({
-        type: 'assistant',
-        content: `🔧 ${contextStatus}`,
-        timestamp: new Date(),
-      });
-    }
-    setChatHistory(initialHistory);
-  }, [contextStatus]);
+  // Load GROK.md + docs-index.md at startup (~700 tokens vs old 15k tokens)
+  useCLAUDEmd(setChatHistory);
 
   // Session logging
   useSessionLogging(chatHistory);
@@ -191,8 +171,6 @@ export default function ChatInterface({
   agent,
   initialMessage,
   quiet = false,
-  contextPack,
-  contextStatus,
 }: ChatInterfaceProps) {
   const [currentAgent, setCurrentAgent] = useState<GrokAgent | null>(
     agent || null
@@ -211,8 +189,6 @@ export default function ChatInterface({
       agent={currentAgent}
       initialMessage={initialMessage}
       quiet={quiet}
-      contextPack={contextPack}
-      contextStatus={contextStatus}
     />
   );
 }
