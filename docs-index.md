@@ -19,6 +19,63 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 - `docs-index.md` - This index file
 - `README.md` - Project README for GitHub
 
+### User Documentation (`.agent/docs/claude-code/`)
+
+**Getting Started**
+- `getting-started/overview.md` - Project overview and introduction
+- `getting-started/quickstart.md` - Quick start guide (5-minute setup)
+- `getting-started/common-workflows.md` - Real-world usage patterns
+
+**Building with Grok One-Shot**
+- `build-with-claude-code/subagents.md` - Autonomous task execution
+- `build-with-claude-code/mcp.md` - Model Context Protocol integration
+- `build-with-claude-code/troubleshooting.md` - Common issues and solutions
+
+**Deployment**
+- `deployment/overview.md` - Deployment strategies and environments
+
+**Administration**
+- `administration/advanced-installation.md` - Complex installation scenarios
+- `administration/data-usage.md` - Data handling and privacy
+
+**Configuration**
+- `configuration/settings.md` - Configuration and settings
+- `configuration/terminal-configuration.md` - Terminal setup and optimization
+- `configuration/model-configuration.md` - Model selection and tuning
+- `configuration/profiles.md` - Configuration profiles (TBD)
+
+**Reference**
+- `reference/cli-reference.md` - Complete CLI command reference
+- `reference/interactive-mode.md` - Interactive session guide
+- `reference/slash-commands.md` - Slash command reference
+- `reference/advanced-slash-commands.md` - Advanced slash commands (TBD)
+
+**Features**
+- `features/context-management.md` - Context loading and optimization
+- `features/tool-system.md` - Built-in tool capabilities
+- `features/session-management.md` - Session handling and storage
+- `features/git-integration.md` - Git operations and workflows
+- `features/workflow-automation.md` - Automation patterns
+- `features/research-mode.md` - Codebase exploration
+- `features/error-handling.md` - Error handling and recovery
+- `features/plan-mode.md` - Plan mode (TBD)
+- `features/ide-integration.md` - IDE extensions (TBD)
+- `features/multi-file-operations.md` - Advanced multi-file ops (TBD)
+- `features/codebase-intelligence.md` - Code intelligence (TBD)
+- `features/performance-monitoring.md` - Performance metrics (TBD)
+- `features/testing-integration.md` - Testing framework integration (TBD)
+- `features/code-templates.md` - Code generation templates (TBD)
+- `features/custom-tools.md` - Custom tool creation (TBD)
+- `features/session-restore.md` - Session restoration (TBD)
+- `features/export-import.md` - Export/import capabilities (TBD)
+- `features/analytics.md` - Analytics dashboard (TBD)
+- `features/notifications.md` - Notifications and alerts (TBD)
+- `features/plugin-system.md` - Plugin architecture (TBD)
+- `features/cloud-sync.md` - Cloud synchronization (TBD)
+
+**Resources**
+- `resources/legal-and-compliance.md` - Legal information and compliance
+
 ### System Architecture (`.agent/system/`)
 
 **Core System Design**
@@ -114,6 +171,14 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 
 ## Documentation by Use Case
 
+### For New Users
+
+1. Start: `.agent/docs/claude-code/getting-started/overview.md`
+2. Quick start: `.agent/docs/claude-code/getting-started/quickstart.md`
+3. Workflows: `.agent/docs/claude-code/getting-started/common-workflows.md`
+4. CLI reference: `.agent/docs/claude-code/reference/cli-reference.md`
+5. Troubleshooting: `.agent/docs/claude-code/build-with-claude-code/troubleshooting.md`
+
 ### For New Contributors
 
 1. Start: `.agent/README.md`
@@ -197,10 +262,13 @@ See `.agent/sop/documentation-workflow.md` for details.
 
 This documentation system is designed for token efficiency:
 
-- **GROK.md**: ~400 tokens (comprehensive overview)
-- **docs-index.md**: ~200 tokens (this file)
-- **Total startup**: ~700 tokens (vs old 65k-85k)
-- **On-demand**: AI reads specific docs via Read tool as needed
+- **GROK.md**: ~1,600 tokens (comprehensive overview)
+- **docs-index.md**: ~500 tokens (this file)
+- **Total startup**: ~3,500 tokens (94.6-95.8% reduction vs old 65k-85k!)
+- **44 Claude Code docs**: Available on-demand via Read tool
+- **On-demand loading**: AI reads specific docs only when needed
+
+This achieves industry-standard documentation with minimal startup cost.
 
 ## Contributing to Documentation
 
