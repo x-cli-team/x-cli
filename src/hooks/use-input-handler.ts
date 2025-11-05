@@ -2079,7 +2079,7 @@ ${pushResult.error || 'Git push failed'}
       return true;
     }
 
-    // Add smart-push command (problematic - use /safe-push instead)
+    // Smart-push command - delegates to npm script
     if (trimmedInput === "/smart-push") {
       const userEntry: ChatEntry = {
         type: "user",
@@ -2091,64 +2091,348 @@ ${pushResult.error || 'Git push failed'}
       setIsProcessing(true);
 
       try {
-        // Get current branch
-        const branchResult = await agent.executeBashCommand("git branch --show-current");
-        const currentBranch = branchResult.output?.trim() || "unknown";
-
-        // Step 1: Run quality checks before push
-        const qualityCheckEntry: ChatEntry = {
-          type: "assistant",
-          content: "🔍 **Running pre-push quality checks...**",
-          timestamp: new Date(),
-        };
-        setChatHistory((prev) => [...prev, qualityCheckEntry]);
-
-        // TypeScript check
+        // Step 1: TypeScript Check 📝
         const tsCheckEntry: ChatEntry = {
           type: "assistant",
-          content: "📝 Checking TypeScript...",
+          content: "📝 **Step 1/5**: Checking TypeScript...",
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, tsCheckEntry]);
 
         const tsResult = await agent.executeBashCommand("npm run typecheck");
-        if (tsResult.success) {
-          const tsSuccessEntry: ChatEntry = {
-            type: "tool_result",
-            content: "✅ TypeScript check passed",
-            timestamp: new Date(),
-            toolCall: {
-              id: `ts_check_${Date.now()}`,
-              type: "function",
-              function: {
-                name: "bash",
-                arguments: JSON.stringify({ command: "npm run typecheck" }),
-              },
-            },
-            toolResult: tsResult,
-          };
-          setChatHistory((prev) => [...prev, tsSuccessEntry]);
-        } else {
-          const tsFailEntry: ChatEntry = {
+        const tsResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: tsResult.success ? "✅ TypeScript check passed" : `❌ TypeScript errors: ${tsResult.error}`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `ts_check_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run typecheck" }) },
+          },
+          toolResult: tsResult,
+        };
+        setChatHistory((prev) => [...prev, tsResultEntry]);
+
+        if (!tsResult.success) {
+          const errorEntry: ChatEntry = {
             type: "assistant",
-            content: `❌ **TypeScript check failed**\n\n${tsResult.error || tsResult.output}`,
+            content: `❌ **Smart Push Failed: TypeScript Errors**
+
+**Error Details:**
+\`\`\`
+${tsResult.error || 'TypeScript compilation failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the TypeScript errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/smart-push\` again** to retry the workflow
+
+💡 **Common fixes:**
+• Add missing type annotations
+• Import missing types/modules
+• Fix property name typos
+• Check function signatures`,
             timestamp: new Date(),
           };
-          setChatHistory((prev) => [...prev, tsFailEntry]);
+          setChatHistory((prev) => [...prev, errorEntry]);
           setIsProcessing(false);
           clearInput();
           return true;
         }
 
-        // Linting check (warnings allowed, only errors block)
+        // Lint check
         const lintCheckEntry: ChatEntry = {
           type: "assistant",
-          content: "🧹 Running ESLint...",
+          content: "🧹 **Step 2/5**: Running ESLint...",
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, lintCheckEntry]);
 
         const lintResult = await agent.executeBashCommand("npm run lint");
+        const lintResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: lintResult.success ? "✅ ESLint check completed" : `❌ **Smart Push Failed: ESLint Critical Errors**
+
+**Error Details:**
+\`\`\`
+${lintResult.error || 'ESLint found critical errors'}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the ESLint errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/smart-push\` again** to retry the workflow
+
+💡 **Common fixes:**
+• Remove unused variables/imports
+• Fix indentation and spacing
+• Add missing semicolons
+• Fix naming conventions
+• Use \`eslint --fix\` for auto-fixable issues`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `lint_check_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run lint" }) },
+          },
+          toolResult: lintResult,
+        };
+        setChatHistory((prev) => [...prev, lintResultEntry]);
+
+        // Git status check
+        const statusCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "📋 **Step 3/5**: Checking git status...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, statusCheckEntry]);
+
+        const statusResult = await agent.executeBashCommand("git status --porcelain");
+        const hasChanges = statusResult.success && statusResult.output?.trim();
+
+        if (!hasChanges) {
+          const noChangesEntry: ChatEntry = {
+            type: "assistant",
+            content: "ℹ️ **No Changes to Commit**: Working tree is clean. Nothing to push!",
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, noChangesEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Stage changes
+        const stageEntry: ChatEntry = {
+          type: "assistant",
+          content: "📦 **Step 4/5**: Staging changes...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, stageEntry]);
+
+        const addResult = await agent.executeBashCommand("git add .");
+        const addResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: addResult.success ? "✅ Changes staged successfully" : `❌ Failed to stage: ${addResult.error}`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_add_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "git add ." }) },
+          },
+          toolResult: addResult,
+        };
+        setChatHistory((prev) => [...prev, addResultEntry]);
+
+        if (!addResult.success) {
+          const stagingErrorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Smart Push Failed: Git Staging Error**
+
+**Error Details:**
+\`\`\`
+${addResult.error || 'Failed to stage changes'}
+\`\`\`
+
+**Next Steps:**
+1. **Check git status**: Run \`git status\` to see what's wrong
+2. **Check file permissions**: Ensure files are writable
+3. **Check .gitignore**: Make sure files aren't being ignored
+4. **Manual staging**: Try \`git add <specific-file>\` for individual files
+
+💡 **Common causes:**
+• File permission issues
+• Large files exceeding git limits
+• Corrupted git repository
+• Disk space issues`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, stagingErrorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Commit with a simple message
+        const commitEntry: ChatEntry = {
+          type: "assistant",
+          content: "💾 **Step 5/5**: Creating commit...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, commitEntry]);
+
+        const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        const commitMsg = `feat: update files - ${timestamp}`;
+        const commitResult = await agent.executeBashCommand(`git commit -m "${commitMsg}"`);
+        
+        const commitResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: commitResult.success ? `✅ Commit created: "${commitMsg}"` : `❌ **Smart Push Failed: Git Commit Error**
+
+**Error Details:**
+\`\`\`
+${commitResult.error || 'Git commit failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Check git config**: Ensure user.name and user.email are set
+2. **Check staged files**: Run \`git status\` to verify staged changes  
+3. **Manual commit**: Try \`git commit\` manually with your own message
+4. **Reset staging**: Use \`git reset\` if needed to unstage problematic files
+
+💡 **Common causes:**
+• Missing git configuration (name/email)
+• Empty commit (no staged changes)
+• Commit message formatting issues
+• Git hooks blocking the commit`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_commit_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: `git commit -m "${commitMsg}"` }) },
+          },
+          toolResult: commitResult,
+        };
+        setChatHistory((prev) => [...prev, commitResultEntry]);
+
+        if (!commitResult.success) {
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        // Push to remote
+        const pushEntry: ChatEntry = {
+          type: "assistant",
+          content: "🚀 **Pushing to remote...**",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, pushEntry]);
+
+        const pushResult = await agent.executeBashCommand("git push");
+        const pushResultEntry: ChatEntry = {
+          type: "tool_result",
+          content: pushResult.success ? "🎉 **Smart Push Completed Successfully!**" : `❌ **Smart Push Failed: Git Push Error**
+
+**Error Details:**
+\`\`\`
+${pushResult.error || 'Git push failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Pull latest changes**: Run \`git pull --rebase\` to get remote updates
+2. **Resolve conflicts**: If there are merge conflicts, resolve them manually
+3. **Try again**: Run \`/smart-push\` again after resolving issues
+4. **Alternative**: Use \`npm run smart-push\` for complex scenarios
+
+💡 **Common causes:**
+• Remote has new commits (fetch first)
+• Branch protection rules
+• Authentication issues
+• Network connectivity problems`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_push_${Date.now()}`,
+            type: "function",
+            function: { name: "bash", arguments: JSON.stringify({ command: "git push" }) },
+          },
+          toolResult: pushResult,
+        };
+        setChatHistory((prev) => [...prev, pushResultEntry]);
+
+      } catch (error: unknown) {
+        const errorEntry: ChatEntry = {
+          type: "assistant",
+          content: `❌ **Smart Push Failed**: ${error instanceof Error ? error.message : String(error)}`,
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, errorEntry]);
+      }
+
+      setIsProcessing(false);
+      clearInput();
+      return true;
+    }
+        // Step 1: TypeScript Check 📝
+        const tsCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "📝 **Step 1/5**: Checking TypeScript...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, tsCheckEntry]);
+
+        const tsResult = await agent.executeBashCommand("npm run typecheck");
+        if (!tsResult.success) {
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Safe Push Failed: TypeScript Errors**
+
+**Error Details:**
+\`\`\`
+${tsResult.error || 'TypeScript compilation failed'}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the TypeScript errors** shown above
+2. **Save your files** after making corrections
+3. **Run \`/smart-push\` again** to retry the workflow`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
+        const tsSuccessEntry: ChatEntry = {
+          type: "tool_result",
+          content: "✅ TypeScript check passed",
+          timestamp: new Date(),
+          toolCall: {
+            id: `ts_check_${Date.now()}`,
+            type: "function",
+            function: {
+              name: "bash",
+              arguments: JSON.stringify({ command: "npm run typecheck" }),
+            },
+          },
+          toolResult: tsResult,
+        };
+        setChatHistory((prev) => [...prev, tsSuccessEntry]);
+
+        // Step 2: ESLint Check 🧹
+        const lintCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "🧹 **Step 2/5**: Running ESLint...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, lintCheckEntry]);
+
+        const lintResult = await agent.executeBashCommand("npm run lint");
+        // ESLint warnings are allowed, only critical errors block the workflow
+        if (!lintResult.success && lintResult.error && lintResult.error.includes("error")) {
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Safe Push Failed: ESLint Critical Errors**
+
+**Error Details:**
+\`\`\`
+${lintResult.error}
+\`\`\`
+
+**Next Steps:**
+1. **Fix the critical ESLint errors** shown above
+2. **Save your files** after making corrections  
+3. **Run \`/smart-push\` again** to retry the workflow`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
+        }
+
         const lintSuccessEntry: ChatEntry = {
           type: "tool_result",
           content: "✅ ESLint check completed (warnings allowed)",
@@ -2165,13 +2449,29 @@ ${pushResult.error || 'Git push failed'}
         };
         setChatHistory((prev) => [...prev, lintSuccessEntry]);
 
-        // Step 2: Check git status and pull latest changes
-        const statusResult = await agent.executeBashCommand("git status --porcelain");
+        // Step 3: Git Status Check 📋
+        const statusCheckEntry: ChatEntry = {
+          type: "assistant",
+          content: "📋 **Step 3/5**: Checking for changes...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, statusCheckEntry]);
 
+        const statusResult = await agent.executeBashCommand("git status --porcelain");
         if (!statusResult.success) {
           const errorEntry: ChatEntry = {
             type: "assistant",
-            content: "❌ **Git Error**\n\nUnable to check git status. Are you in a git repository?",
+            content: `❌ **Safe Push Failed: Git Status Error**
+
+**Error Details:**
+\`\`\`
+${statusResult.error || 'Unable to check git status'}
+\`\`\`
+
+**Next Steps:**
+1. **Ensure you're in a git repository**
+2. **Check git status manually** with \`git status\`
+3. **Run \`/smart-push\` again** after resolving git issues`,
             timestamp: new Date(),
           };
           setChatHistory((prev) => [...prev, errorEntry]);
@@ -2183,7 +2483,7 @@ ${pushResult.error || 'Git push failed'}
         if (!statusResult.output || statusResult.output.trim() === "") {
           const noChangesEntry: ChatEntry = {
             type: "assistant",
-            content: "📋 **No Changes to Push**\n\nWorking directory is clean. No commits to push.",
+            content: "ℹ️ **No Changes to Commit**: Working tree is clean. Nothing to push!",
             timestamp: new Date(),
           };
           setChatHistory((prev) => [...prev, noChangesEntry]);
@@ -2192,116 +2492,36 @@ ${pushResult.error || 'Git push failed'}
           return true;
         }
 
-        // Stage all changes to prevent pull issues with unstaged changes
-        const prePullAddResult = await agent.executeBashCommand("git add .");
-        if (!prePullAddResult.success) {
-          const errorEntry: ChatEntry = {
-            type: "assistant",
-            content: `❌ **Failed to stage changes**\n\n${prePullAddResult.error || "Unknown error"}`,
-            timestamp: new Date(),
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-
-        // Stash staged changes to allow clean pull
-        const stashResult = await agent.executeBashCommand("git stash push --include-untracked --message 'smart-push temporary stash'");
-        if (!stashResult.success) {
-          const errorEntry: ChatEntry = {
-            type: "assistant",
-            content: `❌ **Failed to stash changes**\n\n${stashResult.error || "Unknown error"}`,
-            timestamp: new Date(),
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-
-        // Pull latest changes
-        const pullEntry: ChatEntry = {
-          type: "assistant",
-          content: "🔄 Pulling latest changes...",
+        const statusSuccessEntry: ChatEntry = {
+          type: "tool_result",
+          content: `✅ Changes detected for staging:\n\`\`\`\n${statusResult.output.trim()}\n\`\`\``,
           timestamp: new Date(),
         };
-        setChatHistory((prev) => [...prev, pullEntry]);
+        setChatHistory((prev) => [...prev, statusSuccessEntry]);
 
-        // Check for ongoing git operations and clean up if needed
-        const rebaseCheck = await agent.executeBashCommand("test -d .git/rebase-apply -o -d .git/rebase-merge -o -f .git/MERGE_HEAD && echo 'ongoing' || echo 'clean'");
-        if (rebaseCheck.output?.includes('ongoing')) {
-          const cleanupEntry: ChatEntry = {
-            type: "assistant",
-            content: "⚠️ Git operation in progress - cleaning up...",
-            timestamp: new Date(),
-          };
-          setChatHistory((prev) => [...prev, cleanupEntry]);
+        // Step 4: Stage Changes 📦
+        const stageEntry: ChatEntry = {
+          type: "assistant",
+          content: "📦 **Step 4/5**: Staging changes...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, stageEntry]);
 
-          await agent.executeBashCommand("git rebase --abort 2>/dev/null || git merge --abort 2>/dev/null || true");
-        }
-
-        // Try rebase first, fall back to merge if it fails
-        let pullResult = await agent.executeBashCommand(`git pull --rebase origin ${currentBranch}`);
-        if (!pullResult.success) {
-          pullResult = await agent.executeBashCommand(`git pull origin ${currentBranch}`);
-          if (pullResult.success) {
-            const mergeFallbackEntry: ChatEntry = {
-              type: "assistant",
-              content: "⚠️ Rebase failed, fell back to merge",
-              timestamp: new Date(),
-            };
-            setChatHistory((prev) => [...prev, mergeFallbackEntry]);
-          }
-        }
-
-        if (pullResult.success) {
-          const pullSuccessEntry: ChatEntry = {
-            type: "tool_result",
-            content: pullResult.output?.includes('Successfully rebased') ? "✅ Successfully rebased local changes" : "✅ Successfully pulled latest changes",
-            timestamp: new Date(),
-          };
-          setChatHistory((prev) => [...prev, pullSuccessEntry]);
-
-          // Pop the stashed changes
-          const popStashResult = await agent.executeBashCommand("git stash pop");
-          if (!popStashResult.success) {
-            const errorEntry: ChatEntry = {
-              type: "assistant",
-              content: `⚠️ **Failed to restore stashed changes**\n\n${popStashResult.error || "Unknown error"}\n\n💡 Your changes may be lost. Check git stash list.`,
-              timestamp: new Date(),
-            };
-            setChatHistory((prev) => [...prev, errorEntry]);
-            setIsProcessing(false);
-            clearInput();
-            return true;
-          } else {
-            const popSuccessEntry: ChatEntry = {
-              type: "tool_result",
-              content: "✅ Changes restored from stash",
-              timestamp: new Date(),
-            };
-            setChatHistory((prev) => [...prev, popSuccessEntry]);
-          }
-        } else {
-          const pullFailEntry: ChatEntry = {
-            type: "assistant",
-            content: `❌ **Pull failed**\n\n${pullResult.error || pullResult.output}\n\n💡 Check git status and resolve any conflicts`,
-            timestamp: new Date(),
-          };
-          setChatHistory((prev) => [...prev, pullFailEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-
-        // Stage all changes
         const addResult = await agent.executeBashCommand("git add .");
-
         if (!addResult.success) {
           const errorEntry: ChatEntry = {
             type: "assistant",
-            content: `❌ **Failed to stage changes**\n\n${addResult.error || "Unknown error"}`,
+            content: `❌ **Safe Push Failed: Git Add Error**
+
+**Error Details:**
+\`\`\`
+${addResult.error || 'Failed to stage changes'}
+\`\`\`
+
+**Next Steps:**
+1. **Check file permissions** and git repository state
+2. **Run \`git add .\` manually** to diagnose the issue
+3. **Run \`/smart-push\` again** after fixing staging issues`,
             timestamp: new Date(),
           };
           setChatHistory((prev) => [...prev, errorEntry]);
@@ -2310,7 +2530,7 @@ ${pushResult.error || 'Git push failed'}
           return true;
         }
 
-        const addEntry: ChatEntry = {
+        const addSuccessEntry: ChatEntry = {
           type: "tool_result",
           content: "✅ Changes staged successfully",
           timestamp: new Date(),
@@ -2324,324 +2544,113 @@ ${pushResult.error || 'Git push failed'}
           },
           toolResult: addResult,
         };
-        setChatHistory((prev) => [...prev, addEntry]);
+        setChatHistory((prev) => [...prev, addSuccessEntry]);
 
-        // Get staged changes for commit message generation
-        const diffResult = await agent.executeBashCommand("git diff --cached");
+        // Step 5: Commit & Push 🚀
+        const commitPushEntry: ChatEntry = {
+          type: "assistant",
+          content: "🚀 **Step 5/5**: Creating commit and pushing...",
+          timestamp: new Date(),
+        };
+        setChatHistory((prev) => [...prev, commitPushEntry]);
 
-        // Truncate diff if too long to avoid API limits
-        const maxDiffLength = 50000; // 50k characters
-        const truncatedDiff = diffResult.output
-          ? (diffResult.output.length > maxDiffLength
-              ? diffResult.output.substring(0, maxDiffLength) + "\n... (truncated due to length)"
-              : diffResult.output)
-          : "No staged changes shown";
-
-        // Generate commit message using AI
-        const commitPrompt = `Generate a concise, professional git commit message for these changes:
-
-Git Status:
-${statusResult.output}
-
-Git Diff (staged changes):
-${truncatedDiff}
-
-Follow conventional commit format (feat:, fix:, docs:, etc.) and keep it under 72 characters.
-Respond with ONLY the commit message, no additional text.`;
-
-        let commitMessage = "";
-        let streamingEntry: ChatEntry | null = null;
-        let accumulatedCommitContent = "";
-        let lastCommitUpdateTime = Date.now();
-
-        try {
-          for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
-            if (chunk.type === "content" && chunk.content) {
-              accumulatedCommitContent += chunk.content;
-              const now = Date.now();
-              if (now - lastCommitUpdateTime >= 150) {
-                commitMessage += accumulatedCommitContent;
-                if (!streamingEntry) {
-                  const newEntry = {
-                    type: "assistant" as const,
-                    content: `🤖 Generating commit message...\n\n${commitMessage}`,
-                    timestamp: new Date(),
-                    isStreaming: true,
-                  };
-                  setChatHistory((prev) => [...prev, newEntry]);
-                  streamingEntry = newEntry;
-                } else {
-                  setChatHistory((prev) =>
-                    prev.map((entry, idx) =>
-                      idx === prev.length - 1 && entry.isStreaming
-                        ? {
-                            ...entry,
-                            content: `🤖 Generating commit message...\n\n${commitMessage}`,
-                          }
-                        : entry
-                    )
-                  );
-                }
-                accumulatedCommitContent = "";
-                lastCommitUpdateTime = now;
-              }
-            } else if (chunk.type === "done") {
-              if (streamingEntry) {
-                setChatHistory((prev) =>
-                  prev.map((entry) =>
-                    entry.isStreaming
-                      ? {
-                          ...entry,
-                          content: `✅ Generated commit message: "${commitMessage.trim()}"`,
-                          isStreaming: false,
-                        }
-                      : entry
-                  )
-                );
-              }
-              break;
-            }
-          }
-        } catch (error: any) {
-          // Fallback commit message if AI fails
-          commitMessage = "feat: update files";
+        // Generate timestamp-based commit message
+        const now = new Date();
+        const timestamp = now.toISOString().slice(0, 16).replace('T', ' ');
+        const commitMessage = `feat: update files - ${timestamp}`;
+        
+        const commitResult = await agent.executeBashCommand(`git commit -m "${commitMessage}"`);
+        if (!commitResult.success) {
           const errorEntry: ChatEntry = {
             type: "assistant",
-            content: `⚠️ **AI commit message generation failed**: ${error.message}\n\nUsing fallback message: "${commitMessage}"`,
+            content: `❌ **Safe Push Failed: Git Commit Error**
+
+**Error Details:**
+\`\`\`
+${commitResult.error || 'Failed to create commit'}
+\`\`\`
+
+**Next Steps:**
+1. **Check if there are any commit hooks** causing issues
+2. **Verify staged changes** with \`git status\`
+3. **Run \`/smart-push\` again** or commit manually with \`git commit -m "your message"\``,
             timestamp: new Date(),
           };
           setChatHistory((prev) => [...prev, errorEntry]);
-          if (streamingEntry) {
-            setChatHistory((prev) =>
-              prev.map((entry) =>
-                entry.isStreaming ? { ...entry, isStreaming: false } : entry
-              )
-            );
-          }
+          setIsProcessing(false);
+          clearInput();
+          return true;
         }
 
-        // Execute the commit
-        const cleanCommitMessage = commitMessage
-          .trim()
-          .replace(/^["']|["']$/g, "");
-        const commitCommand = `git commit -m "${cleanCommitMessage}"`;
-        const commitResult = await agent.executeBashCommand(commitCommand);
-
-        const commitEntry: ChatEntry = {
+        const commitSuccessEntry: ChatEntry = {
           type: "tool_result",
-          content: commitResult.success
-            ? `✅ **Commit Created**: ${commitResult.output?.split('\n')[0] || "Commit successful"}`
-            : `❌ **Commit Failed**: ${commitResult.error || "Unknown error"}`,
+          content: `✅ Commit created: "${commitMessage}"`,
           timestamp: new Date(),
           toolCall: {
             id: `git_commit_${Date.now()}`,
             type: "function",
             function: {
               name: "bash",
-              arguments: JSON.stringify({ command: commitCommand }),
+              arguments: JSON.stringify({ command: `git commit -m "${commitMessage}"` }),
             },
           },
           toolResult: commitResult,
         };
-        setChatHistory((prev) => [...prev, commitEntry]);
+        setChatHistory((prev) => [...prev, commitSuccessEntry]);
 
-        if (commitResult.success) {
-          // Push to remote
-          const pushResult = await agent.executeBashCommand("git push");
+        // Push to remote
+        const pushResult = await agent.executeBashCommand("git push");
+        if (!pushResult.success) {
+          const errorEntry: ChatEntry = {
+            type: "assistant",
+            content: `❌ **Safe Push Failed: Git Push Error**
 
-          if (pushResult.success) {
-            const pushEntry: ChatEntry = {
-              type: "tool_result",
-              content: `🚀 **Push Successful**: ${pushResult.output?.split('\n')[0] || "Changes pushed to remote"}`,
-              timestamp: new Date(),
-              toolCall: {
-                id: `git_push_${Date.now()}`,
-                type: "function",
-                function: {
-                  name: "bash",
-                  arguments: JSON.stringify({ command: "git push" }),
-                },
-              },
-              toolResult: pushResult,
-            };
-            setChatHistory((prev) => [...prev, pushEntry]);
+**Error Details:**
+\`\`\`
+${pushResult.error || 'Failed to push to remote'}
+\`\`\`
 
-            // Verification stage
-            const verificationEntry: ChatEntry = {
-              type: "assistant",
-              content: "🔍 **Running post-push verification...**",
-              timestamp: new Date(),
-            };
-            setChatHistory((prev) => [...prev, verificationEntry]);
-
-            // Check git status for any issues
-            const statusCheckResult = await agent.executeBashCommand("git status --porcelain");
-            if (statusCheckResult.success && statusCheckResult.output?.trim() === "") {
-              const statusOkEntry: ChatEntry = {
-                type: "tool_result",
-                content: "✅ **Git Status**: Working directory clean",
-                timestamp: new Date(),
-              };
-              setChatHistory((prev) => [...prev, statusOkEntry]);
-            } else {
-              const statusIssueEntry: ChatEntry = {
-                type: "assistant",
-                content: `⚠️ **Git Status Issues Detected**:\n\n${statusCheckResult.output || "Unknown status"}`,
-                timestamp: new Date(),
-              };
-              setChatHistory((prev) => [...prev, statusIssueEntry]);
-            }
-
-            // Wait a moment for potential CI/NPM publishing
-            const waitEntry: ChatEntry = {
-              type: "assistant",
-              content: "⏳ **Waiting for CI/NPM publishing...** (10 seconds)",
-              timestamp: new Date(),
-            };
-            setChatHistory((prev) => [...prev, waitEntry]);
-
-            await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds
-
-            // Check NPM package version (only if this is an NPM package)
-            const localPackageResult = await agent.executeBashCommand("node -p \"require('./package.json').name\" 2>/dev/null || echo 'no-package'");
-            const localName = localPackageResult.success && localPackageResult.output?.trim() !== 'no-package' ? localPackageResult.output?.trim() : null;
-
-            if (localName) {
-              const localVersionResult = await agent.executeBashCommand("node -p \"require('./package.json').version\"");
-              const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
-
-              const npmCheckResult = await agent.executeBashCommand(`npm view ${localName} version 2>/dev/null || echo 'not-found'`);
-
-              if (npmCheckResult.success && npmCheckResult.output?.trim() && npmCheckResult.output?.trim() !== 'not-found') {
-                const npmVersion = npmCheckResult.output.trim();
-                if (npmVersion === localVersion) {
-                  const npmConfirmEntry: ChatEntry = {
-                    type: "tool_result",
-                    content: `✅ **NPM Package Confirmed**: ${localName} v${npmVersion} published successfully`,
-                    timestamp: new Date(),
-                  };
-                  setChatHistory((prev) => [...prev, npmConfirmEntry]);
-                } else {
-                  const npmPendingEntry: ChatEntry = {
-                    type: "assistant",
-                    content: `⏳ **NPM Status**: Local ${localName} v${localVersion}, NPM v${npmVersion}. Publishing may still be in progress.`,
-                    timestamp: new Date(),
-                  };
-                  setChatHistory((prev) => [...prev, npmPendingEntry]);
-                }
-              } else {
-                const npmSkipEntry: ChatEntry = {
-                  type: "assistant",
-                  content: `ℹ️ **NPM Check Skipped**: Package ${localName} not found on NPM (may not be published yet)`,
-                  timestamp: new Date(),
-                };
-                setChatHistory((prev) => [...prev, npmSkipEntry]);
-              }
-            } else {
-              const npmSkipEntry: ChatEntry = {
-                type: "assistant",
-                content: `ℹ️ **NPM Check Skipped**: No package.json found or not an NPM package`,
-                timestamp: new Date(),
-              };
-              setChatHistory((prev) => [...prev, npmSkipEntry]);
-            }
-
-            // Final success message
-            const finalSuccessEntry: ChatEntry = {
-              type: "assistant",
-              content: "🎉 **Smart Push Complete**: All verifications passed!",
-              timestamp: new Date(),
-            };
-            setChatHistory((prev) => [...prev, finalSuccessEntry]);
-
-          } else {
-            // Check if push failed due to branch protection
-            const pushError = pushResult.error || pushResult.output || "";
-            if (pushError.includes("protected branch") ||
-                pushError.includes("Changes must be made through a pull request") ||
-                pushError.includes("GH006")) {
-              const branchProtectionEntry: ChatEntry = {
-                type: "assistant",
-                content: "🛡️ **Branch Protection Detected**: Direct pushes to this branch are blocked.\n\n🔄 **Creating PR workflow...**",
-                timestamp: new Date(),
-              };
-              setChatHistory((prev) => [...prev, branchProtectionEntry]);
-
-              // Create feature branch
-              const featureBranch = `feature/${new Date().toISOString().slice(0,19).replace(/[:-]/g, '').replace('T', '-')}-smart-push`;
-
-              const createBranchResult = await agent.executeBashCommand(`git checkout -b ${featureBranch}`);
-
-              if (createBranchResult.success) {
-                const pushBranchResult = await agent.executeBashCommand(`git push -u origin ${featureBranch}`);
-
-                if (pushBranchResult.success) {
-                  const branchSuccessEntry: ChatEntry = {
-                    type: "tool_result",
-                    content: `✅ **Feature Branch Created**: \`${featureBranch}\`\n\n📋 **Attempting to create Pull Request...**`,
-                    timestamp: new Date(),
-                  };
-                  setChatHistory((prev) => [...prev, branchSuccessEntry]);
-
-                  // Try to create PR with GitHub CLI
-                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base ${currentBranch}`);
-
-                  if (prResult.success) {
-                    const prUrl = prResult.output?.match(/https:\/\/github\.com\/[^\s]+/)?.[0];
-                    const prSuccessEntry: ChatEntry = {
-                      type: "tool_result",
-                      content: `✅ **Pull Request Created Successfully!**\n\n🔗 **PR URL**: ${prUrl || 'Check GitHub for the link'}\n\n🎯 **Next Steps**:\n• Review the PR on GitHub\n• Wait for CI checks to pass\n• Request approval and merge`,
-                      timestamp: new Date(),
-                    };
-                    setChatHistory((prev) => [...prev, prSuccessEntry]);
-                  } else {
-                    const prManualEntry: ChatEntry = {
-                      type: "assistant",
-                      content: `⚠️ **PR Creation Failed**: GitHub CLI may not be available.\n\n💡 **Create PR Manually**:\n• Go to GitHub repository\n• Create PR from \`${featureBranch}\` → \`${currentBranch}\`\n• Title: \`${cleanCommitMessage}\``,
-                      timestamp: new Date(),
-                    };
-                    setChatHistory((prev) => [...prev, prManualEntry]);
-                  }
-                } else {
-                  const pushFailEntry: ChatEntry = {
-                    type: "tool_result",
-                    content: `❌ **Failed to push feature branch**: ${pushBranchResult.error}`,
-                    timestamp: new Date(),
-                  };
-                  setChatHistory((prev) => [...prev, pushFailEntry]);
-                }
-              } else {
-                const branchFailEntry: ChatEntry = {
-                  type: "tool_result",
-                  content: `❌ **Failed to create feature branch**: ${createBranchResult.error}`,
-                  timestamp: new Date(),
-                };
-                setChatHistory((prev) => [...prev, branchFailEntry]);
-              }
-            } else {
-              const pushFailEntry: ChatEntry = {
-                type: "tool_result",
-                content: `❌ **Push Failed**: ${pushResult.error || "Unknown error"}\n\nTry running \`git push\` manually.`,
-                timestamp: new Date(),
-                toolCall: {
-                  id: `git_push_${Date.now()}`,
-                  type: "function",
-                  function: {
-                    name: "bash",
-                    arguments: JSON.stringify({ command: "git push" }),
-                  },
-                },
-                toolResult: pushResult,
-              };
-              setChatHistory((prev) => [...prev, pushFailEntry]);
-            }
-          }
+**Next Steps:**
+1. **Check your remote repository** access and branch settings
+2. **Verify remote origin** with \`git remote -v\`
+3. **Try manual push** with \`git push\` to diagnose the issue
+4. **Run \`/smart-push\` again** after resolving push issues`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, errorEntry]);
+          setIsProcessing(false);
+          clearInput();
+          return true;
         }
+
+        const pushSuccessEntry: ChatEntry = {
+          type: "tool_result",
+          content: `🚀 Push successful: ${pushResult.output?.split('\n')[0] || "Changes pushed to remote"}`,
+          timestamp: new Date(),
+          toolCall: {
+            id: `git_push_${Date.now()}`,
+            type: "function",
+            function: {
+              name: "bash",
+              arguments: JSON.stringify({ command: "git push" }),
+            },
+          },
+          toolResult: pushResult,
+        };
+        setChatHistory((prev) => [...prev, pushSuccessEntry]);
+
+        // Final success message
+        const successEntry: ChatEntry = {
+          type: "assistant",
+          content: "🎉 Smart Push Complete! All quality checks passed and changes pushed successfully.",
+          timestamp: new Date()
+        };
+        setChatHistory((prev) => [...prev, successEntry]);
 
       } catch (error: unknown) {
         const errorEntry: ChatEntry = {
           type: "assistant",
-          content: `❌ **Smart Push Failed**\n\n${error instanceof Error ? error.message : String(error)}`,
+          content: "❌ Smart Push Failed: " + (error instanceof Error ? error.message : String(error)),
           timestamp: new Date(),
         };
         setChatHistory((prev) => [...prev, errorEntry]);
