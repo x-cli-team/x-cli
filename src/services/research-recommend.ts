@@ -108,7 +108,7 @@ SOP Documentation:
 ${contextPack.sop}
 
 Recent Task Documentation:
-${contextPack.tasks.slice(0, 5).map(t => `${t.filename}:\n${t.content}`).join('\n\n')}
+${contextPack.tasks.slice(0, 5).map((t: { filename: string; content: string }) => `${t.filename}:\n${t.content}`).join('\n\n')}
 
 `;
     }
