@@ -79,7 +79,7 @@ x-cli "try advanced code understanding features"
 **Characteristics:**
 
 - **Intelligence:** Streamlined, focused
-- **Speed:** Very fast (<1 second typical)
+- **Speed:** Very fast (less than 1 second typical)
 - **Context:** 128k tokens
 - **Quality:** Good for straightforward tasks
 - **Cost:** Lower pricing
