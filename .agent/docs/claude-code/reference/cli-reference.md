@@ -97,6 +97,44 @@ x-cli --model grok-2-1212
 
 ---
 
+### `-u, --base-url <url>`
+
+Specify custom Grok API base URL.
+
+```bash
+x-cli -u https://api.x.ai/v1
+x-cli --base-url https://custom-endpoint.com/v1
+```
+
+**Default:** `https://api.x.ai/v1`
+
+**Notes:**
+- For custom deployments or proxies
+- Saved to settings on first use
+- Can also set via `GROK_BASE_URL` environment variable
+- Useful for enterprise deployments
+
+---
+
+### `--max-tool-rounds <number>`
+
+Set maximum number of tool execution rounds.
+
+```bash
+x-cli --max-tool-rounds 500
+x-cli --max-tool-rounds 100  # For simple tasks
+```
+
+**Default:** `400`
+
+**Notes:**
+- Prevents infinite loops in tool execution
+- Higher values allow more complex operations
+- Lower values save API costs for simple tasks
+- Can also set via `MAX_TOOL_ROUNDS` environment variable
+
+---
+
 ### `-p, --prompt <message>`
 
 Run in headless (non-interactive) mode with a single prompt.

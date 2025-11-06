@@ -59,20 +59,50 @@ bun install -g @xagent/one-shot
 
 ### "No API key found"
 
-**Cause:** GROK_API_KEY not set
+**Error message:**
+```
+[2025-11-06T11:11:31.792Z] 🚀 X-CLI Starting Up...
+[2025-11-06T11:11:31.794Z] 📂 Working directory: /home/user/project
+[2025-11-06T11:11:31.794Z] 🖥️  Node version: v20.10.0
+[2025-11-06T11:11:31.794Z] 🔑 API Key: ❌ Missing
+❌ No API key found. Set GROK_API_KEY environment variable.
+[2025-11-06T11:11:31.794Z] ❌ Missing API key - exiting
+```
+
+**Cause:** GROK_API_KEY environment variable not set
 
 **Solutions:**
-```bash
-# Set environment variable
-export GROK_API_KEY="your-key-here"
 
-# Add to shell profile
-echo 'export GROK_API_KEY="your-key"' >> ~/.bashrc
+**1. Set environment variable permanently (recommended):**
+```bash
+# Add to your shell profile (~/.bashrc, ~/.zshrc, or ~/.profile)
+echo 'export GROK_API_KEY="xai-your-actual-key-here"' >> ~/.bashrc
+
+# Reload your shell
 source ~/.bashrc
 
-# Or pass via flag
-x-cli -k "your-key"
+# Verify it's set
+echo $GROK_API_KEY
+# Should output: xai-your-actual-key-here
 ```
+
+**2. Set for current session only:**
+```bash
+export GROK_API_KEY="xai-your-key-here"
+x-cli
+```
+
+**3. Pass via command-line flag:**
+```bash
+x-cli -k "xai-your-key-here"
+```
+
+**Get your API key:**
+- Visit: https://console.x.ai
+- Sign in or create account
+- Navigate to "API Keys" section
+- Click "Create new API key"
+- Copy the key (starts with `xai-`)
 
 ### "Invalid API key" or 401 errors
 

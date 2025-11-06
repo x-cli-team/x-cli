@@ -16,8 +16,16 @@ Get up and running with Grok One-Shot in under 5 minutes.
 # Install globally
 npm install -g @xagent/one-shot
 
-# Verify installation
+# Verify installation (requires API key - see next section)
+# For now, check if command exists:
+which x-cli
+# Output: /usr/local/bin/x-cli (or similar path)
+```
+
+**Note**: The `--version` and `--help` flags currently require an API key. Set your API key first (next section), then you can run:
+```bash
 x-cli --version
+# Output: 1.1.101 (or current version)
 ```
 
 ### Option 2: Bun (Fastest - 4x faster than npm)
@@ -84,10 +92,24 @@ x-cli
 
 # You'll see the welcome banner and prompt:
 #
-# ╔═══════════════════════════════════════════╗
-# ║         GROK ONE-SHOT v1.1.101            ║
-# ║    AI-Powered Terminal Assistant          ║
-# ╚═══════════════════════════════════════════╝
+#   Welcome to X-CLI v1.1.101 ⚡
+#
+#   🚀 Claude Code-level intelligence in your terminal!
+#
+#   💬 Interactive Chat:
+#
+#   Ask me anything! Try:
+#   • "What files are in this directory?"
+#   • "Fix the bug in user-service.ts"
+#   • "Add tests for the authentication module"
+#
+#   🛠️  Power Features:
+#
+#   • Auto-edit mode: Press Shift+Tab to toggle hands-free editing
+#   • Project memory: Create .xcli/GROK.md to customize behavior
+#   • Documentation: Run "/init-agent" for .agent docs system
+#
+#   Type /help for commands, /exit to quit
 #
 # >
 ```
@@ -181,20 +203,35 @@ x-cli -d /path/to/project
 
 ### Approval System
 
-When the AI wants to modify files or run commands, you'll see:
+When the AI wants to modify files or run commands, you'll see an interactive confirmation dialog:
 
 ```
-🔧 The AI wants to:
-   • Edit file: src/index.ts
-   • Run command: npm test
-
-Approve? (y/n/a for approve all)
+┌─ Confirmation ────────────────────────────────┐
+│                                               │
+│ Operation: Edit file                          │
+│ File: src/index.ts                           │
+│                                               │
+│ Options (use ↑/↓ or Tab to navigate):        │
+│                                               │
+│ > Yes                                         │
+│   Yes, and don't ask again this session      │
+│   No                                          │
+│   No, with feedback                           │
+│                                               │
+│ Press Enter to confirm, Esc to cancel        │
+└───────────────────────────────────────────────┘
 ```
 
-Options:
-- `y` - Approve this operation
-- `n` - Reject this operation
-- `a` - Approve all for this session
+**Navigation:**
+- `↑/↓` or `Tab/Shift+Tab` - Navigate options
+- `Enter` - Confirm selected option
+- `Esc` - Cancel operation
+
+**Options explained:**
+- **Yes** - Approve this single operation
+- **Yes, and don't ask again** - Approve all operations this session
+- **No** - Reject this operation
+- **No, with feedback** - Reject and provide explanation to the AI
 
 **Disable confirmations globally:**
 ```bash
@@ -319,17 +356,37 @@ Currently, sessions auto-save but don't auto-resume. You can:
 
 ### "No API key found"
 
-**Solution:**
-```bash
-# Set environment variable
-export GROK_API_KEY="your-key"
-
-# Or pass via flag
-x-cli -k "your-key"
-
-# Or enter interactively when prompted
-x-cli
+**Error message you'll see:**
 ```
+❌ No API key found. Set GROK_API_KEY environment variable.
+```
+
+**Solutions:**
+
+**Option 1: Environment Variable (Recommended)**
+```bash
+# Add to your shell profile (~/.bashrc, ~/.zshrc, or ~/.profile)
+export GROK_API_KEY="xai-your-actual-api-key-here"
+
+# Reload your shell
+source ~/.bashrc  # or ~/.zshrc
+
+# Verify it's set
+echo $GROK_API_KEY
+# Output: xai-your-actual-api-key-here
+```
+
+**Option 2: Pass via flag (temporary - for testing)**
+```bash
+GROK_API_KEY="xai-your-key" x-cli
+```
+
+**Get your API key:**
+- Go to https://console.x.ai
+- Create an account or sign in
+- Navigate to API Keys section
+- Generate a new API key
+- Key format: `xai-` followed by alphanumeric characters
 
 ### "Error: X CLI requires an interactive terminal"
 
