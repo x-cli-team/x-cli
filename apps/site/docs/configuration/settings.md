@@ -140,9 +140,9 @@ x-cli toggle-confirmations
 **Manage via:**
 
 ```bash
-x-cli mcp add <name> "<command>"
+x-cli mcp add \<name\> "\<command\>"
 x-cli mcp list
-x-cli mcp remove <name>
+x-cli mcp remove \<name\>
 ```
 
 ## Environment Variables
@@ -434,7 +434,7 @@ source ~/.bashrc # or ~/.zshrc
 
 ```bash
 # Test command independently
-<command from settings.json>
+\<command from settings.json\>
 
 # Check logs
 export GROK_DEBUG=true
