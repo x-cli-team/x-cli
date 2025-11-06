@@ -41,7 +41,7 @@ Deep codebase intelligence will provide AST-based code understanding, symbol res
 - Symbol extraction and resolution
 - Dependency detection
 - AST parsing (TypeScript, JavaScript, Python)
-- Fast symbol search (<1s for large codebases)
+- Fast symbol search (less than 1s for large codebases)
 
 **Priority:** P0 - Critical for competitive viability
 

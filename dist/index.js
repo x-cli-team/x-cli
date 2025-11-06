@@ -7331,10 +7331,10 @@ var init_dependency_analyzer = __esm({
         const circularDeps = [];
         const visited = /* @__PURE__ */ new Set();
         const visiting = /* @__PURE__ */ new Set();
-        const dfs = (filePath, path35) => {
+        const dfs = (filePath, path33) => {
           if (visiting.has(filePath)) {
-            const cycleStart = path35.indexOf(filePath);
-            const cycle = path35.slice(cycleStart).concat([filePath]);
+            const cycleStart = path33.indexOf(filePath);
+            const cycle = path33.slice(cycleStart).concat([filePath]);
             circularDeps.push({
               cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
               severity: cycle.length <= 2 ? "error" : "warning",
@@ -7350,7 +7350,7 @@ var init_dependency_analyzer = __esm({
           if (node) {
             for (const dependency of node.dependencies) {
               if (graph.nodes.has(dependency)) {
-                dfs(dependency, [...path35, filePath]);
+                dfs(dependency, [...path33, filePath]);
               }
             }
           }
@@ -12097,131 +12097,6 @@ ${option.id}) ${option.title}`);
   }
 });
 
-// src/utils/context-loader.ts
-var context_loader_exports = {};
-__export(context_loader_exports, {
-  formatContextStatus: () => formatContextStatus,
-  loadContext: () => loadContext
-});
-function loadMarkdownDirectory(dirPath) {
-  if (!fs2__default.existsSync(dirPath)) {
-    return "";
-  }
-  const files = fs2__default.readdirSync(dirPath).filter((file) => file.endsWith(".md")).sort();
-  let content = "";
-  for (const file of files) {
-    const filePath = path8__default.join(dirPath, file);
-    try {
-      const fileContent = fs2__default.readFileSync(filePath, "utf-8");
-      content += `
-
-=== ${file} ===
-
-${fileContent}`;
-    } catch (error) {
-      console.warn(`Failed to read ${filePath}:`, error);
-    }
-  }
-  return content;
-}
-function extractDateFromFilename(filename) {
-  const match = filename.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (match) {
-    return new Date(match[1]);
-  }
-  return /* @__PURE__ */ new Date(0);
-}
-function summarizeContent(content, maxLength = MAX_SUMMARY_LENGTH) {
-  if (content.length <= maxLength) {
-    return content;
-  }
-  const truncated = content.substring(0, maxLength);
-  const lastNewline = truncated.lastIndexOf("\n\n");
-  if (lastNewline > maxLength * 0.8) {
-    return truncated.substring(0, lastNewline);
-  }
-  return truncated + "\n\n[...content truncated for context budget...]";
-}
-function loadTaskFiles(tasksDir, maxBudget) {
-  if (!fs2__default.existsSync(tasksDir)) {
-    return [];
-  }
-  const files = fs2__default.readdirSync(tasksDir).filter((file) => file.endsWith(".md")).map((filename) => {
-    const filePath = path8__default.join(tasksDir, filename);
-    const content = fs2__default.readFileSync(filePath, "utf-8");
-    return {
-      filename,
-      content,
-      size: Buffer.byteLength(content, "utf-8"),
-      date: extractDateFromFilename(filename),
-      isSummarized: false
-    };
-  }).sort((a, b) => b.date.getTime() - a.date.getTime());
-  const result = [];
-  let usedBudget = 0;
-  for (const file of files) {
-    let finalContent = file.content;
-    let isSummarized = false;
-    if (usedBudget + file.size > maxBudget) {
-      finalContent = summarizeContent(file.content);
-      const summarizedSize = Buffer.byteLength(finalContent, "utf-8");
-      if (usedBudget + summarizedSize > maxBudget) {
-        continue;
-      }
-      usedBudget += summarizedSize;
-      isSummarized = true;
-    } else {
-      usedBudget += file.size;
-    }
-    result.push({
-      ...file,
-      content: finalContent,
-      isSummarized
-    });
-  }
-  return result;
-}
-function loadContext(agentDir = ".agent") {
-  const systemContent = loadMarkdownDirectory(path8__default.join(agentDir, "system"));
-  const sopContent = loadMarkdownDirectory(path8__default.join(agentDir, "sop"));
-  const systemSize = Buffer.byteLength(systemContent, "utf-8");
-  const sopSize = Buffer.byteLength(sopContent, "utf-8");
-  const taskBudget = Math.max(0, CONTEXT_BUDGET_BYTES - systemSize - sopSize);
-  const tasks = loadTaskFiles(path8__default.join(agentDir, "tasks"), taskBudget);
-  const totalSize = systemSize + sopSize + tasks.reduce((sum, task) => sum + Buffer.byteLength(task.content, "utf-8"), 0);
-  const warnings = [];
-  if (totalSize > CONTEXT_BUDGET_BYTES) {
-    warnings.push(`Context size (${(totalSize / 1024).toFixed(1)}KB) exceeds budget (${CONTEXT_BUDGET_BYTES / 1024}KB)`);
-  }
-  return {
-    system: systemContent,
-    sop: sopContent,
-    tasks,
-    totalSize,
-    warnings
-  };
-}
-function formatContextStatus(pack) {
-  const taskCount = pack.tasks.length;
-  const summarizedCount = pack.tasks.filter((t) => t.isSummarized).length;
-  const sizeKB = (pack.totalSize / 1024).toFixed(1);
-  let status = `[x-cli] Context: loaded system docs, sop docs, ${taskCount} task docs (~${sizeKB} KB).`;
-  if (summarizedCount > 0) {
-    status += ` Summarized ${summarizedCount} older tasks for context budget.`;
-  }
-  if (pack.warnings.length > 0) {
-    status += ` Warnings: ${pack.warnings.join("; ")}`;
-  }
-  return status;
-}
-var CONTEXT_BUDGET_BYTES, MAX_SUMMARY_LENGTH;
-var init_context_loader = __esm({
-  "src/utils/context-loader.ts"() {
-    CONTEXT_BUDGET_BYTES = 280 * 1024;
-    MAX_SUMMARY_LENGTH = 2e3;
-  }
-});
-
 // src/agent/grok-agent.ts
 var grok_agent_exports = {};
 __export(grok_agent_exports, {
@@ -12256,6 +12131,7 @@ var init_grok_agent = __esm({
         const savedModel = manager.getCurrentModel();
         const modelToUse = model || savedModel || "grok-code-fast-1";
         this.maxToolRounds = maxToolRounds || 400;
+        this.contextPack = contextPack;
         this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
         this.grokClient = new GrokClient(apiKey2, modelToUse, baseURL);
         this.textEditor = new TextEditorTool();
@@ -12285,16 +12161,16 @@ CUSTOM INSTRUCTIONS:
 ${customInstructions}
 
 The above custom instructions should be followed alongside the standard instructions below.` : "";
-        const contextSection = contextPack ? `
+        const contextSection = this.contextPack ? `
 
 PROJECT CONTEXT:
-${contextPack.system}
+${this.contextPack.system}
 
 SOP:
-${contextPack.sop}
+${this.contextPack.sop}
 
 TASKS:
-${contextPack.tasks.map((t) => `- ${t.filename}: ${t.content}`).join("\n")}
+${this.contextPack.tasks.map((t) => `- ${t.filename}: ${t.content}`).join("\n")}
 
 The above project context should inform your responses and decision making.` : "";
         this.messages.push({
@@ -12452,14 +12328,12 @@ Current working directory: ${process.cwd()}`
         this.logEntry(userEntry);
         this.messages.push({ role: "user", content: message });
         try {
-          const contextPack = await this.loadContextPack();
           const workflowService = new ResearchRecommendService(this);
           const request = {
-            userTask: message,
-            context: contextPack ? "Project context loaded" : void 0
+            userTask: message
           };
           console.log("\u{1F50D} Researching and analyzing...");
-          const { output, approval, revisions } = await workflowService.researchAndGetApproval(request, contextPack);
+          const { output, approval, revisions } = await workflowService.researchAndGetApproval(request, this.contextPack);
           if (!approval.approved) {
             const rejectionEntry = {
               type: "assistant",
@@ -12863,10 +12737,10 @@ Current working directory: ${process.cwd()}`
                 return await this.textEditor.view(args.path, range);
               } catch (error) {
                 console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-                const path35 = args.path;
-                let command = `cat "${path35}"`;
+                const path33 = args.path;
+                let command = `cat "${path33}"`;
                 if (args.start_line && args.end_line) {
-                  command = `sed -n '${args.start_line},${args.end_line}p' "${path35}"`;
+                  command = `sed -n '${args.start_line},${args.end_line}p' "${path33}"`;
                 }
                 return await this.bash.execute(command);
               }
@@ -13128,18 +13002,6 @@ EOF`;
           fs2__default.appendFileSync(this.sessionLogPath, logLine);
         } catch (error) {
           console.warn("Failed to log session entry:", error);
-        }
-      }
-      /**
-       * Load .agent context pack for enhanced recommendations
-       */
-      async loadContextPack() {
-        try {
-          const contextLoader = await Promise.resolve().then(() => (init_context_loader(), context_loader_exports));
-          return await contextLoader.loadContext(".agent");
-        } catch (error) {
-          console.warn("[Workflow] Failed to load context pack:", error);
-          return void 0;
         }
       }
       /**
@@ -18638,7 +18500,7 @@ var init_package = __esm({
     package_default = {
       type: "module",
       name: "@xagent/one-shot",
-      version: "1.1.99",
+      version: "1.1.101",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal with automatic documentation updates.",
       main: "dist/index.js",
       module: "dist/index.js",
@@ -20682,514 +20544,23 @@ ${pushResult.error || "Git push failed"}
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const branchResult = await agent.executeBashCommand("git branch --show-current");
-        const currentBranch = branchResult.output?.trim() || "unknown";
-        const qualityCheckEntry = {
-          type: "assistant",
-          content: "\u{1F50D} **Running pre-push quality checks...**",
-          timestamp: /* @__PURE__ */ new Date()
-        };
-        setChatHistory((prev) => [...prev, qualityCheckEntry]);
-        const tsCheckEntry = {
-          type: "assistant",
-          content: "\u{1F4DD} Checking TypeScript...",
-          timestamp: /* @__PURE__ */ new Date()
-        };
-        setChatHistory((prev) => [...prev, tsCheckEntry]);
-        const tsResult = await agent.executeBashCommand("npm run typecheck");
-        if (tsResult.success) {
-          const tsSuccessEntry = {
-            type: "tool_result",
-            content: "\u2705 TypeScript check passed",
-            timestamp: /* @__PURE__ */ new Date(),
-            toolCall: {
-              id: `ts_check_${Date.now()}`,
-              type: "function",
-              function: {
-                name: "bash",
-                arguments: JSON.stringify({ command: "npm run typecheck" })
-              }
-            },
-            toolResult: tsResult
-          };
-          setChatHistory((prev) => [...prev, tsSuccessEntry]);
-        } else {
-          const tsFailEntry = {
-            type: "assistant",
-            content: `\u274C **TypeScript check failed**
-
-${tsResult.error || tsResult.output}`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, tsFailEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        const lintCheckEntry = {
-          type: "assistant",
-          content: "\u{1F9F9} Running ESLint...",
-          timestamp: /* @__PURE__ */ new Date()
-        };
-        setChatHistory((prev) => [...prev, lintCheckEntry]);
-        const lintResult = await agent.executeBashCommand("npm run lint");
-        const lintSuccessEntry = {
+        const result = await agent.executeBashCommand("npm run smart-push");
+        const resultEntry = {
           type: "tool_result",
-          content: "\u2705 ESLint check completed (warnings allowed)",
+          content: result.success ? "\u{1F389} Smart Push Completed Successfully!" : `\u274C Smart Push Failed: ${result.error}`,
           timestamp: /* @__PURE__ */ new Date(),
           toolCall: {
-            id: `lint_check_${Date.now()}`,
+            id: `smart_push_${Date.now()}`,
             type: "function",
-            function: {
-              name: "bash",
-              arguments: JSON.stringify({ command: "npm run lint" })
-            }
+            function: { name: "bash", arguments: JSON.stringify({ command: "npm run smart-push" }) }
           },
-          toolResult: lintResult
+          toolResult: result
         };
-        setChatHistory((prev) => [...prev, lintSuccessEntry]);
-        const statusResult = await agent.executeBashCommand("git status --porcelain");
-        if (!statusResult.success) {
-          const errorEntry = {
-            type: "assistant",
-            content: "\u274C **Git Error**\n\nUnable to check git status. Are you in a git repository?",
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        if (!statusResult.output || statusResult.output.trim() === "") {
-          const noChangesEntry = {
-            type: "assistant",
-            content: "\u{1F4CB} **No Changes to Push**\n\nWorking directory is clean. No commits to push.",
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, noChangesEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        const prePullAddResult = await agent.executeBashCommand("git add .");
-        if (!prePullAddResult.success) {
-          const errorEntry = {
-            type: "assistant",
-            content: `\u274C **Failed to stage changes**
-
-${prePullAddResult.error || "Unknown error"}`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        const stashResult = await agent.executeBashCommand("git stash push --include-untracked --message 'smart-push temporary stash'");
-        if (!stashResult.success) {
-          const errorEntry = {
-            type: "assistant",
-            content: `\u274C **Failed to stash changes**
-
-${stashResult.error || "Unknown error"}`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        const pullEntry = {
-          type: "assistant",
-          content: "\u{1F504} Pulling latest changes...",
-          timestamp: /* @__PURE__ */ new Date()
-        };
-        setChatHistory((prev) => [...prev, pullEntry]);
-        const rebaseCheck = await agent.executeBashCommand("test -d .git/rebase-apply -o -d .git/rebase-merge -o -f .git/MERGE_HEAD && echo 'ongoing' || echo 'clean'");
-        if (rebaseCheck.output?.includes("ongoing")) {
-          const cleanupEntry = {
-            type: "assistant",
-            content: "\u26A0\uFE0F Git operation in progress - cleaning up...",
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, cleanupEntry]);
-          await agent.executeBashCommand("git rebase --abort 2>/dev/null || git merge --abort 2>/dev/null || true");
-        }
-        let pullResult = await agent.executeBashCommand(`git pull --rebase origin ${currentBranch}`);
-        if (!pullResult.success) {
-          pullResult = await agent.executeBashCommand(`git pull origin ${currentBranch}`);
-          if (pullResult.success) {
-            const mergeFallbackEntry = {
-              type: "assistant",
-              content: "\u26A0\uFE0F Rebase failed, fell back to merge",
-              timestamp: /* @__PURE__ */ new Date()
-            };
-            setChatHistory((prev) => [...prev, mergeFallbackEntry]);
-          }
-        }
-        if (pullResult.success) {
-          const pullSuccessEntry = {
-            type: "tool_result",
-            content: pullResult.output?.includes("Successfully rebased") ? "\u2705 Successfully rebased local changes" : "\u2705 Successfully pulled latest changes",
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, pullSuccessEntry]);
-          const popStashResult = await agent.executeBashCommand("git stash pop");
-          if (!popStashResult.success) {
-            const errorEntry = {
-              type: "assistant",
-              content: `\u26A0\uFE0F **Failed to restore stashed changes**
-
-${popStashResult.error || "Unknown error"}
-
-\u{1F4A1} Your changes may be lost. Check git stash list.`,
-              timestamp: /* @__PURE__ */ new Date()
-            };
-            setChatHistory((prev) => [...prev, errorEntry]);
-            setIsProcessing(false);
-            clearInput();
-            return true;
-          } else {
-            const popSuccessEntry = {
-              type: "tool_result",
-              content: "\u2705 Changes restored from stash",
-              timestamp: /* @__PURE__ */ new Date()
-            };
-            setChatHistory((prev) => [...prev, popSuccessEntry]);
-          }
-        } else {
-          const pullFailEntry = {
-            type: "assistant",
-            content: `\u274C **Pull failed**
-
-${pullResult.error || pullResult.output}
-
-\u{1F4A1} Check git status and resolve any conflicts`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, pullFailEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        const addResult = await agent.executeBashCommand("git add .");
-        if (!addResult.success) {
-          const errorEntry = {
-            type: "assistant",
-            content: `\u274C **Failed to stage changes**
-
-${addResult.error || "Unknown error"}`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          setIsProcessing(false);
-          clearInput();
-          return true;
-        }
-        const addEntry = {
-          type: "tool_result",
-          content: "\u2705 Changes staged successfully",
-          timestamp: /* @__PURE__ */ new Date(),
-          toolCall: {
-            id: `git_add_${Date.now()}`,
-            type: "function",
-            function: {
-              name: "bash",
-              arguments: JSON.stringify({ command: "git add ." })
-            }
-          },
-          toolResult: addResult
-        };
-        setChatHistory((prev) => [...prev, addEntry]);
-        const diffResult = await agent.executeBashCommand("git diff --cached");
-        const maxDiffLength = 5e4;
-        const truncatedDiff = diffResult.output ? diffResult.output.length > maxDiffLength ? diffResult.output.substring(0, maxDiffLength) + "\n... (truncated due to length)" : diffResult.output : "No staged changes shown";
-        const commitPrompt = `Generate a concise, professional git commit message for these changes:
-
-Git Status:
-${statusResult.output}
-
-Git Diff (staged changes):
-${truncatedDiff}
-
-Follow conventional commit format (feat:, fix:, docs:, etc.) and keep it under 72 characters.
-Respond with ONLY the commit message, no additional text.`;
-        let commitMessage = "";
-        let streamingEntry = null;
-        let accumulatedCommitContent = "";
-        let lastCommitUpdateTime = Date.now();
-        try {
-          for await (const chunk of agent.processUserMessageStream(commitPrompt)) {
-            if (chunk.type === "content" && chunk.content) {
-              accumulatedCommitContent += chunk.content;
-              const now = Date.now();
-              if (now - lastCommitUpdateTime >= 150) {
-                commitMessage += accumulatedCommitContent;
-                if (!streamingEntry) {
-                  const newEntry = {
-                    type: "assistant",
-                    content: `\u{1F916} Generating commit message...
-
-${commitMessage}`,
-                    timestamp: /* @__PURE__ */ new Date(),
-                    isStreaming: true
-                  };
-                  setChatHistory((prev) => [...prev, newEntry]);
-                  streamingEntry = newEntry;
-                } else {
-                  setChatHistory(
-                    (prev) => prev.map(
-                      (entry, idx) => idx === prev.length - 1 && entry.isStreaming ? {
-                        ...entry,
-                        content: `\u{1F916} Generating commit message...
-
-${commitMessage}`
-                      } : entry
-                    )
-                  );
-                }
-                accumulatedCommitContent = "";
-                lastCommitUpdateTime = now;
-              }
-            } else if (chunk.type === "done") {
-              if (streamingEntry) {
-                setChatHistory(
-                  (prev) => prev.map(
-                    (entry) => entry.isStreaming ? {
-                      ...entry,
-                      content: `\u2705 Generated commit message: "${commitMessage.trim()}"`,
-                      isStreaming: false
-                    } : entry
-                  )
-                );
-              }
-              break;
-            }
-          }
-        } catch (error) {
-          commitMessage = "feat: update files";
-          const errorEntry = {
-            type: "assistant",
-            content: `\u26A0\uFE0F **AI commit message generation failed**: ${error.message}
-
-Using fallback message: "${commitMessage}"`,
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, errorEntry]);
-          if (streamingEntry) {
-            setChatHistory(
-              (prev) => prev.map(
-                (entry) => entry.isStreaming ? { ...entry, isStreaming: false } : entry
-              )
-            );
-          }
-        }
-        const cleanCommitMessage = commitMessage.trim().replace(/^["']|["']$/g, "");
-        const commitCommand = `git commit -m "${cleanCommitMessage}"`;
-        const commitResult = await agent.executeBashCommand(commitCommand);
-        const commitEntry = {
-          type: "tool_result",
-          content: commitResult.success ? `\u2705 **Commit Created**: ${commitResult.output?.split("\n")[0] || "Commit successful"}` : `\u274C **Commit Failed**: ${commitResult.error || "Unknown error"}`,
-          timestamp: /* @__PURE__ */ new Date(),
-          toolCall: {
-            id: `git_commit_${Date.now()}`,
-            type: "function",
-            function: {
-              name: "bash",
-              arguments: JSON.stringify({ command: commitCommand })
-            }
-          },
-          toolResult: commitResult
-        };
-        setChatHistory((prev) => [...prev, commitEntry]);
-        if (commitResult.success) {
-          const pushResult = await agent.executeBashCommand("git push");
-          if (pushResult.success) {
-            const pushEntry = {
-              type: "tool_result",
-              content: `\u{1F680} **Push Successful**: ${pushResult.output?.split("\n")[0] || "Changes pushed to remote"}`,
-              timestamp: /* @__PURE__ */ new Date(),
-              toolCall: {
-                id: `git_push_${Date.now()}`,
-                type: "function",
-                function: {
-                  name: "bash",
-                  arguments: JSON.stringify({ command: "git push" })
-                }
-              },
-              toolResult: pushResult
-            };
-            setChatHistory((prev) => [...prev, pushEntry]);
-            const verificationEntry = {
-              type: "assistant",
-              content: "\u{1F50D} **Running post-push verification...**",
-              timestamp: /* @__PURE__ */ new Date()
-            };
-            setChatHistory((prev) => [...prev, verificationEntry]);
-            const statusCheckResult = await agent.executeBashCommand("git status --porcelain");
-            if (statusCheckResult.success && statusCheckResult.output?.trim() === "") {
-              const statusOkEntry = {
-                type: "tool_result",
-                content: "\u2705 **Git Status**: Working directory clean",
-                timestamp: /* @__PURE__ */ new Date()
-              };
-              setChatHistory((prev) => [...prev, statusOkEntry]);
-            } else {
-              const statusIssueEntry = {
-                type: "assistant",
-                content: `\u26A0\uFE0F **Git Status Issues Detected**:
-
-${statusCheckResult.output || "Unknown status"}`,
-                timestamp: /* @__PURE__ */ new Date()
-              };
-              setChatHistory((prev) => [...prev, statusIssueEntry]);
-            }
-            const waitEntry = {
-              type: "assistant",
-              content: "\u23F3 **Waiting for CI/NPM publishing...** (10 seconds)",
-              timestamp: /* @__PURE__ */ new Date()
-            };
-            setChatHistory((prev) => [...prev, waitEntry]);
-            await new Promise((resolve8) => setTimeout(resolve8, 1e4));
-            const localPackageResult = await agent.executeBashCommand(`node -p "require('./package.json').name" 2>/dev/null || echo 'no-package'`);
-            const localName = localPackageResult.success && localPackageResult.output?.trim() !== "no-package" ? localPackageResult.output?.trim() : null;
-            if (localName) {
-              const localVersionResult = await agent.executeBashCommand(`node -p "require('./package.json').version"`);
-              const localVersion = localVersionResult.success ? localVersionResult.output?.trim() : "unknown";
-              const npmCheckResult = await agent.executeBashCommand(`npm view ${localName} version 2>/dev/null || echo 'not-found'`);
-              if (npmCheckResult.success && npmCheckResult.output?.trim() && npmCheckResult.output?.trim() !== "not-found") {
-                const npmVersion = npmCheckResult.output.trim();
-                if (npmVersion === localVersion) {
-                  const npmConfirmEntry = {
-                    type: "tool_result",
-                    content: `\u2705 **NPM Package Confirmed**: ${localName} v${npmVersion} published successfully`,
-                    timestamp: /* @__PURE__ */ new Date()
-                  };
-                  setChatHistory((prev) => [...prev, npmConfirmEntry]);
-                } else {
-                  const npmPendingEntry = {
-                    type: "assistant",
-                    content: `\u23F3 **NPM Status**: Local ${localName} v${localVersion}, NPM v${npmVersion}. Publishing may still be in progress.`,
-                    timestamp: /* @__PURE__ */ new Date()
-                  };
-                  setChatHistory((prev) => [...prev, npmPendingEntry]);
-                }
-              } else {
-                const npmSkipEntry = {
-                  type: "assistant",
-                  content: `\u2139\uFE0F **NPM Check Skipped**: Package ${localName} not found on NPM (may not be published yet)`,
-                  timestamp: /* @__PURE__ */ new Date()
-                };
-                setChatHistory((prev) => [...prev, npmSkipEntry]);
-              }
-            } else {
-              const npmSkipEntry = {
-                type: "assistant",
-                content: `\u2139\uFE0F **NPM Check Skipped**: No package.json found or not an NPM package`,
-                timestamp: /* @__PURE__ */ new Date()
-              };
-              setChatHistory((prev) => [...prev, npmSkipEntry]);
-            }
-            const finalSuccessEntry = {
-              type: "assistant",
-              content: "\u{1F389} **Smart Push Complete**: All verifications passed!",
-              timestamp: /* @__PURE__ */ new Date()
-            };
-            setChatHistory((prev) => [...prev, finalSuccessEntry]);
-          } else {
-            const pushError = pushResult.error || pushResult.output || "";
-            if (pushError.includes("protected branch") || pushError.includes("Changes must be made through a pull request") || pushError.includes("GH006")) {
-              const branchProtectionEntry = {
-                type: "assistant",
-                content: "\u{1F6E1}\uFE0F **Branch Protection Detected**: Direct pushes to this branch are blocked.\n\n\u{1F504} **Creating PR workflow...**",
-                timestamp: /* @__PURE__ */ new Date()
-              };
-              setChatHistory((prev) => [...prev, branchProtectionEntry]);
-              const featureBranch = `feature/${(/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/[:-]/g, "").replace("T", "-")}-smart-push`;
-              const createBranchResult = await agent.executeBashCommand(`git checkout -b ${featureBranch}`);
-              if (createBranchResult.success) {
-                const pushBranchResult = await agent.executeBashCommand(`git push -u origin ${featureBranch}`);
-                if (pushBranchResult.success) {
-                  const branchSuccessEntry = {
-                    type: "tool_result",
-                    content: `\u2705 **Feature Branch Created**: \`${featureBranch}\`
-
-\u{1F4CB} **Attempting to create Pull Request...**`,
-                    timestamp: /* @__PURE__ */ new Date()
-                  };
-                  setChatHistory((prev) => [...prev, branchSuccessEntry]);
-                  const prResult = await agent.executeBashCommand(`gh pr create --title "${cleanCommitMessage}" --body "Auto-generated PR from smart-push" --head ${featureBranch} --base ${currentBranch}`);
-                  if (prResult.success) {
-                    const prUrl = prResult.output?.match(/https:\/\/github\.com\/[^\s]+/)?.[0];
-                    const prSuccessEntry = {
-                      type: "tool_result",
-                      content: `\u2705 **Pull Request Created Successfully!**
-
-\u{1F517} **PR URL**: ${prUrl || "Check GitHub for the link"}
-
-\u{1F3AF} **Next Steps**:
-\u2022 Review the PR on GitHub
-\u2022 Wait for CI checks to pass
-\u2022 Request approval and merge`,
-                      timestamp: /* @__PURE__ */ new Date()
-                    };
-                    setChatHistory((prev) => [...prev, prSuccessEntry]);
-                  } else {
-                    const prManualEntry = {
-                      type: "assistant",
-                      content: `\u26A0\uFE0F **PR Creation Failed**: GitHub CLI may not be available.
-
-\u{1F4A1} **Create PR Manually**:
-\u2022 Go to GitHub repository
-\u2022 Create PR from \`${featureBranch}\` \u2192 \`${currentBranch}\`
-\u2022 Title: \`${cleanCommitMessage}\``,
-                      timestamp: /* @__PURE__ */ new Date()
-                    };
-                    setChatHistory((prev) => [...prev, prManualEntry]);
-                  }
-                } else {
-                  const pushFailEntry = {
-                    type: "tool_result",
-                    content: `\u274C **Failed to push feature branch**: ${pushBranchResult.error}`,
-                    timestamp: /* @__PURE__ */ new Date()
-                  };
-                  setChatHistory((prev) => [...prev, pushFailEntry]);
-                }
-              } else {
-                const branchFailEntry = {
-                  type: "tool_result",
-                  content: `\u274C **Failed to create feature branch**: ${createBranchResult.error}`,
-                  timestamp: /* @__PURE__ */ new Date()
-                };
-                setChatHistory((prev) => [...prev, branchFailEntry]);
-              }
-            } else {
-              const pushFailEntry = {
-                type: "tool_result",
-                content: `\u274C **Push Failed**: ${pushResult.error || "Unknown error"}
-
-Try running \`git push\` manually.`,
-                timestamp: /* @__PURE__ */ new Date(),
-                toolCall: {
-                  id: `git_push_${Date.now()}`,
-                  type: "function",
-                  function: {
-                    name: "bash",
-                    arguments: JSON.stringify({ command: "git push" })
-                  }
-                },
-                toolResult: pushResult
-              };
-              setChatHistory((prev) => [...prev, pushFailEntry]);
-            }
-          }
-        }
+        setChatHistory((prev) => [...prev, resultEntry]);
       } catch (error) {
         const errorEntry = {
           type: "assistant",
-          content: `\u274C **Smart Push Failed**
-
-${error instanceof Error ? error.message : String(error)}`,
+          content: `\u274C Smart Push Failed: ${error instanceof Error ? error.message : String(error)}`,
           timestamp: /* @__PURE__ */ new Date()
         };
         setChatHistory((prev) => [...prev, errorEntry]);
@@ -21693,125 +21064,50 @@ var init_use_context_info = __esm({
   "src/hooks/use-context-info.ts"() {
   }
 });
-function useAutoRead(setChatHistory) {
+function useCLAUDEmd(setChatHistory) {
   useEffect(() => {
-    if (fs2__default.existsSync(".agent")) {
-      const initialMessages = [];
-      let docsRead = 0;
-      let config2 = null;
-      const configPaths = [
-        path8__default.join(".xcli", "auto-read-config.json"),
-        // User config (distributed)
-        path8__default.join(".agent", "auto-read-config.json")
-        // Dev override (gitignored)
-      ];
-      for (const configPath of configPaths) {
-        if (fs2__default.existsSync(configPath)) {
-          try {
-            const configContent = fs2__default.readFileSync(configPath, "utf8");
-            config2 = JSON.parse(configContent);
-            break;
-          } catch (_error) {
-          }
+    const filesToLoad = [
+      { path: "GROK.md", label: "GROK.md", fallback: "CLAUDE.md" },
+      { path: "docs-index.md", label: "Documentation Index" }
+    ];
+    const loadedDocs = [];
+    let totalChars = 0;
+    for (const file of filesToLoad) {
+      let filePath = file.path;
+      let exists = fs2__default.existsSync(filePath);
+      if (!exists && file.fallback) {
+        filePath = file.fallback;
+        exists = fs2__default.existsSync(filePath);
+      }
+      if (exists) {
+        try {
+          const content = fs2__default.readFileSync(filePath, "utf8");
+          const charCount = content.length;
+          totalChars += charCount;
+          loadedDocs.push(file.label);
+          console.log(`\u{1F4C4} Loaded: ${file.label} (${charCount} chars)`);
+        } catch (error) {
+          console.warn(`\u26A0\uFE0F Failed to load ${file.label}:`, error);
+        }
+      } else {
+        if (process.env.NODE_ENV === "development") {
+          console.log(`\u2139\uFE0F ${file.label} not found - will be created in Sprint 1`);
         }
       }
-      const isEnabled = config2?.enabled !== false;
-      const showLoadingMessage = config2?.showLoadingMessage !== false;
-      const showSummaryMessage = config2?.showSummaryMessage !== false;
-      const showFileContents = config2?.showFileContents === true;
-      if (!isEnabled) {
-        return;
-      }
-      if (showLoadingMessage) {
-        initialMessages.push({
-          type: "assistant",
-          content: "\u{1F4DA} Reading core documentation into memory...",
-          timestamp: /* @__PURE__ */ new Date()
-        });
-      }
-      console.log("\u{1F50D} Auto-reading .agent documentation...");
-      const folders = config2?.folders || [
-        {
-          name: "system",
-          priority: 1,
-          files: [
-            { name: "architecture.md", title: "System Architecture", icon: "\u{1F4CB}", required: true },
-            { name: "critical-state.md", title: "Critical State", icon: "\u{1F3D7}\uFE0F", required: false },
-            { name: "installation.md", title: "Installation", icon: "\u{1F3D7}\uFE0F", required: false },
-            { name: "api-schema.md", title: "API Schema", icon: "\u{1F3D7}\uFE0F", required: false },
-            { name: "auto-read-system.md", title: "Auto-Read System", icon: "\u{1F3D7}\uFE0F", required: false }
-          ]
-        },
-        {
-          name: "sop",
-          priority: 2,
-          files: [
-            { name: "git-workflow.md", title: "Git Workflow SOP", icon: "\u{1F527}", required: true },
-            { name: "release-management.md", title: "Release Management SOP", icon: "\u{1F4D6}", required: false },
-            { name: "automation-protection.md", title: "Automation Protection SOP", icon: "\u{1F4D6}", required: false },
-            { name: "npm-publishing-troubleshooting.md", title: "NPM Publishing Troubleshooting", icon: "\u{1F4D6}", required: false }
-          ]
-        }
-      ];
-      if (config2?.customFolders) {
-        folders.push(...config2.customFolders);
-      }
-      folders.sort((a, b) => (a.priority || 999) - (b.priority || 999));
-      for (const folder of folders) {
-        const folderPath = path8__default.join(".agent", folder.name);
-        if (!fs2__default.existsSync(folderPath)) {
-          continue;
-        }
-        for (const file of folder.files) {
-          let filePaths = [];
-          if (file.pattern) {
-            continue;
-          } else {
-            filePaths = [file.name];
-          }
-          for (const fileName of filePaths) {
-            const filePath = path8__default.join(folderPath, fileName);
-            if (!fs2__default.existsSync(filePath)) {
-              if (file.required) ;
-              continue;
-            }
-            try {
-              const content = fs2__default.readFileSync(filePath, "utf8");
-              const displayTitle = file.title || fileName.replace(".md", "").replace("-", " ").toUpperCase();
-              const icon = file.icon || "\u{1F4C4}";
-              console.log(`\u{1F4C4} Loaded: ${folder.name}/${fileName} (${content.length} chars)`);
-              if (showFileContents) {
-                initialMessages.push({
-                  type: "assistant",
-                  content: `${icon} **${displayTitle} (from .agent/${folder.name}/${fileName})**
-
-${content}`,
-                  timestamp: /* @__PURE__ */ new Date()
-                });
-              }
-              docsRead++;
-            } catch (_error) {
-              console.log(`\u26A0\uFE0F Failed to read: ${folder.name}/${fileName}`);
-            }
-          }
-        }
-      }
-      console.log(`\u2705 Auto-read complete: ${docsRead} documentation files loaded`);
-      if (showSummaryMessage && docsRead > 0) {
-        initialMessages.push({
-          type: "assistant",
-          content: `\u2705 ${docsRead} documentation files read - I have a complete understanding of the current architecture and operational procedures.`,
-          timestamp: /* @__PURE__ */ new Date()
-        });
-      }
-      if (initialMessages.length > 0) {
-        setChatHistory(initialMessages);
-      }
+    }
+    if (loadedDocs.length > 0) {
+      const tokenEstimate = Math.round(totalChars / 4);
+      console.log(`\u2705 Context initialized: ${loadedDocs.join(", ")}`);
+      console.log(`\u{1F4CA} Estimated tokens loaded: ~${tokenEstimate} (target: ~700)`);
+      console.log("\u{1F4DA} Additional docs available on-demand via Read tool");
+    } else {
+      console.log("\u{1F4DD} No GROK.md found yet - proceeding without initial context");
+      console.log("\u{1F4A1} Docs will be loaded on-demand via Read tool");
     }
   }, [setChatHistory]);
 }
-var init_use_auto_read = __esm({
-  "src/hooks/use-auto-read.ts"() {
+var init_use_claude_md = __esm({
+  "src/hooks/use-claude-md.ts"() {
   }
 });
 function useStreaming(agent, initialMessage, setChatHistory, streamingState) {
@@ -24110,9 +23406,7 @@ __export(chat_interface_exports, {
 function ChatInterfaceWithAgent({
   agent,
   initialMessage,
-  quiet = false,
-  contextPack: _contextPack,
-  contextStatus
+  quiet = false
 }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -24122,18 +23416,7 @@ function ChatInterfaceWithAgent({
   const [confirmationOptions, setConfirmationOptions] = useState(null);
   const [showContextTooltip, setShowContextTooltip] = useState(false);
   const processingStartTime = useRef(0);
-  useAutoRead(setChatHistory);
-  useEffect(() => {
-    const initialHistory = [];
-    if (contextStatus) {
-      initialHistory.push({
-        type: "assistant",
-        content: `\u{1F527} ${contextStatus}`,
-        timestamp: /* @__PURE__ */ new Date()
-      });
-    }
-    setChatHistory(initialHistory);
-  }, [contextStatus]);
+  useCLAUDEmd(setChatHistory);
   useSessionLogging(chatHistory);
   const { contextInfo } = useContextInfo(agent);
   const handleGlobalShortcuts = (str, key) => {
@@ -24230,9 +23513,7 @@ function ChatInterfaceWithAgent({
 function ChatInterface({
   agent,
   initialMessage,
-  quiet = false,
-  contextPack,
-  contextStatus
+  quiet = false
 }) {
   const [currentAgent, setCurrentAgent] = useState(
     agent || null
@@ -24248,9 +23529,7 @@ function ChatInterface({
     {
       agent: currentAgent,
       initialMessage,
-      quiet,
-      contextPack,
-      contextStatus
+      quiet
     }
   );
 }
@@ -24260,7 +23539,7 @@ var init_chat_interface = __esm({
     init_confirmation_service();
     init_api_key_input();
     init_use_context_info();
-    init_use_auto_read();
+    init_use_claude_md();
     init_use_streaming();
     init_use_confirmations();
     init_use_introduction();
@@ -24529,7 +23808,7 @@ var require_package = __commonJS({
     module.exports = {
       type: "module",
       name: "@xagent/one-shot",
-      version: "1.1.99",
+      version: "1.1.101",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal with automatic documentation updates.",
       main: "dist/index.js",
       module: "dist/index.js",
@@ -24714,7 +23993,6 @@ try {
   const { createToggleConfirmationsCommand: createToggleConfirmationsCommand2 } = await Promise.resolve().then(() => (init_toggle_confirmations(), toggle_confirmations_exports));
   const pkg = await Promise.resolve().then(() => __toESM(require_package(), 1));
   const { checkForUpdates: checkForUpdates2 } = await Promise.resolve().then(() => (init_version_checker(), version_checker_exports));
-  const { loadContext: loadContext2, formatContextStatus: formatContextStatus2 } = await Promise.resolve().then(() => (init_context_loader(), context_loader_exports));
   log("\u2705 All modules imported successfully");
   process.on("SIGTERM", () => {
     log("\u{1F44B} Gracefully shutting down...");
@@ -24788,15 +24066,7 @@ try {
         console.error("\u274C Error: X CLI requires an interactive terminal.");
         process.exit(1);
       }
-      let contextPack;
-      let statusMessage;
-      try {
-        contextPack = loadContext2();
-        statusMessage = formatContextStatus2(contextPack);
-        log("\u{1F4DA} Context loaded successfully");
-      } catch (error) {
-        log(`\u26A0\uFE0F Context loading failed: ${error}`);
-      }
+      log("\u{1F4DA} Documentation available via GROK.md + docs-index.md");
       log("\u{1F680} Launching interactive CLI...");
       if (!options.quiet) {
         printWelcomeBanner2(options.quiet);
@@ -24805,8 +24075,7 @@ try {
       const app = render(React4.createElement(ChatInterface2, {
         agent,
         initialMessage,
-        quiet: options.quiet,
-        contextStatus: statusMessage
+        quiet: options.quiet
       }));
       const cleanup = () => {
         log("\u{1F44B} Shutting down...");
