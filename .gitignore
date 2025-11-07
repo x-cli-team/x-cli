@@ -208,4 +208,4 @@ apps/site/*.mp4
 apps/site/grok-video-*.mp4
 
 # X-CLI configuration
-.xcli/
+.xcli/all-claude-docs.zip
