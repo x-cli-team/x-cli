@@ -1,326 +1,535 @@
 # Subagents
 
-Learn how Grok One-Shot uses specialized subagents for complex multi-step tasks.
+> Learn about subagents in Grok One-Shot - specialized AI agents for specific tasks.
 
 ## Overview
 
-Subagents are autonomous AI workers that handle complex, multi-step tasks independently. When you request something that requires exploration, planning, or multiple operations, Grok One-Shot can launch a subagent to work autonomously and report back.
+Subagents are specialized AI agents designed to handle specific tasks efficiently. While Claude Code offers user-configurable subagents through the `/agents` command, Grok One-Shot currently implements an internal subagent framework for system-level tasks.
 
-## When Subagents Are Used
+## Status in Grok One-Shot
 
-### Automatic Activation
+**Current Status:** Partially Implemented
+**User-Facing Features:** Not Available
+**Planned Full Implementation:** Q2 2026 (Sprint 18-20)
 
-Subagents launch automatically for:
-- **Complex research tasks** - "Find all places we handle user authentication"
-- **Multi-file operations** - "Refactor all API endpoints to use async/await"
-- **Codebase exploration** - "How does the payment processing system work?"
-- **Implementation planning** - "Plan how to add rate limiting to the API"
+### What Works Today
 
-### Agent Types
+Grok One-Shot has an internal subagent framework (`src/subagents/subagent-framework.ts`) that powers specific system tasks:
 
-**`general-purpose`** - Default agent for most tasks
-- Researching complex questions
-- Searching for code patterns
-- Multi-step implementation tasks
-- Has access to all tools (Read, Write, Edit, Glob, Grep, Bash, etc.)
+- **docgen** - Document generation
+- **prd-assistant** - PRD analysis and suggestions
+- **delta** - Change analysis between commits
+- **token-optimizer** - Token usage optimization
+- **summarizer** - Content compression and summarization
+- **sentinel** - Error monitoring and pattern detection
+- **regression-hunter** - Regression risk analysis
+- **guardrail** - Rule compliance validation
 
-**`Explore`** - Specialized for fast codebase exploration
-- Finding files by patterns
-- Searching code for keywords
-- Understanding code architecture
-- Optimized for speed with limited tool set (Glob, Grep, Read, Bash)
+These subagents operate internally and are not directly accessible to users.
 
-## How Subagents Work
+### What's Not Available Yet
 
-### Workflow
+**Claude Code Features:**
+- `/agents` command to view and manage subagents
+- Create custom subagents with specialized prompts
+- Configure subagent tool access
+- Automatic delegation to specialized subagents
+- Project-specific subagents in `.claude/agents/`
+- User-defined subagent descriptions and behaviors
 
-```
-1. Task Submitted
-   └─> "Implement user authentication"
+## Claude Code Subagents
 
-2. Main Agent Analyzes
-   └─> Determines complexity requires subagent
+In Claude Code, subagents provide a way to delegate specific tasks to specialized AI agents. Here's how they work in Claude Code:
 
-3. Subagent Launched
-   └─> Autonomous worker created with specific task
-
-4. Subagent Executes
-   ├─> Explores codebase
-   ├─> Reads relevant files
-   ├─> Plans implementation
-   └─> Generates recommendations
-
-5. Results Returned
-   └─> Subagent reports findings to main agent
-
-6. Presentation
-   └─> Main agent presents results to you
-```
-
-### Example Session
+### View Available Subagents
 
 ```
-> Find all places in the codebase where we make API calls
-
-🤖 Launching exploration subagent...
-📊 Subagent is exploring the codebase...
-
-[Subagent works autonomously]
-
-✅ Subagent completed analysis
-
-Found 23 API call locations:
-• src/services/api-client.ts (12 calls)
-• src/utils/fetch-wrapper.ts (5 calls)
-• src/components/DataLoader.tsx (6 calls)
-
-Recommendation: Consolidate into centralized API service
+> /agents
 ```
 
-## Subagent Capabilities
+This shows all available subagents and lets you create new ones.
 
-### Research & Exploration
+### Use Subagents Automatically
 
-Subagents can:
-- Search entire codebase for patterns
-- Analyze file relationships
-- Track dependencies
-- Find usage examples
-- Identify architectural patterns
+Claude Code will automatically delegate appropriate tasks to specialized subagents:
 
-**Example:**
 ```
-> Explore how error handling works in this project
+> review my recent code changes for security issues
 ```
 
-### Planning & Recommendations
-
-Subagents provide:
-- Implementation plans
-- Pros/cons analysis
-- Risk assessment
-- Effort estimates
-- Alternative approaches
-
-**Example:**
 ```
-> Plan how to add TypeScript to this JavaScript project
+> run all tests and fix any failures
 ```
 
-### Multi-Step Execution
+### Explicitly Request Specific Subagents
 
-Subagents can:
-- Execute complex workflows
-- Coordinate multiple file changes
-- Run tests and verify results
-- Rollback on failures
-- Document completion
-
-**Example:**
 ```
-> Migrate all class components to functional components
+> use the code-reviewer subagent to check the auth module
 ```
 
-## Configuration
+```
+> have the debugger subagent investigate why users can't log in
+```
 
-### Thoroughness Levels
+### Create Custom Subagents
 
-When launching subagents manually (advanced), specify thoroughness:
+```
+> /agents
+```
+
+Then select "Create New subagent" and follow the prompts to define:
+
+* Subagent type (e.g., `api-designer`, `performance-optimizer`)
+* When to use it
+* Which tools it can access
+* Its specialized system prompt
+
+### Project-Specific Subagents
+
+Create project-specific subagents in `.claude/agents/` for team sharing:
+
+```bash
+# Directory structure
+.claude/
+└── agents/
+    ├── code-reviewer.md
+    ├── security-auditor.md
+    └── performance-optimizer.md
+```
+
+## Grok One-Shot Internal Subagents
+
+While Grok One-Shot doesn't expose subagent management to users, it uses an internal subagent framework for system tasks. Here's what each subagent does:
+
+### DocGen Subagent
+
+**Purpose:** Generate documentation for projects
+
+**Use Case:** When the system needs to create documentation automatically
+
+**Configuration:**
+- Context Limit: 2000 tokens
+- Timeout: 30 seconds
+- Max Retries: 2
+
+**Example Internal Usage:**
+```typescript
+const taskId = await subagentFramework.spawnSubagent({
+  type: 'docgen',
+  input: {
+    projectPath: '/path/to/project',
+    docType: 'README'
+  },
+  priority: 'medium'
+});
+
+const result = await subagentFramework.waitForResult(taskId);
+// result.output contains generated documentation
+```
+
+### PRD Assistant Subagent
+
+**Purpose:** Analyze PRDs for conflicts and suggestions
+
+**Use Case:** When reviewing product requirement documents
+
+**Configuration:**
+- Context Limit: 2000 tokens
+- Timeout: 20 seconds
+- Max Retries: 1
+
+**What It Analyzes:**
+- Suggestions based on existing project patterns
+- Conflicts with current architecture
+- Similar tasks in the project
+- Architecture impact assessment
+
+### Delta Subagent
+
+**Purpose:** Analyze changes between Git commits
+
+**Use Case:** Understanding the impact of code changes
+
+**Configuration:**
+- Context Limit: 1500 tokens
+- Timeout: 15 seconds
+- Max Retries: 1
+
+**What It Provides:**
+- List of files changed
+- Architecture change detection
+- New features identified
+- Impact assessment
+
+### Token Optimizer Subagent
+
+**Purpose:** Optimize token usage in conversations
+
+**Use Case:** When conversations become too large
+
+**Configuration:**
+- Context Limit: 1000 tokens
+- Timeout: 10 seconds
+- Max Retries: 1
+
+**What It Does:**
+- Analyzes current token usage
+- Suggests compression strategies
+- Provides reduction estimates
+- Recommends optimization techniques
+
+### Summarizer Subagent
+
+**Purpose:** Compress and summarize content
+
+**Use Case:** When conversation history needs compaction
+
+**Configuration:**
+- Context Limit: 2000 tokens
+- Timeout: 25 seconds
+- Max Retries: 2
+
+**Features:**
+- Configurable compression ratio
+- Key point extraction
+- Original length tracking
+- Maintains important context
+
+### Sentinel Subagent
+
+**Purpose:** Monitor for errors and patterns
+
+**Use Case:** Continuous system monitoring
+
+**Configuration:**
+- Context Limit: 1000 tokens
+- Timeout: 10 seconds
+- Max Retries: 1
+
+**Monitors:**
+- Error logs
+- Command patterns
+- System health
+- Alert generation
+
+### Regression Hunter Subagent
+
+**Purpose:** Detect potential regressions
+
+**Use Case:** Before applying code changes
+
+**Configuration:**
+- Context Limit: 1500 tokens
+- Timeout: 15 seconds
+- Max Retries: 1
+
+**Analyzes:**
+- Proposed changes
+- Known failure patterns
+- Risk level assessment
+- Test recommendations
+
+### Guardrail Subagent
+
+**Purpose:** Validate plans against rules
+
+**Use Case:** Ensuring compliance with project constraints
+
+**Configuration:**
+- Context Limit: 1000 tokens
+- Timeout: 10 seconds
+- Max Retries: 1
+
+**Checks:**
+- Rule violations
+- Warnings
+- Compliance status
+- New rule suggestions
+
+## Subagent Framework Architecture
+
+### Task Management
+
+The subagent framework manages tasks through a lifecycle:
+
+1. **Task Creation** - Spawn a new subagent task
+2. **Execution** - Run in isolated context
+3. **Result Storage** - Store results for retrieval
+4. **Cleanup** - Clear old results after timeout
+
+### Performance Metrics
+
+The framework tracks:
+- Total tasks executed
+- Active task count
+- Completed task count
+- Average execution time
+- Total tokens used
+
+### Example Metrics Query
 
 ```typescript
-// In code or via API
-Task({
-  subagent_type: "Explore",
-  thoroughness: "medium", // "quick", "medium", or "very thorough"
-  prompt: "Find all React hooks usage"
-})
+const metrics = subagentFramework.getPerformanceMetrics();
+console.log(metrics);
+// {
+//   totalTasks: 15,
+//   activeTasks: 2,
+//   completedTasks: 13,
+//   averageExecutionTime: 1234,
+//   totalTokensUsed: 18500
+// }
 ```
 
-**Levels:**
-- `quick` - Fast, surface-level analysis
-- `medium` - Balanced depth and speed (default)
-- `very thorough` - Comprehensive, multi-location search
+## Alternatives for Users Today
 
-### Parallelization
+While user-facing subagents aren't available yet, here are current alternatives:
 
-Multiple subagents can run concurrently:
+### 1. Use MCP Servers
 
-```
-> Analyze the frontend architecture, backend API, and database schema
-```
+Add custom tools via MCP for specialized functionality:
 
-This launches 3 subagents in parallel, dramatically speeding up analysis.
-
-## Best Practices
-
-### Effective Subagent Usage
-
-**Good examples:**
-```
-> Survey the entire codebase for security vulnerabilities
-
-> Find all places where we need to update the API version
-
-> Analyze the test coverage across the project
-
-> Explore how state management is implemented
+```bash
+x-cli mcp add custom-analyzer "node ./analyzers/security.js"
+x-cli mcp add code-reviewer "python ./scripts/review.py"
 ```
 
-**Less effective:**
-```
-> What's in main.ts?  [Too simple - no subagent needed]
+### 2. Document Specialized Workflows
 
-> Fix the bug  [Too vague - needs more context]
-```
+Create documentation in `.agent/docs/` to guide Grok's behavior:
 
-### When to Use Explore vs General-Purpose
+```markdown
+# .agent/docs/workflows/security-review.md
 
-**Use `Explore` for:**
-- Quick file searches
-- Pattern matching
-- Code location finding
-- Lightweight analysis
+## Security Review Workflow
 
-**Use `general-purpose` for:**
-- Complex research
-- Implementation planning
-- Multi-file modifications
-- Tasks requiring all tools
+When reviewing code for security:
 
-## Monitoring Subagents
-
-### Progress Indicators
-
-```
-🤖 Launching subagent: general-purpose
-📊 Subagent is researching...
-🔍 Found 45 relevant files...
-📝 Analyzing patterns...
-✅ Subagent completed in 12.3s
+1. Check for SQL injection vulnerabilities
+2. Verify input validation
+3. Check authentication/authorization
+4. Review cryptography usage
+5. Check for XSS vulnerabilities
 ```
 
-### Token Usage
-
-Subagents consume tokens from your session budget. Monitor with `Ctrl+I`:
+Then ask Grok to follow these workflows:
 
 ```
-🧠 Token Usage: 15.2k/128k
-  Main: 3.4k
-  Subagents: 11.8k
+> Follow the security review workflow in .agent/docs/workflows/security-review.md to check the auth module
 ```
 
-## Limitations
+### 3. Use GROK.md for Project Context
 
-### Current Limitations
+Define specialized behaviors in your GROK.md:
 
-**Subagents cannot:**
-- Interact with you directly (they report to main agent only)
-- Launch other subagents (no nesting)
-- Access external APIs (unless via MCP)
-- Modify their own configuration mid-task
+```markdown
+# GROK.md
 
-**Technical limits:**
-- Maximum task duration: ~10 minutes
-- Token budget shared with main session
-- Cannot exceed `MAX_TOOL_ROUNDS` environment variable
+## Code Review Guidelines
 
-### Timeouts
-
-If a subagent takes too long:
-```
-⏱️ Subagent timeout after 10 minutes
-📊 Partial results available
+When asked to review code:
+- Focus on security, performance, and maintainability
+- Check test coverage
+- Verify documentation
+- Look for edge cases
 ```
 
-**Solutions:**
-- Break task into smaller subtasks
-- Increase `MAX_TOOL_ROUNDS` if needed
-- Be more specific in your request
+### 4. Create Shell Scripts
 
-## Troubleshooting
+Wrap common Grok workflows in shell scripts:
 
-### Subagent Not Launching
+```bash
+#!/bin/bash
+# scripts/grok-review.sh
 
-**Symptoms:** Task executes without subagent
-
-**Causes:**
-- Task is simple enough for main agent
-- Task doesn't match subagent criteria
-
-**Solution:** Subagents launch automatically when needed. If you want deeper analysis, be more explicit:
-```
-> Thoroughly explore the entire authentication system
+echo "Running Grok security review..."
+x-cli -p "Review the following files for security issues: $@"
 ```
 
-### Subagent Stuck
-
-**Symptoms:** Progress indicator doesn't update
-
-**Solutions:**
-1. Wait - complex tasks take time
-2. Press `Ctrl+C` to interrupt
-3. Restart with more specific request
-
-### Incomplete Results
-
-**Symptoms:** Subagent returns partial findings
-
-**Causes:**
-- Token limit reached
-- Timeout occurred
-- Search space too large
-
-**Solutions:**
-```
-> Focus on just the src/api/ directory
-
-> Break into smaller tasks
-
-> Continue from where the subagent left off
+Usage:
+```bash
+./scripts/grok-review.sh src/auth/*.ts
 ```
 
-## Advanced Usage
+## Planned User-Facing Subagents
 
-### Custom Subagent Prompts
+### Roadmap for Full Subagent Support
 
-For advanced users, structure requests to guide subagent behavior:
+**Q2 2026 (Sprint 18-20):**
+- `/agents` command implementation
+- Subagent creation and management
+- Custom subagent definitions
+- Tool access configuration
 
+**Features to Expect:**
+
+1. **View Subagents**
+   ```
+   > /agents
+   ```
+
+2. **Create Subagents**
+   ```
+   > /agents create
+   Name: security-auditor
+   Description: Review code for security vulnerabilities
+   Tools: Read, Grep, Glob
+   Prompt: You are a security expert...
+   ```
+
+3. **Use Subagents**
+   ```
+   > use security-auditor to check the auth module
+   ```
+
+4. **Project Subagents**
+   ```
+   .grok/agents/
+   ├── code-reviewer.md
+   ├── test-generator.md
+   └── doc-writer.md
+   ```
+
+## Comparison: Claude Code vs Grok One-Shot
+
+| Feature | Claude Code | Grok One-Shot |
+|---------|-------------|---------------|
+| **View Subagents** | `/agents` command | ❌ Not available |
+| **Create Subagents** | Interactive creation | ❌ Not available |
+| **Automatic Delegation** | ✅ Yes | ⚠️ Internal only |
+| **Custom Prompts** | ✅ Yes | ❌ Not available |
+| **Tool Restrictions** | ✅ Yes | ⚠️ Internal only |
+| **Project Subagents** | `.claude/agents/` | ❌ Not available |
+| **Internal Framework** | Unknown | ✅ Implemented |
+| **User API** | ✅ Yes | ❌ Not available |
+
+## Best Practices (for Future Use)
+
+When user-facing subagents become available:
+
+### 1. Create Focused Subagents
+
+Keep subagents focused on a single responsibility:
+
+**Good:**
+- `security-auditor` - Security reviews only
+- `test-generator` - Test creation only
+- `doc-writer` - Documentation only
+
+**Bad:**
+- `code-helper` - Too broad, unclear purpose
+
+### 2. Use Descriptive Names
+
+Name subagents clearly:
+- `api-designer` over `api1`
+- `performance-optimizer` over `perf`
+- `database-schema-reviewer` over `db`
+
+### 3. Limit Tool Access
+
+Only grant tools that the subagent needs:
+- Read-only subagents: `Read`, `Grep`, `Glob`
+- Code generators: `Read`, `Write`, `Edit`
+- Reviewers: `Read`, `Grep`, `Glob`, `Bash` (for running tests)
+
+### 4. Write Clear Descriptions
+
+Help Grok know when to use the subagent:
+
+**Good:**
 ```
-> As a subagent task: Explore all database query patterns,
-  categorize by type (SELECT, INSERT, UPDATE, DELETE),
-  and identify optimization opportunities.
-  Be very thorough and check all subdirectories.
+description: Review Python code for PEP 8 compliance, type hints, and docstrings. Use when checking Python code style or when the user asks for Python code review.
 ```
 
-### Parallel Subagent Workflows
-
-Launch multiple independent analyses:
-
+**Bad:**
 ```
-> I need three analyses in parallel:
-  1. Security review of authentication
-  2. Performance analysis of API endpoints
-  3. Test coverage assessment
-
-  Launch subagents for each and report back.
+description: Reviews code
 ```
 
-### Subagent + MCP
+### 5. Share via Git
 
-Subagents can use MCP tools if configured:
+Commit project subagents for team consistency:
 
+```bash
+git add .grok/agents/
+git commit -m "Add code review subagent"
+git push
 ```
-> Use the filesystem MCP server to analyze
-  the project structure across all directories
+
+## Technical Details
+
+### Subagent Configuration Interface
+
+```typescript
+interface SubagentConfig {
+  type: string;
+  contextLimit: number;
+  timeout: number;
+  maxRetries: number;
+}
 ```
 
-## See Also
+### Subagent Task Interface
 
-- [Troubleshooting](./troubleshooting.md) - Common issues
-- [MCP Integration](./mcp.md) - Extend with custom tools
-- [Common Workflows](../getting-started/common-workflows.md) - Usage examples
-- [Configuration](../configuration/settings.md) - Advanced settings
+```typescript
+interface SubagentTask {
+  id: string;
+  type: string;
+  input: any;
+  priority: 'low' | 'medium' | 'high';
+  createdAt: number;
+}
+```
+
+### Subagent Result Interface
+
+```typescript
+interface SubagentResult {
+  taskId: string;
+  type: string;
+  success: boolean;
+  output?: any;
+  error?: string;
+  tokensUsed: number;
+  executionTime: number;
+  summary: string;
+}
+```
+
+## Next Steps
+
+### For Current Users
+
+1. **Use MCP servers** for custom tools
+2. **Document workflows** in `.agent/docs/`
+3. **Configure GROK.md** for project-specific behaviors
+4. **Create shell scripts** for common workflows
+
+### For Future Use
+
+1. **Learn subagent concepts** from this documentation
+2. **Plan subagent strategies** for your projects
+3. **Prepare workflow documentation** that can be converted to subagents
+4. **Watch for updates** in release notes
+
+## Related Documentation
+
+- [Common Workflows](../getting-started/common-workflows.md) - See subagent section
+- [MCP Integration](./mcp.md) - Alternative for custom tools
+- [Plugin System](../features/plugin-system.md) - Future integration point
+- [GROK.md Guide](../../overview.md) - Project context configuration
+
+## Contributing
+
+Want to help implement user-facing subagents?
+
+1. Review the internal framework in `src/subagents/subagent-framework.ts`
+2. Check the [implementation roadmap](../../parity/implementation-roadmap.md)
+3. Open issues for discussion in the GitHub repository
+4. Submit PRs for subagent-related features
 
 ---
 
-Subagents enable Grok One-Shot to tackle complex, multi-step tasks autonomously while keeping you in control through approval gates and progress visibility.
+**Status:** Internal framework implemented, user-facing features planned
+**Planned Release:** Q2 2026 (Sprint 18-20)
+**Last Updated:** 2025-11-07

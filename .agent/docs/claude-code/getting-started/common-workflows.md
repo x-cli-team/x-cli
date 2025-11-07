@@ -1,617 +1,607 @@
-# Common Workflows
+# Common workflows
 
-Real-world usage patterns and workflows for getting the most from Grok One-Shot.
+> Learn about common workflows with Grok One-Shot.
 
-## Overview
+Each task in this document includes clear instructions, example commands, and best practices to help you get the most from Grok One-Shot.
 
-This guide demonstrates practical workflows that combine Grok One-Shot's capabilities for common development tasks.
+## Understand new codebases
 
-## Development Workflows
+### Get a quick codebase overview
 
-### 1. Feature Implementation
+Suppose you've just joined a new project and need to understand its structure quickly.
 
-**Scenario:** Add a new feature with tests and documentation
+<Steps>
+  <Step title="Navigate to the project root directory">
+    ```bash  theme={null}
+    cd /path/to/project
+    ```
+  </Step>
 
-**Workflow:**
-```bash
-# 1. Start session
-x-cli
+  <Step title="Start Grok One-Shot">
+    ```bash  theme={null}
+    x-cli
+    ```
+  </Step>
 
-# 2. Research phase
-> Analyze the current authentication system and identify where to add OAuth support
+  <Step title="Ask for a high-level overview">
+    ```
+    > give me an overview of this codebase
+    ```
+  </Step>
 
-[AI explores codebase, reads relevant files]
+  <Step title="Dive deeper into specific components">
+    ```
+    > explain the main architecture patterns used here
+    ```
 
-# 3. Implementation
-> Implement OAuth authentication with Google provider:
-  - Add OAuth client configuration
-  - Create OAuth routes and handlers
-  - Add user linking logic
-  - Update existing auth middleware
+    ```
+    > what are the key data models?
+    ```
 
-[AI creates/modifies multiple files]
+    ```
+    > how is authentication handled?
+    ```
+  </Step>
+</Steps>
 
-# 4. Testing
-> Generate unit tests for the new OAuth functionality
+<Tip>
+  Tips:
 
-[AI creates test files]
+  * Start with broad questions, then narrow down to specific areas
+  * Ask about coding conventions and patterns used in the project
+  * Request a glossary of project-specific terms
+</Tip>
 
-# 5. Documentation
-> Update the authentication documentation to include OAuth setup instructions
+### Find relevant code
 
-[AI updates docs]
+Suppose you need to locate code related to a specific feature or functionality.
 
-# 6. Review
-> Summarize the changes made and list any follow-up tasks
+<Steps>
+  <Step title="Ask Grok to find relevant files">
+    ```
+    > find the files that handle user authentication
+    ```
+  </Step>
 
-[AI provides summary and TODOs]
+  <Step title="Get context on how components interact">
+    ```
+    > how do these authentication files work together?
+    ```
+  </Step>
+
+  <Step title="Understand the execution flow">
+    ```
+    > trace the login process from front-end to database
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Be specific about what you're looking for
+  * Use domain language from the project
+</Tip>
+
+***
+
+## Fix bugs efficiently
+
+Suppose you've encountered an error message and need to find and fix its source.
+
+<Steps>
+  <Step title="Share the error with Grok">
+    ```
+    > I'm seeing an error when I run npm test
+    ```
+  </Step>
+
+  <Step title="Ask for fix recommendations">
+    ```
+    > suggest a few ways to fix the @ts-ignore in user.ts
+    ```
+  </Step>
+
+  <Step title="Apply the fix">
+    ```
+    > update user.ts to add the null check you suggested
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Tell Grok the command to reproduce the issue and get a stack trace
+  * Mention any steps to reproduce the error
+  * Let Grok know if the error is intermittent or consistent
+</Tip>
+
+***
+
+## Refactor code
+
+Suppose you need to update old code to use modern patterns and practices.
+
+<Steps>
+  <Step title="Identify legacy code for refactoring">
+    ```
+    > find deprecated API usage in our codebase
+    ```
+  </Step>
+
+  <Step title="Get refactoring recommendations">
+    ```
+    > suggest how to refactor utils.js to use modern JavaScript features
+    ```
+  </Step>
+
+  <Step title="Apply the changes safely">
+    ```
+    > refactor utils.js to use ES2024 features while maintaining the same behavior
+    ```
+  </Step>
+
+  <Step title="Verify the refactoring">
+    ```
+    > run tests for the refactored code
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Ask Grok to explain the benefits of the modern approach
+  * Request that changes maintain backward compatibility when needed
+  * Do refactoring in small, testable increments
+</Tip>
+
+***
+
+## Use specialized subagents
+
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently implement user-configurable subagents like Claude Code's `/agents` command. The subagent framework exists internally for specific tasks (docgen, prd-assistant, etc.) but is not user-accessible.
+
+**Claude Code Feature:**
+- `/agents` command to view and create custom AI subagents
+- Automatic delegation to specialized subagents
+- Project-specific subagents in `.claude/agents/`
+
+**Grok One-Shot Current State:**
+Currently, Grok One-Shot uses internal subagents for specific system tasks (see [subagents documentation](../build-with-grok/subagents.md)) but doesn't expose subagent creation or management to users. For specialized workflows, consider:
+- Using MCP servers for custom tools: `x-cli mcp add <server-name> <command>`
+- Creating documentation in `.agent/docs/` to guide Grok's behavior
+- Using GROK.md to define project-specific context and workflows
+
+**Planned Implementation:** Q2 2026 (Sprint 18-20)
+
+***
+
+## Use Plan Mode for safe code analysis
+
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently implement Plan Mode. This is a Claude Code feature for read-only code exploration.
+
+**Claude Code Feature:**
+Plan Mode restricts Claude to read-only operations, perfect for exploring codebases, planning complex changes, or reviewing code safely.
+
+**Grok One-Shot Alternative:**
+While there's no explicit "Plan Mode", you can achieve similar results by:
+1. Explicitly asking Grok to only analyze without making changes:
+   ```
+   > analyze the authentication system and suggest improvements (don't make any changes yet)
+   ```
+2. Reviewing Grok's suggestions before approving file edits
+3. Using confirmation prompts to control when edits are applied
+
+**Planned Implementation:** Q1 2026 (Sprint 14-16)
+
+***
+
+## Work with tests
+
+Suppose you need to add tests for uncovered code.
+
+<Steps>
+  <Step title="Identify untested code">
+    ```
+    > find functions in NotificationsService.swift that are not covered by tests
+    ```
+  </Step>
+
+  <Step title="Generate test scaffolding">
+    ```
+    > add tests for the notification service
+    ```
+  </Step>
+
+  <Step title="Add meaningful test cases">
+    ```
+    > add test cases for edge conditions in the notification service
+    ```
+  </Step>
+
+  <Step title="Run and verify tests">
+    ```
+    > run the new tests and fix any failures
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Ask for tests that cover edge cases and error conditions
+  * Request both unit and integration tests when appropriate
+  * Have Grok explain the testing strategy
+</Tip>
+
+***
+
+## Create pull requests
+
+Suppose you need to create a well-documented pull request for your changes.
+
+<Steps>
+  <Step title="Summarize your changes">
+    ```
+    > summarize the changes I've made to the authentication module
+    ```
+  </Step>
+
+  <Step title="Generate a PR with Grok">
+    ```
+    > create a pr
+    ```
+  </Step>
+
+  <Step title="Review and refine">
+    ```
+    > enhance the PR description with more context about the security improvements
+    ```
+  </Step>
+
+  <Step title="Add testing details">
+    ```
+    > add information about how these changes were tested
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Ask Grok directly to make a PR for you
+  * Review Grok's generated PR before submitting
+  * Ask Grok to highlight potential risks or considerations
+</Tip>
+
+## Handle documentation
+
+Suppose you need to add or update documentation for your code.
+
+<Steps>
+  <Step title="Identify undocumented code">
+    ```
+    > find functions without proper JSDoc comments in the auth module
+    ```
+  </Step>
+
+  <Step title="Generate documentation">
+    ```
+    > add JSDoc comments to the undocumented functions in auth.js
+    ```
+  </Step>
+
+  <Step title="Review and enhance">
+    ```
+    > improve the generated documentation with more context and examples
+    ```
+  </Step>
+
+  <Step title="Verify documentation">
+    ```
+    > check if the documentation follows our project standards
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Specify the documentation style you want (JSDoc, docstrings, etc.)
+  * Ask for examples in the documentation
+  * Request documentation for public APIs, interfaces, and complex logic
+</Tip>
+
+***
+
+## Work with images
+
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently support image analysis. This is a Claude Code feature.
+
+**Claude Code Feature:**
+- Drag and drop images into the CLI
+- Paste images with ctrl+v
+- Analyze screenshots, diagrams, UI mockups
+- Generate code from visual designs
+
+**Grok One-Shot Alternative:**
+Currently, Grok One-Shot is text-only. For visual design tasks:
+- Describe the visual elements in detail via text
+- Use ASCII diagrams for simple visualizations
+- Link to external images with detailed descriptions
+
+**Planned Implementation:** Q3 2026 (Sprint 22-24)
+
+***
+
+## Reference files and directories
+
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently support `@` file references like Claude Code.
+
+**Claude Code Feature:**
+Use `@` to quickly include files or directories:
+- `@src/utils/auth.js` - Include file contents
+- `@src/components` - Show directory listing
+- `@github:repos/owner/repo/issues` - Fetch MCP resources
+
+**Grok One-Shot Alternative:**
+Explicitly ask Grok to read files:
+```
+> read the file src/utils/auth.js and explain the logic
+> show me the structure of the src/components directory
 ```
 
-**Time saved:** 2-4 hours vs manual implementation
+Grok will use the Read, Glob, and Grep tools to access the files you need.
 
-### 2. Bug Investigation and Fix
+**Planned Implementation:** Q2 2026 (Sprint 17-19)
 
-**Scenario:** Track down and fix a production bug
+***
 
-**Workflow:**
-```bash
-x-cli
+## Use extended thinking
 
-# 1. Describe the bug
-> Users report intermittent 500 errors on the /api/users endpoint.
-  Search for the implementation and identify potential causes.
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently support extended thinking mode. This is a Claude-specific feature not available in Grok API.
 
-[AI searches codebase]
+**Claude Code Feature:**
+- Enable extended thinking with `Tab` key
+- Use "think" or "think hard" prompts
+- See visible thinking process
+- Useful for complex architectural decisions
 
-# 2. Analyze
-> Read the users endpoint handler and trace through the error handling
+**Grok One-Shot Alternative:**
+While Grok doesn't have a dedicated "extended thinking" mode, you can encourage deeper analysis by:
+- Asking Grok to "analyze carefully" or "think through all implications"
+- Requesting step-by-step breakdowns
+- Asking for pros/cons analysis
+- Requesting multiple approaches
 
-[AI reads files, follows imports]
+**Not Planned:** This feature depends on Grok API capabilities
 
-# 3. Identify root cause
-> Check database query error handling and timeout configuration
+***
 
-[AI identifies uncaught promise rejection]
+## Resume previous conversations
 
-# 4. Fix
-> Add proper error handling for the database query timeout scenario
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently support resuming previous conversations.
 
-[AI implements fix]
+**Claude Code Feature:**
+- `claude --continue` - Resume most recent conversation
+- `claude --resume` - Interactive conversation picker
+- Full conversation history restoration
 
-# 5. Verify
-> Show me the before/after diff of the changes
+**Grok One-Shot Current State:**
+Grok One-Shot auto-saves conversations to `~/.x-cli/sessions/` but does not currently support resuming them. Session files contain:
+- Complete message history
+- Token usage
+- Timestamp and metadata
 
-[AI summarizes changes]
+**Planned Implementation:** Q1 2026 (Sprint 12-14)
+
+**Workaround:** Review session files in `~/.x-cli/sessions/` to see past conversations
+
+***
+
+## Run parallel Grok sessions with Git worktrees
+
+Suppose you need to work on multiple tasks simultaneously with complete code isolation between Grok instances.
+
+<Steps>
+  <Step title="Understand Git worktrees">
+    Git worktrees allow you to check out multiple branches from the same
+    repository into separate directories. Each worktree has its own working
+    directory with isolated files, while sharing the same Git history. Learn
+    more in the [official Git worktree
+    documentation](https://git-scm.com/docs/git-worktree).
+  </Step>
+
+  <Step title="Create a new worktree">
+    ```bash  theme={null}
+    # Create a new worktree with a new branch
+    git worktree add ../project-feature-a -b feature-a
+
+    # Or create a worktree with an existing branch
+    git worktree add ../project-bugfix bugfix-123
+    ```
+
+    This creates a new directory with a separate working copy of your repository.
+  </Step>
+
+  <Step title="Run Grok in each worktree">
+    ```bash  theme={null}
+    # Navigate to your worktree
+    cd ../project-feature-a
+
+    # Run Grok in this isolated environment
+    x-cli
+    ```
+  </Step>
+
+  <Step title="Run Grok in another worktree">
+    ```bash  theme={null}
+    cd ../project-bugfix
+    x-cli
+    ```
+  </Step>
+
+  <Step title="Manage your worktrees">
+    ```bash  theme={null}
+    # List all worktrees
+    git worktree list
+
+    # Remove a worktree when done
+    git worktree remove ../project-feature-a
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Tips:
+
+  * Each worktree has its own independent file state, making it perfect for parallel Grok sessions
+  * Changes made in one worktree won't affect others, preventing Grok instances from interfering with each other
+  * All worktrees share the same Git history and remote connections
+  * For long-running tasks, you can have Grok working in one worktree while you continue development in another
+  * Use descriptive directory names to easily identify which task each worktree is for
+  * Remember to initialize your development environment in each new worktree according to your project's setup. Depending on your stack, this might include:
+    * JavaScript projects: Running dependency installation (`npm install`, `yarn`)
+    * Python projects: Setting up virtual environments or installing with package managers
+    * Other languages: Following your project's standard setup process
+</Tip>
+
+***
+
+## Use Grok as a unix-style utility
+
+### Add Grok to your verification process
+
+Suppose you want to use Grok One-Shot as a linter or code reviewer.
+
+**Add Grok to your build script:**
+
+```json  theme={null}
+// package.json
+{
+    ...
+    "scripts": {
+        ...
+        "lint:grok": "x-cli -p 'you are a linter. please look at the changes vs. main and report any issues related to typos. report the filename and line number on one line, and a description of the issue on the second line. do not return any other text.'"
+    }
+}
 ```
 
-**Time saved:** 1-2 hours of debugging
+<Tip>
+  Tips:
 
-### 3. Code Refactoring
+  * Use Grok for automated code review in your CI/CD pipeline
+  * Customize the prompt to check for specific issues relevant to your project
+  * Consider creating multiple scripts for different types of verification
+</Tip>
 
-**Scenario:** Refactor legacy code to modern standards
+### Pipe in, pipe out
 
-**Workflow:**
-```bash
-x-cli
+Suppose you want to pipe data into Grok, and get back data in a structured format.
 
-> Refactor src/legacy/user-manager.js to TypeScript with:
-  - Type-safe interfaces
-  - Async/await instead of callbacks
-  - Error handling with Result types
-  - Extract business logic to separate functions
+**Pipe data through Grok:**
 
-[AI performs coordinated refactoring]
-
-> Run tests to ensure nothing broke
-[AI verifies no regressions]
-
-> Update imports in files that use UserManager
-[AI updates dependent files]
+```bash  theme={null}
+cat build-error.txt | x-cli -p 'concisely explain the root cause of this build error' > output.txt
 ```
 
-**Time saved:** 3-5 hours of careful refactoring
+<Tip>
+  Tips:
 
-### 4. Codebase Exploration
+  * Use pipes to integrate Grok into existing shell scripts
+  * Combine with other Unix tools for powerful workflows
+  * Consider using structured prompts for consistent output
+</Tip>
 
-**Scenario:** Understand an unfamiliar codebase
+### Control output format
 
-**Workflow:**
-```bash
-x-cli
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently support `--output-format` flag.
 
-# 1. High-level overview
-> Explain the overall architecture of this application
+**Claude Code Feature:**
+- `--output-format text` - Plain text response (default)
+- `--output-format json` - JSON array with metadata
+- `--output-format stream-json` - Real-time JSON streaming
 
-[AI analyzes structure, provides overview]
+**Grok One-Shot Current State:**
+Currently outputs plain text only. For structured output, use prompting:
 
-# 2. Specific feature
-> How does the authentication system work?
-  Trace the flow from login request to session creation.
-
-[AI follows the flow, explains components]
-
-# 3. Find patterns
-> Find all API endpoints and their authentication requirements
-
-[AI searches and catalogs endpoints]
-
-# 4. Identify issues
-> Are there any security concerns or anti-patterns in the auth code?
-
-[AI analyzes and reports concerns]
+```bash  theme={null}
+x-cli -p 'analyze this code and return ONLY a JSON object with "issues" and "suggestions" arrays' < code.py > analysis.txt
 ```
 
-**Time saved:** 4-8 hours of manual exploration
+**Planned Implementation:** Q1 2026 (Sprint 15-16)
 
-## Code Review Workflows
+***
 
-### 1. Pre-Commit Review
+## Create custom slash commands
 
-**Workflow:**
-```bash
-# Before committing
-x-cli
+> **⚠️ PARITY GAP**: Grok One-Shot does not currently support custom slash commands. This is a planned feature.
 
-> Review my uncommitted changes for:
-  - Code quality issues
-  - Potential bugs
-  - Missing error handling
-  - Documentation gaps
+**Claude Code Feature:**
+- Create commands in `.claude/commands/`
+- Use `$ARGUMENTS` placeholder
+- Personal commands in `~/.claude/commands/`
+- Project commands shared via Git
 
-[AI analyzes git diff, provides feedback]
+**Grok One-Shot Alternative:**
+While slash commands aren't available yet, you can:
+1. Document common prompts in `.agent/docs/workflows/`
+2. Create shell aliases for common Grok commands:
+   ```bash
+   # In ~/.bashrc or ~/.zshrc
+   alias grok-optimize='x-cli -p "Analyze the performance of this code and suggest three specific optimizations:"'
+   alias grok-security='x-cli -p "Review this code for security vulnerabilities, focusing on:"'
+   ```
+3. Use shell scripts to wrap common Grok workflows
 
-> Fix the error handling issue you identified
-[AI makes corrections]
+**Planned Implementation:** Q2 2026 (Sprint 19-21)
 
-> Now show me the final diff
-[AI summarizes clean changes]
+***
 
-# Commit with confidence
-git add .
-git commit -m "feat: add OAuth support"
+## Ask Grok about its capabilities
+
+Grok has built-in access to its documentation and can answer questions about its own features and limitations.
+
+### Example questions
+
+```
+> can Grok One-Shot create pull requests?
 ```
 
-**Time saved:** 30-60 minutes of self-review
-
-### 2. Pull Request Review
-
-**Workflow:**
-```bash
-x-cli
-
-> Review PR #123 for code quality and potential issues
-
-[AI analyzes PR changes via MCP or manual inspection]
-
-> Check if the new authentication code follows our security best practices
-
-[AI compares against project standards]
-
-> Suggest improvements for the error handling
-
-[AI provides specific recommendations]
+```
+> how does Grok One-Shot handle permissions?
 ```
 
-**Time saved:** 45-90 minutes per PR
-
-## Testing Workflows
-
-### 1. Generate Test Suite
-
-**Workflow:**
-```bash
-x-cli
-
-> Generate comprehensive unit tests for src/services/payment-processor.ts including:
-  - Happy path tests
-  - Error scenarios
-  - Edge cases (null, undefined, malformed input)
-  - Mock external API calls
-
-[AI creates test file]
-
-> Run the tests and fix any failures
-[AI iterates on test quality]
+```
+> what commands are available?
 ```
 
-**Time saved:** 2-3 hours of test writing
-
-### 2. Fix Failing Tests
-
-**Workflow:**
-```bash
-# After test failures
-x-cli
-
-> Tests are failing with error "Expected 200 but got 404".
-  Analyze the test file and the implementation to identify the mismatch.
-
-[AI investigates]
-
-> Fix the implementation to match the expected behavior
-[AI corrects code]
-
-> Run tests again to verify
-[AI confirms success]
+```
+> how do I use MCP with Grok One-Shot?
 ```
 
-**Time saved:** 30-60 minutes of debugging
-
-## Documentation Workflows
-
-### 1. Generate Documentation
-
-**Workflow:**
-```bash
-x-cli
-
-> Generate comprehensive README.md for this project including:
-  - Project overview
-  - Installation instructions
-  - Usage examples
-  - API documentation
-  - Contributing guidelines
-
-[AI creates documentation]
-
-> Add JSDoc comments to all public functions in src/api/
-[AI documents code]
+```
+> what are the limitations of Grok One-Shot?
 ```
 
-**Time saved:** 2-4 hours of writing
+<Note>
+  Grok provides documentation-based answers to these questions. For executable examples and hands-on demonstrations, refer to the specific workflow sections above.
+</Note>
 
-### 2. Update Stale Documentation
+<Tip>
+  Tips:
 
-**Workflow:**
-```bash
-x-cli
+  * Grok always has access to the latest Grok One-Shot documentation via GROK.md and docs-index.md
+  * Ask specific questions to get detailed answers
+  * Grok can explain features like MCP integration, configuration, and workflows
+</Tip>
 
-> Compare DOCS.md with actual implementation and update outdated sections
+***
 
-[AI identifies discrepancies]
+## Next steps
 
-> Update the API endpoint documentation to match current routes
-[AI fixes docs]
-```
-
-**Time saved:** 1-2 hours of manual comparison
-
-## Maintenance Workflows
-
-### 1. Dependency Updates
-
-**Workflow:**
-```bash
-x-cli
-
-> Update all dependencies in package.json to latest stable versions
-
-[AI updates package.json]
-
-> Check for breaking changes in the major updates
-[AI reviews changelogs]
-
-> Update code to fix compatibility issues
-[AI makes necessary changes]
-
-> Run tests to verify everything works
-[AI validates updates]
-```
-
-**Time saved:** 2-3 hours of manual updates
-
-### 2. Security Audit
-
-**Workflow:**
-```bash
-x-cli
-
-> Scan codebase for common security vulnerabilities:
-  - SQL injection risks
-  - XSS vulnerabilities
-  - Authentication bypasses
-  - Sensitive data exposure
-
-[AI analyzes code]
-
-> Fix the SQL injection vulnerability in user search
-[AI implements parameterized queries]
-
-> Add input validation to all API endpoints
-[AI adds validation]
-```
-
-**Time saved:** 3-5 hours of security review
-
-## Automation Workflows
-
-### 1. Batch File Operations
-
-**Scenario:** Update file headers across codebase
-
-**Workflow:**
-```bash
-x-cli
-
-> Add MIT license header to all TypeScript files in src/
-  that don't already have one
-
-[AI updates multiple files]
-
-> Update copyright year to 2025 in all files
-[AI batch updates]
-```
-
-**Time saved:** 1-2 hours of manual editing
-
-### 2. Code Generation
-
-**Scenario:** Generate boilerplate for new feature
-
-**Workflow:**
-```bash
-x-cli
-
-> Generate CRUD API for 'products' resource:
-  - Database schema (Prisma)
-  - API routes (Express)
-  - Controllers with validation
-  - Unit tests
-  - Integration tests
-
-[AI generates complete feature scaffold]
-```
-
-**Time saved:** 3-4 hours of boilerplate
-
-## Team Collaboration Workflows
-
-### 1. Onboarding Assistance
-
-**Workflow for new team members:**
-```bash
-x-cli
-
-> I'm new to this codebase. Explain:
-  - Overall architecture
-  - Key design patterns used
-  - How to run locally
-  - How to run tests
-  - Common development tasks
-
-[AI provides comprehensive onboarding]
-
-> Where should I add validation for user input?
-[AI explains validation architecture]
-```
-
-**Time saved:** 4-8 hours of ramping up
-
-### 2. Code Style Enforcement
-
-**Workflow:**
-```bash
-x-cli
-
-> Ensure all files in src/ follow our coding standards:
-  - TypeScript strict mode
-  - Consistent naming (camelCase for variables)
-  - Explicit return types
-  - No 'any' types
-
-[AI enforces standards]
-
-> Generate ESLint config that enforces these rules
-[AI creates config]
-```
-
-**Time saved:** 2-3 hours of manual enforcement
-
-## Research Workflows
-
-### 1. Technology Evaluation
-
-**Workflow:**
-```bash
-x-cli
-
-> Research if we should migrate from REST to GraphQL:
-  - Analyze current API complexity
-  - Identify pain points
-  - Estimate migration effort
-  - Provide recommendation
-
-[AI researches and analyzes]
-```
-
-**Time saved:** 4-6 hours of research
-
-### 2. Performance Investigation
-
-**Workflow:**
-```bash
-x-cli
-
-> Analyze database queries for N+1 problems and suggest optimizations
-
-[AI identifies issues]
-
-> Implement eager loading for user relationships
-[AI optimizes queries]
-
-> Compare performance before and after
-[AI shows improvements]
-```
-
-**Time saved:** 2-4 hours of profiling
-
-## Headless Mode Workflows
-
-### Automation Scripts
-
-**Quick queries without interaction:**
-
-```bash
-# Find technical debt markers
-x-cli -p "list all files with TODO, FIXME, or HACK comments"
-
-# Check code quality
-x-cli -p "find functions longer than 50 lines"
-
-# Security check
-x-cli -p "find all places where user input is used in SQL queries"
-
-# Documentation status
-x-cli -p "list all exported functions without JSDoc comments"
-```
-
-**Chaining for complex automation:**
-```bash
-#!/bin/bash
-# daily-audit.sh
-
-echo "=== Security Scan ==="
-x-cli -p "scan for security vulnerabilities"
-
-echo "=== Code Quality ==="
-x-cli -p "find code quality issues"
-
-echo "=== Test Coverage ==="
-x-cli -p "identify untested code paths"
-```
-
-**Time saved:** 1-2 hours per day of manual checks
-
-## CI/CD Integration
-
-### Pre-Commit Hook
-
-```bash
-#!/bin/bash
-# .git/hooks/pre-commit
-
-# Check for console.log statements
-x-cli -p "check if any staged files contain console.log statements" > /tmp/console-check.txt
-
-if grep -q "Found:" /tmp/console-check.txt; then
-  echo "❌ Found console.log statements. Please remove them."
-  exit 1
-fi
-
-echo "✅ Pre-commit checks passed"
-```
-
-### PR Description Generator
-
-```bash
-# In CI pipeline
-x-cli -p "Generate PR description for these changes: $(git diff main...HEAD)"
-```
-
-**Time saved:** 15-30 minutes per PR
-
-## Best Practices
-
-### Session Management
-
-**DO:**
-- ✅ Start fresh session for unrelated tasks
-- ✅ Use descriptive initial messages
-- ✅ Save important session files
-- ✅ Review token usage (Ctrl+I)
-
-**DON'T:**
-- ❌ Cram multiple unrelated tasks in one session
-- ❌ Let sessions grow to 100k+ tokens unnecessarily
-- ❌ Forget to review changes before approving
-
-### Prompt Engineering
-
-**Effective prompts:**
-```
-✅ "Refactor UserService to use dependency injection and add error handling"
-✅ "Generate integration tests for the payment flow with mock Stripe API"
-✅ "Analyze authentication flow and identify security vulnerabilities"
-```
-
-**Ineffective prompts:**
-```
-❌ "Fix the code"
-❌ "Make it better"
-❌ "Check everything"
-```
-
-**Tips:**
-- Be specific about what you want
-- Mention file/function names when known
-- Specify desired patterns or approaches
-- Include acceptance criteria
-
-### Confirmation Management
-
-**When to use confirmations:**
-- ✅ Multi-file refactoring
-- ✅ Destructive operations
-- ✅ Production codebases
-- ✅ Learning the tool
-
-**When to disable:**
-```bash
-# For trusted automation
-x-cli toggle-confirmations  # Disable
-
-# Run automation
-x-cli -p "update all file headers"
-
-# Re-enable for manual work
-x-cli toggle-confirmations  # Enable
-```
-
-## Workflow Templates
-
-### Template: New Feature
-
-```bash
-x-cli
-> Implement [FEATURE NAME]:
-  1. Research current implementation of related features
-  2. Design the solution following existing patterns
-  3. Implement with error handling and validation
-  4. Generate unit tests
-  5. Update documentation
-  6. Summarize changes and next steps
-```
-
-### Template: Bug Fix
-
-```bash
-x-cli
-> Fix bug: [BUG DESCRIPTION]
-  1. Locate the relevant code
-  2. Identify root cause
-  3. Implement fix with tests
-  4. Verify no regressions
-  5. Document the fix
-```
-
-### Template: Refactor
-
-```bash
-x-cli
-> Refactor [COMPONENT]:
-  From: [CURRENT STATE]
-  To: [DESIRED STATE]
-  While: Maintaining backward compatibility
-  And: Ensuring all tests pass
-```
-
-## See Also
-
-- [Quickstart Guide](./quickstart.md) - Getting started
-- [Interactive Mode](../reference/interactive-mode.md) - Session features
-- [CLI Reference](../reference/cli-reference.md) - Command options
-- [Troubleshooting](../build-with-claude-code/troubleshooting.md) - Common issues
-
----
-
-Master these workflows to maximize productivity and code quality with Grok One-Shot.
+<Card title="Grok One-Shot documentation" icon="book" href="/docs-index">
+  Explore comprehensive documentation in `.agent/docs/`
+</Card>

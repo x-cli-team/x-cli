@@ -1,468 +1,344 @@
-# Legal and Compliance
+# Legal and compliance
 
-Legal information, licenses, and compliance considerations for Grok One-Shot.
+> Legal agreements, compliance information, and security details for Grok One-Shot.
 
-## License
+## Legal agreements
 
-### Grok One-Shot License
+### License
 
-**Type:** MIT License
+Grok One-Shot is open-source software licensed under the MIT License.
 
-**Summary:**
-- ✅ Commercial use permitted
-- ✅ Modification permitted
-- ✅ Distribution permitted
-- ✅ Private use permitted
-- ⚠️ No warranty provided
-- ⚠️ No liability accepted
+Your use of Grok One-Shot is subject to:
+- **Grok One-Shot**: MIT License (see repository LICENSE file)
+- **xAI Grok API**: [xAI Terms of Service](https://x.ai/legal/terms-of-service)
 
-**Full license:** See `LICENSE` file in repository
+> **Parity Gap**: Unlike Claude Code which has formal Commercial Terms (Team, Enterprise, API) and Consumer Terms (Free, Pro, Max), Grok One-Shot is a third-party open-source CLI tool governed by:
+> 1. MIT License for the CLI tool itself
+> 2. xAI's API terms for API usage
 
-**Copyright:** © 2024-2025 X.AI Team / Grok One-Shot Contributors
+### Commercial agreements
 
-### Third-Party Licenses
+**Claude Code approach**:
+- Commercial Terms apply to Team, Enterprise, and Claude API users
+- Consumer Terms apply to Free, Pro, and Max users
+- Whether using 1P (Anthropic) or 3P (Bedrock/Vertex), existing commercial agreements apply
 
-Grok One-Shot depends on open-source software with various licenses:
+**Grok One-Shot approach**:
+- MIT License for CLI tool (permissive, commercial-friendly)
+- xAI API terms apply uniformly to all API users
+- No first-party vs third-party distinction (xAI API only)
+- No tiered commercial agreements within Grok One-Shot
 
-**Major dependencies:**
-- **React/Ink:** MIT License
-- **TypeScript:** Apache License 2.0
-- **Node.js:** MIT License (various components)
+When using Grok One-Shot, you are making API calls to xAI using your own API key. Your usage is governed by:
+- [xAI API Terms of Service](https://x.ai/legal/terms-of-service)
+- [xAI Privacy Policy](https://x.ai/legal/privacy-policy)
+- Any commercial agreements you have with xAI (if applicable)
 
-**View all licenses:**
-```bash
-# From source directory
-npm list --depth=0
+## Compliance
 
-# Or check package.json and node_modules/*/LICENSE
-```
+### Healthcare compliance (BAA)
 
-**License compliance:**
-- All dependencies use permissive licenses (MIT, Apache, BSD)
-- No GPL or copyleft licenses in production dependencies
-- Safe for commercial use
+**Claude Code**:
+- ✅ BAA available for customers with Zero Data Retention (ZDR)
+- ✅ Automatically extends to Claude Code usage
+- ✅ Applicable to Team/Enterprise with BAA + ZDR
 
-## Terms of Use
+**Grok One-Shot**:
+- ❌ xAI does not currently offer Business Associate Agreements (BAA) for HIPAA compliance
+- ❌ No Zero Data Retention (ZDR) option
+- ❌ Not suitable for PHI without explicit xAI agreement
 
-### Grok One-Shot Usage Terms
+> **Parity Gap**: Critical compliance gap for healthcare use cases.
 
-**You may:**
-- ✅ Use for personal projects
-- ✅ Use for commercial projects
-- ✅ Modify and customize
-- ✅ Distribute modified versions
-- ✅ Use in enterprise environments
+**If you require HIPAA compliance**:
+1. Contact xAI directly about enterprise agreements
+2. Verify if BAA and ZDR options are available
+3. Do not process PHI through Grok One-Shot without proper legal agreements
+4. Consider alternative solutions with BAA support (like Claude Code)
 
-**You must:**
-- ⚠️ Comply with X.AI API Terms of Service
-- ⚠️ Manage your own API keys securely
-- ⚠️ Not misuse or abuse the service
-- ⚠️ Respect rate limits and usage quotas
+### Enterprise compliance certifications
 
-**You may not:**
-- ❌ Claim ownership of Grok One-Shot
-- ❌ Remove license or copyright notices
-- ❌ Hold developers liable for damages
-- ❌ Use for illegal purposes
+> **Parity Gap**: Grok One-Shot does not have formal enterprise compliance certifications. For enterprise use cases requiring SOC 2, ISO 27001, or other certifications, review xAI's compliance status directly.
 
-### X.AI API Terms
+**Claude Code certifications**:
+- SOC 2 Type II (via Anthropic Trust Center)
+- Various compliance artifacts available
+- Trust Center: [trust.anthropic.com](https://trust.anthropic.com)
 
-**Important:** Using Grok One-Shot requires agreeing to X.AI's Terms of Service.
+**Grok One-Shot status**:
+- Open-source project (no formal certifications for CLI)
+- xAI API compliance varies
+- Recommend reviewing xAI's compliance documentation
 
-**Key terms:**
-- API key represents agreement with X.AI ToS
-- Usage is subject to X.AI's pricing and quotas
-- Data transmission governed by X.AI's policies
-- Service availability not guaranteed by Grok One-Shot
+**Recommendations for enterprise use**:
+1. Review xAI's security and compliance documentation
+2. Conduct your own security assessment of Grok One-Shot codebase
+3. Implement network controls (API proxies, logging) if needed
+4. Use internal forks if additional controls are required
+5. Keep Grok One-Shot updated to latest version
 
-**Review X.AI Terms:** https://x.ai/terms
+## Security and trust
 
-## Privacy and Data Protection
+### Trust and safety
 
-### Grok One-Shot Privacy Practices
+**Claude Code**:
+- [Anthropic Trust Center](https://trust.anthropic.com)
+- [Transparency Hub](https://www.anthropic.com/transparency)
+- Comprehensive compliance artifacts
+- SOC 2 Type II reports
 
-**What Grok One-Shot collects:**
-- ❌ No telemetry or analytics
-- ❌ No usage tracking
-- ❌ No crash reports sent to developers
-- ✅ Only local configuration and session storage
+**Grok One-Shot**:
+- Open-source codebase (full transparency)
+- No centralized trust center
+- xAI security documentation: [x.ai/legal/security](https://x.ai/legal/security)
+- Community security reviews via GitHub
 
-**What you control:**
-- ✅ All configuration files (`~/.x-cli/`)
-- ✅ All session history
-- ✅ When and how to use the tool
-- ✅ What data to share with AI
+> **Parity Gap**: No formal trust center or compliance artifact repository. Open-source transparency provides different security model.
 
-**See also:** [Data Usage Guide](../administration/data-usage.md)
+### Security vulnerability reporting
 
-### X.AI Privacy Policy
+**Claude Code**:
+- Managed through HackerOne
+- Formal bug bounty program
+- Coordinated disclosure process
+- [Report vulnerabilities](https://hackerone.com/anthropic-vdp/reports/new?type=team&report_type=vulnerability)
 
-**Data sent to X.AI:**
+**Grok One-Shot**:
+- Report via GitHub Security Advisories
+- Or email maintainers (see repository)
+- Community-driven coordinated disclosure
+- No formal bug bounty program
+
+**For xAI/Grok API vulnerabilities**:
+- Report to xAI's security team
+- Follow xAI's responsible disclosure policy
+
+### Open-source security benefits
+
+**Transparency advantages**:
+- ✅ Full source code available on GitHub
+- ✅ No obfuscation or hidden functionality
+- ✅ Community review and contributions welcome
+- ✅ Dependencies auditable via `package.json`
+
+**Security features**:
+- ✅ API key stored locally (not transmitted except to xAI)
+- ✅ No third-party telemetry or tracking
+- ✅ Local-only execution (no cloud components)
+- ✅ TLS encryption for API communication
+- ✅ No external dependencies for core functionality
+
+**Security considerations**:
+- ⚠️ Session files contain full conversation history (stored locally)
+- ⚠️ API key stored in plaintext in `~/.x-cli/settings.json` (use `chmod 600`)
+- ⚠️ File system access as broad as your user permissions
+- ⚠️ Bash command execution capabilities (by design)
+
+## Data handling
+
+### Data policies comparison
+
+| Aspect | Claude Code | Grok One-Shot |
+|--------|-------------|---------------|
+| **Training opt-out** | ✅ Consumer control | ❌ API-level only |
+| **Commercial no-train** | ✅ Default | Per xAI policy |
+| **Development Partner Program** | ✅ Opt-in | ❌ Not available |
+| **Data retention tiers** | ✅ 5yr/30d/ZDR | Per xAI policy |
+| **Local session storage** | ✅ Configurable | ✅ Manual cleanup |
+| **Telemetry** | ✅ Opt-out available | ❌ Not implemented |
+
+### What Grok One-Shot accesses
+
+By design, Grok One-Shot can:
+- Read any file your user account can read
+- Write/edit any file your user account can write
+- Execute bash commands with your user privileges
+- Send file contents and code to xAI API as context
+
+**Security best practices**:
+1. Run Grok One-Shot with appropriate user permissions (not root)
+2. Use `.grokignore` or `.gitignore` to exclude sensitive files
+3. Review prompts before confirming operations
+4. Keep API keys secure and rotated regularly
+5. Monitor `~/.x-cli/sessions/` for sensitive data
+
+### What gets sent to xAI
+
+When using Grok One-Shot, the following data is sent to xAI's API:
 - Your prompts and messages
-- File contents (when AI reads them)
-- Conversation context
-- Tool execution results
+- Code and file contents you reference
+- Tool execution results (file contents, command outputs)
+- Conversation history for context
 
-**X.AI's responsibilities:**
-- Data processing per Privacy Policy
-- Security and encryption
-- Compliance with regulations
-- Data retention and deletion
+**Data minimization tips**:
+1. Be selective about which files you ask Grok One-Shot to read
+2. Avoid including credentials or secrets in prompts
+3. Use environment variables instead of hardcoded secrets
+4. Review session files before sharing for bug reports
 
-**Review X.AI Privacy Policy:** https://x.ai/privacy
+## Compliance certifications
 
-## Compliance Considerations
+> **Parity Gap**: Grok One-Shot is an open-source community project without formal compliance certifications. For regulated industries, conduct your own assessment.
 
-### GDPR (General Data Protection Regulation)
+### Currently unavailable
 
-**Applicability:** EU/EEA users and data subjects
+**Formal certifications**:
+- ❌ SOC 2 Type II certification
+- ❌ ISO 27001 certification
+- ❌ HIPAA BAA
+- ❌ FedRAMP authorization
+- ❌ GDPR Data Processing Agreement (DPA)
+- ❌ PCI-DSS certification
 
-**Key rights:**
-- **Right to access:** You can access your local data (`~/.x-cli/`)
-- **Right to deletion:** Delete `~/.x-cli/` or contact X.AI for API data
-- **Right to portability:** Session files are JSON (portable format)
-- **Right to object:** Stop using the service at any time
+**Why these are unavailable**:
+- Grok One-Shot is an open-source CLI tool, not a SaaS service
+- Certifications apply to xAI's API infrastructure
+- Users should review xAI's compliance directly
 
-**Data controller roles:**
-- **Local data:** You (the user)
-- **API data:** X.AI (data processor)
+### For compliance needs
 
-**Compliance steps:**
-1. Review X.AI's GDPR compliance
-2. Secure API keys and local data
-3. Implement data retention policies
-4. Train users on privacy practices
+**Steps for regulated industries**:
+1. Review xAI's compliance status for the API layer
+2. Conduct your own risk assessment of Grok One-Shot
+3. Implement additional controls as needed:
+   - API proxies for logging and monitoring
+   - Network-level security controls
+   - Audit trails and access controls
+4. Consider forking and adding required controls
+5. Consult with your compliance team before production use
 
-### CCPA (California Consumer Privacy Act)
+### GDPR (Europe)
 
-**Applicability:** California residents
+**User rights**:
+- **Right to access**: View your local session files in `~/.x-cli/`
+- **Right to deletion**: Delete `~/.x-cli/` directory; contact xAI for API data
+- **Right to portability**: Session files are JSON (portable format)
+- **Right to object**: Stop using the service at any time
 
-**Key rights:**
+**Data controller roles**:
+- **Local data**: You (the user)
+- **API data**: xAI (data processor)
+
+### CCPA (California)
+
+**Consumer rights**:
 - Right to know what data is collected
 - Right to deletion
-- Right to opt-out of "sales" (not applicable - no sales)
+- Right to opt-out of "sales" (not applicable - no data sales)
 - Right to non-discrimination
 
-**Compliance:**
+**Compliance**:
 - Grok One-Shot does not "sell" data
 - Local data under your control
-- API data governed by X.AI's CCPA compliance
+- API data governed by xAI's CCPA compliance
 
-### HIPAA (Health Insurance Portability and Accountability Act)
+### HIPAA (Healthcare)
 
-**Applicability:** Healthcare data in the United States
-
-**⚠️ Important:**
-- **Do NOT use Grok One-Shot with PHI (Protected Health Information)** without ensuring X.AI has appropriate BAA (Business Associate Agreement)
+**⚠️ Critical warning**:
+- **Do NOT use Grok One-Shot with PHI (Protected Health Information)** without ensuring xAI has appropriate BAA
 - Default configuration is **NOT HIPAA-compliant**
 - Consult legal counsel before using with healthcare data
 
-**If required for healthcare:**
-1. Verify X.AI offers BAA
-2. Sign BAA with X.AI
-3. Implement additional access controls
-4. Audit and log all usage
-5. Conduct risk assessment
+### PCI-DSS (Payment Card Industry)
 
-### PCI-DSS (Payment Card Industry Data Security Standard)
-
-**Applicability:** Payment card data
-
-**⚠️ Important:**
+**⚠️ Important**:
 - **Do NOT use Grok One-Shot with payment card data (PAN, CVV, etc.)**
 - Not designed for PCI-DSS compliance
 - Use specialized PCI-compliant tools instead
 
-**Why not compliant:**
-- Data transmitted to third-party (X.AI)
-- No card data encryption/tokenization
-- No PCI-DSS certification
+## License and attribution
 
-### SOC 2 / ISO 27001
+**Grok One-Shot**:
+- License: MIT License
+- Copyright: See repository LICENSE file
+- Attribution: Required per MIT License terms
 
-**Enterprise compliance frameworks**
+**Third-party dependencies**:
+- See `package.json` for full dependency list
+- Each dependency has its own license (mostly MIT/BSD)
+- Use `bun install` to review dependency licenses
 
-**Grok One-Shot considerations:**
-- Open-source (can be audited)
-- No telemetry (reduces data exposure)
-- Local data storage (under your control)
-- API security via HTTPS
+**xAI Trademarks**:
+- "Grok" is a trademark of xAI
+- This project is not officially affiliated with or endorsed by xAI
+- Use of xAI's API is subject to their terms
 
-**For compliance:**
-1. Review X.AI's certifications (SOC 2, ISO 27001)
-2. Implement access controls for API keys
-3. Monitor and log usage
-4. Conduct security assessments
-5. Document data flows
+## Terms of use
 
-### FERPA (Family Educational Rights and Privacy Act)
+By using Grok One-Shot, you agree to:
+1. Comply with the MIT License
+2. Comply with xAI's Terms of Service when using their API
+3. Use the tool responsibly and ethically
+4. Not use it for illegal or harmful purposes
+5. Respect the privacy and security of others
 
-**Applicability:** Educational institutions in the United States
+## Liability and warranty
 
-**⚠️ Caution:**
-- Review X.AI's FERPA compliance
-- May require BAA or Data Processing Agreement
-- Limit student data exposure
-- Obtain appropriate consents
-
-## Security and Vulnerability Disclosure
-
-### Security Practices
-
-**Grok One-Shot security:**
-- Regular dependency updates
-- Code reviews via open-source contributions
-- No known critical vulnerabilities
-- HTTPS for all API communication
-
-**Your responsibilities:**
-- Keep Grok One-Shot updated
-- Secure API keys
-- Use strong file permissions
-- Monitor for suspicious activity
-
-### Vulnerability Reporting
-
-**If you discover a security issue:**
-
-1. **Do NOT** publicly disclose yet
-2. **Email:** security@x-cli-team.com (or file private GitHub issue)
-3. **Include:**
-   - Description of vulnerability
-   - Steps to reproduce
-   - Impact assessment
-   - Suggested fix (if available)
-
-**Response timeline:**
-- Acknowledgment: 48 hours
-- Assessment: 7 days
-- Fix: 30 days (depending on severity)
-- Public disclosure: After fix is released
-
-**Coordinated disclosure:**
-- We will work with you on disclosure timing
-- Credit given to reporter (if desired)
-
-## Intellectual Property
-
-### Copyright
-
-**Grok One-Shot:**
-- © 2024-2025 X.AI Team / Contributors
-- Open-source under MIT License
-- Contributions licensed under same terms
-
-**X.AI / Grok:**
-- "Grok" is a trademark of X.AI
-- "X.AI" is a trademark of X.AI Corp
-- Used with permission / under license
-
-**Third-party:**
-- All dependencies retain their copyrights
-- See individual LICENSE files
-
-### Trademarks
-
-**Usage guidelines:**
-- ✅ Refer to "Grok One-Shot" by name
-- ✅ Use for accurate description
-- ⚠️ Do NOT imply official endorsement without permission
-- ❌ Do NOT use X.AI trademarks in your product name
-
-**Questions:** Contact X.AI for trademark usage guidance
-
-### Patents
-
-**Grok One-Shot:**
-- No patents held
-- MIT License includes implicit patent grant
-
-**X.AI:**
-- May hold patents on AI technology
-- Using API implies license to use
-
-## Export Control and Sanctions
-
-### Export Control
-
-**U.S. Export Regulations:**
-- Grok One-Shot is open-source software
-- Generally exempt from export control (publicly available)
-- **However:** Check export regulations for your jurisdiction
-
-**Restricted countries:**
-- Some countries may be subject to U.S. sanctions
-- X.AI API may not be accessible from all countries
-- Check X.AI's Terms of Service for restrictions
-
-**Compliance:**
-- Do NOT use in violation of export laws
-- Do NOT provide to sanctioned entities
-- Verify applicable regulations
-
-### Sanctions Compliance
-
-**U.S. Sanctions (OFAC):**
-- Comply with OFAC sanctions programs
-- Do NOT use if on Specially Designated Nationals (SDN) list
-- Do NOT use in embargoed countries
-
-**Other jurisdictions:**
-- Comply with EU, UK, UN sanctions
-- Verify your jurisdiction's requirements
-
-## Acceptable Use
-
-### Permitted Uses
-
-**You may use Grok One-Shot for:**
-- ✅ Software development
-- ✅ Code analysis and refactoring
-- ✅ Documentation generation
-- ✅ Learning and education
-- ✅ Research and experimentation
-- ✅ Commercial projects
-
-### Prohibited Uses
-
-**You may NOT use Grok One-Shot for:**
-- ❌ Illegal activities
-- ❌ Harassment or abuse
-- ❌ Generating malware (without authorization for security research)
-- ❌ Bypassing security controls (without authorization)
-- ❌ Violating others' intellectual property
-- ❌ Spamming or abuse of X.AI API
-
-### Content Policy
-
-**Generated content:**
-- You are responsible for content you generate
-- AI-generated code may have bugs or vulnerabilities
-- Review and test all AI-generated code
-- Do NOT blindly deploy AI suggestions
-
-**Inappropriate content:**
-- Do NOT attempt to generate illegal content
-- Do NOT use for harassment or hate speech
-- X.AI may have content policies - comply with them
-
-## Liability and Warranty
-
-### No Warranty
-
-**Disclaimer:**
-> Grok One-Shot is provided "AS IS", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement.
-
-**What this means:**
-- No guarantee of correctness
-- No guarantee of fitness for purpose
-- No guarantee of uptime or availability
-- Use at your own risk
-
-### Limitation of Liability
-
-**Disclaimer:**
-> In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.
-
-**What this means:**
-- Developers not liable for damages
-- Developers not liable for data loss
-- Developers not liable for financial losses
-- Developers not liable for security breaches
-
-**Your responsibility:**
-- Test thoroughly before production use
-- Backup your data
-- Secure your API keys
-- Follow security best practices
-
-## Contributing and Licensing
-
-### Contributing Code
-
-**License grant:**
-- By contributing, you agree to license under MIT
-- You retain copyright to your contributions
-- Contributions must not infringe others' rights
-
-**Contributor Agreement:**
-- Implied by submitting pull request
-- No separate CLA required
-- Must have rights to contribute code
-
-### Forking and Redistribution
-
-**You may:**
-- ✅ Fork the repository
-- ✅ Modify for your needs
-- ✅ Redistribute modified versions
-- ✅ Use different name for your fork
-
-**You must:**
-- ⚠️ Retain original LICENSE file
-- ⚠️ Retain copyright notices
-- ⚠️ Indicate changes made
-
-**Example:**
+**MIT License disclaimer**:
 ```
-# Your fork's README
-This is a fork of Grok One-Shot (https://github.com/x-cli-team/x-cli)
-Modified to add custom features for our team.
-Original copyright © 2024-2025 X.AI Team / Contributors
-Fork maintained by YourCompany
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-## Contact and Resources
+**Use at your own risk**:
+- No warranties or guarantees provided
+- No liability for data loss, security issues, or other damages
+- You are responsible for securing your API keys and data
+- You are responsible for compliance with applicable laws and regulations
 
-### Legal Questions
+## Parity summary
 
-**For Grok One-Shot:**
-- GitHub Issues: https://github.com/x-cli-team/x-cli/issues
-- Email: legal@x-cli-team.com (if available)
+### Major gaps vs Claude Code
 
-**For X.AI / Grok API:**
-- X.AI Support: https://x.ai/support
-- X.AI Legal: legal@x.ai
+| Feature | Impact | Mitigation |
+|---------|--------|------------|
+| **No BAA/HIPAA** | Cannot use with PHI | Contact xAI for enterprise agreements |
+| **No ZDR** | No zero data retention | Review xAI retention policy |
+| **No tiered terms** | No commercial/consumer split | Uniform API terms |
+| **No trust center** | No centralized compliance docs | Open-source transparency |
+| **No bug bounty** | Informal security reporting | GitHub Security Advisories |
+| **No formal certs** | No SOC2/ISO27001 for CLI | Review xAI API compliance |
 
-### Compliance Resources
+### Advantages of open-source model
 
-**Documentation:**
+**Benefits**:
+- ✅ Full code transparency (no hidden behavior)
+- ✅ Community security review
+- ✅ No vendor lock-in
+- ✅ Free to fork and customize
+- ✅ No telemetry or tracking
+
+## Contact and resources
+
+**For Grok One-Shot**:
+- GitHub Issues: Report bugs and feature requests
+- GitHub Discussions: Community support
+- Documentation: `.agent/docs/` directory
+
+**For xAI/Grok API**:
+- [xAI Support](https://x.ai/support)
+- [xAI Legal](mailto:legal@x.ai)
+- API documentation: [x.ai/api](https://x.ai/api)
+
+**Compliance resources**:
 - [Data Usage Guide](../administration/data-usage.md)
-- [Security Best Practices](../configuration/settings.md#security)
-- [Deployment Guide](../deployment/overview.md)
-
-**External:**
-- X.AI Terms: https://x.ai/terms
-- X.AI Privacy: https://x.ai/privacy
-- X.AI Compliance: https://x.ai/compliance (check for availability)
-
-## Summary
-
-### Key Takeaways
-
-**License:**
-- Grok One-Shot: MIT (permissive, commercial-friendly)
-- Use freely with attribution
-
-**Privacy:**
-- No telemetry from Grok One-Shot
-- API usage subject to X.AI Privacy Policy
-
-**Compliance:**
-- Review X.AI's compliance for regulated industries
-- **Do NOT** use with PHI or PCI data without verification
-- GDPR/CCPA: Local data under your control, API data with X.AI
-
-**Security:**
-- Open-source, auditable
-- Report vulnerabilities responsibly
-- Keep updated and secure API keys
-
-**Liability:**
-- No warranty provided
-- Developers not liable for damages
-- Use responsibly and test thoroughly
+- [Settings & Security](../configuration/settings.md)
+- [xAI Terms](https://x.ai/legal/terms-of-service)
+- [xAI Privacy](https://x.ai/legal/privacy-policy)
 
 ---
 
-**Disclaimer:** This document provides general information and is not legal advice. Consult qualified legal counsel for your specific situation.
+© 2024-2025 Grok One-Shot Contributors. Open source under MIT License.
+
+Use of xAI's API is subject to [xAI's Terms of Service](https://x.ai/legal/terms-of-service).
+
+**Disclaimer**: This document provides general information and is not legal advice. Consult qualified legal counsel for your specific situation.
+
+**Last updated**: November 7, 2025
+**Version**: 1.1.101
