@@ -1,543 +1,256 @@
-# Data Usage and Privacy
+# Data usage
 
-Understand what data Grok One-Shot collects, stores, and transmits.
+> Learn about xAI's data usage policies for Grok One-Shot
 
-## Overview
+## Data policies
 
-Grok One-Shot is designed with privacy in mind. This guide explains data handling, storage, transmission, and your control over your data.
+### Data training policy
 
-## Data Categories
+**xAI Grok API users**: xAI's data usage policies apply to all data sent through the Grok API. When using Grok One-Shot with your xAI API key, your prompts and model outputs are handled according to [xAI's Privacy Policy](https://x.ai/legal/privacy-policy).
 
-### 1. Configuration Data
+According to xAI's current policies:
+- **API Usage**: Data sent to the Grok API may be used to improve xAI's models and services
+- **Data Retention**: xAI retains API data according to their standard retention policies
+- **Control**: API users should review xAI's terms of service and privacy policy for full details
 
-**What:** Settings and preferences
+> **Parity Gap**: Unlike Claude Code's granular consumer/commercial data controls, Grok One-Shot relies entirely on xAI's API-level data policies. There are currently no opt-out mechanisms within Grok One-Shot itself.
 
-**Location:** `~/.x-cli/settings.json`
+### Development Partner Program
 
-**Contains:**
-- API key
-- Model preferences
-- Confirmation settings
-- MCP server configurations
-- User name (optional)
+> **Parity Gap**: xAI does not currently offer a public Development Partner Program equivalent to Anthropic's. All API usage is governed by standard xAI API terms.
 
-**Transmitted:** No (local only)
+### Feedback using the `/bug` command
 
-**Control:** Full control, can edit or delete
+> **Parity Gap**: Grok One-Shot does not currently implement a `/bug` command. Bug reporting is handled through standard GitHub issues.
 
-**Example:**
-```json
-{
-  "apiKey": "xai-xxxxx",
-  "model": "grok-2-1212",
-  "name": "Alice",
-  "confirmations": true
-}
+If you encounter bugs:
+1. File an issue in the GitHub repository
+2. Include relevant session logs from `~/.x-cli/sessions/` (after sanitizing sensitive data)
+3. Do not include credentials or sensitive code in bug reports
+
+### Session quality surveys
+
+> **Parity Gap**: Grok One-Shot does not currently implement session quality surveys or rating prompts.
+
+**Current status**:
+- ❌ No "How is Grok doing this session?" prompt
+- ❌ No automatic feedback collection
+- ❌ No session ratings
+- ✅ Manual feedback welcome via GitHub issues
+
+### Data retention
+
+Grok One-Shot data retention varies by storage location.
+
+**Local storage (on your machine)**:
+- Sessions stored indefinitely in `~/.x-cli/sessions/`
+- Settings stored in `~/.x-cli/settings.json`
+- You have full control to view, archive, or delete
+- No automatic cleanup or retention limits
+
+**API-level retention (xAI)**:
+- Data sent to xAI's API is subject to xAI's retention policies
+- Review [xAI's Privacy Policy](https://x.ai/legal/privacy-policy) for details
+- No zero data retention option currently available
+- No tiered retention based on account type
+
+> **Parity Gap**: Unlike Claude Code which offers consumer (5-year or 30-day) and commercial (30-day or ZDR) retention tiers, Grok One-Shot relies on xAI's uniform API retention policy.
+
+**Comparison to Claude Code**:
+
+| Feature | Claude Code | Grok One-Shot |
+|---------|-------------|---------------|
+| Consumer data controls | ✅ Opt-in/out | ❌ API-level only |
+| 30-day retention option | ✅ | Per xAI policy |
+| Zero data retention | ✅ (commercial) | ❌ |
+| Local session control | ✅ Configurable | ✅ Manual cleanup |
+
+For full details, please review [xAI's Terms of Service](https://x.ai/legal/terms-of-service) and [Privacy Policy](https://x.ai/legal/privacy-policy).
+
+## Data flow and dependencies
+
+```
+┌─────────────┐
+│   User      │
+│  Terminal   │
+└──────┬──────┘
+       │
+       │ Local file system access
+       │ (reads code, writes edits)
+       │
+┌──────▼──────────────────────┐
+│  Grok One-Shot (Local CLI)  │
+│  - React/Ink UI             │
+│  - GrokAgent core           │
+│  - Session management       │
+│  - Local file operations    │
+└──────┬──────────────────────┘
+       │
+       │ HTTPS (TLS encrypted)
+       │ Prompts, code context, model outputs
+       │
+┌──────▼──────────────────────┐
+│  xAI Grok API               │
+│  https://api.x.ai           │
+│  - grok-4-fast-non-reasoning│
+│  - grok-reasoning-24-11     │
+│  - Other Grok models        │
+└─────────────────────────────┘
 ```
 
-### 2. Session Data
+Grok One-Shot is installed from [NPM](https://www.npmjs.com/package/x-cli). Grok One-Shot runs entirely locally on your machine. In order to interact with the LLM, Grok One-Shot sends data over the network. This data includes all user prompts, code context, and model outputs. The data is encrypted in transit via TLS and is not encrypted at rest (stored locally in `~/.x-cli/`).
 
-**What:** Conversation history and context
+Grok One-Shot is compatible with most popular VPNs and LLM proxies (configure via `GROK_BASE_URL` environment variable).
 
-**Location:** `~/.x-cli/sessions/`
+Grok One-Shot is built on xAI's APIs. For details regarding the API's security controls and logging procedures, please refer to [xAI's security documentation](https://x.ai/legal/security).
 
-**Contains:**
-- User messages
-- AI responses
-- Tool calls and results
-- Token usage statistics
-- Timestamps and metadata
+### Cloud execution
 
-**Transmitted:** No (local only)
+> **Parity Gap**: Grok One-Shot does not currently support cloud-based execution. All sessions run locally on your machine.
 
-**Control:** Full control, can view, archive, or delete
+**Claude Code on the web** (Anthropic's cloud offering) includes:
+- Sessions run in Anthropic-managed VMs
+- Repository cloning to isolated VMs
+- GitHub credential proxy
+- Network traffic security proxy
+- Automatic VM cleanup after sessions
 
-**Example structure:**
-```json
-{
-  "sessionId": "session-2025-11-05-14-30",
-  "messages": [
-    {
-      "role": "user",
-      "content": "list files"
-    },
-    {
-      "role": "assistant",
-      "content": "Here are the files..."
-    }
-  ],
-  "tokenUsage": {
-    "input": 1234,
-    "output": 567
-  }
-}
-```
+**Grok One-Shot** currently:
+- ✅ Runs entirely locally
+- ✅ All code stays on your machine
+- ✅ Direct API calls to xAI only
+- ❌ No cloud VM execution option
+- ❌ No web-based sessions
+- ❌ No remote execution capabilities
 
-### 3. API Communication Data
+This may change in future versions. Track cloud execution requests in GitHub issues.
 
-**What:** Data sent to X.AI API
+## Telemetry services
 
-**Transmitted to:** X.AI servers (https://api.x.ai)
+> **Parity Gap**: Grok One-Shot does not currently implement telemetry, error reporting, or analytics services.
 
-**Contains:**
+**Claude Code telemetry**:
+- Statsig for operational metrics (latency, reliability, usage patterns)
+- Sentry for error logging
+- `/bug` command for feedback
+- Session quality surveys
+- Opt-out via environment variables
+
+**Grok One-Shot telemetry**:
+- ❌ No Statsig telemetry
+- ❌ No Sentry error logging
+- ❌ No operational metrics collection
+- ❌ No `/bug` command
+- ❌ No session surveys
+- ✅ All operations are local-only (except Grok API calls)
+
+**Privacy benefit**: Grok One-Shot does not send any operational data, metrics, or error logs to third-party services. The only network traffic is:
+1. API calls to the configured Grok API endpoint (default: `https://api.x.ai`)
+2. Optional MCP server connections (if configured)
+3. NPM package installation/updates
+
+**No opt-out needed**: Since there is no telemetry, there are no environment variables to disable it.
+
+## Default behaviors by API provider
+
+Grok One-Shot only supports the xAI Grok API. There are no Bedrock or Vertex integrations.
+
+> **Parity Gap**: Unlike Claude Code which supports multiple API providers (Anthropic, AWS Bedrock, Google Vertex), Grok One-Shot only supports xAI's Grok API.
+
+**Claude Code API provider matrix**:
+
+| Service | Claude API | Vertex API | Bedrock API |
+|---------|------------|------------|-------------|
+| Statsig (Metrics) | Default on | Default off | Default off |
+| Sentry (Errors) | Default on | Default off | Default off |
+| `/bug` reports | Default on | Default off | Default off |
+
+**Grok One-Shot**:
+
+| Service | Grok API (xAI) |
+|---------|----------------|
+| Telemetry (Metrics) | Not implemented |
+| Error Reporting | Not implemented |
+| Bug Reports | Manual via GitHub issues |
+| Data Retention | Per xAI API policies + local session storage |
+| Cloud Execution | Not supported |
+
+Environment variables like `DISABLE_TELEMETRY`, `DISABLE_ERROR_REPORTING`, and `DISABLE_BUG_COMMAND` are not needed since these features don't exist.
+
+## Privacy considerations
+
+### What Grok One-Shot sends to xAI
+
+When using Grok One-Shot, the following data is sent to xAI's API:
 - Your prompts and messages
-- File contents (when AI reads/analyzes files)
-- Tool call results
-- Context and conversation history
-
-**Control:** Managed by X.AI's privacy policy
-
-**Retention:** Per X.AI's data retention policy
-
-**Encryption:** HTTPS/TLS in transit
-
-### 4. Usage Logs
-
-**What:** Diagnostic and error logs
-
-**Location:**
-- `xcli-startup.log` (current directory)
-- Console output (when `GROK_DEBUG=true`)
-
-**Contains:**
-- Startup diagnostics
-- Error messages
-- Debug information (if enabled)
-
-**Transmitted:** No (local only)
-
-**Control:** Full control, logs are local files
-
-## What Data is Transmitted
-
-### Sent to X.AI API
-
-**Always sent:**
-```
-✓ User messages and prompts
-✓ Conversation history (for context)
-✓ Model and parameter selections
-✓ API key (for authentication)
-```
-
-**Sent when relevant:**
-```
-✓ File contents (when AI reads files)
-✓ Command outputs (when AI runs commands)
-✓ Directory structure (when AI explores codebase)
-✓ Git information (when AI checks repository status)
-```
-
-**Never sent (stays local):**
-```
-✗ Session files (unless you share them)
-✗ Configuration files
-✗ Unread files (AI only reads what's needed)
-✗ Credentials in environment variables (not accessible to AI)
-```
-
-### Network Communication
-
-**API Endpoint:** `https://api.x.ai/v1`
-
-**Protocol:** HTTPS (TLS 1.2+)
-
-**Authentication:** Bearer token (your API key)
-
-**Request structure:**
-```json
-{
-  "model": "grok-2-1212",
-  "messages": [
-    {"role": "user", "content": "your message"},
-    {"role": "assistant", "content": "AI response"}
-  ],
-  "tools": [...],
-  "stream": true
-}
-```
-
-## Data Storage
-
-### Local Storage
-
-**Configuration:**
-- Location: `~/.x-cli/settings.json`
-- Permissions: `600` (user read/write only) - recommended
-- Format: JSON
-- Size: ~1-5 KB
-
-**Sessions:**
-- Location: `~/.x-cli/sessions/`
-- Permissions: `700` (directory), `600` (files) - recommended
-- Format: JSON
-- Size: Variable (typically 10-100 KB per session)
-- Retention: Indefinite (manual cleanup)
-
-**Logs:**
-- Location: `./xcli-startup.log`
-- Permissions: Default (usually `644`)
-- Format: Plain text
-- Size: ~1-10 KB
-- Retention: Overwritten each run
-
-### Cloud Storage
-
-**X.AI API:**
-- Grok One-Shot does not control X.AI's data retention
-- Refer to X.AI Privacy Policy: https://x.ai/privacy
-- API requests are logged by X.AI for service delivery
-- Data retention per X.AI's terms of service
-
-**No Other Cloud Storage:**
-- Grok One-Shot does not use any other cloud storage
-- No telemetry sent to Grok One-Shot developers
-- No analytics or tracking
-
-## Privacy Controls
-
-### Minimize Data Transmission
-
-**1. Don't let AI read unnecessary files:**
-```
-❌ "Analyze all files in my home directory"
-✅ "Analyze authentication logic in src/auth/"
-```
-
-**2. Use specific prompts:**
-```
-❌ "Fix the code"
-✅ "Fix error handling in src/api/users.ts line 47"
-```
-
-**3. Avoid sharing sensitive data:**
-```
-❌ "Here's my API key: sk-xxxxx"
-✅ Use environment variables, don't paste secrets
-```
-
-### Secure API Keys
-
-**Best practices:**
-```bash
-# ✅ Environment variable (not saved in history)
-export GROK_API_KEY="your-key"
-
-# ✅ Settings file with restricted permissions
-chmod 600 ~/.x-cli/settings.json
-
-# ❌ Command-line flag (visible in history)
-x-cli -k "your-key"  # Avoid
-```
-
-### Clean Up Session Data
-
-**Regularly delete old sessions:**
-```bash
-# View sessions
-ls -lah ~/.x-cli/sessions/
-
-# Delete sessions older than 30 days
-find ~/.x-cli/sessions/ -name "*.json" -mtime +30 -delete
-
-# Or delete all sessions
-rm ~/.x-cli/sessions/*.json
-```
-
-### Disable Logging
-
-**Minimize local logs:**
-```bash
-# Don't enable debug mode unnecessarily
-# export GROK_DEBUG=true  # Only when needed
-
-# Redirect to /dev/null if needed
-x-cli 2>/dev/null
-```
-
-## Data Security
-
-### At Rest (Local Storage)
-
-**Protect local files:**
-```bash
-# Restrict permissions
-chmod 600 ~/.x-cli/settings.json
-chmod 700 ~/.x-cli/sessions/
-
-# Verify
-ls -la ~/.x-cli/
-# Should show: drwx------ (700) for directories
-#              -rw------- (600) for files
-```
-
-**Encrypt home directory:**
-```bash
-# macOS: FileVault
-# Windows: BitLocker
-# Linux: LUKS / dm-crypt
-
-# Encrypts all data in ~/.x-cli/
-```
-
-### In Transit (Network)
-
-**HTTPS encryption:**
-- All API requests use HTTPS (TLS 1.2+)
-- Certificate validation enforced
-- No plain HTTP fallback
-
-**Verify connection security:**
-```bash
-# Check TLS version
-openssl s_client -connect api.x.ai:443 -tls1_2
-
-# Should show: TLSv1.2 or TLSv1.3
-```
-
-### API Key Protection
-
-**Security measures:**
-```bash
-# 1. Use environment variables
-export GROK_API_KEY="xai-xxxxx"
-
-# 2. Restrict settings file permissions
-chmod 600 ~/.x-cli/settings.json
-
-# 3. Don't commit to git
-echo '.x-cli/settings.json' >> ~/.gitignore
-
-# 4. Rotate keys periodically
-# Generate new key at https://console.x.ai
-# Update in settings or environment
-```
-
-## Compliance Considerations
-
-### GDPR (Europe)
-
-**User rights:**
-- **Right to access:** View your local session files
-- **Right to deletion:** Delete `~/.x-cli/` directory
-- **Right to portability:** Session files are JSON (portable)
-
-**X.AI's responsibilities:**
-- Data transmitted to X.AI falls under X.AI's GDPR compliance
-- See X.AI Privacy Policy for details
-
-**Data controller:**
-- Local data: You (the user)
-- API data: X.AI
-
-### CCPA (California)
-
-**Consumer rights:**
-- Similar to GDPR
-- Local data fully under your control
-- API data governed by X.AI's CCPA compliance
-
-### Enterprise Compliance
-
-**SOC 2 / ISO 27001:**
-- Review X.AI's compliance certifications
-- Implement access controls for API keys
-- Monitor and audit API usage
-- Encrypt data at rest and in transit
-
-**HIPAA / PCI-DSS:**
-- **Do not** use Grok One-Shot with protected health information (PHI)
-- **Do not** use with payment card data
-- Unless: X.AI has appropriate compliance (verify with X.AI)
-
-## Data Retention
-
-### Local Data Retention
-
-**You control retention:**
-```bash
-# Keep sessions indefinitely
-# (default - no automatic cleanup)
-
-# Or implement cleanup policy
-# Example: Delete sessions older than 90 days
-find ~/.x-cli/sessions/ -mtime +90 -delete
-
-# Add to cron for automatic cleanup
-# crontab -e
-# 0 0 * * 0 find ~/.x-cli/sessions/ -mtime +90 -delete
-```
-
-### API Data Retention
-
-**X.AI retention policy:**
-- Refer to X.AI Terms of Service
-- Typically: API requests logged for service delivery
-- Retention period: Per X.AI's policy (varies)
-- Deletion requests: Contact X.AI support
-
-## Audit and Monitoring
-
-### Monitor API Usage
-
-**Check token usage:**
-```bash
-# During session: Ctrl+I
-
-# From session files
-cat ~/.x-cli/sessions/*.json | jq '.tokenUsage'
-
-# Total usage across sessions
-find ~/.x-cli/sessions/ -name "*.json" -exec jq '.tokenUsage.input + .tokenUsage.output' {} + | awk '{sum+=$1} END {print sum " total tokens"}'
-```
-
-**Review transmitted data:**
-```bash
-# Session files contain everything sent to API
-cat ~/.x-cli/sessions/latest-session.json | jq '.messages'
-```
-
-### Audit Logs
-
-**Enable detailed logging:**
-```bash
-# Debug mode logs API requests
-export GROK_DEBUG=true
-x-cli 2>&1 | tee audit.log
-
-# Review what was sent
-grep "API Request" audit.log
-```
-
-### DLP (Data Loss Prevention)
-
-**Pre-commit hooks:**
-```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-
-# Check for API keys in staged files
-if git diff --cached | grep -E "xai-[a-zA-Z0-9]+"; then
-  echo "❌ API key detected in commit"
-  exit 1
-fi
-```
-
-**Content filtering:**
-```bash
-# Example: Prevent AI from reading secrets files
-> Don't read .env files or files containing 'password'
-# AI will respect this instruction
-```
-
-## Best Practices
-
-### Data Minimization
-
-**DO:**
-- ✅ Be specific about which files to analyze
-- ✅ Use headless mode for simple queries
-- ✅ Start new sessions for unrelated tasks
-- ✅ Clean up old session files
-
-**DON'T:**
-- ❌ Let AI explore entire home directory
-- ❌ Share passwords or secrets in prompts
-- ❌ Accumulate unlimited session history
-- ❌ Use with sensitive/regulated data without review
-
-### Access Control
-
-**Protect API keys:**
-```bash
-# Team environment: separate keys per user
-export GROK_API_KEY="user1-key"  # User 1
-export GROK_API_KEY="user2-key"  # User 2
-
-# Project environment: separate keys per project
-# project-a/.env
-GROK_API_KEY="project-a-key"
-
-# project-b/.env
-GROK_API_KEY="project-b-key"
-```
-
-**Restrict file access:**
-```bash
-# Settings file: user only
-chmod 600 ~/.x-cli/settings.json
-
-# Sessions directory: user only
-chmod 700 ~/.x-cli/sessions/
-
-# Verify no group/other access
-ls -la ~/.x-cli/
-```
-
-### Incident Response
-
-**If API key compromised:**
-```bash
-# 1. Rotate key immediately
-# Go to https://console.x.ai → Generate new key
-
-# 2. Update local configuration
-export GROK_API_KEY="new-key"
-# or edit ~/.x-cli/settings.json
-
-# 3. Revoke old key (in X.AI console)
-
-# 4. Review API usage logs for unauthorized usage
-```
-
-**If sensitive data exposed:**
-```bash
-# 1. Delete session files
-rm ~/.x-cli/sessions/*.json
-
-# 2. Contact X.AI support for data deletion request
-# (if data was transmitted to API)
-
-# 3. Review and update security practices
-```
-
-## FAQ
-
-**Q: Does Grok One-Shot send telemetry?**
-A: No. Grok One-Shot does not send usage telemetry, analytics, or tracking data to developers.
-
-**Q: Can X.AI see my code?**
-A: X.AI receives any code that the AI reads or analyzes during your session. This is necessary for AI functionality.
-
-**Q: Is my API key stored securely?**
-A: Locally, yes (in settings file). Secure it with file permissions (`chmod 600`). Transmitted via HTTPS to X.AI.
-
-**Q: How long does X.AI keep my data?**
-A: Refer to X.AI's Privacy Policy and Terms of Service for data retention policies.
-
-**Q: Can I use Grok One-Shot in regulated industries?**
-A: Consult your compliance team and X.AI's compliance certifications. May not be suitable for HIPAA/PCI without additional controls.
-
-**Q: What happens if I delete ~/.x-cli/?**
-A: All local configuration and sessions are deleted. No data loss beyond local storage. API data persists per X.AI's policy.
-
-**Q: Can I run Grok One-Shot offline?**
-A: No. Requires internet connection to X.AI API. All AI processing happens on X.AI servers.
-
-**Q: Is my session history private?**
-A: Locally stored sessions are private (on your machine). Data sent to API is subject to X.AI's privacy policy.
-
-## See Also
-
-- [Settings](../configuration/settings.md) - Configuration management
-- [Troubleshooting](../build-with-claude-code/troubleshooting.md) - Common issues
-- [Advanced Installation](./advanced-installation.md) - Enterprise setup
-- [Legal and Compliance](../resources/legal-and-compliance.md) - Legal information
-
-**External Resources:**
-- X.AI Privacy Policy: https://x.ai/privacy
-- X.AI Terms of Service: https://x.ai/terms
+- Code context (file contents you reference or edit)
+- Tool usage and results (file reads, bash commands, etc.)
+- Conversation history (for maintaining context)
+
+### What Grok One-Shot stores locally
+
+- Full session transcripts in `~/.x-cli/sessions/`
+- API key in `~/.x-cli/settings.json`
+- MCP server configurations
+- User preferences and settings
+
+### What Grok One-Shot does NOT do
+
+- Send telemetry or metrics to third parties
+- Report errors to external services
+- Upload code or sessions to any service (except xAI API)
+- Track usage patterns or analytics
+- Create cloud backups
+
+### Security recommendations
+
+1. Keep your `GROK_API_KEY` secure (use `chmod 600 ~/.x-cli/settings.json`)
+2. Review session files before sharing (they contain full conversation history)
+3. Use `.gitignore` for `~/.x-cli/` directory
+4. Sanitize logs before including in bug reports
+5. Review xAI's privacy policy periodically
+6. Regularly clean up old sessions: `rm ~/.x-cli/sessions/*.json`
+
+## Comparison to Claude Code
+
+### Feature parity summary
+
+| Feature | Claude Code | Grok One-Shot | Status |
+|---------|-------------|---------------|--------|
+| **Data Training Control** | ✅ Consumer opt-in/out | ❌ API-level only | Parity gap |
+| **Commercial Terms** | ✅ Team/Enterprise | ❌ API uniform | Parity gap |
+| **Development Partner Program** | ✅ | ❌ | Parity gap |
+| **`/bug` Command** | ✅ | ❌ | Parity gap |
+| **Session Surveys** | ✅ | ❌ | Parity gap |
+| **Tiered Retention** | ✅ 5yr/30d/ZDR | ❌ API policy | Parity gap |
+| **Cloud Execution** | ✅ (web) | ❌ | Parity gap |
+| **Statsig Telemetry** | ✅ (opt-out) | ❌ Not implemented | Different approach |
+| **Sentry Errors** | ✅ (opt-out) | ❌ Not implemented | Different approach |
+| **Multi-Provider** | ✅ Claude/Bedrock/Vertex | ❌ xAI only | Parity gap |
+| **Local Sessions** | ✅ | ✅ | ✅ Parity |
+| **VPN Compatible** | ✅ | ✅ | ✅ Parity |
+| **Local Execution** | ✅ | ✅ | ✅ Parity |
+
+### Why these gaps exist
+
+**Telemetry**: Grok One-Shot prioritizes privacy and simplicity by not collecting any telemetry. This is a design choice, not a missing feature.
+
+**Multi-provider**: Grok One-Shot is specifically built for xAI's Grok API. Adding other providers would require significant architecture changes.
+
+**Cloud execution**: Building cloud infrastructure requires substantial investment. May be considered for future enterprise offering.
+
+**Tiered retention**: Requires xAI to offer similar commercial tiers. Currently not available in xAI's API offerings.
+
+## Additional resources
+
+- [xAI Terms of Service](https://x.ai/legal/terms-of-service)
+- [xAI Privacy Policy](https://x.ai/legal/privacy-policy)
+- [xAI Security Documentation](https://x.ai/legal/security)
+- [Grok API Documentation](https://x.ai/api)
+- [Settings Configuration](../configuration/settings.md)
+- [Legal and Compliance](../resources/legal-and-compliance.md)
 
 ---
 
-Understanding data usage and privacy helps you use Grok One-Shot securely and responsibly.
+**Last updated**: November 7, 2025
+**Version**: 1.1.101

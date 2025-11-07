@@ -1,20 +1,27 @@
-# Troubleshooting Guide
+# Troubleshooting
 
-Solutions to common issues and problems with Grok One-Shot.
+> Discover solutions to common issues with Grok One-Shot installation and usage.
 
-## Installation Issues
+> **Note:** This documentation is adapted from Claude Code. Some features and troubleshooting steps may differ for Grok One-Shot. See parity gap notes throughout.
 
-### "Command not found: x-cli"
+## Common installation issues
+
+### Command not found: x-cli
 
 **Cause:** Global npm/bun binary not in PATH
 
 **Solutions:**
+
 ```bash
 # For npm
 export PATH="$PATH:$(npm bin -g)"
 
 # For Bun
 export PATH="$PATH:$HOME/.bun/bin"
+
+# Add to shell profile (~/.bashrc, ~/.zshrc, etc.)
+echo 'export PATH="$PATH:$(npm bin -g)"' >> ~/.bashrc
+source ~/.bashrc
 
 # Or reinstall
 npm install -g @xagent/one-shot
@@ -23,50 +30,91 @@ npm install -g @xagent/one-shot
 which x-cli
 ```
 
-### "Permission denied" during install
+### Windows installation issues: errors in WSL
 
-**Cause:** Need sudo for global install
+You might encounter the following issues in WSL:
 
-**Solutions:**
+**OS/platform detection issues**: If you receive an error during installation, WSL may be using Windows `npm`. Try:
+
+* Run `npm config set os linux` before installation
+* Install with `npm install -g @xagent/one-shot --force --no-os-check` (Do NOT use `sudo`)
+
+**Node not found errors**: If you see `exec: node: not found` when running `x-cli`, your WSL environment may be using a Windows installation of Node.js. You can confirm this with `which npm` and `which node`, which should point to Linux paths starting with `/usr/` rather than `/mnt/c/`. To fix this, try installing Node via your Linux distribution's package manager or via [`nvm`](https://github.com/nvm-sh/nvm).
+
+**nvm version conflicts**: If you have nvm installed in both WSL and Windows, you may experience version conflicts when switching Node versions in WSL. This happens because WSL imports the Windows PATH by default, causing Windows nvm/npm to take priority over the WSL installation.
+
+You can identify this issue by:
+
+* Running `which npm` and `which node` - if they point to Windows paths (starting with `/mnt/c/`), Windows versions are being used
+* Experiencing broken functionality after switching Node versions with nvm in WSL
+
+To resolve this issue, fix your Linux PATH to ensure the Linux node/npm versions take priority:
+
+**Primary solution: Ensure nvm is properly loaded in your shell**
+
+The most common cause is that nvm isn't loaded in non-interactive shells. Add the following to your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.):
+
 ```bash
-# Use sudo (not recommended)
-sudo npm install -g @xagent/one-shot
-
-# Or use npx (no install needed)
-npx @xagent/one-shot
-
-# Or configure npm for user installs
-mkdir ~/.npm-global
-npm config set prefix '~/.npm-global'
-export PATH=~/.npm-global/bin:$PATH
+# Load nvm if it exists
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 ```
 
-### "Module not found" errors
+Or run directly in your current session:
 
-**Cause:** Dependencies not installed
-
-**Solutions:**
 ```bash
-# Reinstall with clean cache
-npm cache clean --force
+source ~/.nvm/nvm.sh
+```
+
+**Alternative: Adjust PATH order**
+
+If nvm is properly loaded but Windows paths still take priority, you can explicitly prepend your Linux paths to PATH in your shell configuration:
+
+```bash
+export PATH="$HOME/.nvm/versions/node/$(node -v)/bin:$PATH"
+```
+
+> **Warning:** Avoid disabling Windows PATH importing (`appendWindowsPath = false`) as this breaks the ability to easily call Windows executables from WSL. Similarly, avoid uninstalling Node.js from Windows if you use it for Windows development.
+
+### Linux and Mac installation issues: permission or command not found errors
+
+When installing Grok One-Shot with npm, `PATH` problems may prevent access to `x-cli`.
+You may also encounter permission errors if your npm global prefix is not user writable (eg. `/usr`, or `/usr/local`).
+
+**Recommended solution: Configure npm for user installs**
+
+```bash
+# Configure npm for user-level installs
+mkdir -p ~/.npm-global
+npm config set prefix '~/.npm-global'
+
+# Add to PATH
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Now install without sudo
 npm install -g @xagent/one-shot
 
-# Or with Bun
-bun install -g @xagent/one-shot
+# Verify
+which x-cli
 ```
 
-## API Key Issues
+**Alternative: Use npx (no installation needed)**
 
-### "No API key found"
+```bash
+npx @xagent/one-shot
+```
+
+> **Parity Gap**: Grok One-Shot does not have a native installer like Claude Code. Installation is via npm/bun only.
+
+## API Key and authentication
+
+### No API key found
 
 **Error message:**
 ```
-[2025-11-06T11:11:31.792Z] 🚀 X-CLI Starting Up...
-[2025-11-06T11:11:31.794Z] 📂 Working directory: /home/user/project
-[2025-11-06T11:11:31.794Z] 🖥️  Node version: v20.10.0
-[2025-11-06T11:11:31.794Z] 🔑 API Key: ❌ Missing
 ❌ No API key found. Set GROK_API_KEY environment variable.
-[2025-11-06T11:11:31.794Z] ❌ Missing API key - exiting
 ```
 
 **Cause:** GROK_API_KEY environment variable not set
@@ -83,7 +131,6 @@ source ~/.bashrc
 
 # Verify it's set
 echo $GROK_API_KEY
-# Should output: xai-your-actual-key-here
 ```
 
 **2. Set for current session only:**
@@ -104,55 +151,63 @@ x-cli -k "xai-your-key-here"
 - Click "Create new API key"
 - Copy the key (starts with `xai-`)
 
-### "Invalid API key" or 401 errors
+### Invalid API key or 401 errors
 
 **Cause:** Wrong or expired key
 
 **Solutions:**
 ```bash
-# Verify key
+# Check settings file
 cat ~/.x-cli/settings.json
 
-# Get new key from x.ai
-
-# Update key
+# Update key via command line
 x-cli -k "new-key-here"
+
+# Or edit settings file directly
+vim ~/.x-cli/settings.json
 ```
 
-### "Rate limit exceeded"
+### Rate limit exceeded
 
 **Cause:** Too many API requests
 
 **Solutions:**
 - Wait a few minutes
-- Upgrade API plan
+- Upgrade API plan at https://console.x.ai
 - Reduce token usage per request
-- Use headless mode for simple queries
+- Use headless mode (`-p` flag) for simple queries
+- Start new sessions to clear context
 
-## Runtime Issues
+> **Parity Gap**: Grok One-Shot does not have `/logout` or session management commands like Claude Code.
 
-### "Error: requires interactive terminal"
+## Performance and stability
 
-**Cause:** Running in non-TTY environment
+### High CPU or memory usage
 
-**Solutions:**
-```bash
-# Use headless mode
-x-cli -p "your message"
+Grok One-Shot is designed to work with most development environments, but may consume significant resources when processing large codebases. If you're experiencing performance issues:
 
-# Or ensure proper TTY
-# (don't redirect or run in scripts without -p flag)
-```
+1. Start new sessions to clear context (close and restart)
+2. Use headless mode (`x-cli -p "query"`) for simple tasks
+3. Consider adding large build directories to your `.gitignore` file
+4. Close other applications to free up resources
+
+> **Parity Gap**: Grok One-Shot does not have a `/compact` command like Claude Code to reduce context size within a session.
+
+### Command hangs or freezes
+
+If Grok One-Shot seems unresponsive:
+
+1. Press Ctrl+C to attempt to cancel the current operation
+2. If unresponsive, you may need to close the terminal and restart
+3. Check `xcli-startup.log` for error messages
 
 ### Responses are slow
 
 **Causes & Solutions:**
 
 **1. Network latency**
-```bash
-# Check internet speed
-# Try different network
-```
+- Check internet speed
+- Try different network
 
 **2. Using Node.js instead of Bun**
 ```bash
@@ -164,17 +219,18 @@ bun install -g @xagent/one-shot
 ```
 
 **3. Large context loaded**
-```bash
-# Start fresh session
-# Be more specific in requests
-# Use Ctrl+I to check token usage
-```
+- Start fresh session
+- Be more specific in requests
+- Check token usage in session files
 
 **4. Wrong model**
 ```bash
-# Switch to fast model
-# Press Ctrl+M, select grok-4-fast-non-reasoning
+# Use faster model via environment variable
+export GROK_MODEL="grok-4-fast-non-reasoning"
+x-cli
 ```
+
+> **Parity Gap**: Grok One-Shot does not have interactive model switching (Ctrl+M) like Claude Code.
 
 ### AI responses are incomplete
 
@@ -190,13 +246,12 @@ bun install -g @xagent/one-shot
 > Try that again, but shorter
 
 # Or start new session
-/exit
 x-cli
 ```
 
 ### "Too many tool rounds" error
 
-**Cause:** Hit MAX_TOOL_ROUNDS limit
+**Cause:** Hit MAX_TOOL_ROUNDS limit (default: 400)
 
 **Solutions:**
 ```bash
@@ -207,7 +262,20 @@ export MAX_TOOL_ROUNDS=500
 # Or be more specific in request
 ```
 
-## File Operation Issues
+## File operation issues
+
+### "Error: requires interactive terminal"
+
+**Cause:** Running in non-TTY environment
+
+**Solutions:**
+```bash
+# Use headless mode
+x-cli -p "your message"
+
+# Or ensure proper TTY
+# (don't redirect or run in scripts without -p flag)
+```
 
 ### Changes not applied
 
@@ -224,16 +292,18 @@ ls -la <file>
 # Check git status
 git status
 
-# Try manual approval
-# When prompted, press 'y' to approve
+# Verify working directory
+pwd
+x-cli -d /correct/path
 ```
 
 ### Wrong files modified
 
 **Prevention:**
-- Review changes before approving
+- Review changes carefully
 - Use specific file paths in requests
 - Keep confirmations enabled
+- Use git to track changes
 
 **Recovery:**
 ```bash
@@ -241,11 +311,11 @@ git status
 git diff
 git checkout -- <file>
 
-# Or restore from session backup
+# Or restore from backup
 # Sessions saved in ~/.x-cli/sessions/
 ```
 
-### "File not found" errors
+### File not found errors
 
 **Causes:**
 - Wrong working directory
@@ -262,11 +332,21 @@ x-cli -d /correct/path
 
 # Verify file exists
 ls <file>
+
+# List directory contents
+ls -la
 ```
 
-## MCP Server Issues
+> **Parity Gap**: Grok One-Shot does not have `/permissions` command for configuring approval prompts like Claude Code.
+
+## MCP server issues
 
 ### MCP server won't start
+
+**Symptoms:**
+```
+❌ Failed to start MCP server: filesystem
+```
 
 **Solutions:**
 ```bash
@@ -276,83 +356,245 @@ npx -y @modelcontextprotocol/server-filesystem /path
 # Check permissions
 ls -la /path
 
-# Remove and re-add
-x-cli mcp remove servername
-x-cli mcp add servername "command"
+# Check settings file
+cat ~/.x-cli/settings.json
+
+# Verify dependencies installed
+which npx
+node --version
+
+# Remove and re-add in settings
+vim ~/.x-cli/settings.json
 ```
 
-### MCP tools not working
-
-**Solutions:**
-```
-> Use the [specific tool name] to ...
-
-# Check server logs
-# Restart session
-/exit
-x-cli
-```
-
-## Performance Issues
-
-### High memory usage
-
-**Solutions:**
-```bash
-# Start new session (clears context)
-# Use headless mode for simple tasks
-# Close other applications
-```
-
-### Terminal is laggy
-
-**Solutions:**
-```bash
-# Disable UX enhancements
-export GROK_UX_ENHANCED=false
-
-# Use minimal terminal
-export GROK_UX_MINIMAL=true
-
-# Upgrade terminal emulator (iTerm2, Windows Terminal)
-```
-
-## Session Issues
-
-### Session won't save
+### MCP tools not available
 
 **Causes:**
-- Disk space full
-- Permission issues
+- Server started but failed tool discovery
+- Tool schema invalid
+- Server crashed after startup
 
 **Solutions:**
 ```bash
-# Check disk space
-df -h
+# Check configured servers
+cat ~/.x-cli/settings.json | grep mcpServers -A 20
 
-# Check permissions
-ls -la ~/.x-cli/sessions/
+# Check server command works
+# (run the command manually)
 
-# Create directory if missing
-mkdir -p ~/.x-cli/sessions
-chmod 755 ~/.x-cli/sessions
+# Restart Grok One-Shot
+x-cli
+> Use the [specific tool name] to ...
 ```
 
-### Can't exit session
+### Slow MCP performance
+
+**Causes:**
+- Server processing takes time
+- Network latency (for remote servers)
+- Large data transfers
 
 **Solutions:**
+- Use more specific requests
+- Implement caching in custom servers
+- Optimize server queries
+- Consider local vs remote servers
+
+> **Parity Gap**: Grok One-Shot does not have interactive MCP server status checks or OAuth authentication flows like Claude Code.
+
+## Search and discovery issues
+
+### Search not working
+
+> **Parity Gap**: Grok One-Shot uses built-in search capabilities. System ripgrep installation may not be required, but can improve performance.
+
+If search functionality seems limited:
+
+**Optional: Install system ripgrep for better performance**
+
+```bash
+# macOS (Homebrew)
+brew install ripgrep
+
+# Windows (winget)
+winget install BurntSushi.ripgrep.MSVC
+
+# Ubuntu/Debian
+sudo apt install ripgrep
+
+# Alpine Linux
+apk add ripgrep
+
+# Arch Linux
+pacman -S ripgrep
 ```
-# Try slash command
-/exit
 
-# Try keyboard shortcut
-Ctrl+D
+### Slow or incomplete search results on WSL
 
-# Force exit
-Ctrl+C (twice)
+Disk read performance penalties when [working across file systems on WSL](https://learn.microsoft.com/en-us/windows/wsl/filesystems) may result in fewer-than-expected matches when using Grok One-Shot on WSL.
+
+**Solutions:**
+
+1. **Submit more specific searches**: Reduce the number of files searched by specifying directories or file types
+2. **Move project to Linux filesystem**: Ensure your project is on the Linux filesystem (`/home/`) rather than Windows (`/mnt/c/`)
+3. **Use native Windows instead**: Run Grok One-Shot natively on Windows for better file system performance
+
+## IDE integration issues
+
+> **Parity Gap**: Grok One-Shot does not have IDE integrations like Claude Code's VS Code or JetBrains plugins. It is a standalone CLI tool.
+
+Grok One-Shot is a terminal-based tool and does not integrate directly with IDEs. However, you can:
+
+- Use it in IDE integrated terminals
+- Open files with your IDE using environment variables or commands
+- Use it alongside your IDE workflow
+
+### Terminal issues in IDEs
+
+If you're using Grok One-Shot in IDE terminals (VS Code, JetBrains, etc.) and experiencing issues:
+
+**ESC key not working in JetBrains terminals**
+
+1. Go to Settings → Tools → Terminal
+2. Either:
+   * Uncheck "Move focus to the editor with Escape", or
+   * Click "Configure terminal keybindings" and delete the "Switch focus to Editor" shortcut
+3. Apply the changes
+
+**Terminal display issues**
+
+```bash
+# Set terminal background
+export TERM_BACKGROUND=dark  # or 'light'
+
+# Disable UX enhancements if needed
+export GROK_UX_ENHANCED=false
+export GROK_UX_MINIMAL=true
 ```
 
-## Debug Mode
+## Markdown formatting issues
+
+Grok One-Shot sometimes generates markdown files with missing language tags on code fences, which can affect syntax highlighting and readability.
+
+### Missing language tags in code blocks
+
+If you notice code blocks like this in generated markdown:
+
+````markdown
+```
+function example() {
+  return "hello";
+}
+```
+````
+
+Instead of properly tagged blocks like:
+
+````markdown
+```javascript
+function example() {
+  return "hello";
+}
+```
+````
+
+**Solutions:**
+
+1. **Ask Grok to add language tags**: Request "Please add appropriate language tags to all code blocks in this markdown file."
+
+2. **Use post-processing**: Set up scripts or hooks to detect and add missing language tags after file generation
+
+3. **Manual verification**: Review generated markdown files and request corrections
+
+### Inconsistent spacing and formatting
+
+If generated markdown has excessive blank lines or inconsistent spacing:
+
+**Solutions:**
+
+1. **Request formatting corrections**: Ask Grok to "Fix spacing and formatting issues in this markdown file."
+
+2. **Use formatting tools**: Run markdown formatters like `prettier` on generated files
+
+3. **Specify formatting preferences**: Include formatting requirements in your requests or project documentation
+
+### Best practices for markdown generation
+
+To minimize formatting issues:
+
+* **Be explicit in requests**: Ask for "properly formatted markdown with language-tagged code blocks"
+* **Use project conventions**: Document your preferred markdown style in `GROK.md`
+* **Review before committing**: Check generated markdown files before adding to git
+
+## Platform-specific issues
+
+### macOS
+
+**Issue:** Terminal color problems
+```bash
+export TERM_BACKGROUND=dark  # or 'light'
+```
+
+**Issue:** Permission denied
+```bash
+# Don't use sudo with npm
+# Configure user-level npm instead (see installation section)
+```
+
+### Windows
+
+**Issue:** Git Bash compatibility
+- Use Windows Terminal or PowerShell instead
+- Install latest Git for Windows
+- Consider WSL for better compatibility
+
+**Issue:** Symlink errors (CLAUDE.md)
+```bash
+# Run as Administrator for symlink creation
+# Or manually copy GROK.md to CLAUDE.md
+cp GROK.md CLAUDE.md
+```
+
+### Linux
+
+**Issue:** Old Node.js version
+```bash
+# Update Node.js via package manager
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Or use nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 20
+nvm use 20
+```
+
+## Common error messages
+
+### "EACCES: permission denied"
+
+**Solution:** Don't use sudo. Configure npm for user installs (see installation section).
+
+### "ECONNREFUSED"
+
+**Solution:** Check internet connection and API endpoint. Verify GROK_API_KEY is set.
+
+### "Cannot find module"
+
+**Solution:** Reinstall dependencies:
+```bash
+npm cache clean --force
+npm install -g @xagent/one-shot
+```
+
+### "Maximum call stack size exceeded"
+
+**Solution:** Reduce complexity of request or increase Node.js memory:
+```bash
+export NODE_OPTIONS="--max-old-space-size=4096"
+```
+
+## Debug mode
 
 ### Enable debugging
 
@@ -384,114 +626,50 @@ cat ~/.x-cli/sessions/latest-session.json
 **Check environment:**
 ```bash
 printenv | grep GROK
+printenv | grep MAX_TOOL_ROUNDS
+printenv | grep NODE
 ```
 
-## Platform-Specific Issues
+## Getting more help
 
-### macOS
+> **Parity Gap**: Grok One-Shot does not have `/bug` or `/doctor` commands like Claude Code.
 
-**Issue:** Terminal color problems
-```bash
-export TERM_BACKGROUND=dark  # or 'light'
-```
+If you're experiencing issues not covered here:
 
-**Issue:** Permission denied
-```bash
-# Don't use sudo with npm
-# Configure user-level npm instead
-```
+1. Check the [GitHub repository](https://github.com/your-org/x-cli) for known issues
+2. Review `xcli-startup.log` in your current directory
+3. Check session files in `~/.x-cli/sessions/`
+4. Enable debug mode and review output
+5. File an issue on GitHub with:
+   - Grok One-Shot version (`x-cli --version`)
+   - Operating system and version
+   - Node.js/Bun version (`node --version` or `bun --version`)
+   - Error message and stack trace
+   - Steps to reproduce
+   - Debug logs (`xcli-startup.log`)
 
-### Windows
-
-**Issue:** Git Bash compatibility
-- Use Windows Terminal or PowerShell instead
-- Install latest Git for Windows
-
-**Issue:** Symlink errors (CLAUDE.md)
-- Run as Administrator for symlink creation
-- Or manually copy GROK.md to CLAUDE.md
-
-### Linux
-
-**Issue:** Old Node.js version
-```bash
-# Update Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Or use nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 20
-nvm use 20
-```
-
-## Common Error Messages
-
-### "EACCES: permission denied"
-
-**Solution:** Don't use sudo. Configure npm for user installs.
-
-### "ECONNREFUSED"
-
-**Solution:** Check internet connection and API endpoint.
-
-### "Cannot find module"
-
-**Solution:** Reinstall dependencies: `npm install -g @xagent/one-shot`
-
-### "Maximum call stack size exceeded"
-
-**Solution:** Reduce complexity of request or increase Node.js memory:
-```bash
-export NODE_OPTIONS="--max-old-space-size=4096"
-```
-
-## Getting Further Help
-
-### Before Asking for Help
-
-1. Check this troubleshooting guide
-2. Enable debug mode
-3. Check `xcli-startup.log`
-4. Review session files
-5. Try in a clean environment
-
-### Where to Get Help
-
-- **Documentation:** See GROK.md and docs-index.md
-- **GitHub Issues:** Report bugs and feature requests
-- **Community:** Join discussions on GitHub
-- **Logs:** Include debug logs when reporting issues
-
-### Reporting Issues
-
-**Include:**
-1. Grok One-Shot version (`x-cli --version`)
-2. Operating system and version
-3. Node.js/Bun version
-4. Error message and stack trace
-5. Steps to reproduce
-6. Debug logs (`xcli-startup.log`)
+### Reporting issues
 
 **Template:**
 ```markdown
 **Version:** x-cli 1.1.101
-**OS:** macOS 13.5
-**Runtime:** Bun 1.0.0
+**OS:** macOS 13.5 / Ubuntu 22.04 / Windows 11
+**Runtime:** Node.js 20.10.0 / Bun 1.0.0
 **Error:** [error message]
 **Steps to reproduce:**
 1. ...
 2. ...
 **Debug logs:** [attach xcli-startup.log]
+**Settings:** [relevant parts of ~/.x-cli/settings.json]
 ```
 
-## See Also
+## See also
 
-- [Quickstart Guide](../getting-started/quickstart.md)
-- [CLI Reference](../reference/cli-reference.md)
-- [Configuration](../configuration/settings.md)
-- [Interactive Mode](../reference/interactive-mode.md)
+* [Quickstart Guide](../getting-started/quickstart.md) - Getting started
+* [CLI Reference](../reference/cli-reference.md) - Command-line options
+* [Configuration](../configuration/settings.md) - Settings guide
+* [MCP Integration](./mcp.md) - MCP server setup
 
 ---
 
-**Still having issues?** File an issue on GitHub with debug logs and reproduction steps.
+**Parity Note**: This troubleshooting guide is adapted from Claude Code documentation. Some features (native installer, IDE integrations, /doctor, /bug commands, OAuth flows) are not available in Grok One-Shot. The core troubleshooting principles still apply.
