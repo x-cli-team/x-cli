@@ -248,11 +248,11 @@ AI: "I've reached the maximum number of tool calls (400).
 **Control tool execution:**
 ```bash
 # Enable confirmations (default)
-x-cli toggle-confirmations
+grok toggle-confirmations
 # Status: Confirmations enabled
 
 # Disable for automation
-x-cli toggle-confirmations
+grok toggle-confirmations
 # Status: Confirmations disabled
 ```
 

@@ -174,7 +174,7 @@ cat ~/.x-cli/sessions/latest-session.json | jq '.tokenUsage'
 /exit
 
 # Start new
-x-cli
+grok
 ```
 
 ### Headless Mode for Simple Queries
@@ -182,9 +182,9 @@ x-cli
 **Avoid session accumulation:**
 ```bash
 # Each query is independent
-x-cli -p "list TypeScript files"
-x-cli -p "find TODO comments"
-x-cli -p "check for console.log"
+grok -p "list TypeScript files"
+grok -p "find TODO comments"
+grok -p "check for console.log"
 
 # No context carries over between queries
 ```
@@ -239,7 +239,7 @@ Step 3: "Show me the GrokAgent implementation"
 
 # Start new session
 /exit
-x-cli
+grok
 
 # Resume with summary
 > Continuing from previous session:
@@ -307,12 +307,12 @@ Press Ctrl+I regularly to check context size
 **✅ Start new sessions for unrelated tasks:**
 ```bash
 /exit  # End current task
-x-cli  # Fresh start for new task
+grok  # Fresh start for new task
 ```
 
 **✅ Use headless mode for simple queries:**
 ```bash
-x-cli -p "quick query"  # No session accumulation
+grok -p "quick query"  # No session accumulation
 ```
 
 **✅ Be specific in prompts:**
@@ -358,7 +358,7 @@ Ctrl+I
 ```bash
 # Start new session
 /exit
-x-cli
+grok
 
 # Or use summary technique
 > Summarize findings, then start new session
@@ -380,7 +380,7 @@ If >80k tokens, context is likely cause
 ```bash
 # Start fresh session
 /exit
-x-cli
+grok
 ```
 
 ### Context Confusion
@@ -393,7 +393,7 @@ x-cli
 ```bash
 # Start new session for new topic
 /exit
-x-cli
+grok
 
 # Be explicit
 > Focusing on [NEW TOPIC], ignoring previous discussion about [OLD TOPIC]

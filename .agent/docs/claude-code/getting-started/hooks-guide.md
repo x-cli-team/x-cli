@@ -440,7 +440,7 @@ Use MCP servers for external tool integration:
 
 ```bash
 # Add a custom MCP server for workflow automation
-x-cli mcp add workflow-checker "node ./mcp-servers/workflow/index.js"
+grok mcp add workflow-checker "node ./mcp-servers/workflow/index.js"
 ```
 
 The MCP server can provide tools that Grok uses when needed:
@@ -499,19 +499,19 @@ Future hook system improvements might include:
 
 ```bash
 # Install pre-configured hook templates
-x-cli hooks install prettier-format
-x-cli hooks install eslint-check
-x-cli hooks install test-runner
+grok hooks install prettier-format
+grok hooks install eslint-check
+grok hooks install test-runner
 ```
 
 ### Hook Marketplace
 
 ```bash
 # Browse available hooks
-x-cli hooks browse
+grok hooks browse
 
 # Install community hooks
-x-cli hooks install @community/typescript-formatter
+grok hooks install @community/typescript-formatter
 ```
 
 ## Learn More

@@ -6,7 +6,7 @@
 
 ## Common installation issues
 
-### Command not found: x-cli
+### Command not found: grok
 
 **Cause:** Global npm/bun binary not in PATH
 
@@ -27,7 +27,7 @@ source ~/.bashrc
 npm install -g @xagent/one-shot
 
 # Verify
-which x-cli
+which grok
 ```
 
 ### Windows installation issues: errors in WSL
@@ -39,7 +39,7 @@ You might encounter the following issues in WSL:
 * Run `npm config set os linux` before installation
 * Install with `npm install -g @xagent/one-shot --force --no-os-check` (Do NOT use `sudo`)
 
-**Node not found errors**: If you see `exec: node: not found` when running `x-cli`, your WSL environment may be using a Windows installation of Node.js. You can confirm this with `which npm` and `which node`, which should point to Linux paths starting with `/usr/` rather than `/mnt/c/`. To fix this, try installing Node via your Linux distribution's package manager or via [`nvm`](https://github.com/nvm-sh/nvm).
+**Node not found errors**: If you see `exec: node: not found` when running `grok`, your WSL environment may be using a Windows installation of Node.js. You can confirm this with `which npm` and `which node`, which should point to Linux paths starting with `/usr/` rather than `/mnt/c/`. To fix this, try installing Node via your Linux distribution's package manager or via [`nvm`](https://github.com/nvm-sh/nvm).
 
 **nvm version conflicts**: If you have nvm installed in both WSL and Windows, you may experience version conflicts when switching Node versions in WSL. This happens because WSL imports the Windows PATH by default, causing Windows nvm/npm to take priority over the WSL installation.
 
@@ -79,7 +79,7 @@ export PATH="$HOME/.nvm/versions/node/$(node -v)/bin:$PATH"
 
 ### Linux and Mac installation issues: permission or command not found errors
 
-When installing Grok One-Shot with npm, `PATH` problems may prevent access to `x-cli`.
+When installing Grok One-Shot with npm, `PATH` problems may prevent access to `grok`.
 You may also encounter permission errors if your npm global prefix is not user writable (eg. `/usr`, or `/usr/local`).
 
 **Recommended solution: Configure npm for user installs**
@@ -97,7 +97,7 @@ source ~/.bashrc
 npm install -g @xagent/one-shot
 
 # Verify
-which x-cli
+which grok
 ```
 
 **Alternative: Use npx (no installation needed)**
@@ -136,12 +136,12 @@ echo $GROK_API_KEY
 **2. Set for current session only:**
 ```bash
 export GROK_API_KEY="xai-your-key-here"
-x-cli
+grok
 ```
 
 **3. Pass via command-line flag:**
 ```bash
-x-cli -k "xai-your-key-here"
+grok -k "xai-your-key-here"
 ```
 
 **Get your API key:**
@@ -161,7 +161,7 @@ x-cli -k "xai-your-key-here"
 cat ~/.x-cli/settings.json
 
 # Update key via command line
-x-cli -k "new-key-here"
+grok -k "new-key-here"
 
 # Or edit settings file directly
 vim ~/.x-cli/settings.json
@@ -187,7 +187,7 @@ vim ~/.x-cli/settings.json
 Grok One-Shot is designed to work with most development environments, but may consume significant resources when processing large codebases. If you're experiencing performance issues:
 
 1. Start new sessions to clear context (close and restart)
-2. Use headless mode (`x-cli -p "query"`) for simple tasks
+2. Use headless mode (`grok -p "query"`) for simple tasks
 3. Consider adding large build directories to your `.gitignore` file
 4. Close other applications to free up resources
 
@@ -227,7 +227,7 @@ bun install -g @xagent/one-shot
 ```bash
 # Use faster model via environment variable
 export GROK_MODEL="grok-4-fast-non-reasoning"
-x-cli
+grok
 ```
 
 > **Parity Gap**: Grok One-Shot does not have interactive model switching (Ctrl+M) like Claude Code.
@@ -246,7 +246,7 @@ x-cli
 > Try that again, but shorter
 
 # Or start new session
-x-cli
+grok
 ```
 
 ### "Too many tool rounds" error
@@ -271,7 +271,7 @@ export MAX_TOOL_ROUNDS=500
 **Solutions:**
 ```bash
 # Use headless mode
-x-cli -p "your message"
+grok -p "your message"
 
 # Or ensure proper TTY
 # (don't redirect or run in scripts without -p flag)
@@ -294,7 +294,7 @@ git status
 
 # Verify working directory
 pwd
-x-cli -d /correct/path
+grok -d /correct/path
 ```
 
 ### Wrong files modified
@@ -328,7 +328,7 @@ git checkout -- <file>
 pwd
 
 # Change directory
-x-cli -d /correct/path
+grok -d /correct/path
 
 # Verify file exists
 ls <file>
@@ -383,7 +383,7 @@ cat ~/.x-cli/settings.json | grep mcpServers -A 20
 # (run the command manually)
 
 # Restart Grok One-Shot
-x-cli
+grok
 > Use the [specific tool name] to ...
 ```
 
@@ -604,7 +604,7 @@ export GROK_DEBUG=true
 export GROK_UX_DEBUG=true
 
 # Run with debugging
-x-cli
+grok
 
 # Check startup log
 cat xcli-startup.log
@@ -636,12 +636,12 @@ printenv | grep NODE
 
 If you're experiencing issues not covered here:
 
-1. Check the [GitHub repository](https://github.com/your-org/x-cli) for known issues
+1. Check the [GitHub repository](https://github.com/your-org/grok) for known issues
 2. Review `xcli-startup.log` in your current directory
 3. Check session files in `~/.x-cli/sessions/`
 4. Enable debug mode and review output
 5. File an issue on GitHub with:
-   - Grok One-Shot version (`x-cli --version`)
+   - Grok One-Shot version (`grok --version`)
    - Operating system and version
    - Node.js/Bun version (`node --version` or `bun --version`)
    - Error message and stack trace
@@ -652,7 +652,7 @@ If you're experiencing issues not covered here:
 
 **Template:**
 ```markdown
-**Version:** x-cli 1.1.101
+**Version:** grok 1.1.101
 **OS:** macOS 13.5 / Ubuntu 22.04 / Windows 11
 **Runtime:** Node.js 20.10.0 / Bun 1.0.0
 **Error:** [error message]

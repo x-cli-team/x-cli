@@ -65,15 +65,15 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
 
-      - name: Install x-cli
+      - name: Install grok
         run: |
-          npm install -g x-cli
+          npm install -g grok
 
       - name: Run Grok One-Shot
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         run: |
-          x-cli -p "${{ github.event.inputs.task }}"
+          grok -p "${{ github.event.inputs.task }}"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
@@ -117,9 +117,9 @@ FROM oven/bun:latest
 
 WORKDIR /app
 
-RUN bun install -g x-cli
+RUN bun install -g grok
 
-ENTRYPOINT ["x-cli", "-p"]
+ENTRYPOINT ["grok", "-p"]
 ```
 
 ### Approach 3: Custom GitHub App Integration
@@ -206,8 +206,8 @@ jobs:
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         run: |
-          npm install -g x-cli
-          x-cli -p "${{ steps.task.outputs.task }}"
+          npm install -g grok
+          grok -p "${{ steps.task.outputs.task }}"
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v5
@@ -230,13 +230,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Grok One-Shot
-        run: npm install -g x-cli
+        run: npm install -g grok
 
       - name: Generate Report
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         run: |
-          x-cli -p "Generate a summary of yesterday's commits and open issues"
+          grok -p "Generate a summary of yesterday's commits and open issues"
 ```
 
 ## Best Practices
@@ -291,7 +291,7 @@ When using custom Grok One-Shot GitHub Actions:
   env:
     GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
   run: |
-    x-cli -p "Your instructions here"
+    grok -p "Your instructions here"
 ```
 
 ### With Custom Model Selection
@@ -302,7 +302,7 @@ When using custom Grok One-Shot GitHub Actions:
     GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
     GROK_MODEL: grok-4-fast-non-reasoning
   run: |
-    x-cli -m grok-4-fast-non-reasoning -p "Your task"
+    grok -m grok-4-fast-non-reasoning -p "Your task"
 ```
 
 ### With Max Tool Rounds
@@ -313,7 +313,7 @@ When using custom Grok One-Shot GitHub Actions:
     GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
     MAX_TOOL_ROUNDS: "20"
   run: |
-    x-cli -p "Complex task requiring multiple iterations"
+    grok -p "Complex task requiring multiple iterations"
 ```
 
 ## Using with Alternative Providers
@@ -340,8 +340,8 @@ Confirm:
 
 ### Installation issues
 
-If x-cli installation fails:
-- Use specific version: `npm install -g x-cli@1.1.101`
+If grok installation fails:
+- Use specific version: `npm install -g grok@1.1.101`
 - Verify npm/bun is installed correctly
 - Check network connectivity
 
@@ -349,13 +349,13 @@ If x-cli installation fails:
 
 ### Custom Docker Image
 
-Build optimized Docker image with x-cli pre-installed:
+Build optimized Docker image with grok pre-installed:
 
 ```dockerfile
 FROM oven/bun:latest
 
-# Install x-cli
-RUN bun install -g x-cli
+# Install grok
+RUN bun install -g grok
 
 # Pre-cache common dependencies
 RUN mkdir -p /workspace
@@ -365,7 +365,7 @@ WORKDIR /workspace
 ENV GROK_API_KEY=""
 ENV MAX_TOOL_ROUNDS="400"
 
-ENTRYPOINT ["x-cli"]
+ENTRYPOINT ["grok"]
 ```
 
 ### Reusable Workflow
@@ -395,15 +395,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup x-cli
-        run: npm install -g x-cli
+      - name: Setup grok
+        run: npm install -g grok
 
       - name: Run task
         env:
           GROK_API_KEY: ${{ secrets.grok_api_key }}
           GROK_MODEL: ${{ inputs.model }}
         run: |
-          x-cli -p "${{ inputs.task }}"
+          grok -p "${{ inputs.task }}"
 ```
 
 Use in other workflows:

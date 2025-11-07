@@ -67,9 +67,9 @@ While Grok One-Shot doesn't offer web or mobile interfaces, it provides a powerf
 
 1. **Install via npm/bun**:
    ```bash
-   npm install -g x-cli
+   npm install -g grok
    # or
-   bun install -g x-cli
+   bun install -g grok
    ```
 
 2. **Set API key**:
@@ -79,12 +79,12 @@ While Grok One-Shot doesn't offer web or mobile interfaces, it provides a powerf
 
 3. **Run interactively**:
    ```bash
-   x-cli
+   grok
    ```
 
 4. **Run headless tasks**:
    ```bash
-   x-cli -p "analyze the authentication flow"
+   grok -p "analyze the authentication flow"
    ```
 
 ### Interactive Mode
@@ -103,13 +103,13 @@ For automated or non-interactive use:
 
 ```bash
 # Single task
-x-cli -p "list all TODO comments in the codebase"
+grok -p "list all TODO comments in the codebase"
 
 # With specific model
-x-cli -m grok-4-fast-non-reasoning -p "fix linting errors"
+grok -m grok-4-fast-non-reasoning -p "fix linting errors"
 
 # From specific directory
-x-cli -d /path/to/project -p "analyze dependencies"
+grok -d /path/to/project -p "analyze dependencies"
 ```
 
 ### Session Management
@@ -133,13 +133,13 @@ Extend capabilities via Model Context Protocol:
 
 ```bash
 # Add MCP server
-x-cli mcp add <server-name> <command>
+grok mcp add <server-name> <command>
 
 # List servers
-x-cli mcp list
+grok mcp list
 
 # Remove server
-x-cli mcp remove <server-name>
+grok mcp remove <server-name>
 ```
 
 ## Claude Code Web Features: Detailed Reference
@@ -251,13 +251,13 @@ For repetitive tasks:
 
 ```bash
 # Code review
-x-cli -p "review recent changes for security issues"
+grok -p "review recent changes for security issues"
 
 # Refactoring
-x-cli -p "refactor UserService to use dependency injection"
+grok -p "refactor UserService to use dependency injection"
 
 # Documentation
-x-cli -p "update API docs for auth endpoints"
+grok -p "update API docs for auth endpoints"
 ```
 
 ### 4. Session History
@@ -277,10 +277,10 @@ Add domain-specific tools:
 
 ```bash
 # Add database tools
-x-cli mcp add postgres-tools node-postgres-mcp
+grok mcp add postgres-tools node-postgres-mcp
 
 # Add API testing tools
-x-cli mcp add api-tester http-mcp-server
+grok mcp add api-tester http-mcp-server
 ```
 
 ## Comparing Approaches
@@ -367,17 +367,17 @@ Grok One-Shot embraces a terminal-first philosophy:
 
 ```bash
 # Morning routine
-alias grok-review="x-cli -p 'review changes since yesterday'"
-alias grok-todos="x-cli -p 'list all TODO and FIXME comments'"
+alias grok-review="grok -p 'review changes since yesterday'"
+alias grok-todos="grok -p 'list all TODO and FIXME comments'"
 
 # Pre-commit
-alias grok-lint="x-cli -p 'fix all linting errors'"
-alias grok-test="x-cli -p 'ensure all tests pass'"
+alias grok-lint="grok -p 'fix all linting errors'"
+alias grok-test="grok -p 'ensure all tests pass'"
 
 # Feature development
 grok-review
 git checkout -b feature/new-auth
-x-cli -p "implement JWT authentication for /api/login endpoint"
+grok -p "implement JWT authentication for /api/login endpoint"
 grok-test
 git add . && git commit -m "feat: add JWT authentication"
 ```

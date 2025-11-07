@@ -289,7 +289,7 @@ Ensure:
 Run Grok One-Shot with debug mode to see Skill loading errors:
 
 ```bash  theme={null}
-x-cli --debug
+grok --debug
 ```
 
 ## Share Skills with your team
@@ -331,7 +331,7 @@ When team members pull the latest changes, Skills are immediately available:
 
 ```bash  theme={null}
 git pull
-x-cli  # Skills would be available
+grok  # Skills would be available
 ```
 
 ## Update a Skill
@@ -727,10 +727,10 @@ Create MCP servers for specialized capabilities:
 
 ```bash
 # Add MCP server for PDF processing
-x-cli mcp add pdf-tools "node ./mcp-servers/pdf/index.js"
+grok mcp add pdf-tools "node ./mcp-servers/pdf/index.js"
 
 # Add MCP server for Excel analysis
-x-cli mcp add excel-tools "node ./mcp-servers/excel/index.js"
+grok mcp add excel-tools "node ./mcp-servers/excel/index.js"
 ```
 
 MCP servers can provide tools that Grok uses automatically when needed.
@@ -786,26 +786,26 @@ Available Skills:
 
 ```bash
 # List installed skills
-x-cli skills list
+grok skills list
 
 # Install skill from plugin
-x-cli skills install @team/pdf-tools
+grok skills install @team/pdf-tools
 
 # Remove skill
-x-cli skills remove pdf-processing
+grok skills remove pdf-processing
 
 # Update skill
-x-cli skills update excel-analysis
+grok skills update excel-analysis
 ```
 
 ### Skill Testing
 
 ```bash
 # Test skill activation
-x-cli skills test pdf-processing "Extract text from document.pdf"
+grok skills test pdf-processing "Extract text from document.pdf"
 
 # Validate skill configuration
-x-cli skills validate .grok/skills/my-skill/
+grok skills validate .grok/skills/my-skill/
 ```
 
 ## Next steps

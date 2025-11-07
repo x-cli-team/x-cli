@@ -1012,7 +1012,7 @@ If your hooks aren't working:
 2. **Verify syntax** - Ensure your JSON settings are valid
 3. **Test commands** - Run hook commands manually first
 4. **Check permissions** - Make sure scripts are executable
-5. **Review logs** - Use `x-cli --debug` to see hook execution details
+5. **Review logs** - Use `grok --debug` to see hook execution details
 
 Common issues:
 
@@ -1024,7 +1024,7 @@ Common issues:
 
 For complex hook issues:
 
-1. **Inspect hook execution** - Use `x-cli --debug` to see detailed hook
+1. **Inspect hook execution** - Use `grok --debug` to see detailed hook
    execution
 2. **Validate JSON schemas** - Test hook input/output with external tools
 3. **Check environment variables** - Verify Grok One-Shot's environment is correct
@@ -1035,7 +1035,7 @@ For complex hook issues:
 
 ### Debug Output Example
 
-Use `x-cli --debug` to see hook execution details:
+Use `grok --debug` to see hook execution details:
 
 ```
 [DEBUG] Executing hooks for PostToolUse:Write
