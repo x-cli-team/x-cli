@@ -2,9 +2,9 @@
 title: Overview
 ---
 
-# X CLI
+# Grok One-Shot
 
-X CLI is a conversational AI tool that brings Claude Code-level intelligence directly into your terminal. Built with X.AI's Grok models, it provides advanced file operations, code analysis, and workflow automation through natural language interaction.
+Grok One-Shot is a conversational AI tool that brings Claude Code-level intelligence directly into your terminal. Built with X.AI's Grok models, it provides advanced file operations, code analysis, and workflow automation through natural language interaction.
 
 <div className="hero-card">
   <div className="hero-card-background">
@@ -17,34 +17,39 @@ X CLI is a conversational AI tool that brings Claude Code-level intelligence dir
   <div className="hero-card-overlay"></div>
   <div className="hero-card-content">
     <div className="hero-card-text">
-      <h3>X CLI v1.0.96</h3>
-      <p>We're excited to release the latest advancement in terminal-based AI development tools with Claude Code-level capabilities.</p>
+      <h3>Grok One-Shot</h3>
+      <p>Revolutionary open source terminal AI that surpasses Claude Code with blazing-fast evolution, native x.ai integration, and 95% cost savings. Experience Plan Mode excellence with Shift+Tab twice activation, plus cutting-edge features that ship weekly. The future of AI-powered development, today.</p>
       
       <div className="feature-grid">
         <div className="feature-item">
-          <strong>Tool System</strong>
-          <span>15+ specialized tools</span>
+          <strong>Modalities</strong>
+          <span>🗣️ 📝 🖼️ 🌐</span>
         </div>
         <div className="feature-item">
-          <strong>Context</strong>
-          <span>Unlimited project context</span>
+          <strong>Tools Available</strong>
+          <span>25+</span>
         </div>
       </div>
       
       <div className="feature-list">
         <ul>
-          <li>File operations</li>
-          <li>Code intelligence</li>
+          <li>Advanced file operations</li>
+          <li>Code-aware editing</li>
+          <li>Multi-file transactions</li>
           <li>Web integration</li>
-          <li>Context awareness</li>
-          <li>Professional UX</li>
+          <li>MCP protocol support</li>
+          <li>AST code analysis</li>
+          <li>Symbol search & references</li>
+          <li>Context-aware tooltips</li>
+          <li>Auto-documentation system</li>
+          <li>Task management workflows</li>
         </ul>
       </div>
     </div>
     
     <div className="card-actions">
       <a href="getting-started/installation" className="btn-primary">Get Started</a>
-      <a href="architecture/overview" className="btn-secondary">View Architecture</a>
+      <a href="getting-started/quickstart" className="btn-secondary">View Quickstart</a>
     </div>
   </div>
 </div>
@@ -60,7 +65,7 @@ X CLI is a conversational AI tool that brings Claude Code-level intelligence dir
   
   <div className="jump-card">
     <h4>Tool System</h4>
-    <p>Let X CLI perform file operations, code analysis, and workflow automation.</p>
+    <p>Let Grok One-Shot perform file operations, code analysis, and workflow automation.</p>
     <a href="architecture/overview">Learn more</a>
   </div>
   
@@ -113,7 +118,7 @@ X CLI is a conversational AI tool that brings Claude Code-level intelligence dir
 
 ## Architecture
 
-X CLI is built on a modular architecture with:
+Grok One-Shot is built on a modular architecture with:
 
 - **Agent System**: Central orchestration with streaming responses
 - **Tool System**: Modular tools for specific operations

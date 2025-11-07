@@ -395,7 +395,7 @@ source ~/.bashrc  # or ~/.zshrc
 
 ```bash
 # Test command independently
-<command from settings.json>
+\<command from settings.json\>
 
 # Check logs with debug mode
 export GROK_DEBUG=true

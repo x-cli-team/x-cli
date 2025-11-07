@@ -1,144 +1,384 @@
 ---
-title: Grok CLI Architecture
----# Grok CLI Architecture
+title: Architecture Overview
+---
 
-## Project Type
-**CLI Application** - Conversational AI tool with terminal interface
+# Architecture Overview
 
-## Technology Stack
-- **Language**: TypeScript (ES Modules)
-- **Runtime**: Node.js (Bun optimized for development)
-- **UI**: Ink (React for terminal)
-- **Build**: TypeScript compiler + tsup for dual builds
-- **Package Manager**: Bun (development), NPM (distribution/CI)
-- **Linting**: ESLint with TypeScript support and auto-fix
-- **Performance**: 4x faster dependency installs via Bun
+Grok One-Shot is built on a modular, extensible architecture designed for high-performance AI-powered terminal interactions with robust tool integration and streaming capabilities.
 
-## Core Architecture
+## System Architecture
 
-### Agent System (`src/agent/`)
-- **GrokAgent**: Central orchestration with streaming, tool execution
-- **Conversation Management**: Chat history and context handling
-- **Model Integration**: X.AI Grok models via OpenAI-compatible API
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Input    │───▶│  Agent System   │───▶│  Grok Models    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        Tool System                              │
+├─────────────────┬─────────────────┬─────────────────────────────┤
+│   Core Tools    │ Advanced Tools  │    Integration Tools        │
+├─────────────────┼─────────────────┼─────────────────────────────┤
+│ • Read          │ • MultiEdit     │ • NotebookEdit              │
+│ • Write         │ • WebFetch      │ • BashOutput                │
+│ • Edit          │ • WebSearch     │ • KillBash                  │
+│ • Bash          │ • Task          │ • IDE Integration           │
+│ • Grep          │ • TodoWrite     │                             │
+│ • Glob          │ • Plan Mode     │                             │
+│ • LS            │                 │                             │
+└─────────────────┴─────────────────┴─────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    MCP Integration                              │
+├─────────────────┬─────────────────┬─────────────────────────────┤
+│ File Systems    │    External     │      Custom Servers         │
+│                 │    Services     │                             │
+│ • Local FS      │ • GitHub        │ • User-defined              │
+│ • Remote FS     │ • APIs          │ • Domain-specific           │
+│ • Cloud Storage │ • Databases     │ • Enterprise tools          │
+└─────────────────┴─────────────────┴─────────────────────────────┘
+```
 
-### Tool System (`src/tools/`)
-- **Modular Design**: Independent tools for specific operations
-- **Core Tools**: Read, Write, Edit, Bash, Grep, Glob, LS
-- **Advanced Tools**: MultiEdit, WebFetch, WebSearch, Task, TodoWrite
-- **Documentation Tools**: NEW - Agent system generation and maintenance
+## Core Components
 
-### UI Components (`src/ui/`)
+### Agent System
 
-#### Component Architecture
-- **Modular Design**: Single Responsibility Principle with focused components
-- **Entry-Based Rendering**: Chat entries routed through specialized renderers
-- **Content Renderers**: Dedicated components for different content types
-- **Router Pattern**: ChatEntryRouter for type-based component selection
+The central orchestrator that manages conversation flow, tool selection, and response generation.
 
-#### Core Components
-- **ChatInterface** (180 lines): Main chat orchestration with agent integration
-- **ChatHistory** (74 lines): Entry list management with filtering and pagination
-- **ChatInterfaceRenderer**: Pure UI component for chat display logic
+**Key Features:**
 
-#### Entry Renderers (`components/chat-entries/`)
-- **UserMessageEntry**: User input display with paste summary handling
-- **AssistantMessageEntry**: AI response rendering with markdown support
-- **ToolCallEntry**: Tool execution display with explanations and content rendering
+- **Streaming Responses**: Real-time output with progressive enhancement
+- **Context Management**: Maintains conversation history and workspace context
+- **Tool Orchestration**: Intelligent tool selection and chaining
+- **Error Handling**: Robust error recovery and user feedback
 
-#### Content Renderers (`components/content-renderers/`)
-- **FileContentRenderer**: Syntax-aware file content display with indentation
-- **MarkdownRenderer**: Rich text formatting for assistant responses
+**Implementation:**
 
-#### Supporting Components
-- **Input Handling**: Enhanced terminal input with history and shortcuts
-- **Component Library**: Reusable Ink components for consistent UX
-- **Visual Feedback System**: Claude Code-style UX with contextual spinners and progress indicators
-- **Color System**: Unified palette for consistent visual hierarchy
-- **Background Activity**: Non-intrusive workspace awareness monitoring
+```typescript
+class GrokAgent {
+  private tools: ToolRegistry;
+  private context: ConversationContext;
+  private streaming: StreamingManager;
 
-### MCP Integration (`src/mcp/`)
-- **Model Context Protocol**: Extensible server integration
-- **Supported Servers**: Linear, GitHub, custom servers
-- **Transport Types**: stdio, HTTP, SSE
+  async processQuery(input: string): Promise<StreamingResponse> {
+    // Natural language processing
+    // Tool selection and execution
+    // Response generation
+  }
+}
+```
 
-### Configuration (`src/utils/`)
-- **Settings Management**: User and project-level config
-- **Model Configuration**: Support for multiple AI models
-- **File Locations**: ~/.grok/ for user, .grok/ for project
+### Tool System
 
-### Services (`src/services/`)
-- **UI State Management**: Central event bus for coordinating visual feedback
-- **Paste Detection**: Claude Code-style paste summarization system
-- **Context Management**: Session memory and workspace indexing coordination
+Modular tool architecture enabling extensible functionality through standardized interfaces.
 
-## Build & Distribution
-- **Development**: `bun run dev` for live reload (4x faster than npm)
-- **Production**: `bun run build` → dist/ directory (optimized TypeScript compilation)
-- **Linting**: `bun run lint` with auto-fix support (ESLint + TypeScript)
-- **Installation**: NPM global package (universal compatibility)
-- **CI/CD**: GitHub Actions with npm (stable workflow, proven reliability)
-- **Migration**: Seamless switch from npm to Bun for development (Nov 2025)
+**Tool Categories:**
 
-## Extension Points
-- **Tool System**: Add new tools in src/tools/
-- **MCP Servers**: Configure external service integration
-- **UI Components**: Extend terminal interface capabilities
-- **Commands**: Add slash commands in input handler
+1. **Core Tools**: Essential file and system operations
+2. **Advanced Tools**: Complex operations and AI-enhanced workflows
+3. **Integration Tools**: External system connectivity
 
-## Current Capabilities
-Core file operations (Read, Write, Edit, MultiEdit)
-Shell integration (Bash, BashOutput, KillBash)
-Search and discovery (Grep, Glob, LS)
-Web capabilities (WebFetch, WebSearch)
-Task management (Task, TodoWrite)
-IDE integration (NotebookEdit, mcp__ide__)
-MCP server ecosystem
-Project-specific configuration
-**Claude Code-style UX** (Enhanced visual feedback system)
-**Professional UI** (ASCII art banner, contextual spinners, progress bars)
-**Real-time feedback** (Background activity monitoring, state coordination)
-**Consistent design** (Unified color system, motion design principles)
-**Context awareness** (Ctrl+I tooltip, workspace intelligence, memory pressure monitoring)
-**Dynamic status** (Real-time project stats, git branch detection, session tracking)
-**Keyboard workflow** (Global shortcuts for enhanced productivity)
+**Tool Interface:**
 
-## Implemented Features (P1-P3 Complete)
-**Documentation generation system** - Full .agent docs with 15+ commands
-**Subagent framework** - Token-optimized processing
-**Self-healing guardrails** - /heal command and incident tracking
-**Advanced code intelligence** - CodeAwareEditor with syntax understanding
-**CI/CD integration** - Automated NPM publishing workflow
-**Multi-file operations** - Atomic editing with transaction support
-**Operation history** - Comprehensive undo/redo system
-**Advanced search** - Regex patterns with file filtering
-**File tree operations** - Directory management and organization
+```typescript
+interface Tool {
+  name: string;
+  description: string;
+  schema: JSONSchema;
+  execute(params: ToolParams): Promise<ToolResult>;
+}
+```
 
-## Automation Infrastructure
-**GitHub Actions** - Combined release + publish workflow
-**Version Management** - Auto-bump with README synchronization
-**Protection System** - Safeguards against workflow breakage
-**Error Recovery** - Self-healing with guardrails
-**Documentation** - Comprehensive troubleshooting guides
+### Plan Mode Engine
 
-## Documentation Architecture
+Claude Code-compatible read-only exploration system with AI-powered planning.
 
-### Internal Documentation System (`.agent/`)
-- **Source of Truth**: All internal docs stored in `.agent/` directory
-- **Organized Structure**: system/, sop/, tasks/, incidents/, parity/, sessions/
-- **Git Integration**: Husky pre-commit hook auto-syncs to public docs
-- **Session Logging**: `.agent/sessions/` captures agent-assisted development learnings
+**Activation Flow:**
 
-### Public Documentation System
-- **Docusaurus Site**: `apps/site/` with comprehensive documentation
-- **Auto-Sync**: `apps/site/src/scripts/sync-agent-docs.js` maps internal to public docs
-- **OG Tags System**: Custom meta tags for social media branding
-- **Build Validation**: Post-build checks prevent Docusaurus branding regressions
+```
+User: Shift+Tab (twice) → Plan Mode Active
+                      ↓
+Read-only Tool Filter → Safe Exploration
+                      ↓
+AI Planning Engine → Implementation Strategy
+                      ↓
+User Approval → Execution Phase
+```
 
-## Future Roadmap (2025)
-**Git Integration** - Advanced operations, PR management
-**Testing Framework** - Jest/Pytest integration
-**IDE Integration** - VS Code extension, Vim plugin
-**Database Tools** - SQL/NoSQL operation assistance
-**Cloud Integration** - AWS, Docker, Kubernetes support
+**Safety Features:**
 
-*Updated: 2025-10-28*
+- Destructive operation blocking
+- Read-only tool filtering
+- User confirmation for execution
+- Rollback capabilities
+
+## Data Flow Architecture
+
+### Request Processing Pipeline
+
+```
+User Input → Input Parser → Intent Recognition → Tool Selection → Execution → Response Generation
+     ↓            ↓              ↓                 ↓           ↓            ↓
+Context      Validation     AI Analysis      Tool Chain   Real-time    Streaming
+Loading      & Sanitization                  Planning     Feedback     Output
+```
+
+### Context Management
+
+**Session Context:**
+
+- Conversation history
+- File system state
+- Tool execution results
+- User preferences
+
+**Workspace Context:**
+
+- Project structure
+- Git repository state
+- Configuration files
+- Environment variables
+
+**Global Context:**
+
+- User settings
+- MCP server configurations
+- Tool availability
+- System capabilities
+
+## Performance Architecture
+
+### Streaming System
+
+**Real-time Response Delivery:**
+
+- Progressive content rendering
+- Chunked data transmission
+- Background processing
+- Adaptive buffering
+
+**Implementation Pattern:**
+
+```typescript
+async function* streamResponse(query: string) {
+  yield { type: "thinking", content: "Processing..." };
+
+  for await (const result of processTools(query)) {
+    yield { type: "tool_result", content: result };
+  }
+
+  yield { type: "response", content: finalResponse };
+}
+```
+
+### Caching Strategy
+
+**Multi-Level Caching:**
+
+- **L1**: In-memory tool results
+- **L2**: Session-based context
+- **L3**: Persistent user data
+- **L4**: MCP server responses
+
+### Memory Management
+
+**Intelligent Context Pruning:**
+
+- Conversation history optimization
+- Tool result compression
+- Workspace state snapshots
+- Garbage collection for unused data
+
+## Integration Architecture
+
+### MCP Protocol Integration
+
+**Server Management:**
+
+```typescript
+interface MCPServer {
+  name: string;
+  command: string;
+  args: string[];
+  env: Record<string, string>;
+  tools: Tool[];
+  status: "running" | "stopped" | "error";
+}
+```
+
+**Communication Flow:**
+
+```
+Grok Agent ↔ MCP Client ↔ JSON-RPC ↔ MCP Server ↔ External Service
+```
+
+### IDE Integration
+
+**VS Code Extension Architecture:**
+
+- Language Server Protocol (LSP) compatibility
+- Direct API integration
+- Workspace synchronization
+- Real-time collaboration
+
+**Jupyter Integration:**
+
+- Notebook cell execution
+- Kernel management
+- Output streaming
+- Interactive widgets
+
+## Security Architecture
+
+### Data Protection
+
+**Local-First Approach:**
+
+- All processing happens locally
+- No data transmission to external services (except chosen models)
+- Encrypted local storage
+- Secure configuration management
+
+**Permission System:**
+
+- Tool-level permissions
+- File system access controls
+- Network request filtering
+- MCP server sandboxing
+
+### Authentication
+
+**API Key Management:**
+
+- Secure storage in system keychain
+- Environment variable support
+- Per-session configuration
+- Automatic key rotation support
+
+## Scalability Design
+
+### Horizontal Scaling
+
+**Multi-Session Support:**
+
+- Parallel conversation handling
+- Resource isolation
+- Session state management
+- Load balancing
+
+**Tool Execution:**
+
+- Concurrent tool operations
+- Resource pooling
+- Background processing
+- Queue management
+
+### Vertical Scaling
+
+**Resource Optimization:**
+
+- Memory-efficient data structures
+- Lazy loading strategies
+- Incremental processing
+- Adaptive resource allocation
+
+## Development Architecture
+
+### Module System
+
+**Core Modules:**
+
+```
+src/
+├── agent/          # Central orchestration
+├── tools/          # Tool implementations
+├── mcp/           # MCP integration
+├── ui/            # User interface
+├── services/      # Background services
+└── utils/         # Shared utilities
+```
+
+**Plugin Architecture:**
+
+- Tool plugin system
+- MCP server integration
+- Custom command extensions
+- Theme and styling plugins
+
+### Configuration System
+
+**Hierarchical Configuration:**
+
+```
+System Defaults → User Config → Project Config → Session Config → Runtime Config
+```
+
+**Configuration Sources:**
+
+- `~/.x-cli/settings.json`
+- Project `.grok-config.json`
+- Environment variables
+- Command-line flags
+
+## Deployment Architecture
+
+### Distribution Strategy
+
+**Multiple Installation Methods:**
+
+- NPM global package
+- Standalone binaries
+- Docker containers
+- Package managers (Homebrew, etc.)
+
+**Update Mechanism:**
+
+- Automatic update checks
+- Incremental updates
+- Rollback capabilities
+- Version compatibility
+
+### Environment Support
+
+**Cross-Platform Compatibility:**
+
+- Windows, macOS, Linux
+- Multiple terminal emulators
+- Various shell environments
+- Cloud development environments
+
+## Monitoring and Observability
+
+### Performance Metrics
+
+**Real-time Monitoring:**
+
+- Response times
+- Tool execution performance
+- Memory usage
+- Error rates
+
+**User Analytics:**
+
+- Feature usage patterns
+- Tool popularity
+- Performance bottlenecks
+- User satisfaction metrics
+
+### Debugging Support
+
+**Development Tools:**
+
+- Verbose logging modes
+- Tool execution tracing
+- Context inspection
+- Performance profiling
+
+---
+
+**Next Steps:**
+
+- [Getting Started](../getting-started/installation) - Install and configure Grok One-Shot
+- [Tool System](../features/tool-system) - Learn about available tools
+- [MCP Integration](../build-with-claude-code/mcp) - Extend with custom servers

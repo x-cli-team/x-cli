@@ -5,25 +5,13 @@ const path = require('path');
 const { glob } = require('glob');
 
 /**
- * Sync .agent documentation to Docusaurus docs
- * Transforms internal documentation for public consumption
+ * Sync .agent/docs/claude-code documentation to Docusaurus docs
+ * Syncs comprehensive Claude Code parity documentation structure
  */
 
 const AGENT_DIR = path.resolve(__dirname, '../../../../.agent');
+const CLAUDE_CODE_DOCS_DIR = path.resolve(__dirname, '../../../../.agent/docs/claude-code');
 const DOCS_DIR = path.resolve(__dirname, '../../docs');
-
-// Mapping of .agent files to public docs
-// Note: overview.md is excluded to preserve custom overview page
-const SYNC_MAP = {
-  'system/architecture.md': 'architecture/overview.md', 
-  'system/critical-state.md': 'architecture/current-state.md',
-  'system/installation.md': 'getting-started/installation.md',
-  'system/api-schema.md': 'api/schema.md',
-  'sop/release-management.md': 'guides/releases.md',
-  'sop/automation-protection.md': 'guides/automation.md',
-  'sop/npm-publishing-troubleshooting.md': 'troubleshooting/npm.md',
-  'sop/development-workflow.md': 'guides/development-workflow.md',
-};
 
 function addFrontmatter(content, title, sidebarPosition) {
   const frontmatter = [
@@ -83,41 +71,6 @@ function filterContent(content, filePath) {
   return filtered.trim();
 }
 
-function generateRoadmap() {
-  const taskFiles = glob.sync(path.join(AGENT_DIR, 'tasks/*.md'));
-  
-  const roadmapContent = [
-    '---',
-    'title: Roadmap', 
-    'sidebar_position: 1',
-    '---',
-    '',
-    '# X-CLI Roadmap',
-    '',
-    'This roadmap is automatically generated from our internal task tracking system.',
-    '',
-  ];
-  
-  // Extract key roadmap items (filter for public-appropriate tasks)
-  taskFiles.forEach(file => {
-    const content = fs.readFileSync(file, 'utf8');
-    const filename = path.basename(file);
-    
-    // Only include roadmap and sprint tasks
-    if (filename.includes('roadmap') || filename.includes('sprint')) {
-      const title = content.match(/# (.+)/)?.[1] || filename;
-      roadmapContent.push(`## ${title}`);
-      
-      // Extract objective/overview if present
-      const objective = content.match(/\*\*Objective\*\*: (.+)/)?.[1];
-      if (objective) {
-        roadmapContent.push('', objective, '');
-      }
-    }
-  });
-  
-  return roadmapContent.join('\n');
-}
 
 function ensureDir(filePath) {
   const dir = path.dirname(filePath);
@@ -126,84 +79,164 @@ function ensureDir(filePath) {
   }
 }
 
-function syncAgentDocs() {
-  console.log('🔄 Syncing .agent docs to Docusaurus...');
+function syncClaudeCodeDocs() {
+  console.log('🔄 Syncing .agent/docs/claude-code to Docusaurus...');
   
-  // Ensure docs directory exists but don't delete everything
+  // Ensure docs directory exists
   if (!fs.existsSync(DOCS_DIR)) {
     fs.mkdirSync(DOCS_DIR, { recursive: true });
   }
   
-  // Process mapped files (only sync specific files, preserving custom docs)
-  Object.entries(SYNC_MAP).forEach(([source, target]) => {
-    const sourcePath = path.join(AGENT_DIR, source);
-    const targetPath = path.join(DOCS_DIR, target);
+  // Clear existing docs (except custom files we want to preserve)
+  const preserveFiles = ['overview.md']; // Keep custom overview
+  
+  if (fs.existsSync(DOCS_DIR)) {
+    const existing = fs.readdirSync(DOCS_DIR, { withFileTypes: true });
+    existing.forEach(item => {
+      const fullPath = path.join(DOCS_DIR, item.name);
+      if (item.isDirectory()) {
+        // Remove existing directories to clean up old structure
+        fs.rmSync(fullPath, { recursive: true, force: true });
+      } else if (!preserveFiles.includes(item.name)) {
+        // Remove files not in preserve list
+        fs.unlinkSync(fullPath);
+      }
+    });
+  }
+  
+  // Sync all Claude Code documentation files
+  if (fs.existsSync(CLAUDE_CODE_DOCS_DIR)) {
+    const files = glob.sync('**/*.md', { cwd: CLAUDE_CODE_DOCS_DIR });
     
-    if (fs.existsSync(sourcePath)) {
-      console.log(`📄 Processing ${source} → ${target}`);
+    files.forEach(relativeFile => {
+      const sourcePath = path.join(CLAUDE_CODE_DOCS_DIR, relativeFile);
+      const targetPath = path.join(DOCS_DIR, relativeFile);
+      
+      console.log(`📄 Processing ${relativeFile}`);
       
       let content = fs.readFileSync(sourcePath, 'utf8');
       
-      // Transform content
+      // Transform content for public docs
       content = filterContent(content, sourcePath);
       content = rewriteLinks(content);
       
-      // Add frontmatter - extract just the first line after #
+      // Add frontmatter - extract title from first heading
       const titleMatch = content.match(/^# (.+?)(?:\n|$)/m);
-      const title = titleMatch ? titleMatch[1].trim() : path.basename(target, '.md');
+      const title = titleMatch ? titleMatch[1].trim() : path.basename(relativeFile, '.md');
       content = addFrontmatter(content, title);
       
-      // Only write if content has changed
+      // Ensure target directory exists
       ensureDir(targetPath);
       
-      let shouldWrite = true;
-      if (fs.existsSync(targetPath)) {
-        const existingContent = fs.readFileSync(targetPath, 'utf8');
-        shouldWrite = existingContent !== content;
-      }
-      
-      if (shouldWrite) {
-        fs.writeFileSync(targetPath, content);
-        console.log(`✅ Updated ${target}`);
-      } else {
-        console.log(`⏭️  No changes for ${target}`);
-      }
-    } else {
-      console.warn(`⚠️  Source file not found: ${sourcePath}`);
-    }
-  });
-  
-  // Generate dynamic content
-  console.log('📊 Generating roadmap...');
-  const roadmapContent = generateRoadmap();
-  const roadmapPath = path.join(DOCS_DIR, 'roadmap.md');
-  
-  let shouldWriteRoadmap = true;
-  if (fs.existsSync(roadmapPath)) {
-    const existingRoadmap = fs.readFileSync(roadmapPath, 'utf8');
-    shouldWriteRoadmap = existingRoadmap !== roadmapContent;
-  }
-  
-  if (shouldWriteRoadmap) {
-    fs.writeFileSync(roadmapPath, roadmapContent);
-    console.log('✅ Updated roadmap.md');
+      // Write file
+      fs.writeFileSync(targetPath, content);
+      console.log(`✅ Synced ${relativeFile}`);
+    });
+    
+    console.log(`📊 Synced ${files.length} Claude Code documentation files`);
   } else {
-    console.log('⏭️  No changes for roadmap.md');
+    console.warn(`⚠️  Claude Code docs directory not found: ${CLAUDE_CODE_DOCS_DIR}`);
   }
   
-  // Create flat sidebar config like X.AI docs (no categories)
+  // Generate comprehensive sidebar from synced Claude Code docs
+  console.log('📊 Generating comprehensive sidebar...');
+  
+  // Create sidebar config matching synced Claude Code documentation files
   const sidebarConfig = {
     tutorialSidebar: [
+      // Overview (preserve existing custom page)
       'overview',
-      'getting-started/installation',
-      'architecture/overview',
-      'architecture/current-state', 
-      'api/schema',
-      'guides/releases',
-      'guides/automation',
-      'guides/development-workflow',
-      'troubleshooting/npm',
-      'roadmap',
+      
+      // Getting Started
+      {
+        type: 'category',
+        label: 'Getting Started',
+        items: [
+          'getting-started/overview',
+          'getting-started/quickstart', 
+          'getting-started/common-workflows'
+        ]
+      },
+      
+      // Configuration
+      {
+        type: 'category',
+        label: 'Configuration',
+        items: [
+          'configuration/settings',
+          'configuration/terminal-configuration',
+          'configuration/model-configuration',
+          'configuration/profiles'
+        ]
+      },
+      
+      // Features (all available feature docs)
+      {
+        type: 'category', 
+        label: 'Features',
+        items: [
+          'features/context-management',
+          'features/tool-system',
+          'features/session-management',
+          'features/git-integration',
+          'features/workflow-automation',
+          'features/research-mode',
+          'features/error-handling',
+          'features/plan-mode',
+          'features/ide-integration',
+          'features/multi-file-operations',
+          'features/codebase-intelligence',
+          'features/performance-monitoring',
+          'features/testing-integration',
+          'features/code-templates',
+          'features/custom-tools',
+          'features/session-restore',
+          'features/export-import',
+          'features/analytics',
+          'features/notifications',
+          'features/plugin-system',
+          'features/cloud-sync'
+        ]
+      },
+      
+      // Reference
+      {
+        type: 'category',
+        label: 'Reference', 
+        items: [
+          'reference/cli-reference',
+          'reference/interactive-mode',
+          'reference/slash-commands',
+          'reference/advanced-slash-commands'
+        ]
+      },
+      
+      // Build with Grok One-Shot
+      {
+        type: 'category',
+        label: 'Build with Grok One-Shot',
+        items: [
+          'build-with-claude-code/subagents',
+          'build-with-claude-code/mcp',
+          'build-with-claude-code/troubleshooting'
+        ]
+      },
+      
+      // Administration
+      {
+        type: 'category',
+        label: 'Administration',
+        items: [
+          'administration/advanced-installation',
+          'administration/data-usage'
+        ]
+      },
+      
+      // Deployment
+      'deployment/overview',
+      
+      // Resources
+      'resources/legal-and-compliance'
     ],
   };
   
@@ -219,12 +252,12 @@ export default sidebars;`;
     sidebarContent
   );
   
-  console.log('✅ Sync complete!');
+  console.log('✅ Claude Code documentation sync complete!');
 }
 
 // Run if called directly
 if (require.main === module) {
-  syncAgentDocs();
+  syncClaudeCodeDocs();
 }
 
-module.exports = { syncAgentDocs };
+module.exports = { syncClaudeCodeDocs };
