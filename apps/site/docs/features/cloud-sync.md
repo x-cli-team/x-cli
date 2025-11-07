@@ -45,23 +45,23 @@ Optional cloud synchronization for settings, sessions, and configurations across
 
 ```bash
 # Enable cloud sync
-x-cli cloud login
+grok cloud login
 
 # Configure sync
-x-cli cloud sync enable
-x-cli cloud sync configure
+grok cloud sync enable
+grok cloud sync configure
 
 # Choose what to sync
-x-cli cloud sync select settings sessions
+grok cloud sync select settings sessions
 
 # Manual sync
-x-cli cloud sync now
+grok cloud sync now
 
 # View sync status
-x-cli cloud status
+grok cloud status
 
 # Self-hosted setup
-x-cli cloud configure --endpoint https://your-server.com
+grok cloud configure --endpoint https://your-server.com
 ```
 
 ## Roadmap

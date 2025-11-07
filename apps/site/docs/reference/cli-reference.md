@@ -1,621 +1,79 @@
 ---
-title: CLI Reference
+title: CLI reference
 ---
 
-# CLI Reference
+# CLI reference
 
-Complete reference for all Grok One-Shot command-line options and subcommands.
+> Complete reference for Grok One-Shot command-line interface, including commands and flags.
 
-## Table of Contents
+## CLI commands
 
-- [Main Command](#main-command)
-- [Global Options](#global-options)
-- [Subcommands](#subcommands)
-- [Environment Variables](#environment-variables)
-- [Exit Codes](#exit-codes)
+| Command                       | Description                                    | Example                                  |
+| :---------------------------- | :--------------------------------------------- | :--------------------------------------- |
+| `grok`                        | Start interactive REPL                         | `grok`                                   |
+| `grok "query"`                | Start REPL with initial prompt                 | `grok "explain this project"`            |
+| `grok -p "query"`             | Query via SDK, then exit                       | `grok -p "explain this function"`        |
+| `cat file \| grok -p "query"` | Process piped content                          | `cat logs.txt \| grok -p "explain"`      |
+| `grok mcp`                    | Configure Model Context Protocol (MCP) servers | See the Grok One-Shot MCP documentation. |
 
-## Main Command
+> ** Parity Gap:** Grok One-Shot does not yet support `-c`/`--continue` or `-r`/`--resume` flags for session continuation. Sessions are auto-saved to `~/.x-cli/sessions/` but resuming must be done manually.
 
-### `x-cli [message] [options]`
+> ** Parity Gap:** No `grok update` command. Updates must be done via package manager (`npm update -g @xagent/one-shot` or `bun update -g @xagent/one-shot`).
 
-Launch Grok One-Shot in interactive or headless mode.
+## CLI flags
 
-**Syntax:**
+Customize Grok One-Shot's behavior with these command-line flags:
 
-```bash
-x-cli [message] [options]
+| Flag                             | Description                                                                                                             | Example                                          |
+| :------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------- |
+| `--add-dir`                      | Add additional working directories for Grok to access (validates each path exists as a directory)                       | `grok --add-dir ../apps ../lib`                  |
+| `--allowedTools`                 | A list of tools that should be allowed without prompting the user for permission, in addition to settings.json files    | `"Bash(git log:*)" "Bash(git diff:*)" "Read"`    |
+| `--disallowedTools`              | A list of tools that should be disallowed without prompting the user for permission, in addition to settings.json files | `"Bash(git log:*)" "Bash(git diff:*)" "Edit"`    |
+| `--print`, `-p`                  | Print response without interactive mode (see SDK documentation for programmatic usage details)                          | `grok -p "query"`                                |
+| `--system-prompt`                | Replace the entire system prompt with custom text (works in both interactive and print modes)                           | `grok --system-prompt "You are a Python expert"` |
+| `--verbose`                      | Enable verbose logging, shows full turn-by-turn output (helpful for debugging in both print and interactive modes)      | `grok --verbose`                                 |
+| `--max-turns`                    | Limit the number of agentic turns in non-interactive mode                                                               | `grok -p --max-turns 3 "query"`                  |
+| `--model`                        | Sets the model for the current session (e.g., `grok-2-1212`, `grok-beta`)                                               | `grok --model grok-2-1212`                       |
+| `--dangerously-skip-permissions` | Skip permission prompts (use with caution)                                                                              | `grok --dangerously-skip-permissions`            |
+
+> ** Parity Gap:** Grok One-Shot does not support `--agents` flag for dynamic subagent definition. Subagent functionality may be added in future releases.
+
+> ** Parity Gap:** No `--system-prompt-file` or `--append-system-prompt` flags. Only `--system-prompt` is supported for complete prompt replacement.
+
+> ** Parity Gap:** No `--output-format`, `--input-format`, or `--include-partial-messages` flags for structured output in print mode.
+
+> ** Parity Gap:** No `--permission-mode` or `--permission-prompt-tool` flags. Permission handling is simpler than Claude Code's IAM system.
+
+<Tip>
+The `-p` (print) flag is useful for scripting and automation, allowing you to use Grok One-Shot non-interactively.
+</Tip>
+
+### System prompt flags
+
+Grok One-Shot provides the `--system-prompt` flag for customizing the system prompt:
+
+| Flag              | Behavior                           | Modes               | Use Case                                               |
+| :---------------- | :--------------------------------- | :------------------ | :----------------------------------------------------- |
+| `--system-prompt` | **Replaces** entire default prompt | Interactive + Print | Complete control over Grok's behavior and instructions |
+
+**When to use:**
+
+- **`--system-prompt`**: Use when you need complete control over Grok's system prompt. This removes all default Grok One-Shot instructions, giving you a blank slate.
+
+```bash theme={null}
+grok --system-prompt "You are a Python expert who only writes type-annotated code"
 ```
 
-**Examples:**
-
-```bash
-# Interactive mode (no message)
-x-cli
-
-# Interactive with initial message
-x-cli "explain what this code does"
-
-# Headless mode
-x-cli -p "list all TODO comments"
-
-# Specific directory
-x-cli -d /path/to/project
-
-# Quiet mode (no banner)
-x-cli -q "generate README"
-```
-
-## Global Options
-
-### `-k, --api-key <key>`
-
-Provide Grok API key directly via command line.
-
-```bash
-x-cli -k "your-api-key-here"
-```
-
-**Notes:**
-
-- Overrides `GROK_API_KEY` environment variable
-- Saved to `~/.x-cli/settings.json` on first use
-- **Not recommended** for security (use environment variable instead)
-
----
-
-### `-d, --directory <path>`
-
-Set working directory for the session.
-
-```bash
-x-cli -d /path/to/project
-x-cli --directory ~/my-app
-```
-
-**Default:** Current working directory
-
-**Notes:**
-
-- Path must exist
-- All file operations relative to this directory
-- Useful for multi-project workflows
-
----
-
-### `-m, --model <model>`
-
-Specify which Grok model to use.
-
-```bash
-x-cli -m grok-beta
-x-cli --model grok-2-1212
-```
-
-**Available Models:**
-
-- `grok-2-1212` (default) - Latest stable model
-- `grok-beta` - Beta features and improvements
-- `grok-4-fast-non-reasoning` - Fast responses
-
-**Default:** `grok-2-1212`
-
-**Notes:**
-
-- Can also set via `GROK_MODEL` environment variable
-- Saved to settings for future sessions
-- Different models have different capabilities and speeds
-
----
-
-### `-p, --prompt <message>`
-
-Run in headless (non-interactive) mode with a single prompt.
-
-```bash
-x-cli -p "list all files"
-x-cli --prompt "analyze main.ts"
-```
-
-**Notes:**
-
-- Executes and exits immediately
-- No interactive prompts or confirmations
-- Output goes to stdout
-- Perfect for scripting and CI/CD
-- **Requires:** Message must be provided
-
-**Exit codes:**
-
-- `0` - Success
-- `1` - Error occurred
-
----
-
-### `-q, --quiet`
-
-Suppress welcome banner and non-essential output.
-
-```bash
-x-cli -q
-x-cli --quiet "generate docs"
-```
-
-**Notes:**
-
-- Still shows AI responses and errors
-- Useful for cleaner output in scripts
-- Terminal clearing disabled
-
----
-
-### `-h, --help`
-
-Display help information and exit.
-
-```bash
-x-cli --help
-x-cli -h
-```
-
-**Output includes:**
-
-- Usage syntax
-- Available options
-- Subcommands
-- Examples
-
----
-
-### `-v, --version`
-
-Display version information and exit.
-
-```bash
-x-cli --version
-x-cli -v
-```
-
-**Output format:**
-
-```
-@xagent/one-shot v1.1.101
-```
-
-## Subcommands
-
-### `x-cli mcp`
-
-Manage Model Context Protocol (MCP) servers.
-
-**Usage:**
-
-```bash
-x-cli mcp <action> [args]
-```
-
-#### `mcp add <name> <command>`
-
-Add a new MCP server.
-
-```bash
-x-cli mcp add filesystem "npx -y @modelcontextprotocol/server-filesystem"
-x-cli mcp add github "node github-mcp-server/dist/index.js"
-```
-
-**Arguments:**
-
-- `<name>` - Unique identifier for the server
-- `<command>` - Command to start the server
-
-**Notes:**
-
-- Server configuration saved to `~/.x-cli/settings.json`
-- Command should start an MCP-compatible server
-- Server must implement MCP protocol
-
----
-
-#### `mcp list`
-
-List all configured MCP servers.
-
-```bash
-x-cli mcp list
-```
-
-**Output:**
-
-```
-Configured MCP servers:
-• filesystem: npx -y @modelcontextprotocol/server-filesystem
-• github: node github-mcp-server/dist/index.js
-```
-
----
-
-#### `mcp remove <name>`
-
-Remove an MCP server by name.
-
-```bash
-x-cli mcp remove filesystem
-```
-
-**Arguments:**
-
-- `<name>` - Name of the server to remove
-
-**Notes:**
-
-- Removes from settings permanently
-- Does not affect running servers (they're started per-session)
-
----
-
-### `x-cli set-name <name>`
-
-Set your name for personalized AI responses.
-
-```bash
-x-cli set-name "Alice"
-x-cli set-name "Bob Smith"
-```
-
-**Arguments:**
-
-- `<name>` - Your preferred name
-
-**Notes:**
-
-- Saved to `~/.x-cli/settings.json`
-- AI will use this name in responses
-- Can include spaces (use quotes)
-
-**Example:**
-
-```bash
-$ x-cli set-name "Alice"
-Name set to: Alice
-
-$ x-cli
-> help me debug this
-Alice, I'd be happy to help you debug...
-```
-
----
-
-### `x-cli toggle-confirmations`
-
-Enable or disable confirmation prompts.
-
-```bash
-x-cli toggle-confirmations
-```
-
-**Behavior:**
-
-- **Enabled (default):** AI requests approval for file edits and bash commands
-- **Disabled:** AI executes operations without confirmation
-
-**Current status shown after toggle:**
-
-```bash
-$ x-cli toggle-confirmations
-Confirmations are now: disabled
-
-$ x-cli toggle-confirmations
-Confirmations are now: enabled
-```
-
-**Notes:**
-
-- Saved to `~/.x-cli/settings.json`
-- Can also override per-session with `Ctrl+Y` (approve all)
-- **Caution:** Disabling removes safety guardrails
-
-## Environment Variables
-
-### `GROK_API_KEY`
-
-Your xAI Grok API key (required).
-
-```bash
-export GROK_API_KEY="your-api-key-here"
-```
-
-**Priority:**
-
-1. `-k/--api-key` flag (highest)
-2. `GROK_API_KEY` environment variable
-3. Saved in `~/.x-cli/settings.json`
-4. Interactive prompt (lowest)
-
----
-
-### `GROK_MODEL`
-
-Default model to use for API calls.
-
-```bash
-export GROK_MODEL="grok-beta"
-```
-
-**Default:** `grok-2-1212`
-
-**Available:**
-
-- `grok-2-1212` - Latest stable
-- `grok-beta` - Beta features
-- `grok-4-fast-non-reasoning` - Fast mode
-
----
-
-### `GROK_BASE_URL`
-
-Custom API endpoint (advanced).
-
-```bash
-export GROK_BASE_URL="https://custom-endpoint.example.com"
-```
-
-**Default:** `https://api.x.ai/v1`
-
-**Use cases:**
-
-- Proxy servers
-- Testing environments
-- Custom xAI deployments
-
----
-
-### `MAX_TOOL_ROUNDS`
-
-Maximum number of tool execution rounds per request.
-
-```bash
-export MAX_TOOL_ROUNDS=500
-```
-
-**Default:** 400
-
-**Notes:**
-
-- Prevents infinite loops
-- Higher values allow more complex operations
-- Lower values save tokens but may truncate complex tasks
-
----
-
-### `GROK_DEBUG`
-
-Enable debug logging.
-
-```bash
-export GROK_DEBUG=true
-```
-
-**Output:**
-
-- Additional console logging
-- Request/response details
-- Token usage tracking
-- Tool execution details
-
----
-
-### `GROK_TEXT_COLOR`
-
-Force specific text color for terminal output.
-
-```bash
-export GROK_TEXT_COLOR=black # For light terminals
-export GROK_TEXT_COLOR=white # For dark terminals
-```
-
-**Default:** Auto-detected based on terminal theme
-
----
-
-### `TERM_BACKGROUND`
-
-Hint about terminal background color.
-
-```bash
-export TERM_BACKGROUND=light
-export TERM_BACKGROUND=dark
-```
-
-**Used for:** Adaptive text color selection
-
----
-
-### `GROK_UX_ENHANCED`
-
-Enable/disable UX enhancements.
-
-```bash
-export GROK_UX_ENHANCED=false
-```
-
-**Default:** `true`
-
-**Disables:**
-
-- Spinners
-- Progress bars
-- Background activity indicators
-
----
-
-### `GROK_UX_DEBUG`
-
-Debug UX component rendering.
-
-```bash
-export GROK_UX_DEBUG=true
-```
-
-**Output:**
-
-- Component lifecycle logs
-- State changes
-- Event handling details
-
-## Exit Codes
-
-| Code  | Meaning           | Description                    |
-| ----- | ----------------- | ------------------------------ |
-| `0`   | Success           | Command completed successfully |
-| `1`   | Error             | General error occurred         |
-| `2`   | Invalid arguments | Command-line arguments invalid |
-| `130` | Interrupted       | User interrupted with Ctrl+C   |
-
-**Usage in scripts:**
-
-```bash
-#!/bin/bash
-
-# Run headless command
-x-cli -p "check code quality"
-
-# Check exit code
-if [ $? -eq 0 ]; then
-echo " Success"
-else
-echo " Failed"
-exit 1
-fi
-```
-
-## Configuration Files
-
-### `~/.x-cli/settings.json`
-
-Main configuration file.
-
-**Location:** `$HOME/.x-cli/settings.json`
-
-**Structure:**
-
-```json
-{
-  "apiKey": "your-api-key",
-  "baseUrl": "https://api.x.ai/v1",
-  "model": "grok-2-1212",
-  "name": "Your Name",
-  "confirmations": true,
-  "mcpServers": {
-    "server-name": {
-      "command": "command to start server"
-    }
-  }
-}
-```
-
-**Editing:**
-
-```bash
-# View settings
-cat ~/.x-cli/settings.json
-
-# Edit with your preferred editor
-vim ~/.x-cli/settings.json
-nano ~/.x-cli/settings.json
-```
-
----
-
-### `~/.x-cli/sessions/`
-
-Session history directory.
-
-**Location:** `$HOME/.x-cli/sessions/`
-
-**Contents:**
-
-- One JSON file per session
-- Includes full conversation history
-- Token usage tracking
-- Timestamps and metadata
-
-**Management:**
-
-```bash
-# List sessions
-ls ~/.x-cli/sessions/
-
-# View a session
-cat ~/.x-cli/sessions/session-2025-11-05-14-30.json
-
-# Clean old sessions
-find ~/.x-cli/sessions/ -mtime +30 -delete
-```
-
-## Advanced Usage
-
-### Combining Options
-
-```bash
-# Headless + quiet + specific directory
-x-cli -p "analyze code" -q -d ~/project
-
-# Custom model + API key + initial message
-x-cli -m grok-beta -k "key" "help me debug"
-```
-
-### Scripting Examples
-
-**Example 1: CI/CD Integration**
-
-```bash
-#!/bin/bash
-# run-ai-review.sh
-
-set -e
-
-echo "Running AI code review..."
-x-cli -p "Review all changes in src/ and report issues" -q
-
-if [ $? -eq 0 ]; then
-echo " AI review passed"
-else
-echo " AI review found issues"
-exit 1
-fi
-```
-
-**Example 2: Batch Documentation**
-
-```bash
-#!/bin/bash
-# generate-docs.sh
-
-for file in src/**/*.ts; do
-echo "Documenting $file..."
-x-cli -p "Generate JSDoc comments for $file" -q
-done
-```
-
-**Example 3: Daily Code Analysis**
-
-```bash
-#!/bin/bash
-# daily-analysis.sh
-
-REPORT="daily-report-$(date +%Y-%m-%d).md"
-
-x-cli -p "Analyze codebase health and generate report" -q > "$REPORT"
-
-echo "Report saved to: $REPORT"
-```
-
-## See Also
-
-- [Interactive Mode Guide](./interactive-mode.md) - Learn interactive features
-- [Slash Commands](./slash-commands.md) - In-session commands
-- [Configuration Guide](../configuration/settings.md) - Detailed configuration
-- [Troubleshooting](../build-with-claude-code/troubleshooting.md) - Common issues
-
----
-
-**Need help?** Type `x-cli --help` or `/help` in interactive mode.
+<Note>
+The `--system-prompt` flag completely replaces the default system prompt. For most use cases, consider whether you need this level of control, as it removes Grok One-Shot's built-in coding capabilities.
+</Note>
+
+For detailed information about print mode (`-p`) including verbose logging and programmatic usage, see the Grok One-Shot documentation.
+
+## See also
+
+- [Interactive mode](/en/interactive-mode) - Shortcuts, input modes, and interactive features
+- [Slash commands](/en/slash-commands) - Interactive session commands
+- [Quickstart guide](/en/quickstart) - Getting started with Grok One-Shot
+- [Common workflows](/en/common-workflows) - Advanced workflows and patterns
+- [Settings](/en/settings) - Configuration options

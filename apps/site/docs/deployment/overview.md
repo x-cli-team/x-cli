@@ -26,7 +26,7 @@ npm install -g @xagent/one-shot
 bun install -g @xagent/one-shot
 
 # Verify
-x-cli --version
+grok --version
 ```
 
 **Configuration:**
@@ -82,7 +82,7 @@ source ~/.bashrc
 cp team-config/.x-cli-template.json ~/.x-cli/settings.json
 
 # Add personal API key
-x-cli -k "personal-api-key"
+grok -k "personal-api-key"
 ```
 
 3. **Document in team README:**
@@ -93,7 +93,7 @@ x-cli -k "personal-api-key"
 1. Install: `npm install -g @xagent/one-shot`
 2. Copy config: `cp team-config/.x-cli-template.json ~/.x-cli/settings.json`
 3. Set API key: `export GROK_API_KEY="your-key"`
-4. Test: `x-cli --version`
+4. Test: `grok --version`
 ```
 
 **Pros:**
@@ -132,7 +132,7 @@ run: npm install -g @xagent/one-shot
 env:
 GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
 run: |
-x-cli -p "Review PR for security issues and code quality" > review.txt
+grok -p "Review PR for security issues and code quality" > review.txt
 cat review.txt
 
 - name: Comment PR
@@ -191,7 +191,7 @@ ENV GROK_UX_MINIMAL=true
 ENV GROK_API_KEY=""
 
 # Default command
-CMD ["x-cli"]
+CMD ["grok"]
 ```
 
 **Build and run:**
@@ -211,7 +211,7 @@ docker run \
 -e GROK_API_KEY="your-key" \
 -v $(pwd):/workspace \
 grok-oneshot:latest \
-x-cli -p "analyze code"
+grok -p "analyze code"
 ```
 
 **Docker Compose:**
@@ -267,12 +267,12 @@ echo 'export GROK_API_KEY="team-key"' >> ~/.bashrc
 
 ```bash
 # SSH with TTY forwarding
-ssh -t user@server "x-cli"
+ssh -t user@server "grok"
 
 # Or use tmux for persistent sessions
 ssh user@server
 tmux new -s grok
-x-cli
+grok
 # Detach: Ctrl+B, D
 # Reattach: tmux attach -t grok
 ```
@@ -335,7 +335,7 @@ export GROK_UX_MINIMAL=true # For headless environments
 ```bash
 # Base settings in ~/.x-cli/settings.json
 # Override model for specific task
-GROK_MODEL=grok-4-fast-non-reasoning x-cli -p "quick query"
+GROK_MODEL=grok-4-fast-non-reasoning grok -p "quick query"
 ```
 
 ## Security Best Practices
@@ -407,7 +407,7 @@ key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 - name: Quick checks
 env:
 GROK_MODEL: grok-4-fast-non-reasoning
-run: x-cli -p "check for console.log statements"
+run: grok -p "check for console.log statements"
 ```
 
 ### Container Optimization
@@ -426,7 +426,7 @@ RUN npm install -g @xagent/one-shot
 
 FROM node:20-alpine
 COPY --from=build /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=build /usr/local/bin/x-cli /usr/local/bin/x-cli
+COPY --from=build /usr/local/bin/grok /usr/local/bin/grok
 ```
 
 ### Network Optimization
@@ -452,7 +452,7 @@ Press Ctrl+I to see token usage
 
 ```bash
 # Extract from session file
-x-cli -p "analyze code" > /dev/null
+grok -p "analyze code" > /dev/null
 cat ~/.x-cli/sessions/*.json | jq '.tokenUsage'
 ```
 
@@ -478,7 +478,7 @@ cat ~/.x-cli/sessions/*.json | jq '.tokenUsage'
 
 ```bash
 export GROK_DEBUG=true
-x-cli 2>&1 | tee grok-debug.log
+grok 2>&1 | tee grok-debug.log
 ```
 
 **In CI/CD:**
@@ -487,7 +487,7 @@ x-cli 2>&1 | tee grok-debug.log
 - name: AI checks with logging
 run: |
 export GROK_DEBUG=true
-x-cli -p "review code" 2>&1 | tee ai-log.txt
+grok -p "review code" 2>&1 | tee ai-log.txt
 
 - name: Upload logs
 if: failure()
@@ -505,9 +505,9 @@ path: ai-log.txt
 
 ```bash
 # Parallel analysis
-x-cli -p "analyze auth" &
-x-cli -p "analyze api" &
-x-cli -p "analyze db" &
+grok -p "analyze auth" &
+grok -p "analyze api" &
+grok -p "analyze db" &
 wait
 
 # Combine results
@@ -521,7 +521,7 @@ cat ~/.x-cli/sessions/*.json | jq '.messages[-1].content'
 ```bash
 # Add delays between requests
 for file in src/**/*.ts; do
-x-cli -p "analyze $file"
+grok -p "analyze $file"
 sleep 2 # Avoid rate limits
 done
 ```
@@ -532,7 +532,7 @@ done
 
 ```bash
 # Single request for multiple files
-x-cli -p "analyze all TypeScript files in src/ for security issues"
+grok -p "analyze all TypeScript files in src/ for security issues"
 
 # Instead of individual requests per file
 ```
@@ -541,7 +541,7 @@ x-cli -p "analyze all TypeScript files in src/ for security issues"
 
 ### Installation Issues
 
-**Problem:** `command not found: x-cli`
+**Problem:** `command not found: grok`
 
 **Solution:**
 
@@ -561,7 +561,7 @@ npm install -g @xagent/one-shot
 
 ```bash
 # Always use headless mode in CI
-x-cli -p "your query" # Not: x-cli
+grok -p "your query" # Not: grok
 ```
 
 **Problem:** Rate limits in CI
@@ -575,7 +575,7 @@ uses: nick-invision/retry@v2
 with:
 timeout_minutes: 10
 max_attempts: 3
-command: x-cli -p "review code"
+command: grok -p "review code"
 ```
 
 ### Docker Issues
@@ -587,7 +587,7 @@ command: x-cli -p "review code"
 ```bash
 # Run with proper flags
 docker run -it grok-oneshot # Interactive
-docker run grok-oneshot x-cli -p "query" # Headless
+docker run grok-oneshot grok -p "query" # Headless
 ```
 
 ## Upgrade Strategy
@@ -598,7 +598,7 @@ docker run grok-oneshot x-cli -p "query" # Headless
 
 ```bash
 npm update -g @xagent/one-shot
-x-cli --version # Verify
+grok --version # Verify
 ```
 
 **CI/CD:**

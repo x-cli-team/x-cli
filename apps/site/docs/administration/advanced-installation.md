@@ -44,8 +44,8 @@ pnpm add -g @xagent/one-shot
 
 ```bash
 # Clone repository
-git clone https://github.com/x-cli-team/x-cli.git
-cd x-cli
+git clone https://github.com/grok-team/grok.git
+cd grok
 
 # Install dependencies
 bun install # or npm install
@@ -57,7 +57,7 @@ bun run build
 bun link
 
 # Verify
-x-cli --version
+grok --version
 ```
 
 **Benefits:**
@@ -124,7 +124,7 @@ npm install -g @xagent/one-shot
 npx @xagent/one-shot
 
 # Add alias for convenience
-echo 'alias x-cli="npx @xagent/one-shot"' >> ~/.bashrc
+echo 'alias grok="npx @xagent/one-shot"' >> ~/.bashrc
 ```
 
 **Solution 3: Use Bun (no sudo needed)**
@@ -174,8 +174,8 @@ npm install -g @xagent/one-shot@1.1.101
 npm install -g @xagent/one-shot@beta --prefix ~/.local/beta-xagent
 
 # Create aliases
-alias x-cli-stable='x-cli'
-alias x-cli-beta='~/.local/beta-xagent/bin/x-cli'
+alias grok-stable='grok'
+alias grok-beta='~/.local/beta-xagent/bin/grok'
 ```
 
 **Approach 2: npx with version**
@@ -326,19 +326,19 @@ npm install -g @xagent/one-shot
 # deploy-xagent.sh
 
 # Check if installed
-if ! command -v x-cli &> /dev/null; then
+if ! command -v grok &> /dev/null; then
 echo "Installing Grok One-Shot..."
 npm install -g @xagent/one-shot@1.1.101
 fi
 
 # Configure
 if [ ! -f ~/.x-cli/settings.json ]; then
-mkdir -p ~/.x-cli
-cp /shared/config/x-cli-settings.json ~/.x-cli/settings.json
+mkdir -p ~/.grok
+cp /shared/config/grok-settings.json ~/.x-cli/settings.json
 fi
 
 # Verify
-x-cli --version
+grok --version
 echo " Grok One-Shot ready"
 ```
 
@@ -359,7 +359,7 @@ version: "1.1.101"
 
 - name: Copy settings template
 copy:
-src: x-cli-settings.json
+src: grok-settings.json
 dest: ~/.x-cli/settings.json
 mode: '0600'
 ```
@@ -410,15 +410,15 @@ npm install -g @xagent/one-shot
 
 ```bash
 # On internet-connected system
-git clone https://github.com/x-cli-team/x-cli.git
-cd x-cli
+git clone https://github.com/grok-team/grok.git
+cd grok
 npm install
 npm run build
-tar -czf x-cli-built.tar.gz dist/ node_modules/ package.json
+tar -czf grok-built.tar.gz dist/ node_modules/ package.json
 
 # Transfer to air-gapped system
 # Extract and link
-tar -xzf x-cli-built.tar.gz
+tar -xzf grok-built.tar.gz
 npm link
 ```
 
@@ -432,8 +432,8 @@ npm link
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/x-cli-team/x-cli.git
-cd x-cli
+git clone https://github.com/grok-team/grok.git
+cd grok
 git checkout -b custom-features
 bun install
 
@@ -450,14 +450,14 @@ bun run dist/index.js --version
 bun link
 
 # Verify
-x-cli --version # Should show your custom build
+grok --version # Should show your custom build
 ```
 
 **Maintain custom fork:**
 
 ```bash
 # Keep up to date with upstream
-git remote add upstream https://github.com/x-cli-team/x-cli.git
+git remote add upstream https://github.com/grok-team/grok.git
 git fetch upstream
 git rebase upstream/main
 
@@ -546,17 +546,17 @@ cd my-project
 npm install @xagent/one-shot --save-dev
 
 # Use via npx
-npx x-cli
+npx grok
 
 # Or via npm script
 # package.json
 {
 "scripts": {
-"x-cli": "x-cli"
+"grok": "grok"
 }
 }
 
-npm run x-cli
+npm run grok
 ```
 
 ### Vendoring Dependencies
@@ -584,18 +584,18 @@ npm install -g ./vendor/@xagent-one-shot-*.tgz --ignore-scripts
 
 ```bash
 # 1. Command exists
-command -v x-cli
-which x-cli
+command -v grok
+which grok
 
 # 2. Version correct
-x-cli --version
+grok --version
 
 # 3. Help displays
-x-cli --help
+grok --help
 
 # 4. Can access API
 export GROK_API_KEY="test-key"
-x-cli -p "echo test" || echo "API test failed"
+grok -p "echo test" || echo "API test failed"
 
 # 5. Settings file created
 ls -la ~/.x-cli/settings.json
@@ -607,13 +607,13 @@ ls -la ~/.x-cli/settings.json
 
 ```bash
 # Test headless mode
-x-cli -p "list files in current directory"
+grok -p "list files in current directory"
 
 # Test interactive mode
-echo "list files" | x-cli
+echo "list files" | grok
 
 # Test with confirmations
-x-cli toggle-confirmations
+grok toggle-confirmations
 ```
 
 ## Troubleshooting
@@ -629,7 +629,7 @@ x-cli toggle-confirmations
 # Configure user-level npm instead (see above)
 ```
 
-**Problem:** `command not found: x-cli`
+**Problem:** `command not found: grok`
 
 **Solution:**
 
@@ -698,7 +698,7 @@ sudo apt-get install -y nodejs
 
 ```bash
 # Check current version
-x-cli --version
+grok --version
 
 # Upgrade to latest
 npm update -g @xagent/one-shot
@@ -707,7 +707,7 @@ npm update -g @xagent/one-shot
 npm install -g @xagent/one-shot@1.2.0
 
 # Verify
-x-cli --version
+grok --version
 ```
 
 ### Rollback
@@ -720,7 +720,7 @@ npm uninstall -g @xagent/one-shot
 npm install -g @xagent/one-shot@1.1.101
 
 # Verify
-x-cli --version
+grok --version
 ```
 
 ## See Also

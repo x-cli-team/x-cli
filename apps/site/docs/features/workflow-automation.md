@@ -18,9 +18,9 @@ Grok One-Shot excels at automating common development workflows, from code gener
 
 ```bash
 # No interaction needed
-x-cli -p "list all TODO comments in the codebase"
-x-cli -p "find functions without JSDoc comments"
-x-cli -p "check for console.log statements"
+grok -p "list all TODO comments in the codebase"
+grok -p "find functions without JSDoc comments"
+grok -p "check for console.log statements"
 ```
 
 **Benefits:**
@@ -46,16 +46,16 @@ x-cli -p "check for console.log statements"
 # daily-checks.sh
 
 echo "=== Security Scan ==="
-x-cli -p "scan for potential security vulnerabilities"
+grok -p "scan for potential security vulnerabilities"
 
 echo "=== Code Quality ==="
-x-cli -p "find code quality issues"
+grok -p "find code quality issues"
 
 echo "=== Test Coverage ==="
-x-cli -p "identify untested code paths"
+grok -p "identify untested code paths"
 
 echo "=== Documentation ==="
-x-cli -p "find public functions without docs"
+grok -p "find public functions without docs"
 ```
 
 **Usage:**
@@ -87,7 +87,7 @@ run: npm install -g @xagent/one-shot
 env:
 GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
 run: |
-x-cli -p "Review this PR for:
+grok -p "Review this PR for:
 - Security vulnerabilities
 - Code quality issues
 - Performance concerns
@@ -118,13 +118,13 @@ body: '## AI Code Review\n\n' + review
 echo "Running AI pre-commit checks..."
 
 # Check for console.log
-if x-cli -p "check if staged files contain console.log" | grep -q "Found:"; then
+if grok -p "check if staged files contain console.log" | grep -q "Found:"; then
 echo " console.log statements found"
 exit 1
 fi
 
 # Check for TODO without issue reference
-if x-cli -p "check if staged files have TODO without issue numbers" | grep -q "Found:"; then
+if grok -p "check if staged files have TODO without issue numbers" | grep -q "Found:"; then
 echo " TODO without issue reference found"
 # Warning only, don't block
 fi
@@ -139,7 +139,7 @@ echo " Pre-commit checks passed"
 # .git/hooks/pre-push
 
 echo "Running tests before push..."
-x-cli -p "run tests and report results"
+grok -p "run tests and report results"
 
 if [ $? -ne 0 ]; then
 echo " Tests failed, push aborted"
@@ -157,7 +157,7 @@ echo " Tests passed, pushing..."
 
 ```bash
 # Interactive
-x-cli
+grok
 
 > Generate CRUD API for 'products' resource:
 - Database model (Prisma)
@@ -173,7 +173,7 @@ x-cli
 **Headless:**
 
 ```bash
-x-cli -p "Generate REST API endpoint for user registration with validation, error handling, and tests"
+grok -p "Generate REST API endpoint for user registration with validation, error handling, and tests"
 ```
 
 ### Template 2: Refactoring
@@ -181,7 +181,7 @@ x-cli -p "Generate REST API endpoint for user registration with validation, erro
 **Systematic refactoring:**
 
 ```bash
-x-cli
+grok
 
 > Refactor [COMPONENT]:
 From: callback-based async
@@ -199,11 +199,11 @@ Add: error handling
 **Generate docs:**
 
 ```bash
-x-cli -p "Generate comprehensive API documentation for all endpoints in src/api/"
+grok -p "Generate comprehensive API documentation for all endpoints in src/api/"
 
-x-cli -p "Add JSDoc comments to all public functions in src/services/"
+grok -p "Add JSDoc comments to all public functions in src/services/"
 
-x-cli -p "Create README.md with installation, usage, and examples"
+grok -p "Create README.md with installation, usage, and examples"
 ```
 
 ### Template 4: Testing
@@ -211,7 +211,7 @@ x-cli -p "Create README.md with installation, usage, and examples"
 **Generate tests:**
 
 ```bash
-x-cli
+grok
 
 > Generate comprehensive test suite for src/services/payment-processor.ts:
 - Unit tests for each method
@@ -233,16 +233,16 @@ x-cli
 # enforce-quality.sh
 
 # Find and fix linting issues
-x-cli -p "run eslint and fix auto-fixable issues"
+grok -p "run eslint and fix auto-fixable issues"
 
 # Remove unused imports
-x-cli -p "remove unused imports from all TypeScript files"
+grok -p "remove unused imports from all TypeScript files"
 
 # Standardize formatting
-x-cli -p "run prettier on all source files"
+grok -p "run prettier on all source files"
 
 # Generate quality report
-x-cli -p "analyze code quality and generate report"
+grok -p "analyze code quality and generate report"
 ```
 
 ## Automation Workflows
@@ -316,9 +316,9 @@ command: comment on PR
 **Workflow templates:**
 
 ```bash
-x-cli workflow run code-review
-x-cli workflow run deploy-to-staging
-x-cli workflow list
+grok workflow run code-review
+grok workflow run deploy-to-staging
+grok workflow list
 ```
 
 **Advanced automation:**
@@ -346,23 +346,23 @@ echo "# Code Quality Report - $DATE"
 echo ""
 
 echo "## Security"
-x-cli -p "scan for security vulnerabilities"
+grok -p "scan for security vulnerabilities"
 echo ""
 
 echo "## Code Quality"
-x-cli -p "analyze code quality and list top issues"
+grok -p "analyze code quality and list top issues"
 echo ""
 
 echo "## Test Coverage"
-x-cli -p "analyze test coverage and identify gaps"
+grok -p "analyze test coverage and identify gaps"
 echo ""
 
 echo "## Technical Debt"
-x-cli -p "find TODO, FIXME, and HACK comments"
+grok -p "find TODO, FIXME, and HACK comments"
 echo ""
 
 echo "## Performance"
-x-cli -p "identify potential performance issues"
+grok -p "identify potential performance issues"
 } > "$REPORT"
 
 echo "Report generated: $REPORT"
@@ -388,7 +388,7 @@ echo "Preparing pull request..."
 
 # 1. Run tests
 echo "Running tests..."
-x-cli -p "run test suite and report results"
+grok -p "run test suite and report results"
 
 if [ $? -ne 0 ]; then
 echo " Tests failed"
@@ -397,19 +397,19 @@ fi
 
 # 2. Check code quality
 echo "Checking code quality..."
-x-cli -p "lint code and fix auto-fixable issues"
+grok -p "lint code and fix auto-fixable issues"
 
 # 3. Update documentation
 echo "Checking documentation..."
-x-cli -p "ensure all public APIs are documented"
+grok -p "ensure all public APIs are documented"
 
 # 4. Generate changelog entry
 echo "Generating changelog..."
-x-cli -p "analyze recent commits and draft changelog entry" > changelog-draft.md
+grok -p "analyze recent commits and draft changelog entry" > changelog-draft.md
 
 # 5. Review changes
 echo "Reviewing changes..."
-x-cli -p "review uncommitted changes for issues"
+grok -p "review uncommitted changes for issues"
 
 echo " PR preparation complete"
 echo "Review changelog-draft.md and commit changes"
@@ -430,7 +430,7 @@ for file in $FILES; do
 echo "Migrating $file..."
 
 # Convert to TypeScript
-x-cli -p "convert $file to TypeScript with proper types"
+grok -p "convert $file to TypeScript with proper types"
 
 # Rename .js to .ts
 # (handled by AI or manually)
@@ -438,7 +438,7 @@ x-cli -p "convert $file to TypeScript with proper types"
 done
 
 echo "Migration complete, running type check..."
-x-cli -p "run tsc --noEmit to check for type errors"
+grok -p "run tsc --noEmit to check for type errors"
 ```
 
 ### Example 4: Automated Documentation
@@ -450,16 +450,16 @@ x-cli -p "run tsc --noEmit to check for type errors"
 echo "Generating documentation..."
 
 # API documentation
-x-cli -p "generate OpenAPI spec from Express routes in src/api/"
+grok -p "generate OpenAPI spec from Express routes in src/api/"
 
 # Code documentation
-x-cli -p "add JSDoc comments to all public functions in src/"
+grok -p "add JSDoc comments to all public functions in src/"
 
 # User documentation
-x-cli -p "generate user guide with examples for main features"
+grok -p "generate user guide with examples for main features"
 
 # Developer documentation
-x-cli -p "generate CONTRIBUTING.md with setup and workflow instructions"
+grok -p "generate CONTRIBUTING.md with setup and workflow instructions"
 
 # Generate site
 npm run docs:build
@@ -483,19 +483,19 @@ fi
 echo "Preparing release $VERSION..."
 
 # 1. Update version
-x-cli -p "update version to $VERSION in package.json"
+grok -p "update version to $VERSION in package.json"
 
 # 2. Generate changelog
-x-cli -p "generate CHANGELOG.md entry for version $VERSION from git commits"
+grok -p "generate CHANGELOG.md entry for version $VERSION from git commits"
 
 # 3. Update documentation
-x-cli -p "update version references in documentation to $VERSION"
+grok -p "update version references in documentation to $VERSION"
 
 # 4. Run tests
-x-cli -p "run full test suite including integration tests"
+grok -p "run full test suite including integration tests"
 
 # 5. Build
-x-cli -p "run production build"
+grok -p "run production build"
 
 # 6. Create git tag
 git add .
@@ -513,37 +513,37 @@ echo "Review changes, then: git push && git push --tags"
 ** Use headless mode for automation:**
 
 ```bash
-x-cli -p "query" # Not interactive x-cli
+grok -p "query" # Not interactive grok
 ```
 
 ** Disable confirmations for trusted automation:**
 
 ```bash
-x-cli toggle-confirmations # Disable
+grok toggle-confirmations # Disable
 ./automation-script.sh
-x-cli toggle-confirmations # Re-enable
+grok toggle-confirmations # Re-enable
 ```
 
 ** Use specific prompts:**
 
 ```bash
 # Good
-x-cli -p "find console.log in src/ excluding test files"
+grok -p "find console.log in src/ excluding test files"
 
 # Bad
-x-cli -p "check the code"
+grok -p "check the code"
 ```
 
 ** Capture and log output:**
 
 ```bash
-x-cli -p "query" > output.txt 2>&1
+grok -p "query" > output.txt 2>&1
 ```
 
 ** Handle errors:**
 
 ```bash
-if ! x-cli -p "run tests"; then
+if ! grok -p "run tests"; then
 echo "Tests failed"
 exit 1
 fi
@@ -555,10 +555,10 @@ fi
 
 ```bash
 # Bad
-echo "query" | x-cli
+echo "query" | grok
 
 # Good
-x-cli -p "query"
+grok -p "query"
 ```
 
 ** Leave confirmations disabled globally:**
@@ -571,21 +571,21 @@ x-cli -p "query"
 
 ```bash
 # Bad
-x-cli -p "important task"
+grok -p "important task"
 # continues even if failed
 
 # Good
-x-cli -p "important task" || exit 1
+grok -p "important task" || exit 1
 ```
 
 ** Hardcode sensitive data:**
 
 ```bash
 # Bad
-x-cli -p "deploy with key abc123"
+grok -p "deploy with key abc123"
 
 # Good
-x-cli -p "deploy with key from $DEPLOY_KEY"
+grok -p "deploy with key from $DEPLOY_KEY"
 ```
 
 ## Performance Optimization
@@ -596,14 +596,14 @@ x-cli -p "deploy with key from $DEPLOY_KEY"
 
 ```bash
 # Sequential (slow)
-x-cli -p "task 1"
-x-cli -p "task 2"
-x-cli -p "task 3"
+grok -p "task 1"
+grok -p "task 2"
+grok -p "task 3"
 
 # Parallel (fast)
-x-cli -p "task 1" &
-x-cli -p "task 2" &
-x-cli -p "task 3" &
+grok -p "task 1" &
+grok -p "task 2" &
+grok -p "task 3" &
 wait
 ```
 
@@ -613,10 +613,10 @@ wait
 
 ```bash
 # Fast model for simple queries
-GROK_MODEL=grok-4-fast-non-reasoning x-cli -p "find TODO comments"
+GROK_MODEL=grok-4-fast-non-reasoning grok -p "find TODO comments"
 
 # Default model for complex tasks
-GROK_MODEL=grok-2-1212 x-cli -p "refactor authentication system"
+GROK_MODEL=grok-2-1212 grok -p "refactor authentication system"
 ```
 
 ### Caching
@@ -626,7 +626,7 @@ GROK_MODEL=grok-2-1212 x-cli -p "refactor authentication system"
 ```bash
 # Cache file listing
 if [ ! -f .cache/files.txt ]; then
-x-cli -p "list all source files" > .cache/files.txt
+grok -p "list all source files" > .cache/files.txt
 fi
 
 # Use cache
@@ -681,7 +681,7 @@ return 1
 }
 
 # Usage
-retry x-cli -p "run tests"
+retry grok -p "run tests"
 ```
 
 ## See Also

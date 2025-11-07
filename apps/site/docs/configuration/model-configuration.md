@@ -36,7 +36,7 @@ Grok One-Shot supports multiple X.AI models, each optimized for different scenar
 
 ```bash
 export GROK_MODEL="grok-2-1212"
-x-cli "refactor authentication system to use JWT"
+grok "refactor authentication system to use JWT"
 ```
 
 ### grok-beta
@@ -62,7 +62,7 @@ x-cli "refactor authentication system to use JWT"
 
 ```bash
 export GROK_MODEL="grok-beta"
-x-cli "try advanced code understanding features"
+grok "try advanced code understanding features"
 ```
 
 **Warning:** Beta models may have:
@@ -96,7 +96,7 @@ x-cli "try advanced code understanding features"
 
 ```bash
 export GROK_MODEL="grok-4-fast-non-reasoning"
-x-cli -p "list all TODO comments"
+grok -p "list all TODO comments"
 ```
 
 **Limitations:**
@@ -133,7 +133,7 @@ export GROK_MODEL="grok-2-1212"
 **Specify at launch:**
 
 ```bash
-x-cli -m grok-4-fast-non-reasoning
+grok -m grok-4-fast-non-reasoning
 ```
 
 **Pros:**
@@ -255,8 +255,8 @@ Research session: 20,000-100,000 tokens
 
 ```bash
 # ~/.bashrc
-alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning x-cli'
-alias grok='x-cli' # Uses default grok-2-1212
+alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
+alias grok='grok' # Uses default grok-2-1212
 
 # Usage
 grok-fast "find all console.log statements"
@@ -276,7 +276,7 @@ export GROK_MODEL=grok-2-1212
 
 # Load before running
 cd ~/projects/simple-app
-source .env && x-cli
+source .env && grok
 ```
 
 ### Shell Aliases
@@ -285,9 +285,9 @@ source .env && x-cli
 
 ```bash
 # ~/.bashrc or ~/.zshrc
-alias grok-default='GROK_MODEL=grok-2-1212 x-cli'
-alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning x-cli'
-alias grok-beta='GROK_MODEL=grok-beta x-cli'
+alias grok-default='GROK_MODEL=grok-2-1212 grok'
+alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
+alias grok-beta='GROK_MODEL=grok-beta grok'
 ```
 
 **Usage:**
@@ -304,13 +304,13 @@ grok-beta "test new features"
 
 ```bash
 # High-performance simple tasks
-alias grok-quick='GROK_MODEL=grok-4-fast-non-reasoning MAX_TOOL_ROUNDS=100 x-cli -p'
+alias grok-quick='GROK_MODEL=grok-4-fast-non-reasoning MAX_TOOL_ROUNDS=100 grok -p'
 
 # Deep research mode
-alias grok-research='GROK_MODEL=grok-2-1212 MAX_TOOL_ROUNDS=500 x-cli'
+alias grok-research='GROK_MODEL=grok-2-1212 MAX_TOOL_ROUNDS=500 grok'
 
 # Beta testing
-alias grok-experimental='GROK_MODEL=grok-beta GROK_DEBUG=true x-cli'
+alias grok-experimental='GROK_MODEL=grok-beta GROK_DEBUG=true grok'
 ```
 
 ## Optimization Strategies
@@ -371,7 +371,7 @@ grok-beta "try new reasoning capabilities"
 
 ```bash
 # 1. Quick exploration
-GROK_MODEL=grok-4-fast-non-reasoning x-cli
+GROK_MODEL=grok-4-fast-non-reasoning grok
 
 > Search for authentication code
 [Quick search results]
@@ -401,12 +401,12 @@ GROK_MODEL=grok-4-fast-non-reasoning x-cli
 
 ```bash
 # For token-intensive tasks, start with default context
-GROK_MODEL=grok-2-1212 x-cli
+GROK_MODEL=grok-2-1212 grok
 
 # For many small tasks, use fast model
-GROK_MODEL=grok-4-fast-non-reasoning x-cli -p "query 1" && \
-x-cli -p "query 2" && \
-x-cli -p "query 3"
+GROK_MODEL=grok-4-fast-non-reasoning grok -p "query 1" && \
+grok -p "query 2" && \
+grok -p "query 3"
 ```
 
 ## Monitoring and Analysis
@@ -437,11 +437,11 @@ cat ~/.x-cli/sessions/latest-session.json | grep -A5 "tokenUsage"
 
 ```bash
 # Fast model timing
-time GROK_MODEL=grok-4-fast-non-reasoning x-cli -p "list files"
+time GROK_MODEL=grok-4-fast-non-reasoning grok -p "list files"
 # Typical: 1-2 seconds
 
 # Default model timing
-time GROK_MODEL=grok-2-1212 x-cli -p "list files"
+time GROK_MODEL=grok-2-1212 grok -p "list files"
 # Typical: 3-5 seconds
 ```
 
@@ -513,7 +513,7 @@ export GROK_MODEL=grok-2-1212
 
 ```bash
 # 1. Restart session with desired model
-x-cli -m grok-2-1212
+grok -m grok-2-1212
 
 # 2. Set via environment
 export GROK_MODEL=grok-2-1212
@@ -593,7 +593,7 @@ X.AI regularly releases new models. Check documentation:
 
 ```bash
 # List available models (future feature)
-x-cli --list-models
+grok --list-models
 ```
 
 ## See Also

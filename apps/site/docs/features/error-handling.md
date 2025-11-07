@@ -376,7 +376,7 @@ git restore . # Undo if needed
 git checkout -b test/ai-changes
 
 # Let AI make changes
-x-cli "refactor authentication"
+grok "refactor authentication"
 
 # Review and test
 npm test
@@ -399,7 +399,7 @@ git branch -D test/ai-changes
 
 ```bash
 export GROK_DEBUG=true
-x-cli
+grok
 ```
 
 **Debug output includes:**
@@ -564,7 +564,7 @@ Should I try editing that instead?"
 ```bash
 export GROK_API_KEY="your-key"
 # or
-x-cli -k "your-key"
+grok -k "your-key"
 ```
 
 ### Error: "Rate limit exceeded"

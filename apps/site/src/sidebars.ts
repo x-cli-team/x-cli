@@ -76,20 +76,6 @@ const sidebars: SidebarsConfig = {
         "administration/data-usage"
       ]
     },
-    {
-      "type": "category",
-      "label": "Architecture",
-      "items": [
-        "architecture/overview"
-      ]
-    },
-    {
-      "type": "category",
-      "label": "Community",
-      "items": [
-        "community/testimonials"
-      ]
-    },
     "deployment/overview",
     "resources/legal-and-compliance"
   ]

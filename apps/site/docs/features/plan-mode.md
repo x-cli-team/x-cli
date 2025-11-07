@@ -43,7 +43,7 @@ Plan Mode will provide a dedicated read-only exploration and planning phase befo
 
 ```bash
 # Explicit activation
-x-cli --plan-mode
+grok --plan-mode
 
 # Automatic activation (configurable)
 # For complex multi-file operations
