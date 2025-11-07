@@ -30,19 +30,19 @@ Real-time notifications for long-running operations, errors, and important event
 
 ```bash
 # Enable notifications
-x-cli notifications enable
+grok notifications enable
 
 # Configure channels
-x-cli notifications add slack webhook-url
-x-cli notifications add email user@example.com
+grok notifications add slack webhook-url
+grok notifications add email user@example.com
 
 # Set thresholds
-x-cli notifications set-threshold tokens 50000
-x-cli notifications set-threshold cost 10.00
+grok notifications set-threshold tokens 50000
+grok notifications set-threshold cost 10.00
 
 # Notification rules
-x-cli notifications rule "notify on error"
-x-cli notifications rule "notify when tokens > 50k"
+grok notifications rule "notify on error"
+grok notifications rule "notify when tokens > 50k"
 ```
 
 ## Roadmap

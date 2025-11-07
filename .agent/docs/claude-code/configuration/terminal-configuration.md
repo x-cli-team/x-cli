@@ -57,7 +57,7 @@ Grok One-Shot automatically detects terminal colors using:
 **Check detection:**
 ```bash
 export GROK_DEBUG_COLORS=1
-x-cli
+grok
 # Shows detected background and color choices
 ```
 
@@ -271,8 +271,7 @@ export TERM=xterm-256color
 export LANG=en_US.UTF-8
 
 # Optional: Aliases
-alias grok='x-cli'
-alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning x-cli'
+alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
 ```
 
 ### Zsh Configuration
@@ -290,8 +289,7 @@ export TERM=xterm-256color
 export LANG=en_US.UTF-8
 
 # Optional: Aliases
-alias grok='x-cli'
-alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning x-cli'
+alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
 ```
 
 ### Fish Configuration
@@ -309,8 +307,7 @@ set -x TERM xterm-256color
 set -x LANG en_US.UTF-8
 
 # Optional: Aliases
-alias grok='x-cli'
-alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning x-cli'
+alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
 ```
 
 ## SSH and Remote Terminals
@@ -352,7 +349,7 @@ set -g mouse on
 **Start session:**
 ```bash
 tmux new-session -s grok
-x-cli
+grok
 # Detach: Ctrl+B, D
 # Reattach: tmux attach -t grok
 ```
@@ -377,7 +374,7 @@ altscreen on
 ```bash
 # 1. Check detection
 export GROK_DEBUG_COLORS=1
-x-cli
+grok
 
 # 2. Force background type
 export TERM_BACKGROUND=dark  # or 'light'
@@ -491,11 +488,11 @@ echo "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏ █░ ✓ ✗"
 
 # 3. Grok One-Shot
 export GROK_DEBUG_COLORS=1
-x-cli
+grok
 # Check output for correct detection
 
 # 4. Interactive test
-x-cli "list files in current directory"
+grok "list files in current directory"
 # Watch for smooth rendering
 ```
 

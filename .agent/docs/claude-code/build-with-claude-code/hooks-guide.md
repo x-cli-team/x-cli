@@ -60,14 +60,14 @@ npm run lint-staged
 
 ### 3. Shell Script Wrappers
 
-Wrap `x-cli` commands with custom automation:
+Wrap `grok` commands with custom automation:
 
 ```bash
 #!/bin/bash
 # dev-with-checks.sh
 
 # Run Grok One-Shot
-x-cli "$@"
+grok "$@"
 
 # Post-session cleanup
 echo "Running post-session checks..."
@@ -101,7 +101,7 @@ Use MCP (Model Context Protocol) to add custom tools to Grok One-Shot:
 
 ```bash
 # Add an MCP server that provides formatting tools
-x-cli mcp add formatter "npx -y @modelcontextprotocol/server-formatter"
+grok mcp add formatter "npx -y @modelcontextprotocol/server-formatter"
 ```
 
 Then ask Grok One-Shot to use the formatting tools when needed.

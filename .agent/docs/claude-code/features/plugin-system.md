@@ -109,7 +109,7 @@ Let's create a simple greeting plugin to get you familiar with the plugin system
   <Step title="Install and test your plugin">
     ```bash Start Grok One-Shot from parent directory theme={null}
     cd ..
-    x-cli
+    grok
     ```
 
     ```shell Add the test marketplace theme={null}
@@ -311,7 +311,7 @@ When developing plugins, use a local marketplace to test changes iteratively. Th
   <Step title="Install and test">
     ```bash Start Grok One-Shot from parent directory theme={null}
     cd ..
-    x-cli
+    grok
     ```
 
     ```shell Add your development marketplace theme={null}
@@ -404,8 +404,8 @@ Grok One-Shot supports MCP servers, which can be packaged and shared:
 
 ```bash
 # Add MCP server (current functionality)
-x-cli mcp add filesystem "npx -y @modelcontextprotocol/server-filesystem"
-x-cli mcp add github "node github-mcp-server/dist/index.js"
+grok mcp add filesystem "npx -y @modelcontextprotocol/server-filesystem"
+grok mcp add github "node github-mcp-server/dist/index.js"
 ```
 
 Document MCP server setup in your project README:
@@ -418,8 +418,8 @@ Document MCP server setup in your project README:
 Add these MCP servers for full functionality:
 
 \`\`\`bash
-x-cli mcp add filesystem "npx -y @modelcontextprotocol/server-filesystem"
-x-cli mcp add custom-tools "node ./mcp-servers/custom/index.js"
+grok mcp add filesystem "npx -y @modelcontextprotocol/server-filesystem"
+grok mcp add custom-tools "node ./mcp-servers/custom/index.js"
 \`\`\`
 ```
 
@@ -541,19 +541,19 @@ Future plugin system in Grok One-Shot would likely include:
 
 ```bash
 # Add marketplace
-x-cli plugin marketplace add org/grok-plugins
+grok plugin marketplace add org/grok-plugins
 
 # Install plugin
-x-cli plugin install formatter@org
+grok plugin install formatter@org
 
 # List installed plugins
-x-cli plugin list
+grok plugin list
 
 # Update plugin
-x-cli plugin update formatter@org
+grok plugin update formatter@org
 
 # Remove plugin
-x-cli plugin uninstall formatter@org
+grok plugin uninstall formatter@org
 ```
 
 ## Comparison: Plugins vs Current Alternatives
@@ -575,7 +575,7 @@ x-cli plugin uninstall formatter@org
 | **Agents** | Plugin agents | ⚠️ Limited subagent support |
 | **Hooks** | Plugin hooks | ❌ Not available (future) |
 | **Skills** | Plugin skills | ❌ Not available (use GROK.md + docs) |
-| **MCP servers** | Plugin MCP | ✅ Available via `x-cli mcp` |
+| **MCP servers** | Plugin MCP | ✅ Available via `grok mcp` |
 
 ## Next steps
 

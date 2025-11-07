@@ -19,7 +19,7 @@ Suppose you've just joined a new project and need to understand its structure qu
 
   <Step title="Start Grok One-Shot">
     ```bash  theme={null}
-    x-cli
+    grok
     ```
   </Step>
 
@@ -170,7 +170,7 @@ Suppose you need to update old code to use modern patterns and practices.
 
 **Grok One-Shot Current State:**
 Currently, Grok One-Shot uses internal subagents for specific system tasks (see [subagents documentation](../build-with-grok/subagents.md)) but doesn't expose subagent creation or management to users. For specialized workflows, consider:
-- Using MCP servers for custom tools: `x-cli mcp add <server-name> <command>`
+- Using MCP servers for custom tools: `grok mcp add <server-name> <command>`
 - Creating documentation in `.agent/docs/` to guide Grok's behavior
 - Using GROK.md to define project-specific context and workflows
 
@@ -432,14 +432,14 @@ Suppose you need to work on multiple tasks simultaneously with complete code iso
     cd ../project-feature-a
 
     # Run Grok in this isolated environment
-    x-cli
+    grok
     ```
   </Step>
 
   <Step title="Run Grok in another worktree">
     ```bash  theme={null}
     cd ../project-bugfix
-    x-cli
+    grok
     ```
   </Step>
 
@@ -484,7 +484,7 @@ Suppose you want to use Grok One-Shot as a linter or code reviewer.
     ...
     "scripts": {
         ...
-        "lint:grok": "x-cli -p 'you are a linter. please look at the changes vs. main and report any issues related to typos. report the filename and line number on one line, and a description of the issue on the second line. do not return any other text.'"
+        "lint:grok": "grok -p 'you are a linter. please look at the changes vs. main and report any issues related to typos. report the filename and line number on one line, and a description of the issue on the second line. do not return any other text.'"
     }
 }
 ```
@@ -504,7 +504,7 @@ Suppose you want to pipe data into Grok, and get back data in a structured forma
 **Pipe data through Grok:**
 
 ```bash  theme={null}
-cat build-error.txt | x-cli -p 'concisely explain the root cause of this build error' > output.txt
+cat build-error.txt | grok -p 'concisely explain the root cause of this build error' > output.txt
 ```
 
 <Tip>
@@ -528,7 +528,7 @@ cat build-error.txt | x-cli -p 'concisely explain the root cause of this build e
 Currently outputs plain text only. For structured output, use prompting:
 
 ```bash  theme={null}
-x-cli -p 'analyze this code and return ONLY a JSON object with "issues" and "suggestions" arrays' < code.py > analysis.txt
+grok -p 'analyze this code and return ONLY a JSON object with "issues" and "suggestions" arrays' < code.py > analysis.txt
 ```
 
 **Planned Implementation:** Q1 2026 (Sprint 15-16)
@@ -551,8 +551,8 @@ While slash commands aren't available yet, you can:
 2. Create shell aliases for common Grok commands:
    ```bash
    # In ~/.bashrc or ~/.zshrc
-   alias grok-optimize='x-cli -p "Analyze the performance of this code and suggest three specific optimizations:"'
-   alias grok-security='x-cli -p "Review this code for security vulnerabilities, focusing on:"'
+   alias grok-optimize='grok -p "Analyze the performance of this code and suggest three specific optimizations:"'
+   alias grok-security='grok -p "Review this code for security vulnerabilities, focusing on:"'
    ```
 3. Use shell scripts to wrap common Grok workflows
 

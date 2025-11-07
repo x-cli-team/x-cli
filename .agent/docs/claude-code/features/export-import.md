@@ -30,18 +30,18 @@ Export sessions, configurations, and work artifacts to various formats, and impo
 
 ```bash
 # Export session
-x-cli export --format markdown > session-report.md
-x-cli export --format html > session-report.html
-x-cli export --format json > session-data.json
+grok export --format markdown > session-report.md
+grok export --format html > session-report.html
+grok export --format json > session-data.json
 
 # Export configuration
-x-cli config export > team-config.json
+grok config export > team-config.json
 
 # Export code changes
-x-cli export --changes-only > changes.patch
+grok export --changes-only > changes.patch
 
 # Generate report
-x-cli export --report --template security-audit
+grok export --report --template security-audit
 ```
 
 ## Roadmap

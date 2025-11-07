@@ -8,11 +8,11 @@ Grok One-Shot offers a variety of settings to configure its behavior to meet you
 
 The `settings.json` file is the mechanism for configuring Grok One-Shot:
 
-* **User settings** are defined in `~/.grok/settings.json` and apply to all projects.
+* **User settings** are defined in `~/.x-cli/settings.json` and apply to all projects.
 
 > **⚠️ Parity Gap:** Grok One-Shot does not support project-level settings files (`.grok/settings.json` in project directories) or enterprise managed policy settings. All configuration is user-level only.
 
-**Location:** `~/.grok/settings.json`
+**Location:** `~/.x-cli/settings.json`
 
 **Example settings.json:**
 
@@ -95,9 +95,9 @@ MCP servers extend Grok One-Shot with additional tools and capabilities. Configu
 **Manage via CLI:**
 
 ```bash
-x-cli mcp add \<name\> "\<command\>"
-x-cli mcp list
-x-cli mcp remove \<name\>
+grok mcp add <name> "<command>"
+grok mcp list
+grok mcp remove <name>
 ```
 
 **Environment variable substitution:**
@@ -113,13 +113,13 @@ Settings are applied in order of precedence (highest to lowest):
 
 1. **Command line arguments**
    * Temporary overrides for a specific session
-   * Example: `x-cli -k "temp-key" -m "grok-beta"`
+   * Example: `grok -k "temp-key" -m "grok-beta"`
 
 2. **Environment variables**
    * Override settings file values
-   * Example: `GROK_MODEL=grok-beta x-cli`
+   * Example: `GROK_MODEL=grok-beta grok`
 
-3. **User settings** (`~/.grok/settings.json`)
+3. **User settings** (`~/.x-cli/settings.json`)
    * Persistent global settings
 
 > **⚠️ Parity Gap:** Claude Code supports enterprise managed policies and project-level settings that take precedence over user settings. Grok One-Shot only has user-level settings.
@@ -130,29 +130,29 @@ Settings are applied in order of precedence (highest to lowest):
 
 ```bash
 # API key (prompts if not set)
-x-cli -k "new-key"
+grok -k "new-key"
 
 # Name
-x-cli set-name "Your Name"
+grok set-name "Your Name"
 
 # Confirmations toggle
-x-cli toggle-confirmations
+grok toggle-confirmations
 
 # MCP servers
-x-cli mcp add servername "command"
-x-cli mcp remove servername
+grok mcp add servername "command"
+grok mcp remove servername
 ```
 
 **Manual editing:**
 
 ```bash
 # View current settings
-cat ~/.grok/settings.json
+cat ~/.x-cli/settings.json
 
 # Edit with your preferred editor
-vim ~/.grok/settings.json
-nano ~/.grok/settings.json
-code ~/.grok/settings.json
+vim ~/.x-cli/settings.json
+nano ~/.x-cli/settings.json
+code ~/.x-cli/settings.json
 ```
 
 **Important:** Valid JSON required. Invalid JSON will cause errors on startup.
@@ -161,13 +161,13 @@ code ~/.grok/settings.json
 
 ```bash
 # Backup current settings
-cp ~/.grok/settings.json ~/.grok/settings.json.backup
+cp ~/.x-cli/settings.json ~/.x-cli/settings.json.backup
 
 # Delete settings (will be recreated on next run)
-rm ~/.grok/settings.json
+rm ~/.x-cli/settings.json
 
 # Or reset to defaults
-cat > ~/.grok/settings.json << 'EOF'
+cat > ~/.x-cli/settings.json << 'EOF'
 {
   "confirmations": true
 }
@@ -266,9 +266,9 @@ Use shell aliases for different configurations:
 
 ```bash
 # ~/.bashrc
-alias grok-prod='GROK_MODEL=grok-2-1212 x-cli'
-alias grok-beta='GROK_MODEL=grok-beta x-cli'
-alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning x-cli'
+alias grok-prod='GROK_MODEL=grok-2-1212 grok'
+alias grok-beta='GROK_MODEL=grok-beta grok'
+alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
 ```
 
 Usage:
@@ -292,14 +292,14 @@ MAX_TOOL_ROUNDS=500
 Load before running:
 
 ```bash
-source .env && x-cli
+source .env && grok
 ```
 
 > **⚠️ Parity Gap:** Claude Code supports automatic loading of project-level `.claude/settings.json` files that are checked into source control and shared with teams. Grok One-Shot requires manual environment file loading for per-project configuration.
 
 ## Session storage
 
-**Location:** `~/.grok/sessions/`
+**Location:** `~/.x-cli/sessions/`
 
 **Contents:**
 - One JSON file per session
@@ -311,17 +311,17 @@ source .env && x-cli
 
 ```bash
 # View sessions
-ls -la ~/.grok/sessions/
+ls -la ~/.x-cli/sessions/
 
 # View specific session
-cat ~/.grok/sessions/session-2025-11-05-14-30.json
+cat ~/.x-cli/sessions/session-2025-11-05-14-30.json
 
 # Clean old sessions (older than 30 days)
-find ~/.grok/sessions/ -name "*.json" -mtime +30 -delete
+find ~/.x-cli/sessions/ -name "*.json" -mtime +30 -delete
 
 # Archive sessions
 mkdir ~/session-archives
-mv ~/.grok/sessions/*.json ~/session-archives/
+mv ~/.x-cli/sessions/*.json ~/session-archives/
 ```
 
 > **⚠️ Parity Gap:** Claude Code supports automatic cleanup of old sessions via `cleanupPeriodDays` setting (default: 30 days). Grok One-Shot requires manual session cleanup.
@@ -342,7 +342,7 @@ Grok One-Shot has access to a set of powerful tools that help it understand and 
 | **WebSearch**    | Performs web searches with domain filtering                         | Confirmation*       |
 | **Write**        | Creates or overwrites files                                         | Confirmation*       |
 
-\* Confirmation can be disabled via `confirmations: false` in settings.json or `x-cli toggle-confirmations`
+\* Confirmation can be disabled via `confirmations: false` in settings.json or `grok toggle-confirmations`
 
 > **⚠️ Parity Gap:** Claude Code supports:
 > - Granular permission rules (allow/deny/ask) for each tool
@@ -363,9 +363,9 @@ Grok One-Shot has access to a set of powerful tools that help it understand and 
 
 **Check:**
 
-1. File exists: `ls ~/.grok/settings.json`
-2. Valid JSON: `python -m json.tool ~/.grok/settings.json`
-3. Correct permissions: `chmod 644 ~/.grok/settings.json`
+1. File exists: `ls ~/.x-cli/settings.json`
+2. Valid JSON: `python -m json.tool ~/.x-cli/settings.json`
+3. Correct permissions: `chmod 644 ~/.x-cli/settings.json`
 
 ### Environment variables not working
 
@@ -399,7 +399,7 @@ source ~/.bashrc  # or ~/.zshrc
 
 # Check logs with debug mode
 export GROK_DEBUG=true
-x-cli
+grok
 ```
 
 ### API key not found
@@ -409,18 +409,18 @@ x-cli
 ```bash
 # Check priority order:
 # 1. Command line flag
-x-cli -k "your-key"
+grok -k "your-key"
 
 # 2. Environment variable
 export GROK_API_KEY="your-key"
-x-cli
+grok
 
 # 3. Settings file
-echo '{"apiKey":"your-key"}' > ~/.grok/settings.json
-x-cli
+echo '{"apiKey":"your-key"}' > ~/.x-cli/settings.json
+grok
 
 # 4. Will be prompted interactively
-x-cli
+grok
 ```
 
 ## Best practices
@@ -429,7 +429,7 @@ x-cli
 
 **Do:**
 - ✅ Use environment variables for API keys
-- ✅ Restrict file permissions: `chmod 600 ~/.grok/settings.json`
+- ✅ Restrict file permissions: `chmod 600 ~/.x-cli/settings.json`
 - ✅ Never commit settings.json to git
 - ✅ Use `${VAR}` references for secrets in MCP config
 - ✅ Review confirmations before approving operations

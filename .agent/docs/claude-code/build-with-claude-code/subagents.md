@@ -289,8 +289,8 @@ While user-facing subagents aren't available yet, here are current alternatives:
 Add custom tools via MCP for specialized functionality:
 
 ```bash
-x-cli mcp add custom-analyzer "node ./analyzers/security.js"
-x-cli mcp add code-reviewer "python ./scripts/review.py"
+grok mcp add custom-analyzer "node ./analyzers/security.js"
+grok mcp add code-reviewer "python ./scripts/review.py"
 ```
 
 ### 2. Document Specialized Workflows
@@ -342,7 +342,7 @@ Wrap common Grok workflows in shell scripts:
 # scripts/grok-review.sh
 
 echo "Running Grok security review..."
-x-cli -p "Review the following files for security issues: $@"
+grok -p "Review the following files for security issues: $@"
 ```
 
 Usage:

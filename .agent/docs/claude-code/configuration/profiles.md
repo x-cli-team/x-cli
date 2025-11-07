@@ -21,16 +21,16 @@ Multiple configuration profiles for different projects, environments, or use cas
 
 ```bash
 # Work profile
-x-cli --profile work
+grok --profile work
 
 # Personal projects
-x-cli --profile personal
+grok --profile personal
 
 # Fast/cheap mode
-x-cli --profile fast
+grok --profile fast
 
 # Quality/thorough mode
-x-cli --profile quality
+grok --profile quality
 ```
 
 ## Roadmap

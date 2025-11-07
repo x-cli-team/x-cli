@@ -31,10 +31,10 @@ Claude Code hooks are user-defined shell commands that execute at various points
    npx prettier --write .
    ```
 
-3. **Shell Scripts**: Wrap `x-cli` commands in shell scripts for automation
+3. **Shell Scripts**: Wrap `grok` commands in shell scripts for automation
    ```bash
    #!/bin/bash
-   x-cli -p "review code" && npm run format
+   grok -p "review code" && npm run format
    ```
 
 ## Future Implementation

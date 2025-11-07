@@ -21,19 +21,19 @@ Resume previous sessions with full context, continue conversations, and restore 
 
 ```bash
 # Resume last session
-x-cli --resume
+grok --resume
 
 # Resume specific session
-x-cli --resume session-2025-11-05-14-30-12
+grok --resume session-2025-11-05-14-30-12
 
 # Resume with summary
-x-cli --resume --summarize
+grok --resume --summarize
 
 # List resumable sessions
-x-cli sessions list
+grok sessions list
 
 # Branch from session point
-x-cli sessions branch session-xyz --from-message 15
+grok sessions branch session-xyz --from-message 15
 ```
 
 ## Roadmap
@@ -55,7 +55,7 @@ x-cli sessions branch session-xyz --from-message 15
 # Manually resume via summary
 cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[-5:] | .[] | .content | .[0:200]'
 
-x-cli
+grok
 
 > Continuing from previous session:
   [Paste summary]

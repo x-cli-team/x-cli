@@ -197,7 +197,7 @@ Here are some commonly used MCP servers you can connect to Grok One-Shot:
 
 > **Parity Gap**: Grok One-Shot currently uses a simplified MCP configuration system compared to Claude Code. Some features like OAuth authentication, installation scopes, and plugin-provided servers may not be fully supported yet.
 
-MCP servers can be configured in Grok One-Shot's settings file at `~/.x-cli/settings.json` or `~/.grok/settings.json`.
+MCP servers can be configured in Grok One-Shot's settings file at `~/.x-cli/settings.json` or `~/.x-cli/settings.json`.
 
 ### Basic MCP server configuration
 
@@ -223,22 +223,22 @@ Add MCP servers to your settings file:
 
 ### Managing your servers
 
-> **Parity Gap**: CLI commands for MCP management (`x-cli mcp add`, `x-cli mcp list`, etc.) are available in Grok One-Shot. However, features like OAuth authentication flows and scope management may differ from Claude Code.
+> **Parity Gap**: CLI commands for MCP management (`grok mcp add`, `grok mcp list`, etc.) are available in Grok One-Shot. However, features like OAuth authentication flows and scope management may differ from Claude Code.
 
 ```bash
 # Add a server (if CLI support is available)
-x-cli mcp add <name> <command>
+grok mcp add <name> <command>
 
 # List configured servers
-x-cli mcp list
+grok mcp list
 
 # Remove a server
-x-cli mcp remove <name>
+grok mcp remove <name>
 ```
 
 **Tips:**
 * Set environment variables with `env` in your settings file
-* Configure MCP server startup timeout using the MCP_TIMEOUT environment variable (e.g., `MCP_TIMEOUT=10000 x-cli` sets a 10-second timeout)
+* Configure MCP server startup timeout using the MCP_TIMEOUT environment variable (e.g., `MCP_TIMEOUT=10000 grok` sets a 10-second timeout)
 * Grok One-Shot will display a warning when MCP tool output exceeds token limits
 
 **Windows Users**: On native Windows (not WSL), local MCP servers that use `npx` require the `cmd /c` wrapper to ensure proper execution.
@@ -332,7 +332,7 @@ Without the `cmd /c` wrapper, you'll encounter "Connection closed" errors becaus
 
 ## MCP installation scopes
 
-> **Parity Gap**: Installation scopes (local/project/user) may not be fully implemented in Grok One-Shot. The system currently uses a single settings file at `~/.x-cli/settings.json` or `~/.grok/settings.json`.
+> **Parity Gap**: Installation scopes (local/project/user) may not be fully implemented in Grok One-Shot. The system currently uses a single settings file at `~/.x-cli/settings.json` or `~/.x-cli/settings.json`.
 
 In a full implementation, MCP servers could be configured at different scope levels:
 
@@ -340,7 +340,7 @@ In a full implementation, MCP servers could be configured at different scope lev
 
 Available to you across all projects. Currently, all MCP configuration in Grok One-Shot is effectively user-scoped.
 
-**Location**: `~/.x-cli/settings.json` or `~/.grok/settings.json`
+**Location**: `~/.x-cli/settings.json` or `~/.x-cli/settings.json`
 
 ### Project scope
 

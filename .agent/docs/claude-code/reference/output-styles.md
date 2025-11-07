@@ -66,12 +66,12 @@ The AI will maintain this context throughout the session.
 
 ### 3. Command-line system prompt
 
-> **Note**: This feature may be added in a future version. Check the current CLI options with `x-cli --help`.
+> **Note**: This feature may be added in a future version. Check the current CLI options with `grok --help`.
 
 A potential future enhancement could allow:
 ```bash
 # Hypothetical future feature
-x-cli --system-prompt "You are a teaching assistant..."
+grok --system-prompt "You are a teaching assistant..."
 ```
 
 ## Comparison to related features
