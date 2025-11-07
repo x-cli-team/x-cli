@@ -17,7 +17,7 @@ Grok One-Shot is git-aware and can perform common version control operations thr
 **Automatic detection:**
 
 ```
-When you start x-cli in a git repository:
+When you start grok in a git repository:
 - AI knows it's a git repo
 - Can check git status
 - Can create commits

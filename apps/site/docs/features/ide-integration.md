@@ -15,7 +15,7 @@ Native IDE extensions for VS Code and JetBrains IDEs will bring Grok One-Shot di
 ### VS Code Extension
 
 - **Inline AI assistance** - Code suggestions and completions
-- **Terminal integration** - x-cli embedded in VS Code terminal
+- **Terminal integration** - grok embedded in VS Code terminal
 - **Context sync** - Open files automatically available to AI
 - **Sidebar panel** - Dedicated Grok One-Shot interface
 - **Keyboard shortcuts** - Quick access to AI commands
@@ -55,7 +55,7 @@ Use Grok One-Shot CLI in integrated terminal:
 
 ```bash
 # In VS Code or JetBrains terminal
-x-cli
+grok
 
 # AI can still modify files
 # Refresh editor to see changes

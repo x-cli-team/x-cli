@@ -484,8 +484,8 @@ Session 3: "Analyze database layer"
 
 ```
 # Use headless mode for specific queries
-x-cli -p "list all authentication-related files"
-x-cli -p "analyze src/auth/middleware.ts specifically"
+grok -p "list all authentication-related files"
+grok -p "analyze src/auth/middleware.ts specifically"
 ```
 
 ## Advanced Research Techniques
@@ -555,7 +555,7 @@ Saved as: docs/research/payment-system-analysis.md
 > Analyze authentication in src/auth/ only (not entire codebase)
 
 # Or use faster model
-GROK_MODEL=grok-4-fast-non-reasoning x-cli
+GROK_MODEL=grok-4-fast-non-reasoning grok
 
 # Or break into smaller queries
 ```
@@ -592,7 +592,7 @@ export MAX_TOOL_ROUNDS=500
 [Copy summary]
 
 /exit
-x-cli
+grok
 
 > Continuing from previous research:
 [Paste summary]

@@ -286,11 +286,11 @@ Here's what I've completed so far..."
 
 ```bash
 # Enable confirmations (default)
-x-cli toggle-confirmations
+grok toggle-confirmations
 # Status: Confirmations enabled
 
 # Disable for automation
-x-cli toggle-confirmations
+grok toggle-confirmations
 # Status: Confirmations disabled
 ```
 

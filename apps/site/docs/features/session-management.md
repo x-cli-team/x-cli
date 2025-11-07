@@ -17,7 +17,7 @@ Sessions are the foundation of Grok One-Shot's conversational interface. Each se
 **Interactive mode:**
 
 ```bash
-x-cli
+grok
 
 # Session starts
 # Loads: GROK.md + docs-index.md (~3,500 tokens)
@@ -27,7 +27,7 @@ x-cli
 **With initial message:**
 
 ```bash
-x-cli "analyze authentication flow"
+grok "analyze authentication flow"
 
 # Session starts with your message already queued
 # AI processes and responds immediately
@@ -36,7 +36,7 @@ x-cli "analyze authentication flow"
 **Headless mode (no session persistence):**
 
 ```bash
-x-cli -p "quick query"
+grok -p "quick query"
 
 # Executes query
 # No session file created
@@ -249,10 +249,10 @@ cat ~/.x-cli/sessions/problem-session.json | jq '.messages'
 
 ```bash
 # Future commands
-x-cli sessions list
-x-cli sessions show <session-id>
-x-cli sessions delete <session-id>
-x-cli sessions resume <session-id>
+grok sessions list
+grok sessions show <session-id>
+grok sessions delete <session-id>
+grok sessions resume <session-id>
 ```
 
 **Session restoration:**
@@ -525,12 +525,12 @@ rm ~/.x-cli/sessions/session-2025-11-05-14-30-12.json
 
 ```bash
 # Day 1: Start project exploration
-x-cli "analyze the authentication system architecture"
+grok "analyze the authentication system architecture"
 # Session: session-2025-11-05-09-00-00.json
 # Token usage: 25k
 
 # Day 2: Different task (new session)
-x-cli "refactor error handling in API routes"
+grok "refactor error handling in API routes"
 # Session: session-2025-11-06-10-30-00.json
 # Token usage: 18k
 
@@ -542,7 +542,7 @@ cat ~/.x-cli/sessions/session-2025-11-05-*.json | jq -r '.messages[] | select(.r
 
 ```bash
 # Start debugging session
-x-cli
+grok
 
 > Debug: Users report 500 errors on /api/users endpoint
 [Long investigation with many tool calls]
