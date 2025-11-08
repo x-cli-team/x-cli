@@ -44,21 +44,21 @@ Let's create a simple greeting plugin to get you familiar with the plugin system
 
 <Steps>
 <Step title="Create the marketplace structure">
-```bash theme={null}
+```bash language="bash"
 mkdir test-marketplace
 cd test-marketplace
 ```
 </Step>
 
 <Step title="Create the plugin directory">
-```bash theme={null}
+```bash language="bash"
 mkdir my-first-plugin
 cd my-first-plugin
 ```
 </Step>
 
 <Step title="Create the plugin manifest">
-```bash Create .grok-plugin/plugin.json theme={null}
+```bash Create .grok-plugin/plugin.json language="bash"
 mkdir .grok-plugin
 cat > .grok-plugin/plugin.json << 'EOF'
 {
@@ -74,7 +74,7 @@ EOF
 </Step>
 
 <Step title="Add a custom command">
-```bash Create commands/hello.md theme={null}
+```bash Create commands/hello.md language="bash"
 mkdir commands
 cat > commands/hello.md << 'EOF'
 ---
@@ -90,7 +90,7 @@ EOF
 </Step>
 
 <Step title="Create the marketplace manifest">
-```bash Create marketplace.json theme={null}
+```bash Create marketplace.json language="bash"
 cd ..
 mkdir .grok-plugin
 cat > .grok-plugin/marketplace.json << 'EOF'
@@ -113,22 +113,22 @@ EOF
 </Step>
 
 <Step title="Install and test your plugin">
-```bash Start Grok One-Shot from parent directory theme={null}
+```bash Start Grok One-Shot from parent directory language="bash"
 cd ..
 grok
 ```
 
-```shell Add the test marketplace theme={null}
+```shell Add the test marketplace language="bash"
 /plugin marketplace add ./test-marketplace
 ```
 
-```shell Install your plugin theme={null}
+```shell Install your plugin language="bash"
 /plugin install my-first-plugin@test-marketplace
 ```
 
 Select "Install now". You'll then need to restart Grok One-Shot in order to use the new plugin.
 
-```shell Try your new command theme={null}
+```shell Try your new command language="bash"
 /hello
 ```
 
@@ -188,11 +188,11 @@ Learn how to discover, install, and manage plugins to extend your Grok One-Shot 
 
 Marketplaces are catalogs of available plugins. Add them to discover and install plugins:
 
-```shell Add a marketplace theme={null}
+```shell Add a marketplace language="bash"
 /plugin marketplace add your-org/grok-plugins
 ```
 
-```shell Browse available plugins theme={null}
+```shell Browse available plugins language="bash"
 /plugin
 ```
 
@@ -202,7 +202,7 @@ For detailed marketplace management including Git repositories, local developmen
 
 #### Via interactive menu (recommended for discovery)
 
-```shell Open the plugin management interface theme={null}
+```shell Open the plugin management interface language="bash"
 /plugin
 ```
 
@@ -210,19 +210,19 @@ Select "Browse Plugins" to see available options with descriptions, features, an
 
 #### Via direct commands (for quick installation)
 
-```shell Install a specific plugin theme={null}
+```shell Install a specific plugin language="bash"
 /plugin install formatter@your-org
 ```
 
-```shell Enable a disabled plugin theme={null}
+```shell Enable a disabled plugin language="bash"
 /plugin enable plugin-name@marketplace-name
 ```
 
-```shell Disable without uninstalling theme={null}
+```shell Disable without uninstalling language="bash"
 /plugin disable plugin-name@marketplace-name
 ```
 
-```shell Completely remove a plugin theme={null}
+```shell Completely remove a plugin language="bash"
 /plugin uninstall plugin-name@marketplace-name
 ```
 
@@ -274,7 +274,7 @@ When developing plugins, use a local marketplace to test changes iteratively. Th
 <Step title="Set up your development structure">
 Organize your plugin and marketplace for testing:
 
-```bash Create directory structure theme={null}
+```bash Create directory structure language="bash"
 mkdir dev-marketplace
 cd dev-marketplace
 mkdir my-plugin
@@ -295,7 +295,7 @@ dev-marketplace/
 </Step>
 
 <Step title="Create the marketplace manifest">
-```bash Create marketplace.json theme={null}
+```bash Create marketplace.json language="bash"
 mkdir .grok-plugin
 cat > .grok-plugin/marketplace.json << 'EOF'
 {
@@ -316,16 +316,16 @@ EOF
 </Step>
 
 <Step title="Install and test">
-```bash Start Grok One-Shot from parent directory theme={null}
+```bash Start Grok One-Shot from parent directory language="bash"
 cd ..
 grok
 ```
 
-```shell Add your development marketplace theme={null}
+```shell Add your development marketplace language="bash"
 /plugin marketplace add ./dev-marketplace
 ```
 
-```shell Install your plugin theme={null}
+```shell Install your plugin language="bash"
 /plugin install my-plugin@dev-marketplace
 ```
 
@@ -339,11 +339,11 @@ Test your plugin components:
 <Step title="Iterate on your plugin">
 After making changes to your plugin code:
 
-```shell Uninstall the current version theme={null}
+```shell Uninstall the current version language="bash"
 /plugin uninstall my-plugin@dev-marketplace
 ```
 
-```shell Reinstall to test changes theme={null}
+```shell Reinstall to test changes language="bash"
 /plugin install my-plugin@dev-marketplace
 ```
 

@@ -416,7 +416,7 @@ Grok One-Shot may support environment variable expansion in MCP configurations:
   "mcpServers": {
     "api-server": {
       "type": "http",
-      "url": "${API_BASE_URL//api.example.com}/mcp",
+      "url": "${API_BASE_URL}/mcp  # Note: // substitution syntax may not be supported",
       "env": {
         "API_KEY": "${API_KEY}"
       }
