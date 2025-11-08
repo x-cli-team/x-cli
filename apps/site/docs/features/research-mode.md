@@ -1,8 +1,6 @@
 ---
 title: Research Mode
----
-
-# Research Mode
+---# Research Mode
 
 Deep codebase exploration and analysis capabilities.
 
@@ -15,7 +13,6 @@ Research mode enables Grok One-Shot to autonomously explore codebases, analyze a
 ### Automatic Activation
 
 **AI determines when research is needed:**
-
 ```
 User: "How does the authentication system work across the entire application?"
 
@@ -24,7 +21,6 @@ AI thinks: This requires exploring multiple files and tracing flows.
 ```
 
 **Indicators that trigger research mode:**
-
 - Questions about "overall architecture"
 - Requests to "find all occurrences" of something
 - "How does X work?" when X spans multiple files
@@ -34,7 +30,6 @@ AI thinks: This requires exploring multiple files and tracing flows.
 ### vs. Simple Queries
 
 **Simple query (no subagent needed):**
-
 ```
 User: "Read src/auth/middleware.ts and explain it"
 
@@ -45,7 +40,6 @@ AI:
 ```
 
 **Complex research (subagent activated):**
-
 ```
 User: "Analyze the entire authentication flow from login to session management"
 
@@ -65,21 +59,18 @@ AI:
 ### Implemented
 
 **Autonomous exploration:**
-
 - Explore subagent for codebase research
 - Automatic file discovery
 - Pattern matching and search
 - Multi-file analysis
 
 **Analysis types:**
-
 - Architecture overview
 - Feature tracing
 - Dependency analysis
 - Pattern identification
 
 **Tool usage:**
-
 - Glob for file discovery
 - Grep for content search
 - Read for file analysis
@@ -88,14 +79,12 @@ AI:
 ### Partially Implemented
 
 **Structured output:**
-
 - Comprehensive analysis
 - No standardized report format
 - No visual diagrams
 - No export formats
 
 **Codebase understanding:**
-
 - Manual dependency tracing
 - No automatic dependency graph
 - No AST-based analysis
@@ -104,21 +93,18 @@ AI:
 ### Planned Features
 
 **Advanced analysis:**
-
 - AST parsing for precise code understanding
 - Dependency graph generation
 - Architecture diagram creation
 - Metrics and statistics
 
 **Plan mode:**
-
 - Dedicated read-only research phase
 - Plan approval before execution
 - Visual plan representation
 - Plan modification
 
 **Report generation:**
-
 - Structured markdown reports
 - Architecture diagrams
 - Code flow visualizations
@@ -129,13 +115,11 @@ AI:
 ### Example 1: Architecture Analysis
 
 **User request:**
-
 ```
 > Explain the overall architecture of this application
 ```
 
 **AI workflow:**
-
 ```
 1. Spawns Explore subagent
 2. Subagent explores:
@@ -156,7 +140,6 @@ AI:
 ```
 
 **Output example:**
-
 ```
 Architecture Overview:
 
@@ -191,13 +174,11 @@ Architecture Overview:
 ### Example 2: Feature Investigation
 
 **User request:**
-
 ```
 > How does the authentication middleware work? Trace the entire flow.
 ```
 
 **AI workflow:**
-
 ```
 1. Spawns Explore subagent
 2. Subagent investigates:
@@ -212,7 +193,6 @@ Architecture Overview:
 ```
 
 **Output example:**
-
 ```
 Authentication Flow:
 
@@ -253,13 +233,11 @@ No rate limiting on auth endpoints
 ### Example 3: Dependency Analysis
 
 **User request:**
-
 ```
 > Find all places that depend on the user service and analyze potential impact of changes
 ```
 
 **AI workflow:**
-
 ```
 1. Spawns Explore subagent
 2. Subagent searches:
@@ -275,7 +253,6 @@ No rate limiting on auth endpoints
 ```
 
 **Output example:**
-
 ```
 User Service Dependencies:
 
@@ -317,13 +294,11 @@ Recommended Changes:
 ### Example 4: Security Audit
 
 **User request:**
-
 ```
 > Perform a security audit of the codebase
 ```
 
 **AI workflow:**
-
 ```
 1. Spawns Explore subagent (or general-purpose)
 2. Subagent analyzes:
@@ -338,7 +313,6 @@ Recommended Changes:
 ```
 
 **Output example:**
-
 ```
 Security Audit Report:
 
@@ -386,7 +360,6 @@ Action Items:
 ### Effective Research Prompts
 
 **DO:**
-
 ```
 "Analyze the entire authentication system and document the flow"
 "Find all database queries and check for SQL injection risks"
@@ -395,7 +368,6 @@ Action Items:
 ```
 
 **DON'T:**
-
 ```
 "Look at everything"
 "Check the code"
@@ -405,7 +377,6 @@ Action Items:
 ### Managing Research Scope
 
 **Focused research:**
-
 ```
 > Analyze authentication in src/auth/ directory only
 
@@ -413,7 +384,6 @@ Action Items:
 ```
 
 **Broad research:**
-
 ```
 > Analyze how authentication integrates across the entire application
 
@@ -423,7 +393,6 @@ Action Items:
 ### Iterative Research
 
 **Progressive refinement:**
-
 ```
 Step 1: "Give me an overview of the authentication system"
 [AI provides high-level summary]
@@ -436,7 +405,6 @@ Step 3: "Are there security issues in the token verification?"
 ```
 
 **Benefits:**
-
 - Build understanding progressively
 - Control depth of analysis
 - Manage context usage
@@ -446,25 +414,21 @@ Step 3: "Are there security issues in the token verification?"
 ### Current Limitations
 
 **No plan mode yet:**
-
 - Research executes immediately
 - No read-only exploration phase
 - No plan approval step
 
 **Limited visualization:**
-
 - Text-only output
 - No diagrams or graphs
 - No interactive exploration
 
 **Manual dependency tracking:**
-
 - AI manually follows imports
 - No automatic dependency graph
 - No impact analysis tool
 
 **Context limits:**
-
 - Large codebases may hit token limits
 - Deep exploration accumulates context
 - May need multiple sessions
@@ -472,7 +436,6 @@ Step 3: "Are there security issues in the token verification?"
 ### Workarounds
 
 **For large codebases:**
-
 ```
 # Break into multiple research sessions
 Session 1: "Analyze frontend architecture"
@@ -481,7 +444,6 @@ Session 3: "Analyze database layer"
 ```
 
 **For deep exploration:**
-
 ```
 # Use headless mode for specific queries
 grok -p "list all authentication-related files"
@@ -493,7 +455,6 @@ grok -p "analyze src/auth/middleware.ts specifically"
 ### Research with Web Access
 
 **Leverage WebFetch and WebSearch:**
-
 ```
 > Research best practices for implementing OAuth 2.0 and check if our implementation follows them
 
@@ -508,7 +469,6 @@ AI:
 ### Multi-Phase Research
 
 **Complex investigations:**
-
 ```
 Phase 1: Discovery
 > What are all the API endpoints and their authentication requirements?
@@ -523,7 +483,6 @@ Phase 3: Recommendations
 ### Research Documentation
 
 **Generate research reports:**
-
 ```
 > Research the payment processing system and create a comprehensive markdown report
 
@@ -543,13 +502,11 @@ Saved as: docs/research/payment-system-analysis.md
 ### Research Takes Too Long
 
 **Causes:**
-
 - Scope too broad
 - Too many files to analyze
 - Deep nested dependencies
 
 **Solutions:**
-
 ```
 # Limit scope
 > Analyze authentication in src/auth/ only (not entire codebase)
@@ -563,13 +520,11 @@ GROK_MODEL=grok-4-fast-non-reasoning grok
 ### Incomplete Research
 
 **Causes:**
-
 - Hit token limit
 - Hit tool round limit
 - Network timeout
 
 **Solutions:**
-
 ```
 # Increase limits
 export MAX_TOOL_ROUNDS=500
@@ -585,7 +540,6 @@ export MAX_TOOL_ROUNDS=500
 **Symptoms:** Research session grows to 80k+ tokens
 
 **Solution:**
-
 ```
 # Start new session with summary
 > Summarize findings so far

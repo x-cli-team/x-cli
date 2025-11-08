@@ -1,8 +1,6 @@
 ---
 title: Codebase Intelligence
----
-
-# Codebase Intelligence
+---# Codebase Intelligence
 
 **Status:** Planned Feature (TBD)
 
@@ -41,7 +39,6 @@ Deep codebase intelligence will provide AST-based code understanding, symbol res
 ## Roadmap
 
 ### Q1 2025: Sprint 3-5 (6 weeks)
-
 - File system indexing
 - Symbol extraction and resolution
 - Dependency detection
@@ -53,13 +50,11 @@ Deep codebase intelligence will provide AST-based code understanding, symbol res
 ## Current Capabilities
 
 **Available now:**
-
 - Text-based search (Glob, Grep)
 - Manual code tracing
 - AI-powered analysis
 
 **Limitations:**
-
 - No AST-based operations
 - No symbol resolution
 - Manual dependency tracking

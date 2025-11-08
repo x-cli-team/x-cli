@@ -1,8 +1,6 @@
 ---
 title: Deployment Overview
----
-
-# Deployment Overview
+---# Deployment Overview
 
 Deploy and manage Grok One-Shot in various environments.
 
@@ -17,7 +15,6 @@ Grok One-Shot supports deployment in development, CI/CD, containerized, and team
 **Best for:** Individual developers, learning, experimentation
 
 **Installation:**
-
 ```bash
 # Via npm
 npm install -g @xagent/one-shot
@@ -30,7 +27,6 @@ grok --version
 ```
 
 **Configuration:**
-
 ```bash
 # Set API key
 export GROK_API_KEY="your-key"
@@ -41,13 +37,11 @@ source ~/.bashrc
 ```
 
 **Pros:**
-
 - Quick setup
 - Full interactive features
 - Easy updates
 
 **Cons:**
-
 - Manual configuration
 - Not team-synchronized
 
@@ -60,7 +54,6 @@ source ~/.bashrc
 **Setup:**
 
 1. **Create team configuration template:**
-
 ```bash
 # team-config/.x-cli-template.json
 {
@@ -76,7 +69,6 @@ source ~/.bashrc
 ```
 
 2. **Team member setup:**
-
 ```bash
 # Clone template
 cp team-config/.x-cli-template.json ~/.x-cli/settings.json
@@ -86,7 +78,6 @@ grok -k "personal-api-key"
 ```
 
 3. **Document in team README:**
-
 ```markdown
 ## Grok One-Shot Setup
 
@@ -97,13 +88,11 @@ grok -k "personal-api-key"
 ```
 
 **Pros:**
-
 - Consistent team configuration
 - Individual API keys (cost tracking)
 - Easy onboarding
 
 **Cons:**
-
 - Manual synchronization
 - Configuration drift possible
 
@@ -150,20 +139,17 @@ body: '## AI Code Review\n\n' + review
 ```
 
 **Security considerations:**
-
 - Use repository secrets for API keys
 - Limit API key permissions
 - Set token usage limits
 - Monitor costs
 
 **Pros:**
-
 - Automated consistency
 - Scales with team
 - No manual intervention
 
 **Cons:**
-
 - API costs per run
 - Requires secret management
 - Network dependency
@@ -173,7 +159,6 @@ body: '## AI Code Review\n\n' + review
 **Best for:** Consistent environments, cloud deployments
 
 **Dockerfile:**
-
 ```dockerfile
 FROM node:20-alpine
 
@@ -195,7 +180,6 @@ CMD ["grok"]
 ```
 
 **Build and run:**
-
 ```bash
 # Build image
 docker build -t grok-oneshot:latest .
@@ -215,29 +199,26 @@ grok -p "analyze code"
 ```
 
 **Docker Compose:**
-
 ```yaml
-version: "3.8"
+version: '3.8'
 services:
 grok-oneshot:
 image: grok-oneshot:latest
 environment:
-  - GROK_API_KEY=${GROK_API_KEY}
-  - GROK_MODEL=grok-2-1212
+- GROK_API_KEY=${GROK_API_KEY}
+- GROK_MODEL=grok-2-1212
 volumes:
-  - ./:/workspace
+- ./:/workspace
 stdin_open: true
 tty: true
 ```
 
 **Pros:**
-
 - Consistent environment
 - Easy distribution
 - Isolated dependencies
 
 **Cons:**
-
 - Added complexity
 - Requires Docker knowledge
 - Volume mapping needed
@@ -247,7 +228,6 @@ tty: true
 **Best for:** Team access, centralized execution
 
 **Setup on server:**
-
 ```bash
 # SSH to server
 ssh user@server
@@ -264,7 +244,6 @@ echo 'export GROK_API_KEY="team-key"' >> ~/.bashrc
 ```
 
 **Team access:**
-
 ```bash
 # SSH with TTY forwarding
 ssh -t user@server "grok"
@@ -278,13 +257,11 @@ grok
 ```
 
 **Pros:**
-
 - Centralized API key management
 - Shared computing resources
 - Persistent sessions
 
 **Cons:**
-
 - Network latency
 - SSH access required
 - Server maintenance needed
@@ -314,15 +291,15 @@ export GROK_UX_MINIMAL=true # For headless environments
 
 ```json
 {
-  "apiKey": "xai-xxxxxxxxxxxxx",
-  "model": "grok-2-1212",
-  "confirmations": true,
-  "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace"]
-    }
-  }
+"apiKey": "xai-xxxxxxxxxxxxx",
+"model": "grok-2-1212",
+"confirmations": true,
+"mcpServers": {
+"filesystem": {
+"command": "npx",
+"args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace"]
+}
+}
 }
 ```
 
@@ -343,7 +320,6 @@ GROK_MODEL=grok-4-fast-non-reasoning grok -p "quick query"
 ### API Key Management
 
 **DO:**
-
 - Use environment variables in CI/CD
 - Store in secrets management (GitHub Secrets, HashiCorp Vault)
 - Rotate keys periodically
@@ -351,7 +327,6 @@ GROK_MODEL=grok-4-fast-non-reasoning grok -p "quick query"
 - Monitor usage and costs
 
 **DON'T:**
-
 - Commit API keys to git
 - Share keys in team chat
 - Use production keys in development
@@ -443,13 +418,11 @@ COPY --from=build /usr/local/bin/grok /usr/local/bin/grok
 ### Token Usage Tracking
 
 **In interactive mode:**
-
 ```
 Press Ctrl+I to see token usage
 ```
 
 **In CI/CD:**
-
 ```bash
 # Extract from session file
 grok -p "analyze code" > /dev/null
@@ -459,14 +432,12 @@ cat ~/.x-cli/sessions/*.json | jq '.tokenUsage'
 ### Cost Tracking
 
 **Per-user tracking:**
-
 ```bash
 # Different API keys per team member
 # Monitor via X.AI dashboard
 ```
 
 **Per-project tracking:**
-
 ```bash
 # Different API keys per project
 # Or tag usage in tracking system
@@ -475,14 +446,12 @@ cat ~/.x-cli/sessions/*.json | jq '.tokenUsage'
 ### Error Logging
 
 **Enable debug mode:**
-
 ```bash
 export GROK_DEBUG=true
 grok 2>&1 | tee grok-debug.log
 ```
 
 **In CI/CD:**
-
 ```yaml
 - name: AI checks with logging
 run: |
@@ -544,7 +513,6 @@ grok -p "analyze all TypeScript files in src/ for security issues"
 **Problem:** `command not found: grok`
 
 **Solution:**
-
 ```bash
 # Add npm global bin to PATH
 export PATH="$PATH:$(npm bin -g)"
@@ -558,7 +526,6 @@ npm install -g @xagent/one-shot
 **Problem:** Interactive mode fails in CI
 
 **Solution:**
-
 ```bash
 # Always use headless mode in CI
 grok -p "your query" # Not: grok
@@ -567,7 +534,6 @@ grok -p "your query" # Not: grok
 **Problem:** Rate limits in CI
 
 **Solution:**
-
 ```yaml
 # Add retry logic
 - name: AI checks
@@ -583,7 +549,6 @@ command: grok -p "review code"
 **Problem:** TTY errors in container
 
 **Solution:**
-
 ```bash
 # Run with proper flags
 docker run -it grok-oneshot # Interactive
@@ -595,14 +560,12 @@ docker run grok-oneshot grok -p "query" # Headless
 ### Update Process
 
 **Development:**
-
 ```bash
 npm update -g @xagent/one-shot
 grok --version # Verify
 ```
 
 **CI/CD:**
-
 ```yaml
 # Pin version for stability
 - name: Install
@@ -614,7 +577,6 @@ run: npm install -g @xagent/one-shot@latest
 ```
 
 **Docker:**
-
 ```dockerfile
 # Pin version
 RUN npm install -g @xagent/one-shot@1.1.101
@@ -626,7 +588,6 @@ RUN npm install -g @xagent/one-shot@latest
 ### Breaking Changes
 
 **Check changelog:**
-
 ```bash
 # View release notes
 npm view @xagent/one-shot versions

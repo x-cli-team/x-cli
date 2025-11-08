@@ -1,8 +1,6 @@
 ---
 title: Configuration Profiles
----
-
-# Configuration Profiles
+---# Configuration Profiles
 
 **Status:** Planned Feature (TBD)
 

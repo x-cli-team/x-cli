@@ -1,8 +1,6 @@
 ---
 title: Tool System
----
-
-# Tool System
+---# Tool System
 
 Built-in tools that enable AI to interact with your development environment.
 
@@ -15,36 +13,30 @@ Grok One-Shot's power comes from its comprehensive tool system. Tools allow the 
 ### 1. File Operations
 
 **Read Tool**
-
 - **Purpose:** Read file contents
 - **Usage:** AI reads code, configs, documentation
 - **Example:**
-
 ```
 > Explain how authentication works
 [AI uses Read tool on src/auth/middleware.ts]
 ```
 
 **Write Tool**
-
 - **Purpose:** Create new files
 - **Usage:** Generate new code, configs, docs
 - **Confirmation:** Required (unless disabled)
 - **Example:**
-
 ```
 > Create a new authentication service
 [AI uses Write tool to create src/services/auth-service.ts]
 ```
 
 **Edit Tool**
-
 - **Purpose:** Modify existing files
 - **Usage:** Code changes, refactoring, fixes
 - **Confirmation:** Required (unless disabled)
 - **How it works:** Exact string replacement
 - **Example:**
-
 ```
 > Fix the error handling in user-service.ts
 [AI uses Edit tool to modify specific lines]
@@ -53,24 +45,20 @@ Grok One-Shot's power comes from its comprehensive tool system. Tools allow the 
 ### 2. Code Search
 
 **Glob Tool**
-
 - **Purpose:** Find files by pattern
 - **Usage:** Locate files matching glob patterns
 - **Fast:** Optimized file system search
 - **Example:**
-
 ```
 > Find all TypeScript test files
 [AI uses Glob with pattern "**/*.test.ts"]
 ```
 
 **Grep Tool**
-
 - **Purpose:** Search file contents
 - **Usage:** Find code patterns, function calls, imports
 - **Powerful:** Full regex support via ripgrep
 - **Example:**
-
 ```
 > Find all TODO comments
 [AI uses Grep with pattern "TODO"]
@@ -79,13 +67,11 @@ Grok One-Shot's power comes from its comprehensive tool system. Tools allow the 
 ### 3. Command Execution
 
 **Bash Tool**
-
 - **Purpose:** Execute shell commands
 - **Usage:** Run builds, tests, git operations
 - **Confirmation:** Required (unless disabled)
 - **Security:** Runs with your user permissions
 - **Example:**
-
 ```
 > Run the test suite
 [AI uses Bash to execute "npm test"]
@@ -94,34 +80,28 @@ Grok One-Shot's power comes from its comprehensive tool system. Tools allow the 
 ### 4. Advanced Tools
 
 **Task Tool (Subagents)**
-
 - **Purpose:** Spawn autonomous AI workers
 - **Usage:** Complex multi-step tasks
 - **When:** AI determines task needs deep exploration
 - **Example:**
-
 ```
 > Research the entire authentication flow and suggest improvements
 [AI spawns Explore subagent to autonomously research]
 ```
 
 **WebFetch Tool**
-
 - **Purpose:** Fetch and analyze web pages
 - **Usage:** Research documentation, check examples
 - **Example:**
-
 ```
 > Look up the latest Next.js routing docs
 [AI uses WebFetch to fetch and analyze docs]
 ```
 
 **WebSearch Tool**
-
 - **Purpose:** Search the web
 - **Usage:** Find current information, libraries, solutions
 - **Example:**
-
 ```
 > Find the most popular React state management libraries in 2025
 [AI uses WebSearch to get current info]
@@ -132,7 +112,6 @@ Grok One-Shot's power comes from its comprehensive tool system. Tools allow the 
 ### Typical AI Tool Usage
 
 **Example session:**
-
 ```
 User: "Fix the bug in user authentication"
 
@@ -176,7 +155,6 @@ AI workflow:
 ```
 
 **Benefits:**
-
 - Seamless multi-step operations
 - Error recovery and iteration
 - No manual intervention needed
@@ -184,7 +162,6 @@ AI workflow:
 ### Tool Call Limits
 
 **MAX_TOOL_ROUNDS protection:**
-
 ```bash
 export MAX_TOOL_ROUNDS=400 # Default
 
@@ -194,7 +171,6 @@ export MAX_TOOL_ROUNDS=400 # Default
 ```
 
 **What happens at limit:**
-
 ```
 AI: "I've reached the maximum number of tool calls (400).
 Here's what I've completed so far..."
@@ -205,7 +181,6 @@ Here's what I've completed so far..."
 ### Fully Implemented
 
 **File operations:**
-
 - Read files (any size with pagination)
 - Write new files
 - Edit existing files (exact string replacement)
@@ -213,7 +188,6 @@ Here's what I've completed so far..."
 - Grep search (powerful regex via ripgrep)
 
 **Command execution:**
-
 - Run shell commands
 - Capture stdout/stderr
 - Handle timeouts
@@ -221,13 +195,11 @@ Here's what I've completed so far..."
 - Stream output
 
 **Research:**
-
 - Spawn subagents for exploration
 - Web fetch with content analysis
 - Web search integration
 
 **Session management:**
-
 - Save conversations
 - Track tool usage
 - Token accounting
@@ -235,19 +207,16 @@ Here's what I've completed so far..."
 ### Partially Implemented
 
 **Multi-file operations:**
-
 - Sequential file edits
 - No atomic transactions (rollback if one fails)
 - No change preview before execution
 
 **Code intelligence:**
-
 - Basic text search (Glob/Grep)
 - No AST-based refactoring
 - No symbol resolution
 
 **Dependency tracking:**
-
 - AI manually follows imports
 - No automatic dependency graph
 - No impact analysis
@@ -255,25 +224,21 @@ Here's what I've completed so far..."
 ### Planned Features
 
 **Advanced file operations:**
-
 - Multi-edit with atomic rollback
 - Change preview and approval
 - Undo/redo system
 
 **Code intelligence:**
-
 - AST parsing and manipulation
 - Symbol resolution and renaming
 - Automated refactoring (extract function, inline, etc.)
 
 **Codebase understanding:**
-
 - Automatic dependency graphs
 - Impact analysis for changes
 - Architecture detection
 
 **Plan mode:**
-
 - Read-only exploration phase
 - Plan generation and approval
 - Plan-to-execution bridge
@@ -283,7 +248,6 @@ Here's what I've completed so far..."
 ### Confirmation System
 
 **Control tool execution:**
-
 ```bash
 # Enable confirmations (default)
 grok toggle-confirmations
@@ -295,14 +259,12 @@ grok toggle-confirmations
 ```
 
 **Per-tool behavior:**
-
 - **Read, Glob, Grep:** No confirmation (read-only)
 - **Write, Edit:** Confirmation required (unless disabled)
 - **Bash:** Confirmation required (unless disabled)
 - **Task:** No confirmation (spawns autonomous agent)
 
 **Example with confirmations:**
-
 ```
 AI: I'll edit src/auth/middleware.ts to fix the bug.
 
@@ -315,19 +277,17 @@ v → View details before deciding
 ### Tool Timeouts
 
 **Prevent hanging operations:**
-
 ```bash
 # Bash tool timeout (default: 2 minutes)
 # Can be extended for long operations
 ```
 
 **Background execution:**
-
 ```typescript
 // AI can run commands in background
 Bash({
-  command: "npm run build",
-  run_in_background: true,
+command: "npm run build",
+run_in_background: true
 });
 // AI continues while build runs
 ```
@@ -335,19 +295,16 @@ Bash({
 ### Tool Permissions
 
 **Security model:**
-
 - Tools run with **your user permissions**
 - No privilege escalation
 - Same access as running commands yourself
 
 **File access:**
-
 - Can access files you can access
 - Respects file system permissions
 - No special filesystem access
 
 **Command execution:**
-
 - Runs in your shell environment
 - Has your PATH and environment variables
 - Same capabilities as your terminal
@@ -357,14 +314,12 @@ Bash({
 ### Effective Tool Usage
 
 **DO:**
-
 - Let AI choose appropriate tools
 - Trust AI's tool coordination
 - Review confirmations before approving
 - Monitor for unexpected tool usage
 
 **DON'T:**
-
 - Micro-manage tool selection
 - Approve without reading (when confirmations enabled)
 - Disable confirmations unless you trust the task
@@ -373,7 +328,6 @@ Bash({
 ### Error Handling
 
 **AI handles tool errors:**
-
 ```
 User: "Fix the bug in auth.ts"
 
@@ -387,7 +341,6 @@ Response: "Found the file at src/auth/middleware.ts and fixed the bug."
 ```
 
 **Benefits:**
-
 - Automatic error recovery
 - Adapts to environment
 - Continues despite failures
@@ -489,14 +442,12 @@ Subagent:
 **Symptoms:** AI says "Tool call failed"
 
 **Common causes:**
-
 - File doesn't exist (Read/Edit)
 - Permission denied (Write/Edit/Bash)
 - Syntax error (Edit with invalid old_string)
 - Timeout (Bash for long operations)
 
 **AI recovery:**
-
 - Tries alternative approach
 - Reports error to user
 - Suggests manual action if necessary
@@ -506,13 +457,11 @@ Subagent:
 **Symptoms:** AI uses tools unexpectedly
 
 **Possible causes:**
-
 - Ambiguous prompt
 - AI misunderstood intent
 - Overly broad request
 
 **Solutions:**
-
 ```
 Be more specific
 Use confirmations to catch unexpected actions
@@ -526,7 +475,6 @@ Review AI's plan before execution
 **Cause:** Hit MAX_TOOL_ROUNDS limit
 
 **Solutions:**
-
 ```bash
 # Increase limit
 export MAX_TOOL_ROUNDS=500

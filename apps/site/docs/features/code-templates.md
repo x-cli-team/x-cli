@@ -1,8 +1,6 @@
 ---
 title: Code Generation Templates
----
-
-# Code Generation Templates
+---# Code Generation Templates
 
 **Status:** Planned Feature (TBD)
 

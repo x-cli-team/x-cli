@@ -1,8 +1,6 @@
 ---
 title: Terminal Configuration
----
-
-# Terminal Configuration
+---# Terminal Configuration
 
 Optimize your terminal environment for the best Grok One-Shot experience.
 
@@ -15,19 +13,16 @@ Grok One-Shot adapts to your terminal capabilities, but proper configuration ens
 ### Recommended Terminals
 
 **macOS:**
-
 - **iTerm2** (Recommended) - Best color support, performance
 - Terminal.app - Built-in, adequate support
 - Warp - Modern alternative with good compatibility
 
 **Windows:**
-
 - **Windows Terminal** (Recommended) - Excellent Unicode and color support
 - PowerShell - Good compatibility
 - Git Bash - Acceptable, some limitations
 
 **Linux:**
-
 - **Alacritty** (Recommended) - GPU-accelerated, excellent performance
 - GNOME Terminal - Solid all-around choice
 - Konsole - KDE's terminal, great features
@@ -37,19 +32,16 @@ Grok One-Shot adapts to your terminal capabilities, but proper configuration ens
 ### Why It Matters
 
 **Color Support:**
-
 - Grok One-Shot uses 256-color palette for visual feedback
 - Basic terminals may display incorrect colors
 - Modern terminals render spinners, progress bars smoothly
 
 **Unicode Support:**
-
 - Spinners use Unicode characters (⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏)
 - Progress bars use block characters (█░)
 - Icons and symbols enhance readability
 
 **Performance:**
-
 - Fast rendering = smooth animations
 - GPU acceleration reduces CPU usage
 - Good terminals handle rapid updates efficiently
@@ -65,7 +57,6 @@ Grok One-Shot automatically detects terminal colors using:
 3. **Heuristics** (terminal type, platform)
 
 **Check detection:**
-
 ```bash
 export GROK_DEBUG_COLORS=1
 grok
@@ -85,7 +76,6 @@ export TERM_BACKGROUND=light
 ```
 
 **Add to shell profile:**
-
 ```bash
 # ~/.bashrc or ~/.zshrc
 export TERM_BACKGROUND=dark # or 'light'
@@ -102,7 +92,6 @@ export GROK_TEXT_COLOR=black
 ```
 
 **When to use:**
-
 - Automatic detection fails
 - Custom terminal themes
 - Specific contrast preferences
@@ -110,7 +99,6 @@ export GROK_TEXT_COLOR=black
 ### Color System Details
 
 **Default Palette:**
-
 - **Blue/Cyan** - Information, search operations
 - **Green** - Success, completed operations
 - **Yellow** - Warnings, in-progress operations
@@ -119,7 +107,6 @@ export GROK_TEXT_COLOR=black
 - **Gray** - Secondary information, timestamps
 
 **Adaptive Behavior:**
-
 ```
 Dark Background → Bright colors (high contrast)
 Light Background → Darker colors (readability)
@@ -130,7 +117,6 @@ Light Background → Darker colors (readability)
 ### Recommended Fonts
 
 **Monospace fonts with good Unicode support:**
-
 - **JetBrains Mono** - Excellent for code, great ligatures
 - **Fira Code** - Popular, good Unicode support
 - **Cascadia Code** - Microsoft's developer font
@@ -139,7 +125,6 @@ Light Background → Darker colors (readability)
 - **Consolas** - Windows system monospace
 
 **What to look for:**
-
 - Full Unicode coverage (especially box drawing)
 - Clear distinction between similar characters (O/0, l/1/I)
 - Comfortable at typical sizes (12-14pt)
@@ -148,7 +133,6 @@ Light Background → Darker colors (readability)
 ### Font Settings
 
 **iTerm2:**
-
 ```
 Preferences → Profiles → Text
 Font: JetBrains Mono, 13pt
@@ -157,26 +141,24 @@ Anti-aliased: Yes
 ```
 
 **Windows Terminal:**
-
 ```json
 {
-  "profiles": {
-    "defaults": {
-      "font": {
-        "face": "Cascadia Code",
-        "size": 12
-      }
-    }
-  }
+"profiles": {
+"defaults": {
+"font": {
+"face": "Cascadia Code",
+"size": 12
+}
+}
+}
 }
 ```
 
 **VS Code Terminal:**
-
 ```json
 {
-  "terminal.integrated.fontFamily": "JetBrains Mono",
-  "terminal.integrated.fontSize": 13
+"terminal.integrated.fontFamily": "JetBrains Mono",
+"terminal.integrated.fontSize": 13
 }
 ```
 
@@ -185,21 +167,18 @@ Anti-aliased: Yes
 ### Enable 256-Color Support
 
 **Check current support:**
-
 ```bash
 echo $TERM
 # Should be: xterm-256color, screen-256color, etc.
 ```
 
 **Enable if needed:**
-
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export TERM=xterm-256color
 ```
 
 **For tmux:**
-
 ```bash
 # ~/.tmux.conf
 set -g default-terminal "screen-256color"
@@ -208,7 +187,6 @@ set -g default-terminal "screen-256color"
 ### Unicode Support
 
 **Ensure UTF-8 encoding:**
-
 ```bash
 # Check current locale
 locale
@@ -218,7 +196,6 @@ locale
 ```
 
 **Set if needed:**
-
 ```bash
 # Add to shell profile
 export LANG=en_US.UTF-8
@@ -240,7 +217,6 @@ export GROK_UX_MINIMAL=true
 ```
 
 **What this does:**
-
 - No animated spinners
 - No progress bars
 - Simpler text-only output
@@ -249,7 +225,6 @@ export GROK_UX_MINIMAL=true
 ### Terminal-Specific Optimizations
 
 **iTerm2:**
-
 ```
 Preferences → General → Selection
 Applications in terminal may access clipboard
@@ -259,20 +234,18 @@ Scrollback lines: 10000 (adjust for performance)
 ```
 
 **Windows Terminal:**
-
 ```json
 {
-  "profiles": {
-    "defaults": {
-      "useAcrylic": false, // Disable transparency
-      "historySize": 10000
-    }
-  }
+"profiles": {
+"defaults": {
+"useAcrylic": false, // Disable transparency
+"historySize": 10000
+}
+}
 }
 ```
 
 **Alacritty:**
-
 ```yaml
 # ~/.config/alacritty/alacritty.yml
 scrolling:
@@ -356,7 +329,6 @@ SendEnv TERM LANG
 ```
 
 **On remote server:**
-
 ```bash
 # Ensure environment is set
 export TERM=xterm-256color
@@ -367,7 +339,6 @@ export GROK_API_KEY="your-key"
 ### tmux/screen Support
 
 **tmux configuration:**
-
 ```bash
 # ~/.tmux.conf
 set -g default-terminal "screen-256color"
@@ -378,7 +349,6 @@ set -g mouse on
 ```
 
 **Start session:**
-
 ```bash
 tmux new-session -s grok
 grok
@@ -387,7 +357,6 @@ grok
 ```
 
 **screen configuration:**
-
 ```bash
 # ~/.screenrc
 term screen-256color
@@ -399,13 +368,11 @@ altscreen on
 ### Colors Look Wrong
 
 **Symptoms:**
-
 - Text hard to read
 - Colors appear inverted
 - Random color glitches
 
 **Solutions:**
-
 ```bash
 # 1. Check detection
 export GROK_DEBUG_COLORS=1
@@ -425,13 +392,11 @@ echo $TERM
 ### Unicode Characters Broken
 
 **Symptoms:**
-
 - Spinners show weird characters
 - Progress bars look corrupted
 - Boxes and lines broken
 
 **Solutions:**
-
 ```bash
 # 1. Check locale
 locale
@@ -448,13 +413,11 @@ export GROK_UX_ENHANCED=false
 ### Terminal is Laggy
 
 **Symptoms:**
-
 - Slow rendering
 - Animations stutter
 - High CPU usage
 
 **Solutions:**
-
 ```bash
 # 1. Use minimal mode
 export GROK_UX_MINIMAL=true
@@ -474,7 +437,6 @@ export GROK_UX_ENHANCED=false
 **Cause:** Terminal size detection issues
 
 **Solutions:**
-
 ```bash
 # 1. Check terminal size
 echo $COLUMNS x $LINES
@@ -491,7 +453,6 @@ echo $COLUMNS x $LINES
 ### Optimal Setup
 
 **Recommended configuration:**
-
 ```bash
 # ~/.bashrc or ~/.zshrc
 
@@ -509,7 +470,6 @@ export GROK_MODEL="grok-2-1212"
 ```
 
 **Terminal emulator:**
-
 - Use modern terminal (iTerm2, Windows Terminal, Alacritty)
 - Enable 256-color support
 - Install monospace font with Unicode support
@@ -543,12 +503,10 @@ grok "list files in current directory"
 ### macOS
 
 **Default Terminal.app:**
-
 - Adequate but basic
 - iTerm2 strongly recommended
 
 **Settings:**
-
 ```
 Terminal → Preferences → Profiles
 Text: SF Mono, 13pt
@@ -558,17 +516,14 @@ Background: Choose theme (Dark/Light)
 ### Windows
 
 **PowerShell:**
-
 - Use Windows Terminal for best experience
 - Legacy PowerShell has limitations
 
 **Git Bash:**
-
 - Works but limited Unicode support
 - Windows Terminal improves this
 
 **WSL:**
-
 ```bash
 # Best option for Windows
 # Full Linux terminal capabilities
@@ -578,12 +533,10 @@ Background: Choose theme (Dark/Light)
 ### Linux
 
 **Most distributions:**
-
 - Excellent terminal support out of box
 - Choose emulator based on desktop environment
 
 **Minimal installs:**
-
 ```bash
 # Install recommended terminal
 sudo apt install alacritty # Debian/Ubuntu

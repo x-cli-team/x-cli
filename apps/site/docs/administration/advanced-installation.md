@@ -1,8 +1,6 @@
 ---
 title: Advanced Installation
----
-
-# Advanced Installation
+---# Advanced Installation
 
 Advanced installation scenarios and configurations for complex environments.
 
@@ -15,25 +13,21 @@ This guide covers advanced installation methods, multi-version management, custo
 ### Standard Installation
 
 **Via npm:**
-
 ```bash
 npm install -g @xagent/one-shot
 ```
 
 **Via Bun (recommended for performance):**
-
 ```bash
 bun install -g @xagent/one-shot
 ```
 
 **Via Yarn:**
-
 ```bash
 yarn global add @xagent/one-shot
 ```
 
 **Via pnpm:**
-
 ```bash
 pnpm add -g @xagent/one-shot
 ```
@@ -41,7 +35,6 @@ pnpm add -g @xagent/one-shot
 ### From Source
 
 **Clone and build:**
-
 ```bash
 # Clone repository
 git clone https://github.com/grok-team/grok.git
@@ -61,13 +54,11 @@ grok --version
 ```
 
 **Benefits:**
-
 - Latest unreleased features
 - Ability to modify code
 - Contribute to development
 
 **Drawbacks:**
-
 - Manual updates
 - Potential instability
 - Build dependencies required
@@ -75,23 +66,20 @@ grok --version
 ### Specific Version Installation
 
 **Install specific version:**
-
 ```bash
 npm install -g @xagent/one-shot@1.1.101
 ```
 
 **Pin version in package.json:**
-
 ```json
 {
-  "devDependencies": {
-    "@xagent/one-shot": "1.1.101"
-  }
+"devDependencies": {
+"@xagent/one-shot": "1.1.101"
+}
 }
 ```
 
 **Why pin versions:**
-
 - Reproducible builds
 - Avoid breaking changes
 - Team consistency
@@ -101,7 +89,6 @@ npm install -g @xagent/one-shot@1.1.101
 **Problem:** Global install requires sudo
 
 **Solution 1: Configure npm prefix**
-
 ```bash
 # Create directory for global packages
 mkdir ~/.npm-global
@@ -118,7 +105,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Solution 2: Use npx**
-
 ```bash
 # Run without installation
 npx @xagent/one-shot
@@ -128,7 +114,6 @@ echo 'alias grok="npx @xagent/one-shot"' >> ~/.bashrc
 ```
 
 **Solution 3: Use Bun (no sudo needed)**
-
 ```bash
 # Bun installs to user directory by default
 bun install -g @xagent/one-shot
@@ -139,13 +124,11 @@ bun install -g @xagent/one-shot
 ### nvm (Node Version Manager)
 
 **Install nvm:**
-
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 ```
 
 **Use different Node.js versions:**
-
 ```bash
 # Install Node.js versions
 nvm install 18
@@ -165,7 +148,6 @@ nvm use 20 # Back to Grok One-Shot
 **Scenario:** Test new version while keeping stable version
 
 **Approach 1: npm aliases**
-
 ```bash
 # Install stable version
 npm install -g @xagent/one-shot@1.1.101
@@ -179,7 +161,6 @@ alias grok-beta='~/.local/beta-xagent/bin/grok'
 ```
 
 **Approach 2: npx with version**
-
 ```bash
 # Use specific version via npx
 npx @xagent/one-shot@1.1.101 "query"
@@ -191,7 +172,6 @@ npx @xagent/one-shot@latest "query"
 ### macOS
 
 **Homebrew (if available):**
-
 ```bash
 # Currently not in Homebrew
 # Use npm or Bun
@@ -200,7 +180,6 @@ npm install -g @xagent/one-shot
 ```
 
 **M1/M2 (Apple Silicon):**
-
 ```bash
 # Works natively on Apple Silicon
 # No Rosetta needed
@@ -208,7 +187,6 @@ bun install -g @xagent/one-shot
 ```
 
 **Multiple shells (bash/zsh/fish):**
-
 ```bash
 # Bash
 echo 'export GROK_API_KEY="your-key"' >> ~/.bashrc
@@ -223,7 +201,6 @@ echo 'set -x GROK_API_KEY "your-key"' >> ~/.config/fish/config.fish
 ### Windows
 
 **PowerShell:**
-
 ```powershell
 # Install Node.js from nodejs.org
 # Or use Bun
@@ -237,14 +214,12 @@ $env:GROK_API_KEY = "your-key"
 ```
 
 **Git Bash:**
-
 ```bash
 npm install -g @xagent/one-shot
 echo 'export GROK_API_KEY="your-key"' >> ~/.bashrc
 ```
 
 **WSL (Windows Subsystem for Linux):**
-
 ```bash
 # Use Linux installation method
 curl -fsSL https://bun.sh/install | bash
@@ -252,7 +227,6 @@ bun install -g @xagent/one-shot
 ```
 
 **Scoop (package manager):**
-
 ```powershell
 # Currently not in Scoop
 # Use npm/Bun
@@ -261,7 +235,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Chocolatey:**
-
 ```powershell
 # Currently not in Chocolatey
 # Use npm/Bun
@@ -272,7 +245,6 @@ npm install -g @xagent/one-shot
 ### Linux
 
 **Debian/Ubuntu:**
-
 ```bash
 # Install Node.js 20 (recommended)
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -287,7 +259,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Fedora/RHEL/CentOS:**
-
 ```bash
 # Install Node.js
 curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
@@ -298,7 +269,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Arch Linux:**
-
 ```bash
 # Install Node.js
 sudo pacman -S nodejs npm
@@ -308,7 +278,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Alpine Linux (Docker):**
-
 ```bash
 # Minimal installation for containers
 apk add --no-cache nodejs npm
@@ -345,7 +314,6 @@ echo " Grok One-Shot ready"
 **Deploy via configuration management:**
 
 **Ansible:**
-
 ```yaml
 # playbook.yml
 - name: Install Grok One-Shot
@@ -365,7 +333,6 @@ mode: '0600'
 ```
 
 **Puppet:**
-
 ```puppet
 package { '@xagent/one-shot':
 ensure => '1.1.101',
@@ -384,7 +351,6 @@ mode => '0600',
 **Scenario:** No internet access on target systems
 
 **Approach 1: npm pack**
-
 ```bash
 # On internet-connected system
 npm pack @xagent/one-shot
@@ -396,7 +362,6 @@ npm install -g ./xagent-one-shot-1.1.101.tgz
 ```
 
 **Approach 2: Private npm registry**
-
 ```bash
 # Set up Verdaccio or Artifactory
 # Mirror @xagent/one-shot package
@@ -407,7 +372,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Approach 3: Build from source**
-
 ```bash
 # On internet-connected system
 git clone https://github.com/grok-team/grok.git
@@ -429,7 +393,6 @@ npm link
 **Scenario:** Need custom features or patches
 
 **Steps:**
-
 ```bash
 # 1. Clone and setup
 git clone https://github.com/grok-team/grok.git
@@ -454,7 +417,6 @@ grok --version # Should show your custom build
 ```
 
 **Maintain custom fork:**
-
 ```bash
 # Keep up to date with upstream
 git remote add upstream https://github.com/grok-team/grok.git
@@ -468,7 +430,6 @@ bun run build
 ### Build Flags and Options
 
 **Optimize for production:**
-
 ```bash
 # Build with optimization
 NODE_ENV=production bun run build
@@ -483,7 +444,6 @@ NODE_ENV=production bun run build
 ### Platform-Specific Builds
 
 **Cross-platform considerations:**
-
 ```bash
 # Build includes platform-specific shims
 # No additional steps needed
@@ -499,7 +459,6 @@ npm pack
 ### Corporate Proxy
 
 **Configure npm to use proxy:**
-
 ```bash
 # HTTP proxy
 npm config set proxy http://proxy.company.com:8080
@@ -513,7 +472,6 @@ npm install -g @xagent/one-shot
 ```
 
 **Configure Grok One-Shot API requests:**
-
 ```bash
 # Set proxy for API requests (if needed)
 export HTTP_PROXY=http://proxy.company.com:8080
@@ -525,7 +483,6 @@ export HTTPS_PROXY=http://proxy.company.com:8080
 **Problem:** Corporate SSL interception
 
 **Solution:**
-
 ```bash
 # Option 1: Add custom CA (recommended)
 export NODE_EXTRA_CA_CERTS=/path/to/corporate-ca.pem
@@ -539,7 +496,6 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
 ### Isolated Installations
 
 **Use npm workspaces:**
-
 ```bash
 # Project-specific installation
 cd my-project
@@ -562,7 +518,6 @@ npm run grok
 ### Vendoring Dependencies
 
 **Bundle everything for offline use:**
-
 ```bash
 # Create vendor directory
 mkdir vendor
@@ -581,7 +536,6 @@ npm install -g ./vendor/@xagent-one-shot-*.tgz --ignore-scripts
 ### Installation Verification
 
 **Comprehensive check:**
-
 ```bash
 # 1. Command exists
 command -v grok
@@ -604,7 +558,6 @@ ls -la ~/.x-cli/settings.json
 ### Integration Testing
 
 **Test in actual environment:**
-
 ```bash
 # Test headless mode
 grok -p "list files in current directory"
@@ -623,7 +576,6 @@ grok toggle-confirmations
 **Problem:** `EACCES: permission denied`
 
 **Solution:**
-
 ```bash
 # Don't use sudo
 # Configure user-level npm instead (see above)
@@ -632,7 +584,6 @@ grok toggle-confirmations
 **Problem:** `command not found: grok`
 
 **Solution:**
-
 ```bash
 # Add to PATH
 export PATH="$PATH:$(npm bin -g)"
@@ -644,7 +595,6 @@ npm install -g @xagent/one-shot
 **Problem:** `Cannot find module`
 
 **Solution:**
-
 ```bash
 # Clear npm cache
 npm cache clean --force
@@ -657,7 +607,6 @@ npm install -g @xagent/one-shot
 **Problem:** Slow installation
 
 **Solution:**
-
 ```bash
 # Use Bun (4x faster)
 bun install -g @xagent/one-shot
@@ -671,21 +620,18 @@ npm config set registry https://registry.npmjs.org # Restore
 ### Platform-Specific Issues
 
 **macOS: Permission errors with npm**
-
 ```bash
 # Fix npm permissions
 sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}
 ```
 
 **Windows: Long path issues**
-
 ```bash
 # Enable long paths in Git for Windows
 git config --system core.longpaths true
 ```
 
 **Linux: Old Node.js version**
-
 ```bash
 # Update Node.js
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -

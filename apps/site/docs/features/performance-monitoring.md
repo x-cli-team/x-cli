@@ -1,8 +1,6 @@
 ---
 title: Performance Monitoring
----
-
-# Performance Monitoring
+---# Performance Monitoring
 
 **Status:** Planned Feature (TBD)
 

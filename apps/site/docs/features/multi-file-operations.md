@@ -1,8 +1,6 @@
 ---
 title: Advanced Multi-File Operations
----
-
-# Advanced Multi-File Operations
+---# Advanced Multi-File Operations
 
 **Status:** Planned Feature (TBD)
 
@@ -74,7 +72,6 @@ Imports updated automatically
 ## Roadmap
 
 ### Q1 2025: Sprint 6-8 (6 weeks)
-
 - Change impact analysis
 - Dependency tracking
 - Coordinated multi-file editing
@@ -87,13 +84,11 @@ Imports updated automatically
 ## Current Capabilities
 
 **Available now:**
-
 - Sequential file edits
 - Manual coordination
 - AI tracks changes
 
 **Limitations:**
-
 - No atomic transactions
 - No automatic rollback
 - Manual dependency tracking

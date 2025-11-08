@@ -1,8 +1,6 @@
 ---
 title: Notifications and Alerts
----
-
-# Notifications and Alerts
+---# Notifications and Alerts
 
 **Status:** Planned Feature (TBD)
 

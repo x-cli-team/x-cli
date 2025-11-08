@@ -1,8 +1,6 @@
 ---
 title: Session Restoration
----
-
-# Session Restoration
+---# Session Restoration
 
 **Status:** Planned Feature (TBD)
 
