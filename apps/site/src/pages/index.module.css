@@ -385,7 +385,7 @@
   .heroCardContainer {
     /* TRY POSITION RELATIVE: Since margins aren't working */
     position: relative !important;      /* Enable top positioning */
-    top: -5.5rem !important;            /* Move up by another half red square */
+    top: -12rem !important;             /* Much much closer to pills - was -8rem, now -12rem */
     transform: none !important;         /* No transforms */
     -webkit-transform: none !important;
     margin: 0 !important;                /* Remove auto centering */
@@ -506,6 +506,20 @@
   .installSection {
     padding: 0.5rem 0 !important;
     margin-bottom: 1rem !important; /* Reduced since card now has its own top margin */
+  }
+  
+  /* Make installation pills stack vertically on mobile */
+  .installSection > div {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    align-items: center !important;
+  }
+  
+  /* Make both pills same width on mobile */
+  .installSection .chipBtn {
+    width: 100% !important;
+    max-width: 320px !important;
+    justify-content: center !important;
   }
   
   .chipBtnSolid {

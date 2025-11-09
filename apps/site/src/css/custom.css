@@ -688,6 +688,53 @@
   .jump-in-grid {
     grid-template-columns: 1fr;
   }
+
+  /* === Mobile Docs Navigation Fix === */
+  /* Ensure hamburger menu is visible */
+  .navbar__toggle {
+    display: block !important;
+  }
+  
+  /* Force navbar sidebar to show navigation items */
+  .navbar-sidebar__items {
+    display: block !important;
+    padding: 1rem 0 !important;
+  }
+  
+  /* Show navbar items in mobile sidebar */
+  .navbar-sidebar__item {
+    display: block !important;
+    padding: 0.5rem 1rem !important;
+  }
+  
+  .navbar-sidebar__item .navbar__link {
+    display: block !important;
+    padding: 0.5rem 0 !important;
+    color: var(--ifm-navbar-link-color) !important;
+    text-decoration: none !important;
+  }
+  
+  /* Add docs navigation to mobile sidebar on docs pages */
+  @media (max-width: 996px) {
+    /* Hide desktop sidebar */
+    .theme-doc-sidebar-container {
+      display: none !important;
+    }
+    
+    /* Make content full width */
+    .col--doc-content {
+      max-width: 100% !important;
+      flex: 1 !important;
+    }
+    
+    /* Copy docs sidebar menu into navbar sidebar */
+    .docs-wrapper .navbar-sidebar__items::after {
+      content: "";
+      display: block;
+      border-top: 1px solid var(--ifm-border-color);
+      margin: 1rem 0;
+    }
+  }
 }
 
 /* === Font Consistency === */
