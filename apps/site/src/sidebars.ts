@@ -8,6 +8,7 @@ const sidebars: SidebarsConfig = {
       "label": "Getting Started",
       "items": [
         "getting-started/overview",
+        "getting-started/installation",
         "getting-started/quickstart",
         "getting-started/common-workflows",
         "getting-started/hooks",
@@ -85,6 +86,20 @@ const sidebars: SidebarsConfig = {
     },
     {
       "type": "category",
+      "label": "Architecture",
+      "items": [
+        "architecture/overview"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Community",
+      "items": [
+        "community/testimonials"
+      ]
+    },
+    {
+      "type": "category",
       "label": "Deployment",
       "items": [
         "deployment/overview",
@@ -92,6 +107,7 @@ const sidebars: SidebarsConfig = {
         "deployment/claude-code-on-the-web"
       ]
     },
+    "roadmap",
     "resources/legal-and-compliance"
   ]
 };

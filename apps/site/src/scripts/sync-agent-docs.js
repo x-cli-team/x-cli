@@ -88,15 +88,18 @@ function syncClaudeCodeDocs() {
   }
   
   // Clear existing docs (except custom files we want to preserve)
-  const preserveFiles = ['overview.md']; // Keep custom overview
+  const preserveFiles = ['overview.md', 'roadmap.md']; // Keep custom files
+  const preserveDirectories = ['architecture', 'community']; // Keep custom directories
   
   if (fs.existsSync(DOCS_DIR)) {
     const existing = fs.readdirSync(DOCS_DIR, { withFileTypes: true });
     existing.forEach(item => {
       const fullPath = path.join(DOCS_DIR, item.name);
       if (item.isDirectory()) {
-        // Remove existing directories to clean up old structure
-        fs.rmSync(fullPath, { recursive: true, force: true });
+        // Only remove directories that are not in preserve list
+        if (!preserveDirectories.includes(item.name)) {
+          fs.rmSync(fullPath, { recursive: true, force: true });
+        }
       } else if (!preserveFiles.includes(item.name)) {
         // Remove files not in preserve list
         fs.unlinkSync(fullPath);
@@ -153,6 +156,7 @@ function syncClaudeCodeDocs() {
         label: 'Getting Started',
         items: [
           'getting-started/overview',
+          'getting-started/installation',
           'getting-started/quickstart',
           'getting-started/common-workflows',
           'getting-started/hooks',
@@ -238,7 +242,25 @@ function syncClaudeCodeDocs() {
           'administration/data-usage'
         ]
       },
-
+      
+      // Architecture
+      {
+        type: 'category',
+        label: 'Architecture',
+        items: [
+          'architecture/overview'
+        ]
+      },
+      
+      // Community
+      {
+        type: 'category',
+        label: 'Community',
+        items: [
+          'community/testimonials'
+        ]
+      },
+      
       // Deployment
       {
         type: 'category',
@@ -249,7 +271,9 @@ function syncClaudeCodeDocs() {
           'deployment/claude-code-on-the-web'
         ]
       },
-
+      
+      // Roadmap
+      'roadmap',
       // Resources
       'resources/legal-and-compliance'
     ],
