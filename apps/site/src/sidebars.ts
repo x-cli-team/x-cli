@@ -9,7 +9,10 @@ const sidebars: SidebarsConfig = {
       "items": [
         "getting-started/overview",
         "getting-started/quickstart",
-        "getting-started/common-workflows"
+        "getting-started/common-workflows",
+        "getting-started/hooks",
+        "getting-started/hooks-guide",
+        "getting-started/skills"
       ]
     },
     {
@@ -46,6 +49,7 @@ const sidebars: SidebarsConfig = {
         "features/analytics",
         "features/notifications",
         "features/plugin-system",
+        "features/skills",
         "features/cloud-sync"
       ]
     },
@@ -56,7 +60,8 @@ const sidebars: SidebarsConfig = {
         "reference/cli-reference",
         "reference/interactive-mode",
         "reference/slash-commands",
-        "reference/advanced-slash-commands"
+        "reference/advanced-slash-commands",
+        "reference/output-styles"
       ]
     },
     {
@@ -65,6 +70,8 @@ const sidebars: SidebarsConfig = {
       "items": [
         "build-with-claude-code/subagents",
         "build-with-claude-code/mcp",
+        "build-with-claude-code/hooks",
+        "build-with-claude-code/hooks-guide",
         "build-with-claude-code/troubleshooting"
       ]
     },
@@ -76,7 +83,15 @@ const sidebars: SidebarsConfig = {
         "administration/data-usage"
       ]
     },
-    "deployment/overview",
+    {
+      "type": "category",
+      "label": "Deployment",
+      "items": [
+        "deployment/overview",
+        "deployment/github-actions",
+        "deployment/claude-code-on-the-web"
+      ]
+    },
     "resources/legal-and-compliance"
   ]
 };

@@ -18500,7 +18500,7 @@ var init_package = __esm({
     package_default = {
       type: "module",
       name: "@xagent/one-shot",
-      version: "1.1.102",
+      version: "1.1.105",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal with automatic documentation updates.",
       main: "dist/index.js",
       module: "dist/index.js",
@@ -21439,66 +21439,12 @@ __export(use_console_setup_exports, {
   useConsoleSetup: () => useConsoleSetup
 });
 function printWelcomeBanner(_quiet = false) {
-  if (_quiet) return;
-  const isTTY = !!process.stdout.isTTY;
-  if (isTTY) {
-    process.stdout.write("\x1B[?25l");
-    process.stdout.write("\x1B[H");
-    process.stdout.write("\x1B[2J");
-    process.stdout.write("\x1B[3J");
-    process.stdout.write("\x1B[H");
-  }
-  const isFancy = process.env.X_CLI_ASCII !== "block";
-  const fancyAscii = String.raw`__/\\\_______/\\\______________________/\\\\\\\\\__/\\\______________/\\\\\\\\\\\_        
- _\///\\\___/\\\/____________________/\\\////////__\/\\\_____________\/////\\\///__       
-  ___\///\\\\\\/____________________/\\\/___________\/\\\_________________\/\\\_____      
-   _____\//\\\\_______/\\\\\\\\\\\__/\\\_____________\/\\\_________________\/\\\_____     
-    ______\/\\\\______\///////////__\/\\\_____________\/\\\_________________\/\\\_____    
-     ______/\\\\\\___________________\//\\\____________\/\\\_________________\/\\\_____   
-      ____/\\\////\\\__________________\///\\\__________\/\\\_________________\/\\\_____  
-       __/\\\/___\///\\\__________________\////\\\\\\\\\_\/\\\\\\\\\\\\\\\__/\\\\\\\\\\\_ 
-        _\///_______\///______________________\/////////__\///////////////__\///////////__`;
-  const blockAscii = String.raw`\x1b[34m  ████      ████████ ████      ████
-  ████████  ██████████████  ████████
- ██████████  ██████████████  ████████
- ██████████  ██████████████  ████████
-  ████████  ██████████████  ████████
-   ████      ████████ ████      ████\x1b[0m`;
-  const asciiArt = (isFancy ? fancyAscii : blockAscii).normalize("NFC");
-  process.stdout.write(asciiArt + "\n");
-  const welcomeBanner = [
-    "",
-    `\x1B[32m  Welcome to X-CLI v${package_default.version} \u26A1\x1B[0m`,
-    "",
-    `\x1B[36m  \u{1F680} Claude Code-level intelligence in your terminal!\x1B[0m`,
-    "",
-    `\x1B[33m  \u2714 Ready. Type your first command or paste code to begin.\x1B[0m`,
-    "",
-    `\x1B[35m  \u{1F4A1} Quick Start Tips:\x1B[0m`,
-    "",
-    `  \u2022 Ask anything: "Create a React component" or "Debug this Python script"`,
-    `  \u2022 Edit files: "Add error handling to app.js"`,
-    `  \u2022 Run commands: "Set up a new Node.js project"`,
-    `  \u2022 Get help: Type "/help" for all commands`,
-    "",
-    `\x1B[35m  \u{1F6E0}\uFE0F  Power Features:\x1B[0m`,
-    "",
-    `  \u2022 Auto-edit mode: Press Shift+Tab to toggle hands-free editing`,
-    `  \u2022 Project memory: Create .xcli/GROK.md to customize behavior`,
-    `  \u2022 Documentation: Run "/init-agent" for .agent docs system`,
-    `  \u2022 Error recovery: Run "/heal" after errors to add guardrails`,
-    "",
-    `\x1B[37m  Type your request in natural language. Ctrl+C to clear, 'exit' to quit.\x1B[0m`,
-    ""
-  ].join("\n");
-  process.stdout.write(welcomeBanner);
-  if (isTTY) process.stdout.write("\x1B[?25h");
+  return;
 }
 function useConsoleSetup(_quiet = false) {
 }
 var init_use_console_setup = __esm({
   "src/hooks/use-console-setup.ts"() {
-    init_package();
   }
 });
 function useSessionLogging(chatHistory) {
@@ -23808,7 +23754,7 @@ var require_package = __commonJS({
     module.exports = {
       type: "module",
       name: "@xagent/one-shot",
-      version: "1.1.102",
+      version: "1.1.105",
       description: "An open-source AI agent that brings advanced AI capabilities directly into your terminal with automatic documentation updates.",
       main: "dist/index.js",
       module: "dist/index.js",

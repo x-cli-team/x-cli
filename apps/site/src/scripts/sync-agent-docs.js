@@ -153,8 +153,11 @@ function syncClaudeCodeDocs() {
         label: 'Getting Started',
         items: [
           'getting-started/overview',
-          'getting-started/quickstart', 
-          'getting-started/common-workflows'
+          'getting-started/quickstart',
+          'getting-started/common-workflows',
+          'getting-started/hooks',
+          'getting-started/hooks-guide',
+          'getting-started/skills'
         ]
       },
       
@@ -172,7 +175,7 @@ function syncClaudeCodeDocs() {
       
       // Features (all available feature docs)
       {
-        type: 'category', 
+        type: 'category',
         label: 'Features',
         items: [
           'features/context-management',
@@ -195,6 +198,7 @@ function syncClaudeCodeDocs() {
           'features/analytics',
           'features/notifications',
           'features/plugin-system',
+          'features/skills',
           'features/cloud-sync'
         ]
       },
@@ -202,12 +206,13 @@ function syncClaudeCodeDocs() {
       // Reference
       {
         type: 'category',
-        label: 'Reference', 
+        label: 'Reference',
         items: [
           'reference/cli-reference',
           'reference/interactive-mode',
           'reference/slash-commands',
-          'reference/advanced-slash-commands'
+          'reference/advanced-slash-commands',
+          'reference/output-styles'
         ]
       },
       
@@ -218,6 +223,8 @@ function syncClaudeCodeDocs() {
         items: [
           'build-with-claude-code/subagents',
           'build-with-claude-code/mcp',
+          'build-with-claude-code/hooks',
+          'build-with-claude-code/hooks-guide',
           'build-with-claude-code/troubleshooting'
         ]
       },
@@ -231,10 +238,18 @@ function syncClaudeCodeDocs() {
           'administration/data-usage'
         ]
       },
-      
+
       // Deployment
-      'deployment/overview',
-      
+      {
+        type: 'category',
+        label: 'Deployment',
+        items: [
+          'deployment/overview',
+          'deployment/github-actions',
+          'deployment/claude-code-on-the-web'
+        ]
+      },
+
       // Resources
       'resources/legal-and-compliance'
     ],
