@@ -54,7 +54,7 @@ const config: Config = {
       tagName: 'meta',
       attributes: {
         property: 'og:image',
-        content: 'https://grok-one-shot.dev/img/grok-one-shot-welcome.png',
+        content: 'https://grok-one-shot.dev/img/logo.png',
       },
     },
     {
@@ -101,7 +101,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/xcli-welcome.png',
+    image: 'img/logo.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
@@ -109,21 +109,21 @@ const config: Config = {
       title: 'Grok One-Shot',
       logo: {
         alt: 'Grok One-Shot Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
       },
       items: [
         {
-          to: '/docs/getting-started/quickstart',
+          to: '/docs/overview',
           label: 'For Users',
           position: 'left',
         },
         {
-          to: '/docs/community/testimonials',
+          to: '/docs/community',
           label: 'Community',
           position: 'left',
         },
         {
-          to: '/docs/architecture/overview',
+          to: '/docs/developers',
           label: 'For Developers',
           position: 'left',
         },

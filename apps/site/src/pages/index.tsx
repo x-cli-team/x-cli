@@ -414,9 +414,13 @@ function NavLink({ children, href }: { children: React.ReactNode; href: string }
 function LogoMark() {
   return (
     <div className={styles.logo}>
-      <div className={styles.logoIcon}>
-        G
-      </div>
+      <img 
+        src="/img/logo.png" 
+        alt="Grok One-Shot Logo" 
+        className={styles.logoIcon}
+        width="32" 
+        height="32"
+      />
       <span className={styles.logoText}>Grok One-Shot</span>
     </div>
   );

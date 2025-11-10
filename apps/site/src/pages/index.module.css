@@ -711,6 +711,7 @@
   background-color: white;
   border-radius: 0.5rem;
   display: flex;
+  object-fit: contain;
   align-items: center;
   justify-content: center;
   color: black;
