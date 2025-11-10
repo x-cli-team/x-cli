@@ -1,6 +1,8 @@
 ---
 title: Workflow Automation
----# Workflow Automation
+---
+
+# Workflow Automation
 
 Automate repetitive development tasks with Grok One-Shot.
 
@@ -13,6 +15,7 @@ Grok One-Shot excels at automating common development workflows, from code gener
 ### 1. Headless Automation
 
 **Single-shot queries:**
+
 ```bash
 # No interaction needed
 grok -p "list all TODO comments in the codebase"
@@ -21,12 +24,14 @@ grok -p "check for console.log statements"
 ```
 
 **Benefits:**
+
 - Fast execution
 - No session overhead
 - Scriptable
 - CI/CD friendly
 
 **Use cases:**
+
 - Code quality checks
 - Quick searches
 - Status reports
@@ -35,6 +40,7 @@ grok -p "check for console.log statements"
 ### 2. Script-Based Automation
 
 **Shell scripts:**
+
 ```bash
 #!/bin/bash
 # daily-checks.sh
@@ -53,6 +59,7 @@ grok -p "find public functions without docs"
 ```
 
 **Usage:**
+
 ```bash
 chmod +x daily-checks.sh
 ./daily-checks.sh > daily-report.txt
@@ -61,6 +68,7 @@ chmod +x daily-checks.sh
 ### 3. CI/CD Integration
 
 **GitHub Actions example:**
+
 ```yaml
 name: AI Code Review
 
@@ -102,6 +110,7 @@ body: '## AI Code Review\n\n' + review
 ### 4. Git Hooks
 
 **Pre-commit checks:**
+
 ```bash
 #!/bin/bash
 # .git/hooks/pre-commit
@@ -124,6 +133,7 @@ echo " Pre-commit checks passed"
 ```
 
 **Pre-push validation:**
+
 ```bash
 #!/bin/bash
 # .git/hooks/pre-push
@@ -144,6 +154,7 @@ echo " Tests passed, pushing..."
 ### Template 1: Code Generation
 
 **Generate boilerplate:**
+
 ```bash
 # Interactive
 grok
@@ -160,6 +171,7 @@ grok
 ```
 
 **Headless:**
+
 ```bash
 grok -p "Generate REST API endpoint for user registration with validation, error handling, and tests"
 ```
@@ -167,6 +179,7 @@ grok -p "Generate REST API endpoint for user registration with validation, error
 ### Template 2: Refactoring
 
 **Systematic refactoring:**
+
 ```bash
 grok
 
@@ -184,6 +197,7 @@ Add: error handling
 ### Template 3: Documentation Generation
 
 **Generate docs:**
+
 ```bash
 grok -p "Generate comprehensive API documentation for all endpoints in src/api/"
 
@@ -195,6 +209,7 @@ grok -p "Create README.md with installation, usage, and examples"
 ### Template 4: Testing
 
 **Generate tests:**
+
 ```bash
 grok
 
@@ -212,6 +227,7 @@ grok
 ### Template 5: Code Quality
 
 **Quality enforcement:**
+
 ```bash
 #!/bin/bash
 # enforce-quality.sh
@@ -234,21 +250,25 @@ grok -p "analyze code quality and generate report"
 ### Implemented
 
 **Headless execution:**
+
 - Single-shot queries via `-p` flag
 - Non-interactive mode
 - Scriptable commands
 
 **Multi-tool coordination:**
+
 - AI chains tools automatically
 - Error recovery
 - Context awareness
 
 **File operations:**
+
 - Batch file reading
 - Multi-file editing
 - Pattern-based operations
 
 **Command execution:**
+
 - Run tests
 - Run builds
 - Run linters
@@ -257,16 +277,19 @@ grok -p "analyze code quality and generate report"
 ### Partially Implemented
 
 **Workflow composition:**
+
 - Manual chaining of commands
 - No built-in workflow DSL
 - No workflow templates
 
 **State management:**
+
 - No workflow state persistence
 - No checkpoint/resume
 - No rollback on failure
 
 **Scheduling:**
+
 - External cron/scheduler needed
 - No built-in scheduling
 - No recurring workflows
@@ -274,6 +297,7 @@ grok -p "analyze code quality and generate report"
 ### Planned Features
 
 **Workflow DSL:**
+
 ```yaml
 # .x-cli/workflows/code-review.yml
 name: Code Review Workflow
@@ -290,6 +314,7 @@ command: comment on PR
 ```
 
 **Workflow templates:**
+
 ```bash
 grok workflow run code-review
 grok workflow run deploy-to-staging
@@ -297,6 +322,7 @@ grok workflow list
 ```
 
 **Advanced automation:**
+
 - Conditional execution
 - Parallel steps
 - Error handling and retry
@@ -346,6 +372,7 @@ echo "Report generated: $REPORT"
 ```
 
 **Schedule with cron:**
+
 ```bash
 # Run daily at 9 AM
 0 9 * * * cd /path/to/project && ./daily-quality-report.sh
@@ -484,11 +511,13 @@ echo "Review changes, then: git push && git push --tags"
 ### DO
 
 ** Use headless mode for automation:**
+
 ```bash
 grok -p "query" # Not interactive grok
 ```
 
 ** Disable confirmations for trusted automation:**
+
 ```bash
 grok toggle-confirmations # Disable
 ./automation-script.sh
@@ -496,6 +525,7 @@ grok toggle-confirmations # Re-enable
 ```
 
 ** Use specific prompts:**
+
 ```bash
 # Good
 grok -p "find console.log in src/ excluding test files"
@@ -505,11 +535,13 @@ grok -p "check the code"
 ```
 
 ** Capture and log output:**
+
 ```bash
 grok -p "query" > output.txt 2>&1
 ```
 
 ** Handle errors:**
+
 ```bash
 if ! grok -p "run tests"; then
 echo "Tests failed"
@@ -520,6 +552,7 @@ fi
 ### DON'T
 
 ** Run in interactive mode from scripts:**
+
 ```bash
 # Bad
 echo "query" | grok
@@ -529,11 +562,13 @@ grok -p "query"
 ```
 
 ** Leave confirmations disabled globally:**
+
 ```bash
 # Dangerous - disables safety for manual use too
 ```
 
 ** Ignore exit codes:**
+
 ```bash
 # Bad
 grok -p "important task"
@@ -544,6 +579,7 @@ grok -p "important task" || exit 1
 ```
 
 ** Hardcode sensitive data:**
+
 ```bash
 # Bad
 grok -p "deploy with key abc123"
@@ -557,6 +593,7 @@ grok -p "deploy with key from $DEPLOY_KEY"
 ### Parallel Execution
 
 **Run independent tasks concurrently:**
+
 ```bash
 # Sequential (slow)
 grok -p "task 1"
@@ -573,6 +610,7 @@ wait
 ### Model Selection
 
 **Use fast model for simple tasks:**
+
 ```bash
 # Fast model for simple queries
 GROK_MODEL=grok-4-fast-non-reasoning grok -p "find TODO comments"
@@ -584,6 +622,7 @@ GROK_MODEL=grok-2-1212 grok -p "refactor authentication system"
 ### Caching
 
 **Cache expensive operations:**
+
 ```bash
 # Cache file listing
 if [ ! -f .cache/files.txt ]; then
@@ -599,6 +638,7 @@ cat .cache/files.txt
 ### Automation Failures
 
 **Debug failed automation:**
+
 ```bash
 # Enable debug output
 export GROK_DEBUG=true
@@ -609,6 +649,7 @@ less debug.log
 ```
 
 **Common issues:**
+
 - API rate limits (add delays)
 - Timeout on long operations (increase timeout)
 - Context limits (use headless mode)
@@ -617,6 +658,7 @@ less debug.log
 ### Retry Logic
 
 **Add retry for reliability:**
+
 ```bash
 retry() {
 local max_attempts=3

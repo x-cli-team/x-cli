@@ -25,7 +25,7 @@ function addFrontmatter(content, title, sidebarPosition) {
   // Remove existing frontmatter from content if present
   const cleanContent = content.replace(/^---[\s\S]*?---\s*/, '');
   
-  return frontmatter + cleanContent;
+  return frontmatter + '\n' + cleanContent;
 }
 
 function rewriteLinks(content) {
@@ -57,6 +57,34 @@ function filterContent(content, filePath) {
   
   // Remove emoji shortcodes like :emoji:
   filtered = filtered.replace(/:[a-z_+-]+:/g, '');
+  
+  // === MDX/JSX Escape Processing ===
+  // Escape problematic syntax for MDX compilation
+  
+  // Split content into code blocks and text blocks
+  const codeBlockRegex = /```[\s\S]*?```|`[^`]+`/g;
+  const codeBlocks = [];
+  let codeBlockIndex = 0;
+  
+  // Replace code blocks with placeholders
+  filtered = filtered.replace(codeBlockRegex, (match) => {
+    const placeholder = `__CODE_BLOCK_${codeBlockIndex}__`;
+    codeBlocks[codeBlockIndex] = match;
+    codeBlockIndex++;
+    return placeholder;
+  });
+  
+  // Now escape problematic syntax only outside code blocks
+  // Wrap ${} variable syntax in backticks if not already wrapped
+  filtered = filtered.replace(/(\$\{[^}]+\})/g, '`$1`');
+  
+  // Escape curly braces that might be interpreted as JSX (but not in inline code)
+  filtered = filtered.replace(/\{([^}]+)\}/g, '\\{$1\\}');
+  
+  // Restore code blocks
+  for (let i = 0; i < codeBlocks.length; i++) {
+    filtered = filtered.replace(`__CODE_BLOCK_${i}__`, codeBlocks[i]);
+  }
   
   // Clean up multiple spaces but preserve line breaks
   filtered = filtered.replace(/ +/g, ' ');
