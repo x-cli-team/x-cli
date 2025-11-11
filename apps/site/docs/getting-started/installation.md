@@ -1,7 +1,6 @@
 ---
 title: Installation
 ---
-
 # Installation
 
 Get Grok One-Shot running in under 2 minutes with our simple installation process.

@@ -1,7 +1,6 @@
 ---
 title: Model Configuration
 ---
-
 # Model Configuration
 
 Configure and optimize Grok model selection for your specific use cases.
@@ -17,7 +16,6 @@ Grok One-Shot supports multiple X.AI models, each optimized for different scenar
 **Best for:** General-purpose coding and complex tasks
 
 **Characteristics:**
-
 - **Intelligence:** High reasoning capability
 - **Speed:** Moderate (2-5 seconds typical)
 - **Context:** 128k tokens
@@ -25,7 +23,6 @@ Grok One-Shot supports multiple X.AI models, each optimized for different scenar
 - **Cost:** Standard pricing
 
 **Use cases:**
-
 - Complex refactoring
 - Architecture decisions
 - Multi-file changes
@@ -33,7 +30,6 @@ Grok One-Shot supports multiple X.AI models, each optimized for different scenar
 - Research and analysis
 
 **Example:**
-
 ```bash
 export GROK_MODEL="grok-2-1212"
 grok "refactor authentication system to use JWT"
@@ -44,7 +40,6 @@ grok "refactor authentication system to use JWT"
 **Best for:** Bleeding-edge features and capabilities
 
 **Characteristics:**
-
 - **Intelligence:** Latest model improvements
 - **Speed:** Moderate to slow
 - **Context:** 128k tokens
@@ -52,21 +47,18 @@ grok "refactor authentication system to use JWT"
 - **Cost:** Beta pricing (may vary)
 
 **Use cases:**
-
 - Testing new capabilities
 - Experimental features
 - Research projects
 - Early adopters
 
 **Example:**
-
 ```bash
 export GROK_MODEL="grok-beta"
 grok "try advanced code understanding features"
 ```
 
 **Warning:** Beta models may have:
-
 - Unexpected behavior
 - API changes
 - Availability fluctuations
@@ -77,7 +69,6 @@ grok "try advanced code understanding features"
 **Best for:** Quick queries and simple tasks
 
 **Characteristics:**
-
 - **Intelligence:** Streamlined, focused
 - **Speed:** Very fast (less than 1 second typical)
 - **Context:** 128k tokens
@@ -85,7 +76,6 @@ grok "try advanced code understanding features"
 - **Cost:** Lower pricing
 
 **Use cases:**
-
 - Quick file searches
 - Simple edits
 - Code formatting
@@ -93,14 +83,12 @@ grok "try advanced code understanding features"
 - List operations
 
 **Example:**
-
 ```bash
 export GROK_MODEL="grok-4-fast-non-reasoning"
 grok -p "list all TODO comments"
 ```
 
 **Limitations:**
-
 - Less sophisticated reasoning
 - May miss complex patterns
 - Better for mechanical tasks
@@ -111,68 +99,58 @@ grok -p "list all TODO comments"
 ### 1. Environment Variable (Persistent)
 
 **Set default model:**
-
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export GROK_MODEL="grok-2-1212"
 ```
 
 **Pros:**
-
 - Sets default for all sessions
 - No need to specify each time
 - Easy to change globally
 
 **Cons:**
-
 - Requires shell restart to change
 - Same model for all projects
 
 ### 2. Command Line Flag (Per-Session)
 
 **Specify at launch:**
-
 ```bash
 grok -m grok-4-fast-non-reasoning
 ```
 
 **Pros:**
-
 - Override default for specific session
 - Test different models easily
 - Project-specific choices
 
 **Cons:**
-
 - Must specify each time
 - Verbose command line
 
 ### 3. Settings File (Persistent)
 
 **Edit `~/.x-cli/settings.json`:**
-
 ```json
 {
-  "model": "grok-2-1212",
-  "apiKey": "your-key"
+"model": "grok-2-1212",
+"apiKey": "your-key"
 }
 ```
 
 **Pros:**
-
 - Persistent default
 - Centralized configuration
 - Works without environment variables
 
 **Cons:**
-
 - Manual file editing
 - Requires JSON knowledge
 
 ### 4. Interactive Switch (In-Session)
 
 **During session - press `Ctrl+M`:**
-
 ```
 Current model: grok-2-1212
 Available models:
@@ -184,13 +162,11 @@ Select model: [1-3]
 ```
 
 **Pros:**
-
 - Switch mid-session
 - No restart needed
 - Try different models instantly
 
 **Cons:**
-
 - Temporary (resets on exit)
 - Must remember keyboard shortcut
 
@@ -216,23 +192,22 @@ Fast, Lower Quality
 
 ### Decision Matrix
 
-| Task Type             | Recommended Model | Reason                   |
-| --------------------- | ----------------- | ------------------------ |
-| Complex refactoring   | grok-2-1212       | Needs reasoning          |
-| Architecture design   | grok-2-1212       | Strategic thinking       |
-| Quick file search     | grok-4-fast       | Speed matters            |
-| Simple edits          | grok-4-fast       | Straightforward          |
-| Multi-file changes    | grok-2-1212       | Coordination needed      |
-| Code review           | grok-2-1212       | Deep analysis            |
-| Format code           | grok-4-fast       | Mechanical task          |
-| Research codebase     | grok-2-1212       | Understanding needed     |
-| List files/functions  | grok-4-fast       | Simple queries           |
-| Experimental features | grok-beta         | Testing new capabilities |
+| Task Type | Recommended Model | Reason |
+|-----------|-------------------|--------|
+| Complex refactoring | grok-2-1212 | Needs reasoning |
+| Architecture design | grok-2-1212 | Strategic thinking |
+| Quick file search | grok-4-fast | Speed matters |
+| Simple edits | grok-4-fast | Straightforward |
+| Multi-file changes | grok-2-1212 | Coordination needed |
+| Code review | grok-2-1212 | Deep analysis |
+| Format code | grok-4-fast | Mechanical task |
+| Research codebase | grok-2-1212 | Understanding needed |
+| List files/functions | grok-4-fast | Simple queries |
+| Experimental features | grok-beta | Testing new capabilities |
 
 ### Cost Considerations
 
 **Typical token usage:**
-
 ```
 Simple query: 500-2,000 tokens
 Code edit: 2,000-10,000 tokens
@@ -241,7 +216,6 @@ Research session: 20,000-100,000 tokens
 ```
 
 **Optimization strategies:**
-
 1. Use grok-4-fast for simple tasks (lower cost)
 2. Use grok-2-1212 for complex work (worth the cost)
 3. Switch models mid-session as needed (Ctrl+M)
@@ -252,7 +226,6 @@ Research session: 20,000-100,000 tokens
 ### Development Workflow
 
 **Fast iteration on simple tasks:**
-
 ```bash
 # ~/.bashrc
 alias grok-fast='GROK_MODEL=grok-4-fast-non-reasoning grok'
@@ -266,7 +239,6 @@ grok "refactor error handling"
 ### Project-Specific Setup
 
 **Use different models per project:**
-
 ```bash
 # ~/projects/simple-app/.env
 export GROK_MODEL=grok-4-fast-non-reasoning
@@ -282,7 +254,6 @@ source .env && grok
 ### Shell Aliases
 
 **Quick model switching:**
-
 ```bash
 # ~/.bashrc or ~/.zshrc
 alias grok-default='GROK_MODEL=grok-2-1212 grok'
@@ -291,7 +262,6 @@ alias grok-beta='GROK_MODEL=grok-beta grok'
 ```
 
 **Usage:**
-
 ```bash
 grok-fast "quick query"
 grok-default "complex task"
@@ -301,7 +271,6 @@ grok-beta "test new features"
 ### Advanced Configuration
 
 **Model + other settings:**
-
 ```bash
 # High-performance simple tasks
 alias grok-quick='GROK_MODEL=grok-4-fast-non-reasoning MAX_TOOL_ROUNDS=100 grok -p'
@@ -318,7 +287,6 @@ alias grok-experimental='GROK_MODEL=grok-beta GROK_DEBUG=true grok'
 ### When to Use Each Model
 
 **Use grok-4-fast-non-reasoning when:**
-
 - Task is well-defined and simple
 - Speed is priority
 - Output format is predictable
@@ -326,7 +294,6 @@ alias grok-experimental='GROK_MODEL=grok-beta GROK_DEBUG=true grok'
 - Cost optimization matters
 
 **Examples:**
-
 ```bash
 grok-fast "list all TypeScript files"
 grok-fast "format this JSON"
@@ -335,7 +302,6 @@ grok-fast "count lines of code"
 ```
 
 **Use grok-2-1212 when:**
-
 - Task requires reasoning
 - Multi-step operations
 - Quality is priority
@@ -343,7 +309,6 @@ grok-fast "count lines of code"
 - Strategic decisions
 
 **Examples:**
-
 ```bash
 grok "refactor authentication system"
 grok "analyze performance bottlenecks"
@@ -352,14 +317,12 @@ grok "review security implications"
 ```
 
 **Use grok-beta when:**
-
 - Testing new features
 - Experimental workflows
 - Early access needed
 - Providing feedback to X.AI
 
 **Examples:**
-
 ```bash
 grok-beta "test advanced code understanding"
 grok-beta "try new reasoning capabilities"
@@ -368,7 +331,6 @@ grok-beta "try new reasoning capabilities"
 ### Hybrid Approach
 
 **Start fast, upgrade if needed:**
-
 ```bash
 # 1. Quick exploration
 GROK_MODEL=grok-4-fast-non-reasoning grok
@@ -386,19 +348,16 @@ GROK_MODEL=grok-4-fast-non-reasoning grok
 **All models support 128k context, but usage differs:**
 
 **grok-4-fast-non-reasoning:**
-
 - Efficient token usage
 - Focused responses
 - Less context needed
 
 **grok-2-1212:**
-
 - More context utilization
 - Deeper analysis
 - Higher token consumption
 
 **Strategy:**
-
 ```bash
 # For token-intensive tasks, start with default context
 GROK_MODEL=grok-2-1212 grok
@@ -414,7 +373,6 @@ grok -p "query 3"
 ### Token Usage Tracking
 
 **Check usage during session:**
-
 ```
 # Press Ctrl+I in interactive mode
 Token Usage:
@@ -425,7 +383,6 @@ Model: grok-2-1212
 ```
 
 **Review session files:**
-
 ```bash
 # Sessions saved in ~/.x-cli/sessions/
 cat ~/.x-cli/sessions/latest-session.json | grep -A5 "tokenUsage"
@@ -434,7 +391,6 @@ cat ~/.x-cli/sessions/latest-session.json | grep -A5 "tokenUsage"
 ### Performance Metrics
 
 **Compare models empirically:**
-
 ```bash
 # Fast model timing
 time GROK_MODEL=grok-4-fast-non-reasoning grok -p "list files"
@@ -454,7 +410,6 @@ time GROK_MODEL=grok-2-1212 grok -p "list files"
 **Cause:** Typo or unsupported model
 
 **Solution:**
-
 ```bash
 # Check spelling
 echo $GROK_MODEL
@@ -470,7 +425,6 @@ echo $GROK_MODEL
 **Symptoms:** Model takes too long
 
 **Solutions:**
-
 ```bash
 # 1. Switch to fast model
 export GROK_MODEL=grok-4-fast-non-reasoning
@@ -489,7 +443,6 @@ ping api.x.ai
 **Symptoms:** Fast model gives inadequate responses
 
 **Solutions:**
-
 ```bash
 # 1. Switch to default model
 export GROK_MODEL=grok-2-1212
@@ -505,12 +458,10 @@ export GROK_MODEL=grok-2-1212
 **Symptoms:** Ctrl+M doesn't change model
 
 **Causes:**
-
 - Terminal doesn't capture Ctrl+M
 - Session state issue
 
 **Solutions:**
-
 ```bash
 # 1. Restart session with desired model
 grok -m grok-2-1212
@@ -527,7 +478,6 @@ export GROK_MODEL=grok-2-1212
 ### General Guidelines
 
 **DO:**
-
 - Start with grok-2-1212 for unknown complexity
 - Switch to grok-4-fast for simple follow-ups
 - Use environment variables for consistent defaults
@@ -535,7 +485,6 @@ export GROK_MODEL=grok-2-1212
 - Test grok-beta for new features (when available)
 
 **DON'T:**
-
 - Use grok-4-fast for complex reasoning
 - Use grok-2-1212 for trivial queries unnecessarily
 - Ignore token costs on large operations
@@ -545,7 +494,6 @@ export GROK_MODEL=grok-2-1212
 ### Optimal Configurations
 
 **For learning/exploration:**
-
 ```bash
 # Use default model, generous tool rounds
 export GROK_MODEL=grok-2-1212
@@ -553,7 +501,6 @@ export MAX_TOOL_ROUNDS=500
 ```
 
 **For production automation:**
-
 ```bash
 # Use fast model, limit rounds
 export GROK_MODEL=grok-4-fast-non-reasoning
@@ -561,7 +508,6 @@ export MAX_TOOL_ROUNDS=100
 ```
 
 **For experimentation:**
-
 ```bash
 # Use beta, enable debug
 export GROK_MODEL=grok-beta
@@ -573,7 +519,6 @@ export GROK_DEBUG=true
 ### Custom Model Endpoints
 
 **For proxy or custom deployments:**
-
 ```bash
 export GROK_BASE_URL="https://custom-endpoint.example.com/v1"
 export GROK_MODEL="grok-2-1212"
@@ -582,7 +527,6 @@ export GROK_MODEL="grok-2-1212"
 ### API Version Compatibility
 
 Grok One-Shot uses X.AI API v1 endpoints:
-
 - Base URL: `https://api.x.ai/v1`
 - Compatible with standard OpenAI API format
 - Model names specific to X.AI
@@ -590,7 +534,6 @@ Grok One-Shot uses X.AI API v1 endpoints:
 ### Future Models
 
 X.AI regularly releases new models. Check documentation:
-
 ```bash
 # List available models (future feature)
 grok --list-models

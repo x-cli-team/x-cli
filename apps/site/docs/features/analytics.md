@@ -1,7 +1,6 @@
 ---
 title: Analytics Dashboard
 ---
-
 # Analytics Dashboard
 
 **Status:** Planned Feature (TBD)
