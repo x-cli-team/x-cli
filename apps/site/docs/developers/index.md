@@ -1,90 +1,104 @@
 ---
-title: Developer Guide Overview
+title: Developer Resources
 sidebar_position: 1
 ---
 
-# For Developers
+# Developer Resources
 
-Build powerful integrations and extend Grok One-Shot with custom tools, MCP servers, and advanced features.
+Welcome to the Grok One-Shot developer hub. Here you'll find everything you need to build with, extend, and contribute to Grok One-Shot.
 
-## Getting Started
+## Quick Links
 
-### 🏗️ Architecture Overview
+### 🛠️ Development Setup
 
-Understand how Grok One-Shot works under the hood and how to extend it.
+- [Development Setup](./setup) - Get your local development environment ready
+- [Contributing Guide](../community/contributing) - How to contribute to Grok One-Shot
+- [Architecture Overview](../architecture/overview) - Understand how Grok One-Shot works
 
-[View Architecture →](../architecture/overview)
+### 🔧 Building with Grok One-Shot
 
-### ⚡ Quick Development Setup
+- [MCP Integration](../build-with-claude-code/mcp) - Connect external tools and services
+- [Hooks System](../build-with-claude-code/hooks) - Automate workflows with hooks
+- [Configuration](../configuration/settings) - Advanced configuration options
 
-Get up and running with local development in minutes.
+### 📖 API Reference
 
-[Setup Guide →](./getting-started)
+- [CLI Reference](../reference/cli-reference) - Complete command-line interface
+- [Environment Variables](../configuration/settings#environment-variables) - Configuration via environment
+- [Settings Schema](../configuration/settings#settings-schema) - JSON configuration format
 
-### 📚 API Reference
+## Development Workflow
 
-Complete reference for all available APIs, interfaces, and extension points.
+### Local Development
 
-[API Docs →](./api-reference)
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/x-cli-team/x-cli.git
+   cd x-cli
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   bun install
+   ```
+
+3. **Run in development mode**
+   ```bash
+   bun run dev
+   ```
+
+### Contributing Code
+
+- Follow the [Contributing Guide](../community/contributing)
+- Check the [Development Setup](./setup) for detailed instructions
+- Review [Architecture](../architecture/overview) to understand the codebase
+
+### Testing
+
+- Run tests: `bun test`
+- Build locally: `bun run build`
+- Check types: `bun run typecheck`
 
 ## Extension Points
 
-### 🔧 Custom Tools
+### MCP Servers
 
-Build powerful custom tools that integrate seamlessly with Grok One-Shot's workflow.
+Extend Grok One-Shot capabilities by creating Model Context Protocol servers:
 
-[Learn More →](../features/custom-tools)
+- File system tools
+- API integrations
+- Database connections
+- Custom business logic
 
-### 🌐 MCP Integration
+### Configuration
 
-Create Model Context Protocol servers to extend Grok's capabilities.
+Customize behavior through:
 
-[MCP Guide →](../build-with-claude-code/mcp)
+- User settings (`~/.x-cli/settings.json`)
+- Project settings (`.grok/settings.json`)
+- Environment variables
+- Command-line flags
 
-### 🪝 Hooks System
+## Resources
 
-Hook into Grok's lifecycle events to customize behavior and add automation.
+### Documentation
 
-[Hooks Documentation →](../build-with-claude-code/hooks)
+- [Getting Started](../getting-started/overview) - User guide
+- [Features](../features/context-management) - Detailed feature documentation
+- [Configuration](../configuration/settings) - Setup and customization
 
-## Development Resources
+### Community
 
-### 💻 Code Examples
+- [Discord Community](https://discord.gg/grok-one-shot) - Chat with developers
+- [GitHub Issues](https://github.com/x-cli-team/x-cli/issues) - Report bugs and request features
+- [Discussions](https://github.com/x-cli-team/x-cli/discussions) - General discussions
 
-Real-world examples and starter templates for common integration patterns.
+## Support
 
-[View Examples →](./examples)
+Need help with development?
 
-### 🧪 Testing & Debugging
-
-Best practices for testing your extensions and debugging integration issues.
-
-[Testing Guide →](../features/testing-integration)
-
-### 📦 Publishing & Distribution
-
-Learn how to package and distribute your tools and integrations.
-
-[Publishing Guide →](../deployment/overview)
-
-## Advanced Topics
-
-### 🔄 Subagents
-
-Build specialized AI agents that work within Grok's multi-agent system.
-
-[Subagents Guide →](../build-with-claude-code/subagents)
-
-### ⚙️ Configuration
-
-Deep dive into advanced configuration options for power users and enterprises.
-
-[Advanced Config →](../configuration/profiles)
-
-### 🚀 Performance
-
-Optimize your integrations for speed and reliability at scale.
-
-[Performance Guide →](../features/performance-monitoring)
-
-Ready to start building? Begin with our [Getting Started Guide →](./getting-started)
+- Check our [Troubleshooting Guide](../build-with-claude-code/troubleshooting)
+- Ask in [Discord #developers](https://discord.gg/grok-one-shot)
+- Create a [GitHub Discussion](https://github.com/x-cli-team/x-cli/discussions)

@@ -117,7 +117,7 @@ function syncClaudeCodeDocs() {
   
   // Clear existing docs (except custom files we want to preserve)
   const preserveFiles = ['overview.md', 'roadmap.md']; // Keep custom files
-  const preserveDirectories = ['architecture', 'community']; // Keep custom directories
+  const preserveDirectories = ['architecture', 'community', 'developers']; // Keep custom directories
   
   if (fs.existsSync(DOCS_DIR)) {
     const existing = fs.readdirSync(DOCS_DIR, { withFileTypes: true });
@@ -285,7 +285,20 @@ function syncClaudeCodeDocs() {
         type: 'category',
         label: 'Community',
         items: [
+          'community/index',
+          'community/contributing', 
+          'community/support',
           'community/testimonials'
+        ]
+      },
+      
+      // Developers
+      {
+        type: 'category', 
+        label: 'Developers',
+        items: [
+          'developers/index',
+          'developers/setup'
         ]
       },
       

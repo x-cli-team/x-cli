@@ -1,8 +1,0 @@
-{
-  "label": "🏗️ For Developers",
-  "position": 200,
-  "link": {
-    "type": "generated-index",
-    "description": "Build powerful integrations and extend Grok One-Shot with custom tools, MCP servers, and advanced features."
-  }
-}

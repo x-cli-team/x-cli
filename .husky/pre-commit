@@ -64,6 +64,22 @@ npx lint-staged --config package.json .agent/**/*.{md,mdx} && npx lint-staged --
 echo "📝 Checking for .agent documentation updates..."
 npm run update-agent-docs-auto 2>/dev/null || echo "📝 Documentation update skipped (not required)"
 
+# Validate MDX files for compilation errors
+echo "🔍 Validating MDX documentation..."
+if ! npm run build:site > /dev/null 2>&1; then
+  echo "❌ MDX compilation failed! Please fix MDX syntax errors before committing."
+  echo "💡 Common issues:"
+  echo "   - Custom component closing tags (</Tip>, </Step>, </Note>) inside list items"
+  echo "   - Missing blank lines before closing tags"
+  echo "   - Unmatched opening/closing tags"
+  echo ""
+  echo "🔧 To debug: Run 'npm run build:site' to see detailed errors"
+  echo "🚫 Commit blocked - fix MDX errors and try again"
+  exit 1
+else
+  echo "✅ MDX documentation validated successfully"
+fi
+
 # TODO: Add session learnings capture here
 # This could log agent interactions, learnings, or changes made during the session
 # For now, this is a placeholder for future implementation
