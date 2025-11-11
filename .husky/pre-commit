@@ -77,6 +77,22 @@ else
   echo "⚠️ Grok not available - skipping roadmap update"
 fi
 
+# Run core features test suite
+if ! ./scripts/test-core-features-husky.sh true 2>/dev/null; then
+  echo "❌ Core features validation failed! Essential functionality is broken."
+  echo "💡 Common issues:"
+  echo "   - TypeScript compilation errors"
+  echo "   - Missing dependencies"
+  echo "   - Build configuration problems"
+  echo "   - Core source files missing"
+  echo ""
+  echo "🔧 To debug: Run './scripts/test-core-features.sh' for detailed analysis"
+  echo "🚫 Commit blocked - fix core functionality and try again"
+  exit 1
+else
+  echo "✅ Core features validated successfully"
+fi
+
 # Validate MDX files for compilation errors
 echo "🔍 Validating MDX documentation..."
 if ! npm run build:site > /dev/null 2>&1; then
