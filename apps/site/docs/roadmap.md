@@ -6,7 +6,7 @@ title: Roadmap
 
 Our development roadmap outlines planned features and improvements for Grok One-Shot.
 
-## Current Version: v1.1.105
+## Current Version: v1.1.113
 
 ### Recently Completed
 
@@ -26,7 +26,7 @@ Our development roadmap outlines planned features and improvements for Grok One-
 - Installation and configuration guides
 - API reference and troubleshooting
 
-## Next Release: v1.2.0 (December 2024)
+## Next Release: v1.2.0 (December 2025)
 
 ### In Development
 
@@ -51,7 +51,7 @@ Our development roadmap outlines planned features and improvements for Grok One-
 - Enhanced debugging tools
 - Better session restore
 
-## Q1 2025
+## Q1 2026
 
 ### Planned Features
 
@@ -76,7 +76,7 @@ Our development roadmap outlines planned features and improvements for Grok One-
 - Custom model fine-tuning
 - Advanced reasoning modes
 
-## Q2 2025
+## Q2 2026
 
 ### Future Vision
 
