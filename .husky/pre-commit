@@ -93,6 +93,22 @@ else
   echo "✅ Core features validated successfully"
 fi
 
+# Run quick tool system validation
+if ! ./scripts/test-tools-quick.sh true 2>/dev/null; then
+  echo "❌ Tool system validation failed! Tool infrastructure is broken."
+  echo "💡 Common issues:"
+  echo "   - Tool exports missing"
+  echo "   - Tool files deleted or moved"
+  echo "   - Tool registration broken"
+  echo "   - MCP integration issues"
+  echo ""
+  echo "🔧 To debug: Run 'npm run test:tools' for comprehensive tool analysis"
+  echo "🚫 Commit blocked - fix tool system and try again"
+  exit 1
+else
+  echo "✅ Tool system validated successfully (25+ tools)"
+fi
+
 # Validate MDX files for compilation errors
 echo "🔍 Validating MDX documentation..."
 if ! npm run build:site > /dev/null 2>&1; then
