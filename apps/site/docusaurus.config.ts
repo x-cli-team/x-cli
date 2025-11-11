@@ -54,7 +54,7 @@ const config: Config = {
       tagName: 'meta',
       attributes: {
         property: 'og:image',
-        content: 'https://grok-one-shot.dev/img/logo.png',
+        content: 'https://grok-one-shot.org/img/logo.png',
       },
     },
     {
