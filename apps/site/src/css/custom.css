@@ -233,9 +233,6 @@
   background: var(--ifm-background-color);
 }
 
-.container {
-  max-width: 1200px;
-}
 
 /* Clean typography */
 .markdown h1 {
