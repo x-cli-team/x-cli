@@ -109,6 +109,22 @@ else
   echo "✅ Tool system validated successfully (25+ tools)"
 fi
 
+# Run tool code validation to catch accidental changes
+if ! ./scripts/validate-tool-code-husky.sh true 2>/dev/null; then
+  echo "❌ Tool code validation failed! Accidental changes detected in core tools."
+  echo "💡 Common issues:"
+  echo "   - Tool class definitions missing"
+  echo "   - Core methods removed or renamed"
+  echo "   - Export statements broken"
+  echo "   - Tool files deleted or moved"
+  echo ""
+  echo "🔧 To debug: Run 'npm run test:tools:validate' for detailed analysis"
+  echo "🚫 Commit blocked - review changes to tool files carefully"
+  exit 1
+else
+  echo "✅ Tool code integrity verified (no accidental changes detected)"
+fi
+
 # Validate MDX files for compilation errors
 echo "🔍 Validating MDX documentation..."
 if ! npm run build:site > /dev/null 2>&1; then

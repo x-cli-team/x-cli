@@ -30,6 +30,7 @@
     "test:core": "./scripts/test-core-features.sh",
     "test:tools": "./scripts/test-all-tools.sh",
     "test:tools:quick": "./scripts/test-tools-quick.sh",
+    "test:tools:validate": "./scripts/validate-tool-code.sh",
     "prepare": "husky install",
     "dev:site": "cd apps/site && npm run start",
     "build:site": "cd apps/site && npm run build",
