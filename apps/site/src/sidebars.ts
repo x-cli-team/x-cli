@@ -10,7 +10,6 @@ const sidebars: SidebarsConfig = {
       "label": "🚀 Getting Started",
       "items": [
         "getting-started/overview",
-        "getting-started/installation", 
         "getting-started/quickstart",
         "getting-started/common-workflows",
         "getting-started/skills"
