@@ -33,7 +33,7 @@ jobs:
         run: |
           # Create a temporary package.json for GitHub Packages
           # Use @x-cli-team scope to match the organization name
-          jq '.name = "@x-cli-team/x-cli" | .publishConfig.registry = "https://npm.pkg.github.com"' package.json > package-github.json
+          jq '.name = "@x-cli-team/grok-one-shot" | .publishConfig.registry = "https://npm.pkg.github.com"' package.json > package-github.json
           mv package-github.json package.json
 
       - name: Publish to GitHub Packages

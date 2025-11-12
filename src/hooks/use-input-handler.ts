@@ -603,7 +603,7 @@ ${versionInfo.isUpdateAvailable
 }
 
 Package: ${pkg.name}
-GitHub: https://github.com/x-cli-team/x-cli
+GitHub: https://github.com/x-cli-team/grok-one-shot
 NPM: https://www.npmjs.com/package/${pkg.name}`,
           timestamp: new Date(),
         };

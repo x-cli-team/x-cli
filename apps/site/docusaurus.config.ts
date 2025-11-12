@@ -5,6 +5,9 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
+  onBrokenLinks: 'warn',
+  onBrokenAnchors: 'warn',
+  onBrokenAnchors: 'warn',
   title: 'Grok One-Shot',
   tagline: 'Claude Code-level intelligence in your terminal',
   favicon: 'img/favicon.ico',
@@ -22,7 +25,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'x-cli-team', // Usually your GitHub org/user name.
+  organizationName: 'x-cli-team', // GitHub organization (preserved for CI/CD compatibility)
   projectName: 'grok-one-shot', // Usually your repo name.
 
   onBrokenLinks: 'warn',

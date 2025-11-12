@@ -18512,6 +18512,7 @@ var init_package = __esm({
         }
       },
       bin: {
+        "grok-one-shot": "./dist/index.js",
         grok: "./dist/index.js"
       },
       files: [
@@ -18614,12 +18615,12 @@ var init_package = __esm({
       preferGlobal: true,
       repository: {
         type: "git",
-        url: "https://github.com/x-cli-team/x-cli.git"
+        url: "https://github.com/x-cli-team/grok-one-shot.git"
       },
       bugs: {
-        url: "https://github.com/x-cli-team/x-cli/issues"
+        url: "https://github.com/x-cli-team/grok-one-shot/issues"
       },
-      homepage: "https://x-cli.dev",
+      homepage: "https://grok-one-shot.org",
       icon: "docs/assets/logos/x-cli-logo.svg",
       publishConfig: {
         access: "public"
@@ -19195,7 +19196,7 @@ Use \`/upgrade\` to update automatically or run:
 \`${versionInfo.updateCommand}\`` : "\u2705 **You are up to date!**"}
 
 Package: ${package_default.name}
-GitHub: https://github.com/x-cli-team/x-cli
+GitHub: https://github.com/x-cli-team/grok-one-shot
 NPM: https://www.npmjs.com/package/${package_default.name}`,
           timestamp: /* @__PURE__ */ new Date()
         };
@@ -23778,6 +23779,7 @@ var require_package = __commonJS({
         }
       },
       bin: {
+        "grok-one-shot": "./dist/index.js",
         grok: "./dist/index.js"
       },
       files: [
@@ -23880,12 +23882,12 @@ var require_package = __commonJS({
       preferGlobal: true,
       repository: {
         type: "git",
-        url: "https://github.com/x-cli-team/x-cli.git"
+        url: "https://github.com/x-cli-team/grok-one-shot.git"
       },
       bugs: {
-        url: "https://github.com/x-cli-team/x-cli/issues"
+        url: "https://github.com/x-cli-team/grok-one-shot/issues"
       },
-      homepage: "https://x-cli.dev",
+      homepage: "https://grok-one-shot.org",
       icon: "docs/assets/logos/x-cli-logo.svg",
       publishConfig: {
         access: "public"
@@ -23994,7 +23996,7 @@ try {
     log("\u{1F916} Creating GrokAgent instance...");
     const agent = new GrokAgent2(apiKey, baseURL, model, maxToolRounds);
     log("\u{1F4CB} Setting up Commander CLI...");
-    program.name("x-cli").description("AI-powered CLI assistant").version(pkg.default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key").option("-u, --base-url <url>", "Grok API base URL").option("-m, --model <model>", "AI model to use").option("-p, --prompt <prompt>", "process a single prompt and exit (headless mode)").option("--max-tool-rounds <rounds>", "maximum tool rounds", "400").option("-q, --quiet", "suppress startup banner and messages").action(async (message, options) => {
+    program.name("grok one shot").description("AI-powered CLI assistant").version(pkg.default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key").option("-u, --base-url <url>", "Grok API base URL").option("-m, --model <model>", "AI model to use").option("-p, --prompt <prompt>", "process a single prompt and exit (headless mode)").option("--max-tool-rounds <rounds>", "maximum tool rounds", "400").option("-q, --quiet", "suppress startup banner and messages").action(async (message, options) => {
       log("\u{1F3AF} Starting main execution...");
       if (options.directory) {
         try {

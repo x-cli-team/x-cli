@@ -113,7 +113,7 @@ try {
 
     log("📋 Setting up Commander CLI...");
     program
-      .name("x-cli")
+      .name("grok one shot")
       .description("AI-powered CLI assistant")
       .version(pkg.default.version)
       .argument("[message...]", "Initial message to send to Grok")

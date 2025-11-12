@@ -217,7 +217,7 @@ jobs:
           cp package.json package.json.backup
 
           # Update package name to be scoped (required for GitHub Packages)
-          sed -i 's/"name": "@xagent\/one-shot"/"name": "@x-cli-team\/x-cli"/' package.json
+          sed -i 's/"name": "@xagent\/one-shot"/"name": "@x-cli-team\/grok-one-shot"/' package.json
 
           echo "Created scoped package.json for GitHub Packages:"
           grep '"name":' package.json
@@ -282,7 +282,7 @@ jobs:
             ```
 
             ### What's New
-            - See [CHANGELOG.md](https://github.com/x-cli-team/x-cli/blob/main/CHANGELOG.md) for details
+            - See [CHANGELOG.md](https://github.com/x-cli-team/grok-one-shot/blob/main/CHANGELOG.md) for details
             - Full release notes available in commit history
           draft: false
           prerelease: false
@@ -302,7 +302,7 @@ jobs:
           echo "✅ Published both packages v${NEW_VER} to:"
           echo "  📦 NPM (primary): https://www.npmjs.com/package/@xagent/one-shot"
           echo "  📦 NPM (legacy): https://www.npmjs.com/package/@xagent/x-cli"
-          echo "  📦 GitHub Packages: https://github.com/x-cli-team/x-cli/pkgs/npm/x-cli"
+          echo "  📦 GitHub Packages: https://github.com/x-cli-team/grok-one-shot/pkgs/npm/grok-one-shot"
 
 # Test commit to verify branch protection bypass works
 # Final test after bypass setup

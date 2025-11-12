@@ -16,6 +16,7 @@ clean_install() {
     pkill -f grok 2>/dev/null || true  # Clean up old installations
     
     # Remove existing installations
+    npm uninstall -g @xagent/one-shot 2>/dev/null || true
     npm uninstall -g @xagent/x-cli 2>/dev/null || true
     
     # Force remove directories if they exist
@@ -29,10 +30,10 @@ clean_install() {
             rm -f "$NODE_PATH/bin/grok" 2>/dev/null || true
         fi
         # Clean up new installations
-        if [ -d "$NODE_PATH/lib/node_modules/@xagent/x-cli" ]; then
+        if [ -d "$NODE_PATH/lib/node_modules/@xagent/one-shot" ]; then
             echo "🗑️ Removing previous Grok One Shot installation..."
-            rm -rf "$NODE_PATH/lib/node_modules/@xagent/x-cli" 2>/dev/null || true
-            rm -f "$NODE_PATH/bin/xcli" 2>/dev/null || true
+            rm -rf "$NODE_PATH/lib/node_modules/@xagent/one-shot" 2>/dev/null || true
+            rm -f "$NODE_PATH/bin/grok-one-shot" 2>/dev/null || true
         fi
     fi
     
@@ -45,26 +46,26 @@ try_install() {
     echo "📦 Installing Grok One Shot..."
     
     # Method 1: Standard install
-    if npm install -g @xagent/x-cli@latest 2>/dev/null; then
+    if npm install -g @xagent/one-shot@latest 2>/dev/null; then
         return 0
     fi
     
     echo "⚠️ Standard install failed, trying alternative methods..."
     
     # Method 2: Force install
-    if npm install -g @xagent/x-cli@latest --force 2>/dev/null; then
+    if npm install -g @xagent/one-shot@latest --force 2>/dev/null; then
         return 0
     fi
     
     # Method 3: With explicit registry
-    if npm install -g @xagent/x-cli@latest --registry https://registry.npmjs.org/ 2>/dev/null; then
+    if npm install -g @xagent/one-shot@latest --registry https://registry.npmjs.org/ 2>/dev/null; then
         return 0
     fi
     
     # Method 4: Try yarn if available
     if command -v yarn >/dev/null 2>&1; then
         echo "🧶 Trying with Yarn..."
-        if yarn global add @xagent/x-cli@latest 2>/dev/null; then
+        if yarn global add @xagent/one-shot@latest 2>/dev/null; then
             return 0
         fi
     fi
@@ -72,7 +73,7 @@ try_install() {
     # Method 5: Try pnpm if available
     if command -v pnpm >/dev/null 2>&1; then
         echo "📦 Trying with pnpm..."
-        if pnpm add -g @xagent/x-cli@latest 2>/dev/null; then
+        if pnpm add -g @xagent/one-shot@latest 2>/dev/null; then
             return 0
         fi
     fi
@@ -117,12 +118,12 @@ main() {
         echo "❌ Installation failed with all methods."
         echo ""
         echo "🛠️ Manual installation options:"
-        echo "1. Try downloading from: https://github.com/x-cli-team/x-cli/releases"
+        echo "1. Try downloading from: https://github.com/x-cli-team/grok-one-shot/releases"
         echo "2. Or install alternative package managers:"
-        echo "   • Yarn: npm install -g yarn && yarn global add @xagent/x-cli@latest"
-        echo "   • pnpm: npm install -g pnpm && pnpm add -g @xagent/x-cli@latest"
+        echo "   • Yarn: npm install -g yarn && yarn global add @xagent/one-shot@latest"
+        echo "   • pnpm: npm install -g pnpm && pnpm add -g @xagent/one-shot@latest"
         echo ""
-        echo "🐛 Report issues: https://github.com/x-cli-team/x-cli/issues"
+        echo "🐛 Report issues: https://github.com/x-cli-team/grok-one-shot/issues"
         exit 1
     fi
 }

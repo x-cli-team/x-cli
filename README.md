@@ -41,9 +41,9 @@ This release includes critical streaming fixes and major code cleanup.
 </div>
 
 [![NPM Version](https://img.shields.io/npm/v/@xagent/one-shot?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/one-shot)
-[![GitHub Release](https://img.shields.io/github/v/release/x-cli-team/x-cli?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/x-cli/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/x-cli-team/grok-one-shot?style=for-the-badge&logo=github&color=181717)](https://github.com/x-cli-team/grok-one-shot/releases)
 [![Downloads](https://img.shields.io/npm/dm/@xagent/one-shot?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@xagent/one-shot)
-[![License](https://img.shields.io/github/license/x-cli-team/x-cli?style=for-the-badge&color=green)](https://github.com/x-cli-team/x-cli/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/x-cli-team/grok-one-shot?style=for-the-badge&color=green)](https://github.com/x-cli-team/grok-one-shot/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-xAI_Community-5865F2?style=for-the-badge&logo=discord)](https://discord.com/channels/1315720379607679066/1315822328139223064)
 
 A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligence** and advanced tool capabilities.
@@ -55,10 +55,10 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 ## 🔗 Quick Links
 
 - **📦 [NPM Package](https://www.npmjs.com/package/@xagent/one-shot)** - Install globally with `npm install -g @xagent/one-shot`
-- **🐙 [GitHub Repository](https://github.com/x-cli-team/x-cli)** - Source code, issues, and contributions
+- **🐙 [GitHub Repository](https://github.com/x-cli-team/grok-one-shot)** - Source code, issues, and contributions
 - **🎯 [Competitive Parity Analysis](./.agent/parity/)** - Strategic analysis vs Claude Code, Cursor IDE, and OpenAI Codex
 - **💬 [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Official xAI API community support
-- **📚 [Releases](https://github.com/x-cli-team/x-cli/releases)** - Version history and changelogs
+- **📚 [Releases](https://github.com/x-cli-team/grok-one-shot/releases)** - Version history and changelogs
 
 ## Featured In
 
@@ -1066,7 +1066,7 @@ git push origin main --follow-tags
 
 ### 📊 Monitoring
 
-- **GitHub Actions**: https://github.com/x-cli-team/x-cli/actions
+- **GitHub Actions**: https://github.com/x-cli-team/grok-one-shot/actions
 - **NPM Package**: https://www.npmjs.com/package/@xagent/one-shot
 - **Release History**: Check git tags or NPM version history
 
@@ -1250,7 +1250,7 @@ _Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md)
 ### How to Contribute
 
 1. **Fork** the repository on GitHub
-2. **Clone** your fork locally: `git clone https://github.com/yourusername/x-cli.git`
+2. **Clone** your fork locally: `git clone https://github.com/yourusername/grok-one-shot.git`
 3. **Create** a feature branch: `git checkout -b feature/your-feature-name`
 4. **Make** your changes and commit them: `git commit -m "feat: add awesome feature"`
 5. **Push** to your fork: `git push origin feature/your-feature-name`

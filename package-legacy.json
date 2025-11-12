@@ -13,6 +13,7 @@
     }
   },
   "bin": {
+    "grok-one-shot": "./dist/index.js",
     "grok": "./dist/index.js"
   },
   "files": ["dist", "README.md", "package.json"],
@@ -52,10 +53,10 @@
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/x-cli-team/x-cli.git"
+    "url": "https://github.com/x-cli-team/grok-one-shot.git"
   },
   "bugs": {
-    "url": "https://github.com/x-cli-team/x-cli/issues"
+    "url": "https://github.com/x-cli-team/grok-one-shot/issues"
   },
   "homepage": "https://x-cli.dev",
   "publishConfig": {
