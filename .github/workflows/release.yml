@@ -54,8 +54,8 @@ jobs:
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           if echo "$COMMIT_MSG" | grep -qiE "^Bump version to "; then
-            echo "should_release=false" >> $GITHUB_OUTPUT
-            echo "Auto-bump detected; skipping release."
+            echo "should_release=publish_only" >> $GITHUB_OUTPUT
+            echo "Version bump detected; publishing existing version."
           elif echo "$COMMIT_MSG" | grep -qi "Merge pull request.*release/"; then
             echo "should_release=github_release_only" >> $GITHUB_OUTPUT
             echo "Release PR merge detected; creating GitHub release only."
@@ -113,28 +113,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Configure npm auth
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: npm run build
 
       - name: Dry run (sanity check)
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: npm publish --access public --dry-run
 
       - name: Publish to npm (primary package @xagent/one-shot)
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (legacy package @xagent/x-cli)
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           echo "📦 Publishing legacy package @xagent/x-cli for backwards compatibility..."
 
@@ -161,7 +161,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify NPM publication (both packages)
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
@@ -246,10 +246,10 @@ jobs:
           # Restore original package.json to avoid affecting future operations
           mv package.json.backup package.json
 
-      # Get current version for GitHub release (needed for release PR merges)
+      # Get current version for GitHub release (needed for release PR merges and publish_only)
       - name: Get current version
         id: get-version
-        if: steps.should-release.outputs.should_release == 'github_release_only'
+        if: steps.should-release.outputs.should_release == 'github_release_only' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
@@ -257,7 +257,7 @@ jobs:
 
       # ---------- Create GitHub Release ----------
       - name: Create GitHub Release
-        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'github_release_only'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'github_release_only' || steps.should-release.outputs.should_release == 'publish_only'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.get-version.outputs.version || env.NEW_VER }}
@@ -290,13 +290,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Cleanup
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           rm -f .npmrc
           echo "Restored original package.json"
 
       - name: Publish summary
-        if: steps.should-release.outputs.should_release == 'true'
+        if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
           echo "✅ Published both packages v${NEW_VER} to:"
