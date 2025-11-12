@@ -356,7 +356,7 @@ if [ $SUCCESS_COUNT -gt 0 ]; then
 
     echo ""
 
-    echo "📁 To use: cp /tmp/all-claude-docs.zip /home/user/x-cli/"
+    echo "📁 To use: cp /tmp/all-claude-docs.zip /home/user/grok-one-shot/"
 
     echo ""
 

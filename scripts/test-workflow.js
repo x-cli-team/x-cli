@@ -3,7 +3,7 @@
 /**
  * Test Workflow Script
  *
- * Builds, links, and tests the X-CLI workflow features with proper argument passing.
+ * Builds, links, and tests the Grok One Shot workflow features with proper argument passing.
  * Usage: npm run test:workflow "your task description"
  * Example: npm run test:workflow "add a hello world function"
  */
@@ -37,7 +37,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log('🔨 Building X-CLI...');
+  console.log('🔨 Building Grok One Shot...');
   try {
     execSync('npm run build', { stdio: 'inherit' });
   } catch (error) {

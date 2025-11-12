@@ -1,5 +1,5 @@
 #!/bin/bash
-# ⚠️  CRITICAL SMART PUSH SCRIPT FOR X-CLI AUTOMATION ⚠️
+# ⚠️  CRITICAL SMART PUSH SCRIPT FOR Grok One Shot AUTOMATION ⚠️
 #
 # 🎯 PURPOSE: This is the ONLY safe way to push to main branch
 # 

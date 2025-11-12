@@ -79,7 +79,7 @@ jobs:
           const name = extractField('👤 Your Name') || extractField('Your Name');
           const title = extractField('💼 Job Title') || extractField('Job Title');
           const company = extractField('🏢 Company/Organization') || extractField('Company');
-          const quote = extractTextarea('💬 Your Experience with X-CLI') || extractTextarea('Your Experience');
+          const quote = extractTextarea('💬 Your Experience with Grok One Shot') || extractTextarea('Your Experience');
           const link = extractField('🔗 Your Profile Link') || extractField('Profile Link');
           const tags = extractTags();
 
@@ -135,7 +135,7 @@ jobs:
           testimonials.push(testimonial);
 
           // Write back to file
-          const header = '# X CLI Community Testimonials\\n# This file is automatically managed by GitHub Actions\\n# Submit testimonials via: https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml\\n\\n';
+          const header = '# Grok One Shot Community Testimonials\\n# This file is automatically managed by GitHub Actions\\n# Submit testimonials via: https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml\\n\\n';
 
           fs.writeFileSync('data/testimonials.yml', header + yaml.dump(testimonials));
 
@@ -236,7 +236,7 @@ jobs:
             ### ❓ Need Changes?
             Comment on the PR if you need any modifications before it goes live.
 
-            **Welcome to the X-CLI community! 🚀**
+            **Welcome to the Grok One Shot community! 🚀**
 
       - name: Handle parsing errors
         if: failure()

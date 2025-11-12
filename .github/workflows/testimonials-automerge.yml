@@ -15,22 +15,22 @@ permissions:
 jobs:
   testimonials-validate-and-merge:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          
+
       - name: Install validation dependencies
         run: |
           npm install js-yaml ajv ajv-formats
-          
+
       - name: Validate testimonial schema
         run: |
           node - <<'EOF'
@@ -38,9 +38,9 @@ jobs:
           const yaml = require('js-yaml');
           const Ajv = require('ajv');
           const addFormats = require('ajv-formats');
-          
+
           console.log('🔍 Validating testimonial schema...');
-          
+
           try {
             // Load schema and data
             const schema = JSON.parse(fs.readFileSync('data/schemas/testimonial.schema.json', 'utf8'));
@@ -69,20 +69,20 @@ jobs:
             process.exit(1);
           }
           EOF
-          
+
       - name: Ensure only allowed files changed
         run: |
           set -e
           echo "🔍 Checking changed files..."
-          
+
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}... | tr '\n' ' ')
           echo "Changed files: $CHANGED"
-          
+
           if [ -z "$CHANGED" ]; then
             echo "❌ No files changed"
             exit 1
           fi
-          
+
           for f in $CHANGED; do
             case "$f" in
               data/testimonials.yml)
@@ -98,18 +98,18 @@ jobs:
                 ;;
             esac
           done
-          
+
           echo "✅ File change validation passed"
-          
+
       - name: Content moderation and validation
         run: |
           node - <<'EOF'
           const fs = require('fs');
           const yaml = require('js-yaml');
           const { URL } = require('url');
-          
+
           console.log('🔍 Running content moderation...');
-          
+
           try {
             const data = yaml.load(fs.readFileSync('data/testimonials.yml', 'utf8'));
             
@@ -229,7 +229,7 @@ jobs:
             process.exit(1);
           }
           EOF
-          
+
       - name: Validate YAML syntax
         run: |
           echo "🔍 Validating YAML syntax..."
@@ -244,7 +244,7 @@ jobs:
               process.exit(1);
             }
           "
-          
+
       - name: Add auto-merge label
         if: success()
         uses: actions-ecosystem/action-add-labels@v1
@@ -252,7 +252,7 @@ jobs:
           labels: |
             automerge
             validated
-            
+
       - name: Add validation success comment
         if: success()
         uses: peter-evans/create-or-update-comment@v3
@@ -260,26 +260,26 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ## ✅ Automated Validation Passed!
-            
+
             All checks have passed successfully:
-            
+
             - ✅ **Schema validation**: Testimonial format is correct
             - ✅ **Content moderation**: Content meets community guidelines  
             - ✅ **File validation**: Only allowed files were modified
             - ✅ **Duplicate check**: No duplicate testimonials found
             - ✅ **Link verification**: Profile links are valid
-            
+
             🚀 **This PR will auto-merge shortly** and your testimonial will be live within minutes!
-            
-            Thank you for contributing to the X-CLI community! 🎉
-            
+
+            Thank you for contributing to the Grok One Shot community! 🎉
+
       - name: Enable auto-merge
         if: success()
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           merge-method: squash
-          
+
       - name: Add validation failure comment
         if: failure()
         uses: peter-evans/create-or-update-comment@v3
@@ -287,19 +287,19 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ## ❌ Automated Validation Failed
-            
+
             The testimonial submission didn't pass our validation checks. Common issues:
-            
+
             - **Schema errors**: Missing required fields or incorrect format
             - **Content issues**: Inappropriate content or spam patterns detected
             - **Link problems**: Invalid or non-allowlisted profile URLs
             - **File changes**: Unauthorized file modifications
             - **Duplicates**: Testimonial from this person/link already exists
-            
+
             ### 🔧 How to fix:
-            
+
             1. **Check the workflow logs** above for specific error details
             2. **Update your testimonial** by editing the issue and resubmitting
             3. **Need help?** Ask in our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064)
-            
+
             The validation failure details are in the "Actions" tab above. ⬆️

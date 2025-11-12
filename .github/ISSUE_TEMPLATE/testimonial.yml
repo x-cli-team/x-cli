@@ -1,6 +1,6 @@
 name: Join as Collaborator - Share Your Experience
 description: Submit your experience and automatically become a repository collaborator
-title: "[Collaboration] Developer Experience with X-CLI"
+title: "[Collaboration] Developer Experience with Grok One Shot"
 labels: ["testimonial", "community"]
 
 body:
@@ -8,21 +8,21 @@ body:
     attributes:
       value: |
         # Join as Collaborator Through Your Experience
-        
-        Share your technical experience with X-CLI and **automatically become a repository collaborator** with professional benefits.
-        
+
+        Share your technical experience with Grok One Shot and **automatically become a repository collaborator** with professional benefits.
+
         **Professional Benefits You'll Receive:**
         - **Repository collaborator status** with triage permissions for pull requests and issues
         - **Permanent backlink** from our documentation site to your profile for SEO benefits
         - **GitHub profile enhancement** as a contributor to an active open-source CLI tool
         - **Technical skill development** through TypeScript, Node.js, and AI integration experience
         - **Professional networking** opportunities within the developer tooling community
-        
+
         **Your submission will be:**
         - Automatically validated and published to our website within 10 minutes
         - Featured with full professional attribution and link to your profile
         - Used to generate your immediate collaboration invitation
-        
+
         *All processing is automated - you'll receive repository access within minutes of submission.*
 
   - type: input
@@ -55,21 +55,21 @@ body:
   - type: textarea
     id: quote
     attributes:
-      label: Your Technical Experience with X-CLI
+      label: Your Technical Experience with Grok One Shot
       description: |
-        Describe how X-CLI improved your development workflow and productivity. Focus on specific technical benefits.
-        
+        Describe how Grok One Shot improved your development workflow and productivity. Focus on specific technical benefits.
+
         **Strategic Guidelines:**
         - Highlight specific productivity gains or workflow improvements (aim for 2-3 sentences)
         - Mention integration with your existing development stack
         - Reference measurable outcomes (time savings, error reduction, efficiency)
         - Connect to broader themes like AI tooling evolution or open-source values
-        
+
         **Professional Examples:**
-        - "X-CLI eliminated context switching in my development workflow, saving approximately 2 hours daily..."
+        - "Grok One Shot eliminated context switching in my development workflow, saving approximately 2 hours daily..."
         - "The MCP integration architecture opened new possibilities for connecting AI assistance with my existing tools..."
-        - "Contributing to X-CLI enhanced my understanding of AI tool integration and production TypeScript development..."
-      placeholder: "X-CLI eliminated context switching in my development workflow. The AI assistance directly in my terminal improved my debugging accuracy and saved significant time daily."
+        - "Contributing to Grok One Shot enhanced my understanding of AI tool integration and production TypeScript development..."
+      placeholder: "Grok One Shot eliminated context switching in my development workflow. The AI assistance directly in my terminal improved my debugging accuracy and saved significant time daily."
     validations:
       required: true
 
@@ -79,7 +79,7 @@ body:
       label: Professional Profile URL
       description: |
         Your professional profile for backlink attribution and networking opportunities
-        
+
         **Preferred Platforms:**
         - GitHub: https://github.com/username (recommended for developer networking)
         - LinkedIn: https://linkedin.com/in/username (professional networking)
@@ -127,9 +127,9 @@ body:
       label: Collaboration Agreement
       description: Confirm your agreement for testimonial publication and collaboration invitation
       options:
-        - label: I consent to having my testimonial featured on the X-CLI website with professional attribution
+        - label: I consent to having my testimonial featured on the Grok One Shot website with professional attribution
           required: true
-        - label: I confirm this testimonial is truthful and based on my actual experience with X-CLI
+        - label: I confirm this testimonial is truthful and based on my actual experience with Grok One Shot
           required: true
         - label: I understand I will receive a GitHub collaboration invitation with repository access
           required: true
@@ -140,21 +140,21 @@ body:
     attributes:
       value: |
         ---
-        
+
         ### Professional Onboarding Process
-        
+
         **Immediate Next Steps:**
         1. **Automated Processing** - System creates pull request with your testimonial and validates content
         2. **Publication** - Your testimonial goes live on our website within 10 minutes with full attribution
         3. **Collaboration Invitation** - You receive GitHub repository access with triage permissions
         4. **Professional Benefits** - Permanent backlink, portfolio enhancement, and networking opportunities
-        
+
         **After Submission:**
         - Check your email for the GitHub collaboration invitation
         - Explore the codebase and contribution guidelines
         - Join technical discussions and start contributing improvements
         - Connect with other developers in the community
-        
+
         **Questions?** Join our [Discord community](https://discord.com/channels/1315720379607679066/1315822328139223064) or participate in repository discussions.
-        
-        **Welcome to the X-CLI development community.**
+
+        **Welcome to the Grok One Shot development community.**

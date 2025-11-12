@@ -207,6 +207,6 @@ apps/site/.grok/
 apps/site/*.mp4
 apps/site/grok-video-*.mp4
 
-# X-CLI configuration
-.xcli/all-claude-docs.zip
+# Grok One Shot configuration
+.grok-one-shot/all-claude-docs.zip
 all-claude-docs.zip

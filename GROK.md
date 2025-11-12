@@ -24,13 +24,13 @@ Grok One-Shot is an interactive CLI tool that brings AI-powered assistance direc
 export GROK_API_KEY="your-key-here"
 
 # Run interactively
-x-cli
+grok-one-shot
 
 # Run with initial message
-x-cli "analyze the authentication flow"
+grok-one-shot "analyze the authentication flow"
 
 # Headless mode
-x-cli -p "list all TODO comments"
+grok-one-shot -p "list all TODO comments"
 ```
 
 ## Architecture
@@ -46,6 +46,7 @@ x-cli -p "list all TODO comments"
 ### Context Loading Strategy
 
 Grok One-Shot uses an efficient on-demand context loading approach:
+
 - **Startup**: Loads only GROK.md + docs-index.md (~700 tokens)
 - **Runtime**: AI agent reads specific docs via Read tool as needed
 - **Savings**: 93-96% reduction vs old auto-read system (65k-85k → 700 tokens)
@@ -63,7 +64,8 @@ MAX_TOOL_ROUNDS     # Optional: Max tool iterations (default: 400)
 
 ### Settings
 
-Settings stored in `~/.x-cli/settings.json`:
+Settings stored in `~/.xcli/settings.json`:
+
 - API key and base URL
 - Model preferences
 - Confirmation settings
@@ -127,26 +129,31 @@ src/
 ## Key Features
 
 ### 1. Intelligent Code Editing
+
 - Multi-file edits with context awareness
 - Refactoring with impact analysis
 - Syntax-aware modifications
 
 ### 2. Research Workflows
+
 - Automated research with approval gates
 - Codebase exploration and analysis
 - Recommendation generation
 
 ### 3. MCP Integration
+
 - Extensible via Model Context Protocol
 - Custom tools and capabilities
 - Server management via CLI
 
 ### 4. Session Management
-- Auto-saves to `~/.x-cli/sessions/`
+
+- Auto-saves to `~/.xcli/sessions/`
 - Token usage tracking
 - Session replay capability
 
 ### 5. Confirmation System
+
 - Configurable approval gates
 - Operation-level control
 - Session-level overrides
@@ -155,28 +162,28 @@ src/
 
 ```bash
 # Interactive mode
-x-cli
+grok-one-shot
 
 # With initial message
-x-cli "analyze authentication flow"
+grok-one-shot "analyze authentication flow"
 
 # Headless (non-interactive)
-x-cli -p "list all TODOs"
+grok-one-shot -p "list all TODOs"
 
 # Change directory
-x-cli -d /path/to/project
+grok-one-shot -d /path/to/project
 
 # Model selection
-x-cli -m grok-4-fast-non-reasoning
+grok-one-shot -m grok-4-fast-non-reasoning
 
 # MCP server management
-x-cli mcp add <server-name> <command>
-x-cli mcp list
-x-cli mcp remove <server-name>
+grok-one-shot mcp add <server-name> <command>
+grok-one-shot mcp list
+grok-one-shot mcp remove <server-name>
 
 # Configuration
-x-cli set-name "Your Name"
-x-cli toggle-confirmations
+grok-one-shot set-name "Your Name"
+grok-one-shot toggle-confirmations
 ```
 
 ## Best Practices
@@ -184,12 +191,13 @@ x-cli toggle-confirmations
 1. **Context Management**: Let AI load docs on-demand; don't pre-load everything
 2. **Token Efficiency**: Use headless mode for simple queries
 3. **MCP Extensions**: Add custom tools via MCP for domain-specific needs
-4. **Session Review**: Check `~/.x-cli/sessions/` for session history
+4. **Session Review**: Check `~/.xcli/sessions/` for session history
 5. **Documentation**: Keep `.agent/docs/` updated via Husky pre-commit hooks
 
 ## Integration with CI/CD
 
 Pre-commit hooks automatically:
+
 - Sync `.agent/docs/` to `apps/site/docs/` (Docusaurus)
 - Validate documentation structure
 - Update doc indexes
@@ -199,14 +207,17 @@ Pre-commit hooks automatically:
 ### Common Issues
 
 **"No API key found"**
+
 - Set `GROK_API_KEY` environment variable
-- Or use `-k` flag: `x-cli -k your-key`
+- Or use `-k` flag: `grok-one-shot -k your-key`
 
 **"Error: X CLI requires an interactive terminal"**
+
 - Use `-p` flag for headless mode
 - Or run in proper TTY environment
 
 **"Too many tool rounds"**
+
 - Increase `MAX_TOOL_ROUNDS` environment variable
 - Default is 400; adjust based on task complexity
 
@@ -226,7 +237,7 @@ MIT License - see LICENSE file
 
 - Issues: File in GitHub repository
 - Documentation: See `.agent/docs/` directory
-- Updates: Check `x-cli --version` for latest version
+- Updates: Check `grok-one-shot --version` for latest version
 
 ---
 

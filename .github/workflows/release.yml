@@ -263,7 +263,7 @@ jobs:
           tag_name: v${{ steps.get-version.outputs.version || env.NEW_VER }}
           name: Release v${{ steps.get-version.outputs.version || env.NEW_VER }}
           body: |
-            ## 🚀 X-CLI v${{ steps.get-version.outputs.version || env.NEW_VER }}
+            ## 🚀 Grok One Shot v${{ steps.get-version.outputs.version || env.NEW_VER }}
 
             ### Changes
             Automated release triggered by push to main branch.

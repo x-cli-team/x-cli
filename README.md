@@ -338,7 +338,7 @@ pnpm add -g @xagent/one-shot@latest
 bun add -g @xagent/one-shot@latest
 ```
 
-### 🛠️ PATH Setup (If `xcli` command not found)
+### 🛠️ PATH Setup (If `grok-one-shot` command not found)
 
 After installation, if you get "command not found", add npm's global bin to your PATH:
 
@@ -365,8 +365,8 @@ $env:PATH += ";$npmPath"
 **Verify installation:**
 
 ```bash
-xcli --version  # Should show current version
-which xcli      # Should show installation path
+grok-one-shot --version  # Should show current version
+which grok-one-shot      # Should show installation path
 ```
 
 ### ⚡ Quick Start (One-liner)
@@ -383,7 +383,7 @@ X_API_KEY=your_api_key_here npx -y @xagent/one-shot@latest --help
 npm install -g @xagent/one-shot@latest && \
 echo 'export X_API_KEY=your_api_key_here' >> ~/.zshrc && \
 source ~/.zshrc && \
-xcli --help
+grok-one-shot --help
 ```
 
 ### Local Development
@@ -418,7 +418,7 @@ cp .env.example .env
 **Method 3: Command Line Flag**
 
 ```bash
-xcli --api-key your_api_key_here
+grok-one-shot --api-key your_api_key_here
 ```
 
 **Method 4: User Settings File**
@@ -460,7 +460,7 @@ export GROK_BASE_URL=https://your-custom-endpoint.com/v1
 **Method 2: Command Line Flag**
 
 ```bash
-xcli --api-key your_api_key_here --base-url https://your-custom-endpoint.com/v1
+grok-one-shot --api-key your_api_key_here --base-url https://your-custom-endpoint.com/v1
 ```
 
 **Method 3: User Settings File**
@@ -537,7 +537,7 @@ This means you can have different models for different projects while maintainin
 
 ### Using Other API Providers
 
-**Important**: X-CLI uses **OpenAI-compatible APIs**. You can use any provider that implements the OpenAI chat completions standard.
+**Important**: Grok One Shot uses **OpenAI-compatible APIs**. You can use any provider that implements the OpenAI chat completions standard.
 
 **Popular Providers**:
 
@@ -631,7 +631,7 @@ The `.agent` folder is intentionally **gitignored** (contains sensitive project-
 1. **Initialize `.agent` system**:
 
 ```bash
-xcli
+grok-one-shot
 /init-agent
 ```
 
@@ -653,7 +653,7 @@ npx husky add .husky/pre-commit "npm run sync-docs"
 ```json
 {
   "scripts": {
-    "sync-docs": "xcli /update-agent-docs --sync-to-docusaurus"
+    "sync-docs": "grok-one-shot /update-agent-docs --sync-to-docusaurus"
   }
 }
 ```
@@ -682,7 +682,7 @@ npx husky add .husky/pre-commit "npm run sync-docs"
 1. **Initialize your project**:
 
 ```bash
-xcli
+grok-one-shot
 /init-agent
 ```
 
@@ -703,13 +703,13 @@ xcli
 Start the conversational AI assistant:
 
 ```bash
-xcli
+grok-one-shot
 ```
 
 Or specify a working directory:
 
 ```bash
-xcli -d /path/to/project
+grok-one-shot -d /path/to/project
 ```
 
 #### ⌨️ Keyboard Shortcuts
@@ -725,10 +725,10 @@ xcli -d /path/to/project
 Process a single prompt and exit (useful for scripting and automation):
 
 ```bash
-xcli --prompt "show me the package.json file"
-xcli -p "create a new file called example.js with a hello world function"
-xcli --prompt "run bun test and show me the results" --directory /path/to/project
-xcli --prompt "complex task" --max-tool-rounds 50  # Limit tool usage for faster execution
+grok-one-shot --prompt "show me the package.json file"
+grok-one-shot -p "create a new file called example.js with a hello world function"
+grok-one-shot --prompt "run bun test and show me the results" --directory /path/to/project
+grok-one-shot --prompt "complex task" --max-tool-rounds 50  # Limit tool usage for faster execution
 ```
 
 This mode is particularly useful for:
@@ -740,18 +740,18 @@ This mode is particularly useful for:
 
 ### Tool Execution Control
 
-By default, X-CLI allows up to 400 tool execution rounds to handle complex multi-step tasks. You can control this behavior:
+By default, Grok One Shot allows up to 400 tool execution rounds to handle complex multi-step tasks. You can control this behavior:
 
 ```bash
 # Limit tool rounds for faster execution on simple tasks
-xcli --max-tool-rounds 10 --prompt "show me the current directory"
+grok-one-shot --max-tool-rounds 10 --prompt "show me the current directory"
 
 # Increase limit for very complex tasks (use with caution)
-xcli --max-tool-rounds 1000 --prompt "comprehensive code refactoring"
+grok-one-shot --max-tool-rounds 1000 --prompt "comprehensive code refactoring"
 
 # Works with all modes
-xcli --max-tool-rounds 20  # Interactive mode
-xcli git commit-and-push --max-tool-rounds 30  # Git commands
+grok-one-shot --max-tool-rounds 20  # Interactive mode
+grok-one-shot git commit-and-push --max-tool-rounds 30  # Git commands
 ```
 
 **Use Cases**:
@@ -768,21 +768,21 @@ You can specify which AI model to use with the `--model` parameter or `GROK_MODE
 
 ```bash
 # Use x.ai models
-xcli --model grok-4-fast-non-reasoning
-xcli --model grok-4-latest
-xcli --model grok-3-latest
-xcli --model grok-3-fast
+grok-one-shot --model grok-4-fast-non-reasoning
+grok-one-shot --model grok-4-latest
+grok-one-shot --model grok-3-latest
+grok-one-shot --model grok-3-fast
 
 # Use other models (with appropriate API endpoint)
-xcli --model gemini-2.5-pro --base-url https://api-endpoint.com/v1
-xcli --model claude-sonnet-4-20250514 --base-url https://api-endpoint.com/v1
+grok-one-shot --model gemini-2.5-pro --base-url https://api-endpoint.com/v1
+grok-one-shot --model claude-sonnet-4-20250514 --base-url https://api-endpoint.com/v1
 ```
 
 **Method 2: Environment Variable**
 
 ```bash
 export GROK_MODEL=grok-4-fast-non-reasoning
-xcli
+grok-one-shot
 ```
 
 **Method 3: User Settings File**
@@ -800,7 +800,7 @@ Add to `~/.xcli/user-settings.json`:
 ### Command Line Options
 
 ```bash
-xcli [options]
+grok-one-shot [options]
 
 Options:
   -V, --version          output the version number
@@ -837,7 +837,7 @@ Grok One-Shot will automatically load and follow these instructions when working
 
 ## Morph Fast Apply (Optional)
 
-X-CLI supports Morph's Fast Apply model for high-speed code editing at **4,500+ tokens/sec with 98% accuracy**. This is an optional feature that provides lightning-fast file editing capabilities.
+Grok One Shot supports Morph's Fast Apply model for high-speed code editing at **4,500+ tokens/sec with 98% accuracy**. This is an optional feature that provides lightning-fast file editing capabilities.
 
 **Setup**: Configure your Morph API key following the [setup instructions](#setup) above.
 
@@ -860,15 +860,15 @@ When `MORPH_API_KEY` is configured:
 With Morph Fast Apply configured, you can request complex code changes:
 
 ```bash
-xcli --prompt "refactor this function to use async/await and add error handling"
-xcli -p "convert this class to TypeScript and add proper type annotations"
+grok-one-shot --prompt "refactor this function to use async/await and add error handling"
+grok-one-shot -p "convert this class to TypeScript and add proper type annotations"
 ```
 
 The AI will automatically choose between `edit_file` (Morph) for complex changes or `str_replace_editor` for simple replacements.
 
 ## MCP Tools
 
-X-CLI supports MCP (Model Context Protocol) servers, allowing you to extend the AI assistant with additional tools and capabilities.
+Grok One Shot supports MCP (Model Context Protocol) servers, allowing you to extend the AI assistant with additional tools and capabilities.
 
 ### Adding MCP Tools
 
@@ -876,19 +876,19 @@ X-CLI supports MCP (Model Context Protocol) servers, allowing you to extend the 
 
 ```bash
 # Add an stdio-based MCP server
-xcli mcp add my-server --transport stdio --command "bun" --args server.js
+grok-one-shot mcp add my-server --transport stdio --command "bun" --args server.js
 
 # Add an HTTP-based MCP server
-xcli mcp add my-server --transport http --url "http://localhost:3000"
+grok-one-shot mcp add my-server --transport http --url "http://localhost:3000"
 
 # Add with environment variables
-xcli mcp add my-server --transport stdio --command "python" --args "-m" "my_mcp_server" --env "API_KEY=your_key"
+grok-one-shot mcp add my-server --transport stdio --command "python" --args "-m" "my_mcp_server" --env "API_KEY=your_key"
 ```
 
 #### Add from JSON configuration:
 
 ```bash
-xcli mcp add-json my-server '{"command": "bun", "args": ["server.js"], "env": {"API_KEY": "your_key"}}'
+grok-one-shot mcp add-json my-server '{"command": "bun", "args": ["server.js"], "env": {"API_KEY": "your_key"}}'
 ```
 
 ### Linear Integration Example
@@ -897,7 +897,7 @@ To add Linear MCP tools for project management:
 
 ```bash
 # Add Linear MCP server
-xcli mcp add linear --transport sse --url "https://mcp.linear.app/sse"
+grok-one-shot mcp add linear --transport sse --url "https://mcp.linear.app/sse"
 ```
 
 This enables Linear tools like:
@@ -911,13 +911,13 @@ This enables Linear tools like:
 
 ```bash
 # List all configured servers
-xcli mcp list
+grok-one-shot mcp list
 
 # Test server connection
-xcli mcp test server-name
+grok-one-shot mcp test server-name
 
 # Remove a server
-xcli mcp remove server-name
+grok-one-shot mcp remove server-name
 ```
 
 ### Available Transport Types
@@ -1026,7 +1026,7 @@ npm run smart-push
 #### GitHub Secrets (Required)
 
 - **`PAT_TOKEN`**: Personal Access Token with repo permissions (for git operations)
-- **`NPM_TOKEN`**: NPM Automation token from `xcli_cli` account (for publishing)
+- **`NPM_TOKEN`**: NPM Automation token from `grok-one-shot_cli` account (for publishing)
 
 #### Package Configuration (Sacred Settings)
 
@@ -1106,16 +1106,16 @@ MIT
 
 ## Credits
 
-This project is based on [xcli-cli](https://github.com/superagent-ai/xcli-cli) by [@pelaseyed](https://x.com/pelaseyed).
+This project is based on [grok-one-shot-cli](https://github.com/superagent-ai/grok-one-shot-cli) by [@pelaseyed](https://x.com/pelaseyed).
 
 ## Troubleshooting
 
 ### Installation Issues
 
-**🚨 "Command not found: xcli"**
+**🚨 "Command not found: grok-one-shot"**
 
 ```bash
-# Check if xcli is installed
+# Check if grok-one-shot is installed
 npm list -g @xagent/one-shot
 
 # If installed but not in PATH, add npm global bin to PATH:
@@ -1123,7 +1123,7 @@ echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # Verify it works
-xcli --version
+grok-one-shot --version
 ```
 
 **🚨 "Permission denied" during installation**
@@ -1155,7 +1155,7 @@ npm install -g @xagent/one-shot@latest
 
 ```bash
 # Check current version
-xcli --version
+grok-one-shot --version
 npm view @xagent/one-shot version
 
 # Update to latest
@@ -1193,7 +1193,7 @@ echo $X_API_KEY
 
 ```bash
 # Test with verbose output
-xcli --verbose "test message"
+grok-one-shot --verbose "test message"
 
 # Check API endpoint connectivity
 curl -I https://api.x.ai/v1/models
@@ -1204,19 +1204,19 @@ curl -I https://api.x.ai/v1/models
 - **File operations fail**: Check that the file path exists and is accessible
 - **Bash commands fail**: Ensure you have the necessary permissions
 - **Tool timeouts**: Complex operations may take time; the spinner indicates progress
-- **Slow responses**: Try a different model with `xcli --model grok-4-fast-non-reasoning`
+- **Slow responses**: Try a different model with `grok-one-shot --model grok-4-fast-non-reasoning`
 
 ## 🙏 Credits
 
-This project is built upon the excellent foundation of the original [X-CLI](https://github.com/superagent-ai/xcli-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
+This project is built upon the excellent foundation of the original [Grok One Shot](https://github.com/superagent-ai/grok-one-shot-cli) created by [Ismail Pelaseyed](https://github.com/homanp) at [Superagent.ai](https://github.com/superagent-ai).
 
-**Original Project**: [superagent-ai/xcli-cli](https://github.com/superagent-ai/xcli-cli)  
+**Original Project**: [superagent-ai/grok-one-shot-cli](https://github.com/superagent-ai/grok-one-shot-cli)  
 **Founder**: [Ismail Pelaseyed](https://github.com/homanp)  
 **Organization**: [Superagent.ai](https://github.com/superagent-ai)
 
 Grok One-Shot extends the original with advanced file operations, enhanced tool systems, and comprehensive automation while maintaining the core vision of bringing AI-powered terminal intelligence to developers.
 
-**🚀 Now live on NPM**: Install globally with `npm install -g @xagent/one-shot` and start using `xcli` immediately!
+**🚀 Now live on NPM**: Install globally with `npm install -g @xagent/one-shot` and start using `grok-one-shot` immediately!
 
 ## 👥 Contributors
 
@@ -1232,7 +1232,7 @@ To add yourself as a contributor:
 ### Core Contributors
 
 - **[@hinetapora](https://github.com/hinetapora)** — Fork maintainer, advanced tool systems, UX enhancements, auto-upgrade system
-- **[@homanp](https://github.com/homanp)** — Original X-CLI creator and foundation
+- **[@homanp](https://github.com/homanp)** — Original Grok One Shot creator and foundation
 
 ### Community Contributors
 

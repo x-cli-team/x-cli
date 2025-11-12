@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Core Features Test Suite for Grok One-Shot
+# Core Features Test Suite for Grok One Shot
 # Tests essential functionality to prevent regressions
 
 set -e  # Exit on any error
 
-echo "🧪 Starting Grok One-Shot Core Features Test Suite"
+echo "🧪 Starting Grok One Shot Core Features Test Suite"
 echo "=================================================="
 
 # Test configuration
@@ -260,5 +260,5 @@ if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
 else
     echo ""
     echo "🎉 All core features are working correctly!"
-    echo "✅ Grok One-Shot is ready for use"
+    echo "✅ Grok One Shot is ready for use"
 fi

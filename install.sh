@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# X CLI Installer
+# Grok One Shot Installer
 # Handles common npm installation issues automatically
 
 set -e
 
-echo "🤖 Installing X CLI..."
+echo "🤖 Installing Grok One Shot..."
 
 # Function to clean install
 clean_install() {
     echo "🧹 Cleaning previous installation..."
     
     # Kill any running xcli processes
-    pkill -f xcli 2>/dev/null || true
+    pkill -f grok-one-shot 2>/dev/null || true
     pkill -f grok 2>/dev/null || true  # Clean up old installations
     
     # Remove existing installations
@@ -30,7 +30,7 @@ clean_install() {
         fi
         # Clean up new installations
         if [ -d "$NODE_PATH/lib/node_modules/@xagent/x-cli" ]; then
-            echo "🗑️ Removing previous X CLI installation..."
+            echo "🗑️ Removing previous Grok One Shot installation..."
             rm -rf "$NODE_PATH/lib/node_modules/@xagent/x-cli" 2>/dev/null || true
             rm -f "$NODE_PATH/bin/xcli" 2>/dev/null || true
         fi
@@ -42,7 +42,7 @@ clean_install() {
 
 # Function to try different installation methods
 try_install() {
-    echo "📦 Installing X CLI..."
+    echo "📦 Installing Grok One Shot..."
     
     # Method 1: Standard install
     if npm install -g @xagent/x-cli@latest 2>/dev/null; then
@@ -100,18 +100,18 @@ main() {
     
     # Try installation
     if try_install; then
-        echo "✅ X CLI installed successfully!"
+        echo "✅ Grok One Shot installed successfully!"
         echo ""
         echo "🚀 Get started:"
-        echo "   xcli --help"
+        echo "   grok-one-shot --help"
         echo ""
         echo "💡 Set your API key:"
         echo "   export X_API_KEY=your_api_key_here"
         echo ""
         
         # Verify installation
-        if command -v xcli >/dev/null 2>&1; then
-            echo "📋 Installed version: $(xcli --version 2>/dev/null || echo 'unknown')"
+        if command -v grok-one-shot >/dev/null 2>&1; then
+            echo "📋 Installed version: $(grok-one-shot --version 2>/dev/null || echo 'unknown')"
         fi
     else
         echo "❌ Installation failed with all methods."
