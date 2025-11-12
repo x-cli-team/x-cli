@@ -1,8 +1,18 @@
-## 1.1.113 – Logo Assets & NPM Publication Complete
+## 1.1.113 – Repository Migration Complete
 
-✅ **Live on NPM**: [@xagent/one-shot](https://www.npmjs.com/package/@xagent/one-shot) - Fully published and ready for global installation
+✅ **Repository Successfully Renamed**: `x-cli-team/x-cli` → `x-cli-team/grok-one-shot`  
+✅ **Live on NPM**: [@xagent/one-shot](https://www.npmjs.com/package/@xagent/one-shot) - Fully published and ready for global installation  
+✅ **Full Backward Compatibility**: All existing commands and URLs continue working seamlessly
 
-This release includes critical streaming fixes and major code cleanup.
+**Migration Highlights:**
+
+- Repository renamed to align with CLI identity (`grok-one-shot`)
+- GitHub redirects ensure zero user impact
+- Both `grok-one-shot` and legacy `grok` commands work
+- NPM packages maintain same names for compatibility
+- All documentation and workflows updated
+
+This release includes the complete repository migration with critical streaming fixes and major code cleanup.
 
 ### 🚨 **Critical Fixes**
 
@@ -1267,3 +1277,8 @@ _Want to see your name here? Check out our [Contributing Guide](CONTRIBUTING.md)
 - 💡 **Feature requests** - Suggest new functionality
 
 Join our growing community of AI-powered terminal enthusiasts!
+
+---
+
+**🎉 Repository Successfully Migrated to `grok-one-shot`**  
+All services verified and operational. GitHub redirects, NPM packages, Vercel deployments, and CLI commands functioning perfectly with full backward compatibility.
