@@ -234,6 +234,7 @@ jobs:
 
       - name: Publish to GitHub Packages
         if: steps.should-release.outputs.should_release == 'true'
+        continue-on-error: true # Don't fail workflow if GitHub Packages publish fails
         run: |
           echo "Publishing scoped package to GitHub Packages..."
           npm publish
@@ -302,7 +303,7 @@ jobs:
           echo "✅ Release v${NEW_VER} completed successfully!"
           echo "📦 Primary package: https://www.npmjs.com/package/@xagent/one-shot"
           echo "📦 Legacy package: https://www.npmjs.com/package/@xagent/x-cli (best effort)"
-          echo "📦 GitHub Packages: https://github.com/x-cli-team/grok-one-shot/pkgs/npm/grok-one-shot"
+          echo "📦 GitHub Packages: https://github.com/x-cli-team/grok-one-shot/pkgs/npm/grok-one-shot (best effort)"
 
 # Test commit to verify branch protection bypass works
 # Final test after bypass setup
