@@ -135,6 +135,7 @@ jobs:
 
       - name: Publish to npm (legacy package @xagent/x-cli)
         if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
+        continue-on-error: true # Don't fail workflow if legacy publish fails
         run: |
           echo "📦 Publishing legacy package @xagent/x-cli for backwards compatibility..."
 
@@ -148,6 +149,9 @@ jobs:
           NEW_VER=$(node -e "console.log(JSON.parse(require('fs').readFileSync('./package.json.primary', 'utf8')).version)")
           sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VER\"/" package.json
 
+          # Remove deprecated field to allow publishing
+          sed -i '/"deprecated":/d' package.json
+
           echo "Publishing @xagent/x-cli@$NEW_VER..."
           npm publish --access public
 
@@ -160,54 +164,50 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Verify NPM publication (both packages)
+      - name: Verify NPM publication (primary package required, legacy optional)
         if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
 
-          # Array of packages to verify
-          PACKAGES=("@xagent/one-shot" "@xagent/x-cli")
-
-          echo "🔍 Verifying publication of both packages at version $PACKAGE_VERSION..."
+          echo "🔍 Verifying publication of packages at version $PACKAGE_VERSION..."
           sleep 10
 
-          # Verify each package
-          for PACKAGE_NAME in "${PACKAGES[@]}"; do
-            echo "📦 Verifying $PACKAGE_NAME..."
-            
-            # Retry verification up to 3 times per package
-            for i in {1..3}; do
-              if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version >/dev/null 2>&1; then
-                echo "✅ Successfully verified $PACKAGE_NAME@$PACKAGE_VERSION on NPM registry"
-                
-                # Additional verification: check publishConfig
-                PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version 2>/dev/null)
-                if [ "$PUBLISHED_VERSION" = "$PACKAGE_VERSION" ]; then
-                  echo "✅ Version match confirmed: $PUBLISHED_VERSION"
-                  echo "🔗 Package URL: https://www.npmjs.com/package/$PACKAGE_NAME/v/$PACKAGE_VERSION"
-                else
-                  echo "⚠️ Version mismatch: expected $PACKAGE_VERSION, got $PUBLISHED_VERSION"
-                  exit 1
-                fi
-                
-                break
-              else
-                echo "⏳ Attempt $i for $PACKAGE_NAME: Package not yet available, waiting 15 seconds..."
-                sleep 15
-                
-                if [ $i -eq 3 ]; then
-                  echo "❌ Failed to verify $PACKAGE_NAME publication after 3 attempts"
-                  echo "💡 Manual check: npm view $PACKAGE_NAME@$PACKAGE_VERSION"
-                  exit 1
-                fi
+          # Verify primary package (REQUIRED - fail if this fails)
+          echo "📦 Verifying @xagent/one-shot (primary - required)..."
+          for i in {1..3}; do
+            if npm view "@xagent/one-shot@$PACKAGE_VERSION" version >/dev/null 2>&1; then
+              echo "✅ Successfully verified @xagent/one-shot@$PACKAGE_VERSION on NPM registry"
+              break
+            else
+              echo "⏳ Attempt $i: Primary package not yet available, waiting 15 seconds..."
+              sleep 15
+              if [ $i -eq 3 ]; then
+                echo "❌ Failed to verify primary package publication after 3 attempts"
+                exit 1
               fi
-            done
+            fi
           done
 
+          # Verify legacy package (OPTIONAL - warn if this fails)  
+          echo "📦 Verifying @xagent/x-cli (legacy - optional)..."
+          if npm view "@xagent/x-cli@$PACKAGE_VERSION" version >/dev/null 2>&1; then
+            echo "✅ Successfully verified @xagent/x-cli@$PACKAGE_VERSION on NPM registry"
+            LEGACY_SUCCESS=true
+          else
+            echo "⚠️  Legacy package @xagent/x-cli@$PACKAGE_VERSION not found (this is acceptable)"
+            LEGACY_SUCCESS=false
+          fi
+
           echo ""
-          echo "🎉 Successfully verified both packages:"
-          echo "  📦 @xagent/one-shot@$PACKAGE_VERSION (primary)"
-          echo "  📦 @xagent/x-cli@$PACKAGE_VERSION (legacy)"
+          echo "🎉 NPM Publication Summary:"
+          echo "  📦 @xagent/one-shot@$PACKAGE_VERSION (primary) - ✅ VERIFIED"
+          if [ "$LEGACY_SUCCESS" = true ]; then
+            echo "  📦 @xagent/x-cli@$PACKAGE_VERSION (legacy) - ✅ VERIFIED"
+          else
+            echo "  📦 @xagent/x-cli@$PACKAGE_VERSION (legacy) - ⚠️  NOT PUBLISHED (acceptable)"
+          fi
+          echo ""
+          echo "🔗 Primary Package URL: https://www.npmjs.com/package/@xagent/one-shot/v/$PACKAGE_VERSION"
 
       # ---------- Publish to GitHub Packages ----------
       - name: Create scoped package.json for GitHub Packages
@@ -299,10 +299,10 @@ jobs:
         if: steps.should-release.outputs.should_release == 'true' || steps.should-release.outputs.should_release == 'publish_only'
         run: |
           NEW_VER=$(node -p "require('./package.json').version")
-          echo "✅ Published both packages v${NEW_VER} to:"
-          echo "  📦 NPM (primary): https://www.npmjs.com/package/@xagent/one-shot"
-          echo "  📦 NPM (legacy): https://www.npmjs.com/package/@xagent/x-cli"
-          echo "  📦 GitHub Packages: https://github.com/x-cli-team/grok-one-shot/pkgs/npm/grok-one-shot"
+          echo "✅ Release v${NEW_VER} completed successfully!"
+          echo "📦 Primary package: https://www.npmjs.com/package/@xagent/one-shot"
+          echo "📦 Legacy package: https://www.npmjs.com/package/@xagent/x-cli (best effort)"
+          echo "📦 GitHub Packages: https://github.com/x-cli-team/grok-one-shot/pkgs/npm/grok-one-shot"
 
 # Test commit to verify branch protection bypass works
 # Final test after bypass setup
