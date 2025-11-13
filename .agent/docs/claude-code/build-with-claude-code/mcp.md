@@ -197,7 +197,7 @@ Here are some commonly used MCP servers you can connect to Grok One-Shot:
 
 > **Parity Gap**: Grok One-Shot currently uses a simplified MCP configuration system compared to Claude Code. Some features like OAuth authentication, installation scopes, and plugin-provided servers may not be fully supported yet.
 
-MCP servers can be configured in Grok One-Shot's settings file at `~/.x-cli/settings.json` or `~/.x-cli/settings.json`.
+MCP servers can be configured in Grok One-Shot's settings file at `~/.grok/settings.json` or `~/.grok/settings.json`.
 
 ### Basic MCP server configuration
 
@@ -332,7 +332,7 @@ Without the `cmd /c` wrapper, you'll encounter "Connection closed" errors becaus
 
 ## MCP installation scopes
 
-> **Parity Gap**: Installation scopes (local/project/user) may not be fully implemented in Grok One-Shot. The system currently uses a single settings file at `~/.x-cli/settings.json` or `~/.x-cli/settings.json`.
+> **Parity Gap**: Installation scopes (local/project/user) may not be fully implemented in Grok One-Shot. The system currently uses a single settings file at `~/.grok/settings.json` or `~/.grok/settings.json`.
 
 In a full implementation, MCP servers could be configured at different scope levels:
 
@@ -340,7 +340,7 @@ In a full implementation, MCP servers could be configured at different scope lev
 
 Available to you across all projects. Currently, all MCP configuration in Grok One-Shot is effectively user-scoped.
 
-**Location**: `~/.x-cli/settings.json` or `~/.x-cli/settings.json`
+**Location**: `~/.grok/settings.json` or `~/.grok/settings.json`
 
 ### Project scope
 

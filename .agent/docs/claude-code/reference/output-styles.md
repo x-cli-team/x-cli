@@ -81,7 +81,7 @@ grok --system-prompt "You are a teaching assistant..."
 | Feature | GROK.md | Output Styles (future) |
 |---------|---------|----------------------|
 | Scope | Project-specific | Global or project |
-| Location | Project root | `~/.x-cli/output-styles/` |
+| Location | Project root | `~/.grok/output-styles/` |
 | Format | Loaded as user message | Modifies system prompt |
 | Persistence | Committed to repo | User or project settings |
 | Use case | Project conventions | Communication style |
@@ -107,7 +107,7 @@ Different levels of customization:
 **Proposed features**:
 1. Built-in styles: Default, Explanatory, Learning (matching Claude Code)
 2. Custom style creation via markdown files
-3. Style storage in `~/.x-cli/output-styles/` (user) and `.x-cli/output-styles/` (project)
+3. Style storage in `~/.grok/output-styles/` (user) and `.grok/output-styles/` (project)
 4. CLI command or interactive menu for switching styles
 5. Settings integration for persistence
 
@@ -174,7 +174,7 @@ When output styles are implemented, you could use them for:
 Want to help implement output styles? The implementation would involve:
 
 1. **System prompt management**: Modify `src/agent/grok-agent.ts` to support dynamic system prompts
-2. **Storage**: Add file loading from `~/.x-cli/output-styles/`
+2. **Storage**: Add file loading from `~/.grok/output-styles/`
 3. **Settings integration**: Update `src/utils/settings.ts`
 4. **CLI command**: Add new command or interactive menu
 5. **Built-in styles**: Create default style definitions

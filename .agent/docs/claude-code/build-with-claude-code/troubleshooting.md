@@ -158,13 +158,13 @@ grok -k "xai-your-key-here"
 **Solutions:**
 ```bash
 # Check settings file
-cat ~/.x-cli/settings.json
+cat ~/.grok/settings.json
 
 # Update key via command line
 grok -k "new-key-here"
 
 # Or edit settings file directly
-vim ~/.x-cli/settings.json
+vim ~/.grok/settings.json
 ```
 
 ### Rate limit exceeded
@@ -312,7 +312,7 @@ git diff
 git checkout -- <file>
 
 # Or restore from backup
-# Sessions saved in ~/.x-cli/sessions/
+# Sessions saved in ~/.grok/sessions/
 ```
 
 ### File not found errors
@@ -357,14 +357,14 @@ npx -y @modelcontextprotocol/server-filesystem /path
 ls -la /path
 
 # Check settings file
-cat ~/.x-cli/settings.json
+cat ~/.grok/settings.json
 
 # Verify dependencies installed
 which npx
 node --version
 
 # Remove and re-add in settings
-vim ~/.x-cli/settings.json
+vim ~/.grok/settings.json
 ```
 
 ### MCP tools not available
@@ -377,7 +377,7 @@ vim ~/.x-cli/settings.json
 **Solutions:**
 ```bash
 # Check configured servers
-cat ~/.x-cli/settings.json | grep mcpServers -A 20
+cat ~/.grok/settings.json | grep mcpServers -A 20
 
 # Check server command works
 # (run the command manually)
@@ -614,13 +614,13 @@ cat xcli-startup.log
 
 **Check settings:**
 ```bash
-cat ~/.x-cli/settings.json
+cat ~/.grok/settings.json
 ```
 
 **Check sessions:**
 ```bash
-ls -la ~/.x-cli/sessions/
-cat ~/.x-cli/sessions/latest-session.json
+ls -la ~/.grok/sessions/
+cat ~/.grok/sessions/latest-session.json
 ```
 
 **Check environment:**
@@ -638,7 +638,7 @@ If you're experiencing issues not covered here:
 
 1. Check the [GitHub repository](https://github.com/your-org/grok) for known issues
 2. Review `xcli-startup.log` in your current directory
-3. Check session files in `~/.x-cli/sessions/`
+3. Check session files in `~/.grok/sessions/`
 4. Enable debug mode and review output
 5. File an issue on GitHub with:
    - Grok One-Shot version (`grok --version`)
@@ -660,7 +660,7 @@ If you're experiencing issues not covered here:
 1. ...
 2. ...
 **Debug logs:** [attach xcli-startup.log]
-**Settings:** [relevant parts of ~/.x-cli/settings.json]
+**Settings:** [relevant parts of ~/.grok/settings.json]
 ```
 
 ## See also

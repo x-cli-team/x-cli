@@ -395,7 +395,7 @@ Team members clone and copy configurations:
 
 ```bash
 git clone https://github.com/org/grok-configs
-cp grok-configs/settings.json ~/.x-cli/settings.json
+cp grok-configs/settings.json ~/.grok/settings.json
 ```
 
 ### 2. MCP Server Distribution

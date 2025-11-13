@@ -22,8 +22,8 @@ Before reaching out, check if your question is covered in our documentation:
 
 Check if your question has already been asked:
 
-- **[GitHub Issues](https://github.com/x-cli-team/x-cli/issues)** - Known bugs and feature requests
-- **[GitHub Discussions](https://github.com/x-cli-team/x-cli/discussions)** - Community Q&A
+- **[GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues)** - Known bugs and feature requests
+- **[GitHub Discussions](https://github.com/x-cli-team/grok-one-shot/discussions)** - Community Q&A
 
 ## Support Channels
 
@@ -42,7 +42,7 @@ For quick questions and community interaction:
 
 Found a bug? Help us fix it:
 
-**[GitHub Issues](https://github.com/x-cli-team/x-cli/issues)**
+**[GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues)**
 
 - Detailed bug reports with reproduction steps
 - Include system information and error logs
@@ -62,7 +62,7 @@ Found a bug? Help us fix it:
 
 Want to discuss new features or improvements?
 
-**[GitHub Discussions](https://github.com/x-cli-team/x-cli/discussions)**
+**[GitHub Discussions](https://github.com/x-cli-team/grok-one-shot/discussions)**
 
 - Feature ideas and proposals
 - Design discussions
@@ -84,13 +84,13 @@ For sensitive issues or partnership inquiries:
 
 ```bash
 # Check if installed globally
-npm list -g @xagent/x-cli
+npm list -g @xagent/one-shot
 
 # Reinstall globally
-npm install -g @xagent/x-cli
+npm install -g @xagent/one-shot
 
 # Or use npx
-npx @xagent/x-cli --version
+npx @xagent/one-shot --version
 ```
 
 **Permission errors on macOS/Linux:**
@@ -137,7 +137,7 @@ curl -I https://api.x.ai
 - Check your internet connection
 - Try a different model: `grok -m grok-4-fast-non-reasoning`
 - Reduce context with shorter prompts
-- Clear session cache: `rm -rf ~/.x-cli/sessions/`
+- Clear session cache: `rm -rf ~/.grok/sessions/`
 
 ## Response Times
 
@@ -172,7 +172,7 @@ Verify your configuration:
 
 ```bash
 # View current settings
-cat ~/.x-cli/settings.json
+cat ~/.grok/settings.json
 
 # Test basic functionality
 grok "echo hello world"
@@ -187,11 +187,11 @@ Many issues are fixed in newer versions:
 grok --version
 
 # Update to latest
-npm update -g @xagent/x-cli
+npm update -g @xagent/one-shot
 
 # Or reinstall
-npm uninstall -g @xagent/x-cli
-npm install -g @xagent/x-cli
+npm uninstall -g @xagent/one-shot
+npm install -g @xagent/one-shot
 ```
 
 ## Contributing to Support

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-console.log("🚀 X-CLI Debug - Starting...");
+console.log("🚀 grok-one-shotDebug - Starting...");
 console.log("📂 Directory:", process.cwd());
 console.log("🖥️  Node:", process.version);
 console.log("📦 Version:", require("../package.json").version);

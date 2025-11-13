@@ -186,7 +186,7 @@ export class GrokClient {
       };
 
       // Store in local JSON file for analysis (as specified in investigation)
-      const logPath = process.env.XCLI_TOKEN_LOG || `${process.env.HOME}/.xcli/token-usage.jsonl`;
+      const logPath = process.env.XCLI_TOKEN_LOG || `${process.env.HOME}/.grok/token-usage.jsonl`;
 
       // Ensure directory exists
       const dir = path.dirname(logPath);

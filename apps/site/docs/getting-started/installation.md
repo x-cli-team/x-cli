@@ -1,6 +1,7 @@
 ---
 title: Installation
 ---
+
 # Installation
 
 Get Grok One-Shot running in under 2 minutes with our simple installation process.
@@ -62,8 +63,8 @@ export GROK_API_KEY="xai-your-key-here"
 
 ```bash
 # Create settings file
-mkdir -p ~/.x-cli
-echo '{"apiKey":"xai-your-key-here"}' > ~/.x-cli/settings.json
+mkdir -p ~/.grok
+echo '{"apiKey":"xai-your-key-here"}' > ~/.grok/settings.json
 ```
 
 ## Start Using Grok One-Shot
@@ -84,7 +85,7 @@ grok "what does this project do?"
 On first launch, you'll see the welcome screen:
 
 ```
-Welcome to X-CLI v1.1.105
+Welcome to grok-one-shotv1.1.105
 
 Claude Code-level intelligence in your terminal!
 
@@ -185,8 +186,8 @@ xagent/one-shot:latest
 
 ```bash
 # Clone the repository
-git clone https://github.com/x-cli-team/x-cli.git
-cd x-cli
+git clone https://github.com/x-cli-team/grok-one-shot.git
+cd grok-one-shot
 
 # Install dependencies
 npm install # or: bun install

@@ -105,7 +105,9 @@ export class GrokAgent extends EventEmitter {
     baseURL?: string,
     model?: string,
     maxToolRounds?: number,
-    contextPack?: ContextPack
+    contextPack?: ContextPack,
+    verbosityLevel?: 'quiet' | 'normal' | 'verbose',
+    explainLevel?: 'off' | 'brief' | 'detailed'
   ) {
     super();
     const manager = getSettingsManager();
@@ -149,10 +151,13 @@ export class GrokAgent extends EventEmitter {
     // Load .agent context if provided
     const contextSection = this.contextPack ? `\n\nPROJECT CONTEXT:\n${this.contextPack.system}\n\nSOP:\n${this.contextPack.sop}\n\nTASKS:\n${this.contextPack.tasks.map((t: { filename: string; content: string }) => `- ${t.filename}: ${t.content}`).join('\n')}\n\nThe above project context should inform your responses and decision making.` : "";
 
+    // Build verbosity instructions based on user settings
+    const verbosityInstructions = this.buildVerbosityInstructions(verbosityLevel || 'quiet', explainLevel || 'brief');
+
     // Initialize with system message
     this.messages.push({
       role: "system",
-      content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}
+      content: `You are Grok One-Shot, an AI-powered CLI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}${verbosityInstructions}
 
 You have access to these tools:
 
@@ -1238,5 +1243,49 @@ Current working directory: ${process.cwd()}`,
     }
 
     return entries;
+  }
+
+  /**
+   * Build verbosity instructions for the system message based on user settings
+   */
+  private buildVerbosityInstructions(
+    verbosityLevel: 'quiet' | 'normal' | 'verbose',
+    explainLevel: 'off' | 'brief' | 'detailed'
+  ): string {
+    let instructions = '\n\nRESPONSE STYLE:\n';
+    
+    switch (verbosityLevel) {
+      case 'quiet':
+        instructions += '- Keep responses CONCISE and to the point. Avoid lengthy explanations.\n';
+        instructions += '- Prioritize brevity over detail unless specifically requested.\n';
+        instructions += '- Use minimal formatting and avoid verbose tool descriptions.\n';
+        break;
+      case 'normal':
+        instructions += '- Provide balanced responses with appropriate detail.\n';
+        instructions += '- Include context when helpful but avoid unnecessary verbosity.\n';
+        break;
+      case 'verbose':
+        instructions += '- Provide comprehensive, detailed responses.\n';
+        instructions += '- Include extensive context and explanations.\n';
+        instructions += '- Use full formatting and detailed tool descriptions.\n';
+        break;
+    }
+    
+    switch (explainLevel) {
+      case 'off':
+        instructions += '- Do NOT explain your actions or reasoning.\n';
+        instructions += '- Execute operations without commentary.\n';
+        break;
+      case 'brief':
+        instructions += '- Provide brief explanations for your actions when relevant.\n';
+        instructions += '- Keep reasoning concise and focused.\n';
+        break;
+      case 'detailed':
+        instructions += '- Explain your reasoning and approach comprehensively.\n';
+        instructions += '- Provide detailed context for all operations.\n';
+        break;
+    }
+    
+    return instructions;
   }
 }

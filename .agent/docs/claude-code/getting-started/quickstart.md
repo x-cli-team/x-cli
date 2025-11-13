@@ -88,7 +88,7 @@ You'll see the Grok One-Shot welcome screen:
   🛠️  Power Features:
 
   • Auto-edit mode: Press Shift+Tab to toggle hands-free editing
-  • Project memory: Create .xcli/GROK.md to customize behavior
+  • Project memory: Create .grok/GROK.md to customize behavior
   • Documentation: Run "/init-agent" for .agent docs system
 ```
 

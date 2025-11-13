@@ -3,7 +3,7 @@ import * as path from "path";
 import * as os from "os";
 
 /**
- * User-level settings stored in ~/.xcli/config.json (or ~/.grok/user-settings.json for backwards compatibility)
+ * User-level settings stored in ~/.grok/config.json (or ~/.grok/user-settings.json for backwards compatibility)
  * These are global settings that apply across all projects
  */
 export interface UserSettings {
@@ -26,7 +26,7 @@ export interface UserSettings {
 }
 
 /**
- * Project-level settings stored in .xcli/settings.json (or .grok/settings.json for backwards compatibility)
+ * Project-level settings stored in .grok/settings.json (or .grok/settings.json for backwards compatibility)
  * These are project-specific settings
  */
 export interface ProjectSettings {
@@ -75,25 +75,13 @@ export class SettingsManager {
   private projectSettingsPath: string;
 
   private constructor() {
-    // User settings path: try ~/.xcli first, fallback to ~/.grok for backwards compatibility
-    const newUserDir = path.join(os.homedir(), ".xcli");
-    const oldUserDir = path.join(os.homedir(), ".grok");
+    // User settings path
+    const userDir = path.join(os.homedir(), ".grok");
+    this.userSettingsPath = path.join(userDir, "config.json");
 
-    if (fs.existsSync(newUserDir) || !fs.existsSync(oldUserDir)) {
-      this.userSettingsPath = path.join(newUserDir, "config.json");
-    } else {
-      this.userSettingsPath = path.join(oldUserDir, "user-settings.json");
-    }
-
-    // Project settings path: try .xcli first, fallback to .grok for backwards compatibility
-    const newProjectDir = path.join(process.cwd(), ".xcli");
-    const oldProjectDir = path.join(process.cwd(), ".grok");
-
-    if (fs.existsSync(newProjectDir) || !fs.existsSync(oldProjectDir)) {
-      this.projectSettingsPath = path.join(newProjectDir, "settings.json");
-    } else {
-      this.projectSettingsPath = path.join(oldProjectDir, "settings.json");
-    }
+    // Project settings path
+    const projectDir = path.join(process.cwd(), ".grok");
+    this.projectSettingsPath = path.join(projectDir, "settings.json");
   }
 
   /**
@@ -117,7 +105,7 @@ export class SettingsManager {
   }
 
   /**
-   * Load user settings from ~/.xcli/config.json or ~/.grok/user-settings.json
+   * Load user settings from ~/.grok/config.json
    */
   public loadUserSettings(): UserSettings {
     try {
@@ -142,7 +130,7 @@ export class SettingsManager {
   }
 
   /**
-   * Save user settings to ~/.xcli/config.json or ~/.grok/user-settings.json
+   * Save user settings to ~/.grok/config.json
    */
   public saveUserSettings(settings: Partial<UserSettings>): void {
     try {
@@ -197,7 +185,7 @@ export class SettingsManager {
   }
 
   /**
-   * Load project settings from .x/settings.json
+   * Load project settings from .grok/settings.json
    */
   public loadProjectSettings(): ProjectSettings {
     try {
@@ -222,7 +210,7 @@ export class SettingsManager {
   }
 
   /**
-   * Save project settings to .x/settings.json
+   * Save project settings to .grok/settings.json
    */
   public saveProjectSettings(settings: Partial<ProjectSettings>): void {
     try {

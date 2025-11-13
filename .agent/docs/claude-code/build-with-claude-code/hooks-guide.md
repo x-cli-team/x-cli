@@ -120,7 +120,7 @@ Future hook events that would likely be supported:
 Example configuration (future):
 
 ```json
-// ~/.x-cli/settings.json (future)
+// ~/.grok/settings.json (future)
 {
   "hooks": {
     "PostToolUse": [

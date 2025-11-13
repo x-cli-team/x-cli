@@ -27,8 +27,8 @@ Get your local development environment ready for contributing to Grok One-Shot.
 
 ```bash
 # Clone the repository
-git clone https://github.com/x-cli-team/x-cli.git
-cd x-cli
+git clone https://github.com/x-cli-team/grok-one-shot.git
+cd grok-one-shot
 
 # Install dependencies
 bun install
@@ -72,7 +72,7 @@ export GROK_MODEL="grok-4-fast-non-reasoning"
 ## Project Structure
 
 ```
-x-cli/
+grok-one-shot/
 ├── src/                    # Source code
 │   ├── agent/             # Core AI agent logic
 │   ├── commands/          # CLI subcommands
@@ -283,7 +283,7 @@ grok -p "test connection"
 
 1. **Read the [Contributing Guide](../community/contributing)**
 2. **Explore the [Architecture Overview](../architecture/overview)**
-3. **Check out open [Good First Issues](https://github.com/x-cli-team/x-cli/labels/good%20first%20issue)**
+3. **Check out open [Good First Issues](https://github.com/x-cli-team/grok-one-shot/labels/good%20first%20issue)**
 4. **Join the [Developer Discord](https://discord.gg/grok-one-shot)**
 
 Ready to contribute? Start with a small change and work your way up to larger features!

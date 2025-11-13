@@ -25,7 +25,7 @@ According to xAI's current policies:
 
 If you encounter bugs:
 1. File an issue in the GitHub repository
-2. Include relevant session logs from `~/.x-cli/sessions/` (after sanitizing sensitive data)
+2. Include relevant session logs from `~/.grok/sessions/` (after sanitizing sensitive data)
 3. Do not include credentials or sensitive code in bug reports
 
 ### Session quality surveys
@@ -43,8 +43,8 @@ If you encounter bugs:
 Grok One-Shot data retention varies by storage location.
 
 **Local storage (on your machine)**:
-- Sessions stored indefinitely in `~/.x-cli/sessions/`
-- Settings stored in `~/.x-cli/settings.json`
+- Sessions stored indefinitely in `~/.grok/sessions/`
+- Settings stored in `~/.grok/settings.json`
 - You have full control to view, archive, or delete
 - No automatic cleanup or retention limits
 
@@ -98,7 +98,7 @@ For full details, please review [xAI's Terms of Service](https://x.ai/legal/term
 └─────────────────────────────┘
 ```
 
-Grok One-Shot is installed from [NPM](https://www.npmjs.com/package/x-cli). Grok One-Shot runs entirely locally on your machine. In order to interact with the LLM, Grok One-Shot sends data over the network. This data includes all user prompts, code context, and model outputs. The data is encrypted in transit via TLS and is not encrypted at rest (stored locally in `~/.x-cli/`).
+Grok One-Shot is installed from [NPM](https://www.npmjs.com/package/@xagent/one-shot). Grok One-Shot runs entirely locally on your machine. In order to interact with the LLM, Grok One-Shot sends data over the network. This data includes all user prompts, code context, and model outputs. The data is encrypted in transit via TLS and is not encrypted at rest (stored locally in `~/.grok/`).
 
 Grok One-Shot is compatible with most popular VPNs and LLM proxies (configure via `GROK_BASE_URL` environment variable).
 
@@ -189,8 +189,8 @@ When using Grok One-Shot, the following data is sent to xAI's API:
 
 ### What Grok One-Shot stores locally
 
-- Full session transcripts in `~/.x-cli/sessions/`
-- API key in `~/.x-cli/settings.json`
+- Full session transcripts in `~/.grok/sessions/`
+- API key in `~/.grok/settings.json`
 - MCP server configurations
 - User preferences and settings
 
@@ -204,12 +204,12 @@ When using Grok One-Shot, the following data is sent to xAI's API:
 
 ### Security recommendations
 
-1. Keep your `GROK_API_KEY` secure (use `chmod 600 ~/.x-cli/settings.json`)
+1. Keep your `GROK_API_KEY` secure (use `chmod 600 ~/.grok/settings.json`)
 2. Review session files before sharing (they contain full conversation history)
-3. Use `.gitignore` for `~/.x-cli/` directory
+3. Use `.gitignore` for `~/.grok/` directory
 4. Sanitize logs before including in bug reports
 5. Review xAI's privacy policy periodically
-6. Regularly clean up old sessions: `rm ~/.x-cli/sessions/*.json`
+6. Regularly clean up old sessions: `rm ~/.grok/sessions/*.json`
 
 ## Comparison to Claude Code
 

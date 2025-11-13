@@ -144,7 +144,7 @@ export function showBanner(options?: {
   return <Banner style={style} showContext={true} {...contextProps} />;
 }
 
-// Secret easter egg banner for x-cli --ascii
+// Secret easter egg banner for grok-one-shot --ascii
 export const easterEggBanner = `
 ${`
   ██████╗ ██████╗  ██████╗ ██╗  ██╗     ██████╗██╗     ██╗

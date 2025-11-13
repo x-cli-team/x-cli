@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "X-CLI Testimonials",
+  "title": "grok-one-shotTestimonials",
   "description": "Schema for community testimonials about X-CLI",
   "type": "array",
   "items": {
@@ -51,9 +51,18 @@
         "items": {
           "type": "string",
           "enum": [
-            "productivity", "ai-assistance", "terminal", "automation",
-            "developer-experience", "tools", "workflow", "open-source",
-            "community", "performance", "ease-of-use", "innovation"
+            "productivity",
+            "ai-assistance",
+            "terminal",
+            "automation",
+            "developer-experience",
+            "tools",
+            "workflow",
+            "open-source",
+            "community",
+            "performance",
+            "ease-of-use",
+            "innovation"
           ]
         },
         "maxItems": 3,

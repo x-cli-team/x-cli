@@ -119,7 +119,7 @@ ${documentationSection}`;
 - Reference existing documentation rather than recreating context
 
 ---
-*This section was added by the X-CLI documentation system*`;
+*This section was added by the grok-one-shotdocumentation system*`;
   }
 }
 

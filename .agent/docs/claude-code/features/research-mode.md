@@ -159,8 +159,8 @@ Architecture Overview:
    - Agent ← stdin/stdout → MCP Servers
 
 4. State Management:
-   - Session state in ~/.x-cli/sessions/
-   - Configuration in ~/.x-cli/settings.json
+   - Session state in ~/.grok/sessions/
+   - Configuration in ~/.grok/settings.json
    - No persistent database
 
 5. Dependencies:

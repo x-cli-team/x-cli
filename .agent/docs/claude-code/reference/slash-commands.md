@@ -2,7 +2,7 @@
 
 > Control Grok's behavior during an interactive session with slash commands.
 
-> **⚠️ Parity Gap:** Grok One-Shot has a minimal set of built-in slash commands compared to Claude Code. Custom slash commands (via `.x-cli/commands/`) are not yet supported but are planned for future releases.
+> **⚠️ Parity Gap:** Grok One-Shot has a minimal set of built-in slash commands compared to Claude Code. Custom slash commands (via `.grok/commands/`) are not yet supported but are planned for future releases.
 
 ## Built-in slash commands
 
@@ -41,7 +41,7 @@ Custom slash commands allow you to define frequently-used prompts as Markdown fi
 
 Commands stored in your repository and shared with your team. When listed in `/help`, these commands show "(project)" after their description.
 
-**Location**: `.x-cli/commands/` (planned)
+**Location**: `.grok/commands/` (planned)
 
 In the following example, we create the `/optimize` command:
 
@@ -55,26 +55,26 @@ echo "Analyze this code for performance issues and suggest optimizations:" > .gr
 
 Commands available across all your projects. When listed in `/help`, these commands show "(user)" after their description.
 
-**Location**: `~/.x-cli/commands/` (planned)
+**Location**: `~/.grok/commands/` (planned)
 
 In the following example, we create the `/security-review` command:
 
 ```bash  theme={null}
 # Create a personal command (when feature is available)
-mkdir -p ~/.x-cli/commands
-echo "Review this code for security vulnerabilities:" > ~/.x-cli/commands/security-review.md
+mkdir -p ~/.grok/commands
+echo "Review this code for security vulnerabilities:" > ~/.grok/commands/security-review.md
 ```
 
 ### Features
 
 #### Namespacing
 
-Organize commands in subdirectories. The subdirectories are used for organization and appear in the command description, but they do not affect the command name itself. The description will show whether the command comes from the project directory (`.x-cli/commands`) or the user-level directory (`~/.x-cli/commands`), along with the subdirectory name.
+Organize commands in subdirectories. The subdirectories are used for organization and appear in the command description, but they do not affect the command name itself. The description will show whether the command comes from the project directory (`.grok/commands`) or the user-level directory (`~/.grok/commands`), along with the subdirectory name.
 
 Conflicts between user and project level commands are not supported. Otherwise, multiple commands with the same base file name can coexist.
 
-For example, a file at `.x-cli/commands/frontend/component.md` creates the command `/component` with description showing "(project:frontend)".
-Meanwhile, a file at `~/.x-cli/commands/component.md` creates the command `/component` with description showing "(user)".
+For example, a file at `.grok/commands/frontend/component.md` creates the command `/component` with description showing "(project:frontend)".
+Meanwhile, a file at `~/.grok/commands/component.md` creates the command `/component` with description showing "(user)".
 
 #### Arguments
 

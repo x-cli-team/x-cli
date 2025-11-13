@@ -135,7 +135,7 @@ jobs:
           testimonials.push(testimonial);
 
           // Write back to file
-          const header = '# Grok One Shot Community Testimonials\\n# This file is automatically managed by GitHub Actions\\n# Submit testimonials via: https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml\\n\\n';
+          const header = '# Grok One Shot Community Testimonials\\n# This file is automatically managed by GitHub Actions\\n# Submit testimonials via: https://github.com/x-cli-team/grok-one-shot/issues/new?template=testimonial.yml\\n\\n';
 
           fs.writeFileSync('data/testimonials.yml', header + yaml.dump(testimonials));
 
@@ -226,7 +226,7 @@ jobs:
                - Automatic merge to main branch
 
             3. **Live on website** (within 10 minutes total)
-               - Your testimonial will appear on [our landing page](https://x-cli.dev)
+               - Your testimonial will appear on [our landing page](https://grok-one-shot.org)
                - Full attribution with link to your profile
 
             ### 🔍 Track Progress:
@@ -254,7 +254,7 @@ jobs:
 
             ### 🔧 How to fix:
 
-            1. **Use the issue form**: Make sure you fill out the [testimonial form](https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml)
+            1. **Use the issue form**: Make sure you fill out the [testimonial form](https://github.com/x-cli-team/grok-one-shot/issues/new?template=testimonial.yml)
             2. **Complete all fields**: Name, title, company, experience, and profile link are required
             3. **Check for duplicates**: Only one testimonial per person
 

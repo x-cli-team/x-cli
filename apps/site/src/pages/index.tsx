@@ -325,7 +325,7 @@ function Footer() {
           <div className={styles.footerSection}>
             <h3>Credits</h3>
             <ul>
-              <li><a href="https://github.com/x-cli-team/x-cli">Original X CLI Repository</a></li>
+              <li><a href="https://github.com/x-cli-team/grok-one-shot">Original X CLI Repository</a></li>
               <li><a href="https://github.com/homanp">Ismail Pelaseyed</a></li>
             </ul>
           </div>

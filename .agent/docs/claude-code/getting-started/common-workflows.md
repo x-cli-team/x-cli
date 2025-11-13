@@ -390,14 +390,14 @@ While Grok doesn't have a dedicated "extended thinking" mode, you can encourage 
 - Full conversation history restoration
 
 **Grok One-Shot Current State:**
-Grok One-Shot auto-saves conversations to `~/.x-cli/sessions/` but does not currently support resuming them. Session files contain:
+Grok One-Shot auto-saves conversations to `~/.grok/sessions/` but does not currently support resuming them. Session files contain:
 - Complete message history
 - Token usage
 - Timestamp and metadata
 
 **Planned Implementation:** Q1 2026 (Sprint 12-14)
 
-**Workaround:** Review session files in `~/.x-cli/sessions/` to see past conversations
+**Workaround:** Review session files in `~/.grok/sessions/` to see past conversations
 
 ***
 

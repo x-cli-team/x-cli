@@ -273,7 +273,7 @@ grok -p "analyze code quality and generate report"
 
 **Workflow DSL:**
 ```yaml
-# .x-cli/workflows/code-review.yml
+# .grok/workflows/code-review.yml
 name: Code Review Workflow
 trigger: pr_opened
 steps:

@@ -95,7 +95,7 @@ export function useClaudeMd() {
 
 4. **AI responds with accurate info:**
    ```
-   To configure MCP servers, edit ~/.x-cli/settings.json...
+   To configure MCP servers, edit ~/.grok/settings.json...
    [provides information from settings.md]
    ```
 
@@ -155,7 +155,7 @@ Token Usage:
 
 **From session files:**
 ```bash
-cat ~/.x-cli/sessions/latest-session.json | jq '.tokenUsage'
+cat ~/.grok/sessions/latest-session.json | jq '.tokenUsage'
 ```
 
 ## Context Optimization
@@ -263,7 +263,7 @@ grok
 
 **Session management:**
 - Save/restore sessions
-- Session history in `~/.x-cli/sessions/`
+- Session history in `~/.grok/sessions/`
 - Manual session control
 
 ### 🚧 Partially Implemented

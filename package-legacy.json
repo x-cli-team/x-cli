@@ -58,7 +58,7 @@
   "bugs": {
     "url": "https://github.com/x-cli-team/grok-one-shot/issues"
   },
-  "homepage": "https://x-cli.dev",
+  "homepage": "https://grok-one-shot.org",
   "publishConfig": {
     "access": "public"
   },

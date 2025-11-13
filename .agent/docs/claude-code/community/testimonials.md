@@ -73,13 +73,13 @@ Submit a testimonial and automatically become a repository collaborator with:
 - **Technical Growth**: Experience with TypeScript, Node.js, AI integration, and open-source development
 - **Community Impact**: Help shape the future of terminal AI tools
 
-[**Submit Your Testimonial →**](https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml)
+[**Submit Your Testimonial →**](https://github.com/x-cli-team/grok-one-shot/issues/new?template=testimonial.yml)
 
 ### Community Channels
 
 - **Discord**: Join discussions and get real-time help in the [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)
-- **GitHub**: Track development and contribute on [GitHub](https://github.com/x-cli-team/x-cli)
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/x-cli-team/x-cli/issues)
+- **GitHub**: Track development and contribute on [GitHub](https://github.com/x-cli-team/grok-one-shot)
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues)
 
 ## Developer Testimonial Template
 

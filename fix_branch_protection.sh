@@ -15,13 +15,13 @@ gh api --method PUT \
 # Step 2: Check branch protection rules for main
 echo "Checking branch protection for main branch..."
 gh api -H "Accept: application/vnd.github+json" \
-  /repos/x-cli-team/x-cli/branches/main/protection
+  /repos/x-cli-team/grok-one-shot/branches/main/protection
 
 # Step 3: Add GitHub Actions to bypass list if missing
 echo "Updating branch protection to allow GitHub Actions bypass..."
 gh api --method PUT \
   -H "Accept: application/vnd.github+json" \
-  /repos/x-cli-team/x-cli/branches/main/protection \
+  /repos/x-cli-team/grok-one-shot/branches/main/protection \
   -f required_pull_request_reviews='{"required_approving_review_count":1}' \
   -f allow_bypass_pull_request_allowances='{"apps":["github-actions"]}'
 

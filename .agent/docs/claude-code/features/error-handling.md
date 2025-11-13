@@ -390,7 +390,7 @@ cat xcli-startup.log
 **Session files:**
 ```bash
 # View errors in session
-cat ~/.x-cli/sessions/latest-session.json | jq '.messages[] | select(.error)'
+cat ~/.grok/sessions/latest-session.json | jq '.messages[] | select(.error)'
 ```
 
 ### Common Error Patterns
@@ -405,7 +405,7 @@ Check:
 2. Is key valid?
    Try in X.AI console
 3. Is key in settings.json correct?
-   cat ~/.x-cli/settings.json
+   cat ~/.grok/settings.json
 ```
 
 **File operation issues:**

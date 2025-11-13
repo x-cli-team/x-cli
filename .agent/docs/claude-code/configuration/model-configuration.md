@@ -128,7 +128,7 @@ grok -m grok-4-fast-non-reasoning
 
 ### 3. Settings File (Persistent)
 
-**Edit `~/.x-cli/settings.json`:**
+**Edit `~/.grok/settings.json`:**
 ```json
 {
   "model": "grok-2-1212",
@@ -381,8 +381,8 @@ Token Usage:
 
 **Review session files:**
 ```bash
-# Sessions saved in ~/.x-cli/sessions/
-cat ~/.x-cli/sessions/latest-session.json | grep -A5 "tokenUsage"
+# Sessions saved in ~/.grok/sessions/
+cat ~/.grok/sessions/latest-session.json | grep -A5 "tokenUsage"
 ```
 
 ### Performance Metrics

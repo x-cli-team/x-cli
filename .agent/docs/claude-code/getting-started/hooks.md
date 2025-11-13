@@ -34,7 +34,7 @@
 
 Grok One-Shot hooks would be configured in your [settings files](/en/settings):
 
-* `~/.x-cli/settings.json` - User settings
+* `~/.grok/settings.json` - User settings
 * `.grok/settings.json` - Project settings
 * `.grok/settings.local.json` - Local project settings (not committed)
 * Enterprise managed policy settings
@@ -450,7 +450,7 @@ The exact schema for `tool_input` depends on the tool.
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "/Users/.../.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "/Users/.../.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
   "permission_mode": "default",
   "hook_event_name": "PreToolUse",
@@ -469,7 +469,7 @@ The exact schema for `tool_input` and `tool_response` depends on the tool.
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "/Users/.../.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "/Users/.../.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
   "permission_mode": "default",
   "hook_event_name": "PostToolUse",
@@ -490,7 +490,7 @@ The exact schema for `tool_input` and `tool_response` depends on the tool.
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "/Users/.../.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "/Users/.../.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
   "permission_mode": "default",
   "hook_event_name": "Notification",
@@ -503,7 +503,7 @@ The exact schema for `tool_input` and `tool_response` depends on the tool.
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "/Users/.../.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "/Users/.../.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
   "permission_mode": "default",
   "hook_event_name": "UserPromptSubmit",
@@ -520,7 +520,7 @@ from running indefinitely.
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "~/.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "~/.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "permission_mode": "default",
   "hook_event_name": "Stop",
   "stop_hook_active": true
@@ -535,7 +535,7 @@ For `manual`, `custom_instructions` comes from what the user passes into
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "~/.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "~/.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "permission_mode": "default",
   "hook_event_name": "PreCompact",
   "trigger": "manual",
@@ -548,7 +548,7 @@ For `manual`, `custom_instructions` comes from what the user passes into
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "~/.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "~/.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "permission_mode": "default",
   "hook_event_name": "SessionStart",
   "source": "startup"
@@ -560,7 +560,7 @@ For `manual`, `custom_instructions` comes from what the user passes into
 ```json  theme={null}
 {
   "session_id": "abc123",
-  "transcript_path": "~/.x-cli/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
+  "transcript_path": "~/.grok/projects/.../00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl",
   "cwd": "/Users/...",
   "permission_mode": "default",
   "hook_event_name": "SessionEnd",

@@ -59,10 +59,10 @@ Skills would be stored as directories containing a `SKILL.md` file.
 
 ### Personal Skills
 
-Personal Skills would be available across all your projects. Store them in `~/.x-cli/skills/`:
+Personal Skills would be available across all your projects. Store them in `~/.grok/skills/`:
 
 ```bash  theme={null}
-mkdir -p ~/.x-cli/skills/my-skill-name
+mkdir -p ~/.grok/skills/my-skill-name
 ```
 
 **Use personal Skills for**:
@@ -186,7 +186,7 @@ If `allowed-tools` is not specified, Grok will ask for permission to use tools a
 
 Skills would be automatically discovered by Grok from three sources:
 
-* Personal Skills: `~/.x-cli/skills/`
+* Personal Skills: `~/.grok/skills/`
 * Project Skills: `.grok/skills/`
 * Plugin Skills: bundled with installed plugins
 
@@ -208,13 +208,13 @@ This will show all Skills from all sources, including plugin Skills.
 
 ```bash  theme={null}
 # List personal Skills
-ls ~/.x-cli/skills/
+ls ~/.grok/skills/
 
 # List project Skills (if in a project directory)
 ls .grok/skills/
 
 # View a specific Skill's content
-cat ~/.x-cli/skills/my-skill/SKILL.md
+cat ~/.grok/skills/my-skill/SKILL.md
 ```
 
 ## Test a Skill
@@ -251,14 +251,14 @@ Include both what the Skill does and when to use it in the description.
 
 ### Verify file path
 
-**Personal Skills**: `~/.x-cli/skills/skill-name/SKILL.md`
+**Personal Skills**: `~/.grok/skills/skill-name/SKILL.md`
 **Project Skills**: `.grok/skills/skill-name/SKILL.md`
 
 Check the file exists:
 
 ```bash  theme={null}
 # Personal
-ls ~/.x-cli/skills/my-skill/SKILL.md
+ls ~/.grok/skills/my-skill/SKILL.md
 
 # Project
 ls .grok/skills/my-skill/SKILL.md
@@ -340,7 +340,7 @@ Edit SKILL.md directly:
 
 ```bash  theme={null}
 # Personal Skill
-code ~/.x-cli/skills/my-skill/SKILL.md
+code ~/.grok/skills/my-skill/SKILL.md
 
 # Project Skill
 code .grok/skills/my-skill/SKILL.md
@@ -354,7 +354,7 @@ Delete the Skill directory:
 
 ```bash  theme={null}
 # Personal
-rm -rf ~/.x-cli/skills/my-skill
+rm -rf ~/.grok/skills/my-skill
 
 # Project
 rm -rf .grok/skills/my-skill
@@ -457,7 +457,7 @@ cat .grok/skills/my-skill/SKILL.md | head -n 15
 
 ```bash  theme={null}
 # Personal Skills
-ls ~/.x-cli/skills/*/SKILL.md
+ls ~/.grok/skills/*/SKILL.md
 
 # Project Skills
 ls .grok/skills/*/SKILL.md

@@ -63,8 +63,8 @@ async function startCLI() {
     const pkg = await fs.readFile(path.join(process.cwd(), 'package.json'), 'utf8');
     const packageData = JSON.parse(pkg);
     
-    if (packageData.bin && packageData.bin['x-cli']) {
-      await log(`   Using bin script: ${packageData.bin['x-cli']}`);
+    if (packageData.bin && packageData.bin['grok-one-shot']) {
+      await log(`   Using bin script: ${packageData.bin['grok-one-shot']}`);
       // Execute via npx-like pattern for local bin
       execSync('node dist/index.js', { stdio: 'inherit', cwd: process.cwd() });
     } else if (packageData.main) {
@@ -79,7 +79,7 @@ async function startCLI() {
       } else {
         await log('   Starting CLI module directly');
         // For modules that use process.argv directly
-        process.argv = ['node', 'x-cli']; // Reset args for CLI mode
+        process.argv = ['node', 'grok-one-shot']; // Reset args for CLI mode
         await import(mainPath);
       }
     } else {

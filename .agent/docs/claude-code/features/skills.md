@@ -128,7 +128,7 @@ Provide detailed instructions at the start of each session:
 Future Skills structure in Grok One-Shot would likely be:
 
 ```
-~/.x-cli/skills/          # Personal Skills
+~/.grok/skills/          # Personal Skills
 .grok/skills/             # Project Skills
 └── pdf-processing/
     ├── SKILL.md          # Main skill definition

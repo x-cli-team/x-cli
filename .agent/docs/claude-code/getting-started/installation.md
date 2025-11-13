@@ -59,8 +59,8 @@ export GROK_API_KEY="xai-your-key-here"
 
 ```bash
 # Create settings file
-mkdir -p ~/.x-cli
-echo '{"apiKey":"xai-your-key-here"}' > ~/.x-cli/settings.json
+mkdir -p ~/.grok
+echo '{"apiKey":"xai-your-key-here"}' > ~/.grok/settings.json
 ```
 
 ## Start Using Grok One-Shot
@@ -182,8 +182,8 @@ docker run -it \
 
 ```bash
 # Clone the repository
-git clone https://github.com/x-cli-team/x-cli.git
-cd x-cli
+git clone https://github.com/x-cli-team/grok-one-shot.git
+cd grok-one-shot
 
 # Install dependencies
 npm install  # or: bun install

@@ -64,7 +64,7 @@ MAX_TOOL_ROUNDS     # Optional: Max tool iterations (default: 400)
 
 ### Settings
 
-Settings stored in `~/.xcli/settings.json`:
+Settings stored in `~/.grok/settings.json`:
 
 - API key and base URL
 - Model preferences
@@ -148,7 +148,7 @@ src/
 
 ### 4. Session Management
 
-- Auto-saves to `~/.xcli/sessions/`
+- Auto-saves to `~/.grok/sessions/`
 - Token usage tracking
 - Session replay capability
 
@@ -191,7 +191,7 @@ grok-one-shot toggle-confirmations
 1. **Context Management**: Let AI load docs on-demand; don't pre-load everything
 2. **Token Efficiency**: Use headless mode for simple queries
 3. **MCP Extensions**: Add custom tools via MCP for domain-specific needs
-4. **Session Review**: Check `~/.xcli/sessions/` for session history
+4. **Session Review**: Check `~/.grok/sessions/` for session history
 5. **Documentation**: Keep `.agent/docs/` updated via Husky pre-commit hooks
 
 ## Integration with CI/CD

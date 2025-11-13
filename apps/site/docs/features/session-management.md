@@ -1,6 +1,7 @@
 ---
 title: Session Management
 ---
+
 # Session Management
 
 How Grok One-Shot handles conversation sessions, storage, and recovery.
@@ -14,6 +15,7 @@ Sessions are the foundation of Grok One-Shot's conversational interface. Each se
 ### Starting a Session
 
 **Interactive mode:**
+
 ```bash
 grok
 
@@ -23,6 +25,7 @@ grok
 ```
 
 **With initial message:**
+
 ```bash
 grok "analyze authentication flow"
 
@@ -31,6 +34,7 @@ grok "analyze authentication flow"
 ```
 
 **Headless mode (no session persistence):**
+
 ```bash
 grok -p "quick query"
 
@@ -42,6 +46,7 @@ grok -p "quick query"
 ### During a Session
 
 **Conversation flow:**
+
 ```
 1. User types message
 2. AI receives message + full context
@@ -52,6 +57,7 @@ grok -p "quick query"
 ```
 
 **Context accumulation:**
+
 ```
 Initial: ~3,500 tokens (startup context)
 Message 1: +1,500 tokens
@@ -64,17 +70,19 @@ After 20 messages: ~40,000 tokens
 ### Ending a Session
 
 **Graceful exit:**
+
 ```bash
 # In session, type:
 /exit
 # or
 /quit
 
-# Session saved to ~/.x-cli/sessions/
+# Session saved to ~/.grok/sessions/
 # Clean shutdown
 ```
 
 **Keyboard shortcuts:**
+
 ```
 Ctrl+D → Exit gracefully
 Ctrl+C → Interrupt (may not save)
@@ -82,6 +90,7 @@ Ctrl+C (twice) → Force exit (no save)
 ```
 
 **Automatic save:**
+
 - Sessions save periodically during conversation
 - Final save on graceful exit
 - Emergency save on unexpected termination (best effort)
@@ -91,13 +100,15 @@ Ctrl+C (twice) → Force exit (no save)
 ### Storage Location
 
 **Default directory:**
+
 ```bash
-~/.x-cli/sessions/
+~/.grok/sessions/
 ```
 
 **Session files:**
+
 ```bash
-ls ~/.x-cli/sessions/
+ls ~/.grok/sessions/
 
 session-2025-11-05-14-30-12.json
 session-2025-11-05-16-45-03.json
@@ -107,72 +118,77 @@ session-2025-11-06-09-15-22.json
 ### Session File Format
 
 **Structure:**
+
 ```json
 {
-"sessionId": "session-2025-11-05-14-30-12",
-"startTime": "2025-11-05T14:30:12.345Z",
-"endTime": "2025-11-05T15:15:42.789Z",
-"model": "grok-2-1212",
-"messages": [
-{
-"role": "system",
-"content": "[GROK.md + docs-index.md content]"
-},
-{
-"role": "user",
-"content": "analyze authentication flow",
-"timestamp": "2025-11-05T14:30:15.000Z"
-},
-{
-"role": "assistant",
-"content": "I'll analyze the authentication flow...",
-"timestamp": "2025-11-05T14:30:18.500Z",
-"toolCalls": [
-{
-"tool": "Glob",
-"parameters": { "pattern": "**/*auth*" },
-"result": ["src/auth/middleware.ts", "..."]
-}
-]
-}
-],
-"tokenUsage": {
-"input": 23450,
-"output": 8920,
-"total": 32370
-},
-"metadata": {
-"workingDirectory": "/home/user/myproject",
-"nodeVersion": "20.10.0",
-"grokVersion": "1.1.101"
-}
+  "sessionId": "session-2025-11-05-14-30-12",
+  "startTime": "2025-11-05T14:30:12.345Z",
+  "endTime": "2025-11-05T15:15:42.789Z",
+  "model": "grok-2-1212",
+  "messages": [
+    {
+      "role": "system",
+      "content": "[GROK.md + docs-index.md content]"
+    },
+    {
+      "role": "user",
+      "content": "analyze authentication flow",
+      "timestamp": "2025-11-05T14:30:15.000Z"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll analyze the authentication flow...",
+      "timestamp": "2025-11-05T14:30:18.500Z",
+      "toolCalls": [
+        {
+          "tool": "Glob",
+          "parameters": { "pattern": "**/*auth*" },
+          "result": ["src/auth/middleware.ts", "..."]
+        }
+      ]
+    }
+  ],
+  "tokenUsage": {
+    "input": 23450,
+    "output": 8920,
+    "total": 32370
+  },
+  "metadata": {
+    "workingDirectory": "/home/user/myproject",
+    "nodeVersion": "20.10.0",
+    "grokVersion": "1.1.101"
+  }
 }
 ```
 
 ### Session File Benefits
 
 **Review conversations:**
+
 ```bash
 # View recent session
-cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq '.messages[] | {role, content}'
+cat ~/.grok/sessions/session-2025-11-05-14-30-12.json | jq '.messages[] | {role, content}'
 ```
 
 **Track token usage:**
+
 ```bash
 # Total tokens across all sessions
-find ~/.x-cli/sessions/ -name "*.json" -exec jq -r '.tokenUsage.total' {} + | awk '{sum+=$1} END {print sum " total tokens"}'
+find ~/.grok/sessions/ -name "*.json" -exec jq -r '.tokenUsage.total' {} + | awk '{sum+=$1} END {print sum " total tokens"}'
 ```
 
 **Audit tool usage:**
+
 ```bash
 # What tools were used?
-cat ~/.x-cli/sessions/*.json | jq -r '.messages[].toolCalls[]?.tool' | sort | uniq -c
+cat ~/.grok/sessions/*.json | jq -r '.messages[].toolCalls[]?.tool' | sort | uniq -c
 ```
 
 **Debug issues:**
+
 ```bash
 # What happened in that session?
-cat ~/.x-cli/sessions/problem-session.json | jq '.messages'
+cat ~/.grok/sessions/problem-session.json | jq '.messages'
 ```
 
 ## Session Features
@@ -180,11 +196,13 @@ cat ~/.x-cli/sessions/problem-session.json | jq '.messages'
 ### Implemented
 
 **Auto-save:**
+
 - Periodic saves during conversation
 - Save on graceful exit
 - Emergency save on crash (best effort)
 
 **Session files:**
+
 - JSON format for easy parsing
 - Complete conversation history
 - Tool call tracking
@@ -192,11 +210,13 @@ cat ~/.x-cli/sessions/problem-session.json | jq '.messages'
 - Metadata (directory, versions, timestamps)
 
 **Session isolation:**
+
 - Each session independent
 - No cross-session context leakage
 - Clean state per session
 
 **Token tracking:**
+
 - Input token count
 - Output token count
 - Total usage per session
@@ -205,17 +225,20 @@ cat ~/.x-cli/sessions/problem-session.json | jq '.messages'
 ### Partially Implemented
 
 **Session management:**
+
 - No built-in session listing UI
 - No session restore command
 - No session search/filter
 - Manual review via file system
 
 **Session cleanup:**
+
 - No automatic cleanup
 - No retention policies
 - Manual deletion supported
 
 **Session naming:**
+
 - Automatic timestamp-based names
 - No custom session names
 - No session tagging
@@ -223,6 +246,7 @@ cat ~/.x-cli/sessions/problem-session.json | jq '.messages'
 ### Planned Features
 
 **Session management UI:**
+
 ```bash
 # Future commands
 grok sessions list
@@ -232,16 +256,19 @@ grok sessions resume <session-id>
 ```
 
 **Session restoration:**
+
 - Resume previous session with context
 - Continue where you left off
 - Session branching (fork from point)
 
 **Intelligent cleanup:**
+
 - Auto-delete sessions older than N days
 - Configurable retention policy
 - Archive important sessions
 
 **Session analytics:**
+
 - Cost tracking per session
 - Performance metrics
 - Tool usage statistics
@@ -252,94 +279,106 @@ grok sessions resume <session-id>
 ### View Sessions
 
 **List all sessions:**
+
 ```bash
-ls -lah ~/.x-cli/sessions/
+ls -lah ~/.grok/sessions/
 ```
 
 **Recent sessions:**
+
 ```bash
-ls -ltr ~/.x-cli/sessions/ | tail -5
+ls -ltr ~/.grok/sessions/ | tail -5
 ```
 
 **Session details:**
+
 ```bash
 # View specific session
-cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq '.'
+cat ~/.grok/sessions/session-2025-11-05-14-30-12.json | jq '.'
 
 # Pretty print conversation
-cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[] | "\(.role): \(.content | .[0:100])..."'
+cat ~/.grok/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[] | "\(.role): \(.content | .[0:100])..."'
 ```
 
 ### Clean Up Sessions
 
 **Delete old sessions:**
+
 ```bash
 # Sessions older than 30 days
-find ~/.x-cli/sessions/ -name "*.json" -mtime +30 -delete
+find ~/.grok/sessions/ -name "*.json" -mtime +30 -delete
 
 # Sessions older than 90 days
-find ~/.x-cli/sessions/ -name "*.json" -mtime +90 -delete
+find ~/.grok/sessions/ -name "*.json" -mtime +90 -delete
 ```
 
 **Delete all sessions:**
+
 ```bash
-rm ~/.x-cli/sessions/*.json
+rm ~/.grok/sessions/*.json
 
 # Or delete directory
-rm -rf ~/.x-cli/sessions/
-mkdir ~/.x-cli/sessions/
+rm -rf ~/.grok/sessions/
+mkdir ~/.grok/sessions/
 ```
 
 **Selective deletion:**
+
 ```bash
 # Delete sessions from specific date
-rm ~/.x-cli/sessions/session-2025-11-05-*.json
+rm ~/.grok/sessions/session-2025-11-05-*.json
 
 # Keep only last 10 sessions
-ls -t ~/.x-cli/sessions/*.json | tail -n +11 | xargs rm
+ls -t ~/.grok/sessions/*.json | tail -n +11 | xargs rm
 ```
 
 ### Archive Sessions
 
 **Create archive:**
+
 ```bash
 # Archive by month
 mkdir -p ~/session-archives/2025-11
-mv ~/.x-cli/sessions/session-2025-11-*.json ~/session-archives/2025-11/
+mv ~/.grok/sessions/session-2025-11-*.json ~/session-archives/2025-11/
 
 # Compress archive
 tar -czf ~/session-archives/2025-11.tar.gz ~/session-archives/2025-11/
 ```
 
 **Automated archival:**
+
 ```bash
 # Add to crontab
 # Archive sessions older than 30 days, first day of month
-0 0 1 * * find ~/.x-cli/sessions/ -name "*.json" -mtime +30 -exec mv {} ~/session-archives/ \;
+0 0 1 * * find ~/.grok/sessions/ -name "*.json" -mtime +30 -exec mv {} ~/session-archives/ \;
 ```
 
 ### Analyze Sessions
 
 **Token usage by session:**
+
 ```bash
-for file in ~/.x-cli/sessions/*.json; do
+for file in ~/.grok/sessions/*.json; do
 echo "$file: $(jq -r '.tokenUsage.total' $file) tokens"
 done | sort -t: -k2 -n
 ```
 
 **Most expensive sessions:**
+
 ```bash
-find ~/.x-cli/sessions/ -name "*.json" -exec jq -r '"\(.tokenUsage.total) \(.sessionId)"' {} \; | sort -rn | head -10
+find ~/.grok/sessions/ -name "*.json" -exec jq -r '"\(.tokenUsage.total) \(.sessionId)"' {} \; | sort -rn | head -10
 ```
 
 **Tool usage stats:**
+
 ```bash
-cat ~/.x-cli/sessions/*.json | jq -r '.messages[].toolCalls[]?.tool' | sort | uniq -c | sort -rn
+cat ~/.grok/sessions/*.json | jq -r '.messages[].toolCalls[]?.tool' | sort | uniq -c | sort -rn
 ```
 
 **Average session length:**
+
 ```bash
-cat ~/.x-cli/sessions/*.json | jq -r '.messages | length' | awk '{sum+=$1; count++} END {print sum/count " messages per session"}'
+cat ~/.grok/sessions/*.json | jq -r '.messages | length' | awk '{sum+=$1; count++} END {print sum/count " messages per session"}'
 ```
 
 ## Best Practices
@@ -347,12 +386,14 @@ cat ~/.x-cli/sessions/*.json | jq -r '.messages | length' | awk '{sum+=$1; count
 ### Session Hygiene
 
 **DO:**
+
 - Start new session for unrelated tasks
 - Use descriptive initial messages
 - Exit gracefully (/exit or Ctrl+D)
 - Clean up old sessions periodically
 
 **DON'T:**
+
 - Let sessions grow to 100k+ tokens
 - Force exit (Ctrl+C twice) unless necessary
 - Mix unrelated tasks in one session
@@ -361,45 +402,50 @@ cat ~/.x-cli/sessions/*.json | jq -r '.messages | length' | awk '{sum+=$1; count
 ### Session Organization
 
 **By project:**
+
 ```bash
 # Create project-specific session directories
 mkdir ~/projects/myapp/.sessions
 export GROK_SESSIONS_DIR=~/projects/myapp/.sessions # Future feature
 
 # Manual: move relevant sessions
-mv ~/.x-cli/sessions/session-2025-11-05-*.json ~/projects/myapp/.sessions/
+mv ~/.grok/sessions/session-2025-11-05-*.json ~/projects/myapp/.sessions/
 ```
 
 **By date:**
+
 ```bash
 # Archive monthly
 mkdir -p ~/session-archives/2025-11
-mv ~/.x-cli/sessions/session-2025-11-*.json ~/session-archives/2025-11/
+mv ~/.grok/sessions/session-2025-11-*.json ~/session-archives/2025-11/
 ```
 
 **By topic:**
+
 ```bash
 # Manual tagging via filename (workaround)
 # Copy session and rename
-cp ~/.x-cli/sessions/session-2025-11-05-14-30-12.json \
+cp ~/.grok/sessions/session-2025-11-05-14-30-12.json \
 ~/session-archives/auth-refactor-session.json
 ```
 
 ### Session Security
 
 **Protect session files:**
+
 ```bash
 # Restrict permissions
-chmod 700 ~/.x-cli/sessions/
-chmod 600 ~/.x-cli/sessions/*.json
+chmod 700 ~/.grok/sessions/
+chmod 600 ~/.grok/sessions/*.json
 
 # Verify
-ls -la ~/.x-cli/sessions/
+ls -la ~/.grok/sessions/
 # Should show: drwx------ (700) for directory
 # -rw------- (600) for files
 ```
 
 **Be careful with sensitive data:**
+
 ```
 # Sessions contain full conversation history
 # Including any files the AI read
@@ -413,17 +459,19 @@ ls -la ~/.x-cli/sessions/
 **Symptoms:** No session file created
 
 **Causes:**
+
 - Using headless mode (`-p` flag)
 - Permission issues
 - Disk space full
 
 **Solutions:**
+
 ```bash
 # Check directory exists
-mkdir -p ~/.x-cli/sessions/
+mkdir -p ~/.grok/sessions/
 
 # Check permissions
-ls -lad ~/.x-cli/sessions/
+ls -lad ~/.grok/sessions/
 
 # Check disk space
 df -h ~
@@ -434,17 +482,19 @@ df -h ~
 **Symptoms:** Session file missing
 
 **Causes:**
+
 - Used headless mode (no session created)
 - Session didn't save (crash or force exit)
 - Deleted by cleanup script
 
 **Solutions:**
+
 ```bash
 # Check if file exists
-ls ~/.x-cli/sessions/session-*
+ls ~/.grok/sessions/session-*
 
 # Check recent files
-ls -ltr ~/.x-cli/sessions/ | tail -10
+ls -ltr ~/.grok/sessions/ | tail -10
 
 # If lost, can't recover (no cloud backup)
 ```
@@ -454,17 +504,19 @@ ls -ltr ~/.x-cli/sessions/ | tail -10
 **Symptoms:** Invalid JSON in session file
 
 **Causes:**
+
 - Crash during write
 - Disk full during write
 - Manual editing error
 
 **Solutions:**
+
 ```bash
 # Validate JSON
-jq '.' ~/.x-cli/sessions/session-2025-11-05-14-30-12.json
+jq '.' ~/.grok/sessions/session-2025-11-05-14-30-12.json
 
 # If corrupted and unrecoverable, delete
-rm ~/.x-cli/sessions/session-2025-11-05-14-30-12.json
+rm ~/.grok/sessions/session-2025-11-05-14-30-12.json
 ```
 
 ## Session Workflows
@@ -483,7 +535,7 @@ grok "refactor error handling in API routes"
 # Token usage: 18k
 
 # Day 3: Review what was done
-cat ~/.x-cli/sessions/session-2025-11-05-*.json | jq -r '.messages[] | select(.role=="assistant") | .content | .[0:200]'
+cat ~/.grok/sessions/session-2025-11-05-*.json | jq -r '.messages[] | select(.role=="assistant") | .content | .[0:200]'
 ```
 
 ### Example 2: Debugging Session
@@ -499,7 +551,7 @@ grok
 /exit
 
 # Later: Review what was found
-cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[-3:] | .[] | .content'
+cat ~/.grok/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[-3:] | .[] | .content'
 # Shows final findings
 ```
 
@@ -507,7 +559,7 @@ cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[-3:] |
 
 ```bash
 # Generate cost report
-for file in ~/.x-cli/sessions/session-2025-11-*.json; do
+for file in ~/.grok/sessions/session-2025-11-*.json; do
 tokens=$(jq -r '.tokenUsage.total' $file)
 # Assume $0.01 per 1k tokens (example rate)
 cost=$(echo "scale=4; $tokens * 0.01 / 1000" | bc)

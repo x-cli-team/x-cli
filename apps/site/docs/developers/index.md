@@ -34,8 +34,8 @@ Welcome to the Grok One-Shot developer hub. Here you'll find everything you need
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/x-cli-team/x-cli.git
-   cd x-cli
+   git clone https://github.com/x-cli-team/grok-one-shot.git
+   cd grok-one-shot
    ```
 
 2. **Install dependencies**
@@ -76,7 +76,7 @@ Extend Grok One-Shot capabilities by creating Model Context Protocol servers:
 
 Customize behavior through:
 
-- User settings (`~/.x-cli/settings.json`)
+- User settings (`~/.grok/settings.json`)
 - Project settings (`.grok/settings.json`)
 - Environment variables
 - Command-line flags
@@ -92,8 +92,8 @@ Customize behavior through:
 ### Community
 
 - [Discord Community](https://discord.gg/grok-one-shot) - Chat with developers
-- [GitHub Issues](https://github.com/x-cli-team/x-cli/issues) - Report bugs and request features
-- [Discussions](https://github.com/x-cli-team/x-cli/discussions) - General discussions
+- [GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues) - Report bugs and request features
+- [Discussions](https://github.com/x-cli-team/grok-one-shot/discussions) - General discussions
 
 ## Support
 
@@ -101,4 +101,4 @@ Need help with development?
 
 - Check our [Troubleshooting Guide](../build-with-claude-code/troubleshooting)
 - Ask in [Discord #developers](https://discord.gg/grok-one-shot)
-- Create a [GitHub Discussion](https://github.com/x-cli-team/x-cli/discussions)
+- Create a [GitHub Discussion](https://github.com/x-cli-team/grok-one-shot/discussions)

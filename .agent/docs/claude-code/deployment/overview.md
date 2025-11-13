@@ -53,7 +53,7 @@ source ~/.bashrc
 
 1. **Create team configuration template:**
 ```bash
-# team-config/.x-cli-template.json
+# team-config/.grok-template.json
 {
   "model": "grok-2-1212",
   "confirmations": true,
@@ -69,7 +69,7 @@ source ~/.bashrc
 2. **Team member setup:**
 ```bash
 # Clone template
-cp team-config/.x-cli-template.json ~/.x-cli/settings.json
+cp team-config/.grok-template.json ~/.grok/settings.json
 
 # Add personal API key
 grok -k "personal-api-key"
@@ -80,7 +80,7 @@ grok -k "personal-api-key"
 ## Grok One-Shot Setup
 
 1. Install: `npm install -g @xagent/one-shot`
-2. Copy config: `cp team-config/.x-cli-template.json ~/.x-cli/settings.json`
+2. Copy config: `cp team-config/.grok-template.json ~/.grok/settings.json`
 3. Set API key: `export GROK_API_KEY="your-key"`
 4. Test: `grok --version`
 ```
@@ -301,14 +301,14 @@ export GROK_UX_MINIMAL=true  # For headless environments
 }
 ```
 
-**Location:** `~/.x-cli/settings.json`
+**Location:** `~/.grok/settings.json`
 
 ### Hybrid Approach
 
 **Base config in settings.json, overrides via environment:**
 
 ```bash
-# Base settings in ~/.x-cli/settings.json
+# Base settings in ~/.grok/settings.json
 # Override model for specific task
 GROK_MODEL=grok-4-fast-non-reasoning grok -p "quick query"
 ```
@@ -424,7 +424,7 @@ Press Ctrl+I to see token usage
 ```bash
 # Extract from session file
 grok -p "analyze code" > /dev/null
-cat ~/.x-cli/sessions/*.json | jq '.tokenUsage'
+cat ~/.grok/sessions/*.json | jq '.tokenUsage'
 ```
 
 ### Cost Tracking
@@ -478,7 +478,7 @@ grok -p "analyze db" &
 wait
 
 # Combine results
-cat ~/.x-cli/sessions/*.json | jq '.messages[-1].content'
+cat ~/.grok/sessions/*.json | jq '.messages[-1].content'
 ```
 
 ### Rate Limiting

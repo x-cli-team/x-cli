@@ -316,7 +316,7 @@ System Defaults → User Config → Project Config → Session Config → Runtim
 
 **Configuration Sources:**
 
-- `~/.x-cli/settings.json`
+- `~/.grok/settings.json`
 - Project `.grok-config.json`
 - Environment variables
 - Command-line flags

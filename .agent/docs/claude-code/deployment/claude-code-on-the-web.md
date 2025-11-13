@@ -19,7 +19,7 @@
 
 1. **Terminal-based interface**: Full-featured React/Ink CLI interface
 2. **Local execution**: Fast, low-latency execution on your machine
-3. **Session management**: Auto-saved sessions in `~/.x-cli/sessions/`
+3. **Session management**: Auto-saved sessions in `~/.grok/sessions/`
 4. **Headless mode**: Run tasks non-interactively via `-p` flag
 5. **Full filesystem access**: Direct access to your local development environment
 6. **MCP integration**: Extensible via Model Context Protocol
@@ -114,11 +114,11 @@ grok -d /path/to/project -p "analyze dependencies"
 
 ### Session Management
 
-Sessions are automatically saved to `~/.x-cli/sessions/`:
+Sessions are automatically saved to `~/.grok/sessions/`:
 
 ```bash
 # Sessions are timestamped
-~/.x-cli/sessions/2025-11-07T14-30-00.json
+~/.grok/sessions/2025-11-07T14-30-00.json
 
 # Each session includes:
 # - Full conversation history
@@ -164,7 +164,7 @@ Claude Code allows moving sessions between web and terminal - **this is not avai
 **Grok One-Shot alternative**: All work happens in the terminal. Use session files for continuity:
 
 ```bash
-# Sessions auto-save to ~/.x-cli/sessions/
+# Sessions auto-save to ~/.grok/sessions/
 # Resume by reviewing session history or starting new tasks
 ```
 
@@ -265,10 +265,10 @@ grok -p "update API docs for auth endpoints"
 Review past sessions for learning:
 
 ```bash
-ls -ltr ~/.x-cli/sessions/
+ls -ltr ~/.grok/sessions/
 
 # Sessions are JSON files you can inspect
-cat ~/.x-cli/sessions/latest.json
+cat ~/.grok/sessions/latest.json
 ```
 
 ### 5. MCP Extensions

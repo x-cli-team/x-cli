@@ -164,7 +164,7 @@ Based on community feedback:
 
 Have a feature idea? We'd love to hear from you:
 
-- [GitHub Issues](https://github.com/x-cli-team/x-cli/issues) - Feature requests
+- [GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues) - Feature requests
 - [Discord](https://discord.com/channels/1315720379607679066/1315822328139223064) - Community discussion
 - [Testimonials](./community/testimonials) - Automatic collaborator access
 
@@ -194,9 +194,9 @@ Have a feature idea? We'd love to hear from you:
 
 Track development progress:
 
-- **GitHub Milestones**: [View active milestones](https://github.com/x-cli-team/x-cli/milestones)
-- **Project Boards**: [Development board](https://github.com/x-cli-team/x-cli/projects)
-- **Release Notes**: [Latest releases](https://github.com/x-cli-team/x-cli/releases)
+- **GitHub Milestones**: [View active milestones](https://github.com/x-cli-team/grok-one-shot/milestones)
+- **Project Boards**: [Development board](https://github.com/x-cli-team/grok-one-shot/projects)
+- **Release Notes**: [Latest releases](https://github.com/x-cli-team/grok-one-shot/releases)
 
 ## Stay Updated
 

@@ -136,7 +136,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/x-cli-team/x-cli',
+          href: 'https://github.com/x-cli-team/grok-one-shot',
           label: 'GitHub',
           position: 'right',
         },
@@ -171,7 +171,7 @@ const config: Config = {
             },
             {
               label: 'GitHub Issues',
-              href: 'https://github.com/x-cli-team/x-cli/issues',
+              href: 'https://github.com/x-cli-team/grok-one-shot/issues',
             },
             {
               label: 'NPM Package',
@@ -192,7 +192,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/x-cli-team/x-cli',
+              href: 'https://github.com/x-cli-team/grok-one-shot',
             },
           ],
         },
@@ -201,7 +201,7 @@ const config: Config = {
           items: [
             {
               label: 'Original X-CLI',
-              href: 'https://github.com/x-cli-team/x-cli',
+              href: 'https://github.com/x-cli-team/grok-one-shot',
             },
             {
               label: 'Ismail Pelaseyed',
@@ -214,7 +214,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Grok One-Shot. Built with Docusaurus. Forked from <a href="https://github.com/x-cli-team/x-cli" target="_blank" rel="noopener noreferrer">x-cli-team</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Grok One-Shot. Built with Docusaurus. Forked from <a href="https://github.com/x-cli-team/grok-one-shot" target="_blank" rel="noopener noreferrer">x-cli-team</a> by <a href="https://github.com/homanp" target="_blank" rel="noopener noreferrer">Ismail Pelaseyed</a>.`,
     },
     prism: {
       theme: prismThemes.github,

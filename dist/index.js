@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import OpenAI from 'openai';
-import * as fs2 from 'fs';
-import fs2__default, { existsSync, promises } from 'fs';
+import * as fs7 from 'fs';
+import fs7__default, { existsSync, promises } from 'fs';
 import * as path8 from 'path';
 import path8__default from 'path';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
@@ -166,13 +166,13 @@ var init_client = __esm({
             total_tokens: usage.total_tokens || 0,
             reasoning_tokens: usage.reasoning_tokens || 0
           };
-          const logPath = process.env.XCLI_TOKEN_LOG || `${process.env.HOME}/.xcli/token-usage.jsonl`;
+          const logPath = process.env.XCLI_TOKEN_LOG || `${process.env.HOME}/.grok/token-usage.jsonl`;
           const dir = path8__default.dirname(logPath);
-          if (!fs2__default.existsSync(dir)) {
-            fs2__default.mkdirSync(dir, { recursive: true });
+          if (!fs7__default.existsSync(dir)) {
+            fs7__default.mkdirSync(dir, { recursive: true });
           }
           const logLine = JSON.stringify(tokenData) + "\n";
-          fs2__default.appendFileSync(logPath, logLine);
+          fs7__default.appendFileSync(logPath, logLine);
         } catch (error) {
           console.warn("Failed to log token usage:", error);
         }
@@ -414,20 +414,10 @@ var init_settings_manager = __esm({
     };
     SettingsManager = class _SettingsManager {
       constructor() {
-        const newUserDir = path8.join(os.homedir(), ".xcli");
-        const oldUserDir = path8.join(os.homedir(), ".grok");
-        if (fs2.existsSync(newUserDir) || !fs2.existsSync(oldUserDir)) {
-          this.userSettingsPath = path8.join(newUserDir, "config.json");
-        } else {
-          this.userSettingsPath = path8.join(oldUserDir, "user-settings.json");
-        }
-        const newProjectDir = path8.join(process.cwd(), ".xcli");
-        const oldProjectDir = path8.join(process.cwd(), ".grok");
-        if (fs2.existsSync(newProjectDir) || !fs2.existsSync(oldProjectDir)) {
-          this.projectSettingsPath = path8.join(newProjectDir, "settings.json");
-        } else {
-          this.projectSettingsPath = path8.join(oldProjectDir, "settings.json");
-        }
+        const userDir = path8.join(os.homedir(), ".grok");
+        this.userSettingsPath = path8.join(userDir, "config.json");
+        const projectDir = path8.join(process.cwd(), ".grok");
+        this.projectSettingsPath = path8.join(projectDir, "settings.json");
       }
       /**
        * Get singleton instance
@@ -443,20 +433,20 @@ var init_settings_manager = __esm({
        */
       ensureDirectoryExists(filePath) {
         const dir = path8.dirname(filePath);
-        if (!fs2.existsSync(dir)) {
-          fs2.mkdirSync(dir, { recursive: true, mode: 448 });
+        if (!fs7.existsSync(dir)) {
+          fs7.mkdirSync(dir, { recursive: true, mode: 448 });
         }
       }
       /**
-       * Load user settings from ~/.xcli/config.json or ~/.grok/user-settings.json
+       * Load user settings from ~/.grok/config.json
        */
       loadUserSettings() {
         try {
-          if (!fs2.existsSync(this.userSettingsPath)) {
+          if (!fs7.existsSync(this.userSettingsPath)) {
             this.saveUserSettings(DEFAULT_USER_SETTINGS);
             return { ...DEFAULT_USER_SETTINGS };
           }
-          const content = fs2.readFileSync(this.userSettingsPath, "utf-8");
+          const content = fs7.readFileSync(this.userSettingsPath, "utf-8");
           const settings = JSON.parse(content);
           return { ...DEFAULT_USER_SETTINGS, ...settings };
         } catch (error) {
@@ -468,15 +458,15 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Save user settings to ~/.xcli/config.json or ~/.grok/user-settings.json
+       * Save user settings to ~/.grok/config.json
        */
       saveUserSettings(settings) {
         try {
           this.ensureDirectoryExists(this.userSettingsPath);
           let existingSettings = { ...DEFAULT_USER_SETTINGS };
-          if (fs2.existsSync(this.userSettingsPath)) {
+          if (fs7.existsSync(this.userSettingsPath)) {
             try {
-              const content = fs2.readFileSync(this.userSettingsPath, "utf-8");
+              const content = fs7.readFileSync(this.userSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_USER_SETTINGS, ...parsed };
             } catch (_error) {
@@ -484,7 +474,7 @@ var init_settings_manager = __esm({
             }
           }
           const mergedSettings = { ...existingSettings, ...settings };
-          fs2.writeFileSync(
+          fs7.writeFileSync(
             this.userSettingsPath,
             JSON.stringify(mergedSettings, null, 2),
             { mode: 384 }
@@ -513,15 +503,15 @@ var init_settings_manager = __esm({
         return settings[key];
       }
       /**
-       * Load project settings from .x/settings.json
+       * Load project settings from .grok/settings.json
        */
       loadProjectSettings() {
         try {
-          if (!fs2.existsSync(this.projectSettingsPath)) {
+          if (!fs7.existsSync(this.projectSettingsPath)) {
             this.saveProjectSettings(DEFAULT_PROJECT_SETTINGS);
             return { ...DEFAULT_PROJECT_SETTINGS };
           }
-          const content = fs2.readFileSync(this.projectSettingsPath, "utf-8");
+          const content = fs7.readFileSync(this.projectSettingsPath, "utf-8");
           const settings = JSON.parse(content);
           return { ...DEFAULT_PROJECT_SETTINGS, ...settings };
         } catch (error) {
@@ -533,15 +523,15 @@ var init_settings_manager = __esm({
         }
       }
       /**
-       * Save project settings to .x/settings.json
+       * Save project settings to .grok/settings.json
        */
       saveProjectSettings(settings) {
         try {
           this.ensureDirectoryExists(this.projectSettingsPath);
           let existingSettings = { ...DEFAULT_PROJECT_SETTINGS };
-          if (fs2.existsSync(this.projectSettingsPath)) {
+          if (fs7.existsSync(this.projectSettingsPath)) {
             try {
-              const content = fs2.readFileSync(this.projectSettingsPath, "utf-8");
+              const content = fs7.readFileSync(this.projectSettingsPath, "utf-8");
               const parsed = JSON.parse(content);
               existingSettings = { ...DEFAULT_PROJECT_SETTINGS, ...parsed };
             } catch (_error) {
@@ -549,7 +539,7 @@ var init_settings_manager = __esm({
             }
           }
           const mergedSettings = { ...existingSettings, ...settings };
-          fs2.writeFileSync(
+          fs7.writeFileSync(
             this.projectSettingsPath,
             JSON.stringify(mergedSettings, null, 2)
           );
@@ -731,7 +721,7 @@ var init_client2 = __esm({
           this.transports.set(config2.name, transport);
           const client = new Client(
             {
-              name: "x-cli",
+              name: "grok-one-shot",
               version: "1.0.0"
             },
             {
@@ -1690,7 +1680,7 @@ var init_text_editor = __esm({
     init_confirmation_service();
     pathExists = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -1705,16 +1695,16 @@ var init_text_editor = __esm({
         try {
           const resolvedPath = path8.resolve(filePath);
           if (await pathExists(resolvedPath)) {
-            const stats = await fs2.promises.stat(resolvedPath);
+            const stats = await fs7.promises.stat(resolvedPath);
             if (stats.isDirectory()) {
-              const files = await fs2.promises.readdir(resolvedPath);
+              const files = await fs7.promises.readdir(resolvedPath);
               return {
                 success: true,
                 output: `Directory contents of ${filePath}:
 ${files.join("\n")}`
               };
             }
-            const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+            const content = await fs7.promises.readFile(resolvedPath, "utf-8");
             const lines = content.split("\n");
             if (viewRange) {
               const [start, end] = viewRange;
@@ -1764,7 +1754,7 @@ ${numberedLines}${additionalLinesMessage}`
               error: `File not found: ${filePath}`
             };
           }
-          const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const content = await fs7.promises.readFile(resolvedPath, "utf-8");
           if (!content.includes(oldStr)) {
             if (oldStr.includes("\n")) {
               const fuzzyResult = this.findFuzzyMatch(content, oldStr);
@@ -1864,7 +1854,7 @@ ${numberedLines}${additionalLinesMessage}`
             }
           }
           const dir = path8.dirname(resolvedPath);
-          await fs2.promises.mkdir(dir, { recursive: true });
+          await fs7.promises.mkdir(dir, { recursive: true });
           await writeFile(resolvedPath, content, "utf-8");
           this.editHistory.push({
             command: "create",
@@ -1894,7 +1884,7 @@ ${numberedLines}${additionalLinesMessage}`
               error: `File not found: ${filePath}`
             };
           }
-          const fileContent = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const fileContent = await fs7.promises.readFile(resolvedPath, "utf-8");
           const lines = fileContent.split("\n");
           if (startLine < 1 || startLine > lines.length) {
             return {
@@ -1962,7 +1952,7 @@ ${numberedLines}${additionalLinesMessage}`
               error: `File not found: ${filePath}`
             };
           }
-          const fileContent = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const fileContent = await fs7.promises.readFile(resolvedPath, "utf-8");
           const lines = fileContent.split("\n");
           lines.splice(insertLine - 1, 0, content);
           const newContent = lines.join("\n");
@@ -1996,7 +1986,7 @@ ${numberedLines}${additionalLinesMessage}`
           switch (lastEdit.command) {
             case "str_replace":
               if (lastEdit.path && lastEdit.old_str && lastEdit.new_str) {
-                const content = await fs2.promises.readFile(lastEdit.path, "utf-8");
+                const content = await fs7.promises.readFile(lastEdit.path, "utf-8");
                 const revertedContent = content.replace(
                   lastEdit.new_str,
                   lastEdit.old_str
@@ -2006,12 +1996,12 @@ ${numberedLines}${additionalLinesMessage}`
               break;
             case "create":
               if (lastEdit.path) {
-                await fs2.promises.rm(lastEdit.path);
+                await fs7.promises.rm(lastEdit.path);
               }
               break;
             case "insert":
               if (lastEdit.path && lastEdit.insert_line) {
-                const content = await fs2.promises.readFile(lastEdit.path, "utf-8");
+                const content = await fs7.promises.readFile(lastEdit.path, "utf-8");
                 const lines = content.split("\n");
                 lines.splice(lastEdit.insert_line - 1, 1);
                 await writeFile(lastEdit.path, lines.join("\n"), "utf-8");
@@ -2217,7 +2207,7 @@ var init_morph_editor = __esm({
     init_confirmation_service();
     pathExists2 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -2270,7 +2260,7 @@ var init_morph_editor = __esm({
               error: "MORPH_API_KEY not configured. Please set your Morph API key."
             };
           }
-          const initialCode = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const initialCode = await fs7.promises.readFile(resolvedPath, "utf-8");
           const sessionFlags = this.confirmationService.getSessionFlags();
           if (!sessionFlags.fileOperations && !sessionFlags.allOperations) {
             const confirmationResult = await this.confirmationService.requestConfirmation(
@@ -2293,7 +2283,7 @@ ${codeEdit}`
             }
           }
           const mergedCode = await this.callMorphApply(instructions, initialCode, codeEdit);
-          await fs2.promises.writeFile(resolvedPath, mergedCode, "utf-8");
+          await fs7.promises.writeFile(resolvedPath, mergedCode, "utf-8");
           const oldLines = initialCode.split("\n");
           const newLines = mergedCode.split("\n");
           const diff = this.generateDiff(oldLines, newLines, targetFile);
@@ -2467,16 +2457,16 @@ ${codeEdit}`
         try {
           const resolvedPath = path8.resolve(filePath);
           if (await pathExists2(resolvedPath)) {
-            const stats = await fs2.promises.stat(resolvedPath);
+            const stats = await fs7.promises.stat(resolvedPath);
             if (stats.isDirectory()) {
-              const files = await fs2.promises.readdir(resolvedPath);
+              const files = await fs7.promises.readdir(resolvedPath);
               return {
                 success: true,
                 output: `Directory contents of ${filePath}:
 ${files.join("\n")}`
               };
             }
-            const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+            const content = await fs7.promises.readFile(resolvedPath, "utf-8");
             const lines = content.split("\n");
             if (viewRange) {
               const [start, end] = viewRange;
@@ -2904,7 +2894,7 @@ var init_search = __esm({
         const walkDir = async (dir, depth = 0) => {
           if (depth > 10 || files.length >= maxResults) return;
           try {
-            const entries = await fs2.promises.readdir(dir, { withFileTypes: true });
+            const entries = await fs7.promises.readdir(dir, { withFileTypes: true });
             for (const entry of entries) {
               if (files.length >= maxResults) break;
               const fullPath = path8.join(dir, entry.name);
@@ -3544,7 +3534,7 @@ var init_advanced_search = __esm({
     init_confirmation_service();
     pathExists4 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -3566,7 +3556,7 @@ var init_advanced_search = __esm({
               error: `Path not found: ${searchPath}`
             };
           }
-          const stats = await fs2.promises.stat(resolvedPath);
+          const stats = await fs7.promises.stat(resolvedPath);
           const filesToSearch = [];
           if (stats.isFile()) {
             filesToSearch.push(resolvedPath);
@@ -3609,7 +3599,7 @@ var init_advanced_search = __esm({
               error: `Path not found: ${searchPath}`
             };
           }
-          const stats = await fs2.promises.stat(resolvedPath);
+          const stats = await fs7.promises.stat(resolvedPath);
           const filesToProcess = [];
           if (stats.isFile()) {
             filesToProcess.push(resolvedPath);
@@ -3654,7 +3644,7 @@ var init_advanced_search = __esm({
             }
             for (const result of results) {
               if (result.success && result.preview) {
-                await fs2.promises.writeFile(result.filePath, result.preview, "utf-8");
+                await fs7.promises.writeFile(result.filePath, result.preview, "utf-8");
               }
             }
           }
@@ -3716,7 +3706,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
        * Search in a single file
        */
       async searchInFile(filePath, options) {
-        const content = await fs2.promises.readFile(filePath, "utf-8");
+        const content = await fs7.promises.readFile(filePath, "utf-8");
         const lines = content.split("\n");
         const matches = [];
         let pattern;
@@ -3767,7 +3757,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
        */
       async replaceInFile(filePath, options) {
         try {
-          const content = await fs2.promises.readFile(filePath, "utf-8");
+          const content = await fs7.promises.readFile(filePath, "utf-8");
           let pattern;
           try {
             if (options.isRegex) {
@@ -3818,7 +3808,7 @@ ${matchingFiles.join("\n")}` : "No matching files found"
       async getFilesRecursively(dirPath, options) {
         const files = [];
         const walk = async (currentPath) => {
-          const entries = await fs2.promises.readdir(currentPath, { withFileTypes: true });
+          const entries = await fs7.promises.readdir(currentPath, { withFileTypes: true });
           for (const entry of entries) {
             const fullPath = path8.join(currentPath, entry.name);
             if (entry.isDirectory()) {
@@ -4576,7 +4566,7 @@ var init_code_aware_editor = __esm({
     init_confirmation_service();
     pathExists6 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -4598,7 +4588,7 @@ var init_code_aware_editor = __esm({
               error: `File not found: ${filePath}`
             };
           }
-          const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const content = await fs7.promises.readFile(resolvedPath, "utf-8");
           const language = this.detectLanguage(filePath);
           const context = await this.parseCodeContext(content, language);
           const output = this.formatCodeAnalysis(context, filePath);
@@ -4625,7 +4615,7 @@ var init_code_aware_editor = __esm({
               error: `File not found: ${filePath}`
             };
           }
-          const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const content = await fs7.promises.readFile(resolvedPath, "utf-8");
           const language = this.detectLanguage(filePath);
           const context = await this.parseCodeContext(content, language);
           const result = await this.performRefactoring(content, context, operation, language);
@@ -4651,7 +4641,7 @@ var init_code_aware_editor = __esm({
               };
             }
           }
-          await fs2.promises.writeFile(resolvedPath, result.newContent, "utf-8");
+          await fs7.promises.writeFile(resolvedPath, result.newContent, "utf-8");
           return {
             success: true,
             output: result.output
@@ -4675,7 +4665,7 @@ var init_code_aware_editor = __esm({
               error: `File not found: ${filePath}`
             };
           }
-          const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const content = await fs7.promises.readFile(resolvedPath, "utf-8");
           const language = this.detectLanguage(filePath);
           const context = await this.parseCodeContext(content, language);
           const insertionPoint = this.findInsertionPoint(content, context, location, target);
@@ -4705,7 +4695,7 @@ var init_code_aware_editor = __esm({
               };
             }
           }
-          await fs2.promises.writeFile(resolvedPath, newContent, "utf-8");
+          await fs7.promises.writeFile(resolvedPath, newContent, "utf-8");
           return {
             success: true,
             output: `Code inserted at line ${insertionPoint.line + 1} in ${filePath}`
@@ -4729,7 +4719,7 @@ var init_code_aware_editor = __esm({
               error: `File not found: ${filePath}`
             };
           }
-          const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const content = await fs7.promises.readFile(resolvedPath, "utf-8");
           const language = this.detectLanguage(filePath);
           const formattedContent = await this.formatCodeContent(content, language, options);
           if (formattedContent === content) {
@@ -4757,7 +4747,7 @@ var init_code_aware_editor = __esm({
               };
             }
           }
-          await fs2.promises.writeFile(resolvedPath, formattedContent, "utf-8");
+          await fs7.promises.writeFile(resolvedPath, formattedContent, "utf-8");
           return {
             success: true,
             output: `Code formatted in ${filePath}`
@@ -4781,7 +4771,7 @@ var init_code_aware_editor = __esm({
               error: `File not found: ${filePath}`
             };
           }
-          const content = await fs2.promises.readFile(resolvedPath, "utf-8");
+          const content = await fs7.promises.readFile(resolvedPath, "utf-8");
           const language = this.detectLanguage(filePath);
           const context = await this.parseCodeContext(content, language);
           const missingImports = symbols.filter(
@@ -4822,7 +4812,7 @@ ${importsToAdd.join("\n")}`;
               };
             }
           }
-          await fs2.promises.writeFile(resolvedPath, newContent, "utf-8");
+          await fs7.promises.writeFile(resolvedPath, newContent, "utf-8");
           return {
             success: true,
             output: `Added ${missingImports.length} missing imports to ${filePath}`
@@ -5545,7 +5535,7 @@ var init_operation_history = __esm({
           ...options
         };
         const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-        this.historyFile = path8.join(homeDir, ".xcli", "operation-history.json");
+        this.historyFile = path8.join(homeDir, ".grok", "operation-history.json");
         this.loadHistory();
         if (this.options.autoCleanup) {
           this.cleanupOldEntries();
@@ -5567,7 +5557,7 @@ var init_operation_history = __esm({
               files: fileSnapshots
             },
             metadata: {
-              tool: "x-cli",
+              tool: "grok-one-shot",
               filesAffected: files,
               operationSize: this.determineOperationSize(files, rollbackData),
               ...metadata
@@ -6179,7 +6169,7 @@ var init_ast_parser = __esm({
     }
     pathExists8 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -6255,7 +6245,7 @@ var init_ast_parser = __esm({
           if (!await pathExists8(filePath)) {
             throw new Error(`File not found: ${filePath}`);
           }
-          const content = await fs2.promises.readFile(filePath, "utf-8");
+          const content = await fs7.promises.readFile(filePath, "utf-8");
           const language = this.detectLanguage(filePath);
           let result;
           if (language === "typescript" || language === "tsx") {
@@ -6949,7 +6939,7 @@ var init_symbol_search = __esm({
       async findSymbolUsages(symbolRef) {
         const usages = [];
         try {
-          const content = await fs2.promises.readFile(symbolRef.filePath, "utf-8");
+          const content = await fs7.promises.readFile(symbolRef.filePath, "utf-8");
           const lines = content.split("\n");
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -7129,7 +7119,7 @@ var init_dependency_analyzer = __esm({
     init_ast_parser();
     pathExists9 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -7607,7 +7597,7 @@ var init_code_context = __esm({
     init_dependency_analyzer();
     pathExists10 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -7752,7 +7742,7 @@ var init_code_context = __esm({
       async analyzeUsagePatterns(symbol, filePath) {
         const patterns = [];
         try {
-          const content = await fs2.promises.readFile(filePath, "utf-8");
+          const content = await fs7.promises.readFile(filePath, "utf-8");
           const lines = content.split("\n");
           let callCount = 0;
           let assignmentCount = 0;
@@ -7905,7 +7895,7 @@ var init_code_context = __esm({
       }
       async analyzeSemanticContext(filePath, symbols, dependencies) {
         const fileName = path8__default.basename(filePath);
-        const content = await fs2.promises.readFile(filePath, "utf-8");
+        const content = await fs7.promises.readFile(filePath, "utf-8");
         const purpose = this.inferPurpose(fileName, symbols, content);
         const domain = this.extractDomain(filePath, symbols, dependencies);
         const patterns = this.detectDesignPatterns(content, symbols);
@@ -8034,7 +8024,7 @@ var init_code_context = __esm({
         };
       }
       async calculateCodeMetrics(filePath, symbols) {
-        const content = await fs2.promises.readFile(filePath, "utf-8");
+        const content = await fs7.promises.readFile(filePath, "utf-8");
         const lines = content.split("\n");
         const codeLines = lines.filter((line) => line.trim().length > 0 && !line.trim().startsWith("//"));
         const linesOfCode = codeLines.length;
@@ -8143,7 +8133,7 @@ var init_refactoring_assistant = __esm({
     init_operation_history();
     pathExists11 = async (filePath) => {
       try {
-        await fs2.promises.access(filePath, fs2.constants.F_OK);
+        await fs7.promises.access(filePath, fs7.constants.F_OK);
         return true;
       } catch {
         return false;
@@ -8263,7 +8253,7 @@ var init_refactoring_assistant = __esm({
         if (!await pathExists11(filePath)) {
           throw new Error(`File not found: ${filePath}`);
         }
-        const content = await fs2.promises.readFile(filePath, "utf-8");
+        const content = await fs7.promises.readFile(filePath, "utf-8");
         const lines = content.split("\n");
         if (startLine < 0 || endLine >= lines.length || startLine > endLine) {
           throw new Error("Invalid line range");
@@ -8338,7 +8328,7 @@ var init_refactoring_assistant = __esm({
         if (!filePath || !variableName) {
           throw new Error("File path and variable name are required");
         }
-        const content = await fs2.promises.readFile(filePath, "utf-8");
+        const content = await fs7.promises.readFile(filePath, "utf-8");
         const lines = content.split("\n");
         const startLineContent = lines[startLine];
         const endLineContent = lines[endLine];
@@ -8413,7 +8403,7 @@ var init_refactoring_assistant = __esm({
         if (!functionSymbol) {
           throw new Error(`Function '${symbolName}' not found`);
         }
-        const content = await fs2.promises.readFile(filePath, "utf-8");
+        const content = await fs7.promises.readFile(filePath, "utf-8");
         const lines = content.split("\n");
         const functionLines = lines.slice(functionSymbol.startPosition.row, functionSymbol.endPosition.row + 1);
         const functionBody = this.extractFunctionBody(functionLines.join("\n"));
@@ -8523,7 +8513,7 @@ var init_refactoring_assistant = __esm({
       }
       async generateRenameChanges(ref, oldName, newName, includeComments, includeStrings) {
         const changes = [];
-        const content = await fs2.promises.readFile(ref.filePath, "utf-8");
+        const content = await fs7.promises.readFile(ref.filePath, "utf-8");
         const lines = content.split("\n");
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
@@ -11189,11 +11179,11 @@ var init_token_counter = __esm({
 });
 function loadCustomInstructions(workingDirectory = process.cwd()) {
   try {
-    const instructionsPath = path8.join(workingDirectory, ".xcli", "GROK.md");
-    if (!fs2.existsSync(instructionsPath)) {
+    const instructionsPath = path8.join(workingDirectory, ".grok", "GROK.md");
+    if (!fs7.existsSync(instructionsPath)) {
       return null;
     }
-    const customInstructions = fs2.readFileSync(instructionsPath, "utf-8");
+    const customInstructions = fs7.readFileSync(instructionsPath, "utf-8");
     return customInstructions.trim();
   } catch (error) {
     console.warn("Failed to load custom instructions:", error);
@@ -11280,7 +11270,7 @@ var init_execution_orchestrator = __esm({
         step.status = "running";
         step.startTime = /* @__PURE__ */ new Date();
         console.log(`
-[x-cli] #${step.id} ${step.description} \u2026`);
+[grok-one-shot] #${step.id} ${step.description} \u2026`);
         try {
           const beforeState = this.captureFileState();
           await this.agent.processUserMessage(step.description);
@@ -11294,12 +11284,12 @@ var init_execution_orchestrator = __esm({
           }
           step.status = "completed";
           step.endTime = /* @__PURE__ */ new Date();
-          console.log(`[x-cli] #${step.id} \u2713 Completed`);
+          console.log(`[grok-one-shot] #${step.id} \u2713 Completed`);
         } catch (error) {
           step.status = "failed";
           step.endTime = /* @__PURE__ */ new Date();
           step.error = error instanceof Error ? error.message : "Unknown error";
-          console.log(`[x-cli] #${step.id} \u2717 Failed: ${step.error}`);
+          console.log(`[grok-one-shot] #${step.id} \u2717 Failed: ${step.error}`);
         }
       }
       /**
@@ -11309,10 +11299,10 @@ var init_execution_orchestrator = __esm({
         const state = /* @__PURE__ */ new Map();
         try {
           const walkDir = (dir) => {
-            const files = fs2.readdirSync(dir);
+            const files = fs7.readdirSync(dir);
             for (const file of files) {
               const filePath = path8.join(dir, file);
-              const stat = fs2.statSync(filePath);
+              const stat = fs7.statSync(filePath);
               if (stat.isDirectory() && !file.startsWith(".") && file !== "node_modules") {
                 walkDir(filePath);
               } else if (stat.isFile()) {
@@ -11357,10 +11347,10 @@ var init_execution_orchestrator = __esm({
         if (!step.changes || step.changes.length === 0) {
           return;
         }
-        console.log(`[x-cli] #${step.id} Changes detected:`);
+        console.log(`[grok-one-shot] #${step.id} Changes detected:`);
         for (const change of step.changes) {
           console.log(`  ${change.changeType.toUpperCase()}: ${change.filePath}`);
-          if (change.changeType === "modified" && fs2.existsSync(change.filePath)) {
+          if (change.changeType === "modified" && fs7.existsSync(change.filePath)) {
             try {
               if (this.isGitRepository()) {
                 const diff = execSync(`git diff --no-index /dev/null ${change.filePath} 2>/dev/null || git diff ${change.filePath}`, {
@@ -11385,9 +11375,9 @@ var init_execution_orchestrator = __esm({
           return void 0;
         }
         try {
-          const patchesDir = path8.join(__require("os").homedir(), ".xcli", "patches");
-          if (!fs2.existsSync(patchesDir)) {
-            fs2.mkdirSync(patchesDir, { recursive: true });
+          const patchesDir = path8.join(__require("os").homedir(), ".grok", "patches");
+          if (!fs7.existsSync(patchesDir)) {
+            fs7.mkdirSync(patchesDir, { recursive: true });
           }
           const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
           const patchFile = path8.join(patchesDir, `step-${step.id}-${timestamp}.patch`);
@@ -11397,7 +11387,7 @@ var init_execution_orchestrator = __esm({
 
 `;
           for (const change of step.changes) {
-            if (change.changeType === "modified" && fs2.existsSync(change.filePath)) {
+            if (change.changeType === "modified" && fs7.existsSync(change.filePath)) {
               try {
                 const diff = execSync(`git diff ${change.filePath}`, {
                   encoding: "utf-8",
@@ -11411,8 +11401,8 @@ ${diff}
               }
             }
           }
-          fs2.writeFileSync(patchFile, patchContent);
-          console.log(`[x-cli] #${step.id} Patch saved: ${patchFile}`);
+          fs7.writeFileSync(patchFile, patchContent);
+          console.log(`[grok-one-shot] #${step.id} Patch saved: ${patchFile}`);
           return patchFile;
         } catch (error) {
           console.warn(`[Execution] Failed to create patch for step ${step.id}:`, error);
@@ -11427,12 +11417,12 @@ ${diff}
           return;
         }
         for (const change of step.changes) {
-          if ((change.changeType === "modified" || change.changeType === "created") && fs2.existsSync(change.filePath)) {
+          if ((change.changeType === "modified" || change.changeType === "created") && fs7.existsSync(change.filePath)) {
             try {
               const backupPath = `${change.filePath}.bak`;
-              fs2.copyFileSync(change.filePath, backupPath);
+              fs7.copyFileSync(change.filePath, backupPath);
               change.backupPath = backupPath;
-              console.log(`[x-cli] #${step.id} Backup created: ${backupPath}`);
+              console.log(`[grok-one-shot] #${step.id} Backup created: ${backupPath}`);
             } catch (_error) {
               console.warn(`[Execution] Failed to create backup for ${change.filePath}:`, _error);
             }
@@ -11461,7 +11451,7 @@ ${diff}
 Executed ${executionPlan.totalSteps} tasks:
 ${executionPlan.steps.map((step) => `- ${step.description}`).join("\n")}
 
-Auto-generated by x-cli execution orchestrator`;
+Auto-generated by grok-one-shot execution orchestrator`;
           execSync(`git commit -m "${commitMessage}"`, { stdio: "ignore" });
           const hash = execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
           console.log(`\u2705 Git commit created: ${hash.substring(0, 8)}`);
@@ -11522,10 +11512,10 @@ Auto-generated by x-cli execution orchestrator`;
         try {
           const testFiles = [];
           const walkDir = (dir) => {
-            const files = fs2.readdirSync(dir);
+            const files = fs7.readdirSync(dir);
             for (const file of files) {
               const filePath = path8.join(dir, file);
-              const stat = fs2.statSync(filePath);
+              const stat = fs7.statSync(filePath);
               if (stat.isDirectory() && !file.startsWith(".") && file !== "node_modules") {
                 walkDir(filePath);
               } else if (stat.isFile() && (file.includes("test") || file.includes("spec"))) {
@@ -11544,7 +11534,7 @@ Auto-generated by x-cli execution orchestrator`;
        */
       findBuildFiles() {
         const buildFiles = ["package.json", "tsconfig.json", "webpack.config.js", "babel.config.js"];
-        return buildFiles.filter((file) => fs2.existsSync(file));
+        return buildFiles.filter((file) => fs7.existsSync(file));
       }
       /**
        * Find source files
@@ -11553,10 +11543,10 @@ Auto-generated by x-cli execution orchestrator`;
         try {
           const sourceFiles = [];
           const walkDir = (dir) => {
-            const files = fs2.readdirSync(dir);
+            const files = fs7.readdirSync(dir);
             for (const file of files) {
               const filePath = path8.join(dir, file);
-              const stat = fs2.statSync(filePath);
+              const stat = fs7.statSync(filePath);
               if (stat.isDirectory() && !file.startsWith(".") && file !== "node_modules") {
                 walkDir(filePath);
               } else if (stat.isFile() && (file.endsWith(".ts") || file.endsWith(".js") || file.endsWith(".tsx") || file.endsWith(".jsx"))) {
@@ -11577,7 +11567,7 @@ Auto-generated by x-cli execution orchestrator`;
         console.log("\n" + "=".repeat(60));
         console.log("\u{1F6A8} ISSUE ENCOUNTERED");
         console.log("=".repeat(60));
-        console.log(`[x-cli] Issue encountered: ${errorContext.errorMessage}`);
+        console.log(`[grok-one-shot] Issue encountered: ${errorContext.errorMessage}`);
         if (errorContext.affectedFiles.length > 0) {
           console.log(`Affected files: ${errorContext.affectedFiles.slice(0, 5).join(", ")}`);
           if (errorContext.affectedFiles.length > 5) {
@@ -11687,7 +11677,7 @@ Please provide a recovery plan to resolve this issue and continue execution.`,
                 step.status = "failed";
                 step.error = errorContext.errorMessage;
                 executionPlan.failedSteps++;
-                console.log(`[x-cli] #${step.id} \u2717 Failed: ${errorContext.errorMessage}`);
+                console.log(`[grok-one-shot] #${step.id} \u2717 Failed: ${errorContext.errorMessage}`);
               }
             }
           }
@@ -12115,7 +12105,7 @@ var init_grok_agent = __esm({
     init_research_recommend();
     init_execution_orchestrator();
     GrokAgent = class extends EventEmitter {
-      constructor(apiKey2, baseURL, model, maxToolRounds, contextPack) {
+      constructor(apiKey2, baseURL, model, maxToolRounds, contextPack, verbosityLevel, explainLevel) {
         super();
         this.chatHistory = [];
         this.messages = [];
@@ -12173,9 +12163,10 @@ TASKS:
 ${this.contextPack.tasks.map((t) => `- ${t.filename}: ${t.content}`).join("\n")}
 
 The above project context should inform your responses and decision making.` : "";
+        const verbosityInstructions = this.buildVerbosityInstructions(verbosityLevel || "quiet", explainLevel || "brief");
         this.messages.push({
           role: "system",
-          content: `You are X-CLI, an AI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}
+          content: `You are Grok One-Shot, an AI-powered CLI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}${verbosityInstructions}
 
 You have access to these tools:
 
@@ -12951,12 +12942,12 @@ EOF`;
       saveSessionLog() {
         try {
           const sessionDir = path8__default.join(__require("os").homedir(), ".grok");
-          if (!fs2__default.existsSync(sessionDir)) {
-            fs2__default.mkdirSync(sessionDir, { recursive: true });
+          if (!fs7__default.existsSync(sessionDir)) {
+            fs7__default.mkdirSync(sessionDir, { recursive: true });
           }
           const sessionFile = path8__default.join(sessionDir, "session.log");
           const logLines = this.chatHistory.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
-          fs2__default.writeFileSync(sessionFile, logLines);
+          fs7__default.writeFileSync(sessionFile, logLines);
         } catch (error) {
           console.warn("Failed to save session log:", error);
         }
@@ -12989,8 +12980,8 @@ EOF`;
       logEntry(entry) {
         try {
           const dir = path8__default.dirname(this.sessionLogPath);
-          if (!fs2__default.existsSync(dir)) {
-            fs2__default.mkdirSync(dir, { recursive: true });
+          if (!fs7__default.existsSync(dir)) {
+            fs7__default.mkdirSync(dir, { recursive: true });
           }
           const logLine = JSON.stringify({
             type: entry.type,
@@ -12999,7 +12990,7 @@ EOF`;
             toolCallId: entry.toolCall?.id,
             toolCallsCount: entry.toolCalls?.length
           }) + "\n";
-          fs2__default.appendFileSync(this.sessionLogPath, logLine);
+          fs7__default.appendFileSync(this.sessionLogPath, logLine);
         } catch (error) {
           console.warn("Failed to log session entry:", error);
         }
@@ -13028,6 +13019,43 @@ ${output?.plan?.summary || "Task completed"}`,
           this.chatHistory.push(detailsEntry);
         }
         return entries;
+      }
+      /**
+       * Build verbosity instructions for the system message based on user settings
+       */
+      buildVerbosityInstructions(verbosityLevel, explainLevel) {
+        let instructions = "\n\nRESPONSE STYLE:\n";
+        switch (verbosityLevel) {
+          case "quiet":
+            instructions += "- Keep responses CONCISE and to the point. Avoid lengthy explanations.\n";
+            instructions += "- Prioritize brevity over detail unless specifically requested.\n";
+            instructions += "- Use minimal formatting and avoid verbose tool descriptions.\n";
+            break;
+          case "normal":
+            instructions += "- Provide balanced responses with appropriate detail.\n";
+            instructions += "- Include context when helpful but avoid unnecessary verbosity.\n";
+            break;
+          case "verbose":
+            instructions += "- Provide comprehensive, detailed responses.\n";
+            instructions += "- Include extensive context and explanations.\n";
+            instructions += "- Use full formatting and detailed tool descriptions.\n";
+            break;
+        }
+        switch (explainLevel) {
+          case "off":
+            instructions += "- Do NOT explain your actions or reasoning.\n";
+            instructions += "- Execute operations without commentary.\n";
+            break;
+          case "brief":
+            instructions += "- Provide brief explanations for your actions when relevant.\n";
+            instructions += "- Keep reasoning concise and focused.\n";
+            break;
+          case "detailed":
+            instructions += "- Explain your reasoning and approach comprehensively.\n";
+            instructions += "- Provide detailed context for all operations.\n";
+            break;
+        }
+        return instructions;
       }
     };
   }
@@ -15242,7 +15270,7 @@ var init_use_plan_mode = __esm({
       // 30 seconds
       enableDetailedLogging: true,
       autoSavePlans: true,
-      planSaveDirectory: ".xcli/plans"
+      planSaveDirectory: ".grok/plans"
     };
     INITIAL_STATE = {
       active: false,
@@ -15403,7 +15431,7 @@ ${documentationSection}`;
 - Reference existing documentation rather than recreating context
 
 ---
-*This section was added by the X-CLI documentation system*`;
+*This section was added by the grok-one-shotdocumentation system*`;
       }
     };
     claudeMdParser = new ClaudeMdParserImpl();
@@ -15534,18 +15562,18 @@ Documentation for documentation system commands:
 
 ## \u{1F517} Cross-References
 - Main project documentation: ../README.md
-- Configuration: ../.xcli/settings.json
+- Configuration: ../.grok/settings.json
 - Build instructions: ../package.json
 
 ---
-*Generated by X-CLI Documentation System*
+*Generated by grok-one-shotDocumentation System*
 *Last updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*
 `;
       }
       async generateSystemDocs(agentPath) {
         const systemPath = path8__default.join(agentPath, "system");
         const files = [];
-        const archContent = this.config.projectType === "x-cli" ? this.generateGrokArchitecture() : this.generateExternalArchitecture();
+        const archContent = this.config.projectType === "grok-one-shot" ? this.generateGrokArchitecture() : this.generateExternalArchitecture();
         await ops6.promises.writeFile(path8__default.join(systemPath, "architecture.md"), archContent);
         files.push(".agent/system/architecture.md");
         const criticalStateContent = this.generateCriticalState();
@@ -15557,7 +15585,7 @@ Documentation for documentation system commands:
         return files;
       }
       generateGrokArchitecture() {
-        return `# \u{1F3D7}\uFE0F X-CLI Architecture
+        return `# \u{1F3D7}\uFE0F grok-one-shotArchitecture
 
 ## Project Type
 **CLI Application** - Conversational AI tool with terminal interface
@@ -15595,7 +15623,7 @@ Documentation for documentation system commands:
 ### \u2699\uFE0F Configuration (\`src/utils/\`)
 - **Settings Management**: User and project-level config
 - **Model Configuration**: Support for multiple AI models
-- **File Locations**: ~/.xcli/ for user, .xcli/ for project
+- **File Locations**: ~/.grok/ for user, .grok/ for project
 
 ## Build & Distribution
 - **Development**: \`bun run dev\` for live reload
@@ -15660,7 +15688,7 @@ External project documented using X-CLI's .agent system.
       }
       generateCriticalState() {
         const timestamp = (/* @__PURE__ */ new Date()).toISOString();
-        if (this.config.projectType === "x-cli") {
+        if (this.config.projectType === "grok-one-shot") {
           return `# \u{1F527} Current System State
 
 ## Architecture Overview
@@ -15674,7 +15702,7 @@ External project documented using X-CLI's .agent system.
 - **Commands**: Slash-based in src/commands/ (limited - only MCP command currently)
 - **Tools**: Modular tools in src/tools/ (extensive tool system)
 - **UI**: Ink components in src/ui/
-- **Settings**: File-based .xcli/settings.json + ~/.xcli/config.json
+- **Settings**: File-based .grok/settings.json + ~/.grok/config.json
 - **Input**: Enhanced terminal input with history in src/hooks/
 
 ## Command System
@@ -15746,7 +15774,7 @@ Updated By: Agent System Generator during /init-agent
         }
       }
       generateApiSchema() {
-        if (this.config.projectType === "x-cli") {
+        if (this.config.projectType === "grok-one-shot") {
           return `# \u{1F50C} API Schema
 
 ## Grok API Integration
@@ -15902,7 +15930,7 @@ interface Tool {
 - Maintain clear navigation
 
 ## Automation
-- Auto-update triggers configured in .xcli/settings.json
+- Auto-update triggers configured in .grok/settings.json
 - Smart prompts after key file changes
 - Token threshold reminders
 - Integration with git commit hooks
@@ -15911,7 +15939,7 @@ interface Tool {
 `;
         await ops6.promises.writeFile(path8__default.join(sopPath, "documentation-workflow.md"), docWorkflowContent);
         files.push(".agent/sop/documentation-workflow.md");
-        if (this.config.projectType === "x-cli") {
+        if (this.config.projectType === "grok-one-shot") {
           const newCommandContent = `# \u2699\uFE0F Adding New Commands SOP
 
 ## Command System Architecture
@@ -15992,7 +16020,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
       async generateExampleTask(agentPath) {
         const tasksPath = path8__default.join(agentPath, "tasks");
         const files = [];
-        const exampleContent = this.config.projectType === "x-cli" ? this.generateGrokExampleTask() : this.generateExternalExampleTask();
+        const exampleContent = this.config.projectType === "grok-one-shot" ? this.generateGrokExampleTask() : this.generateExternalExampleTask();
         await ops6.promises.writeFile(path8__default.join(tasksPath, "example-prd.md"), exampleContent);
         files.push(".agent/tasks/example-prd.md");
         return files;
@@ -16004,7 +16032,7 @@ Create tool in \`src/tools/\`, then reference in command handler.
 Add comprehensive documentation generation capabilities to X-CLI.
 
 ## Background
-X-CLI needs better documentation tools to help users document both the CLI itself and their projects efficiently.
+grok-one-shotneeds better documentation tools to help users document both the CLI itself and their projects efficiently.
 
 ## Requirements
 
@@ -16153,7 +16181,7 @@ Creates \`.agent/\` folder structure:
 
 ## Project Types
 
-### X-CLI (Internal)
+### grok-one-shot(Internal)
 - Documents X-CLI's own architecture
 - Includes command system patterns
 - References existing tool structure
@@ -16556,7 +16584,7 @@ TypeScript is configured via \`tsconfig.json\`.
 `;
         }
         content += `---
-*Generated by X-CLI Documentation System*
+*Generated by grok-one-shotDocumentation System*
 `;
         content += `*Last updated: ${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}*`;
         return content;
@@ -17168,7 +17196,7 @@ type ${type.name} = ${type.definition}
           });
         }
         content += `---
-*Generated by X-CLI Documentation System*`;
+*Generated by grok-one-shotDocumentation System*`;
         return content;
       }
       generateHtml(documentation) {
@@ -17565,7 +17593,7 @@ var init_update_agent_docs = __esm({
         const configFiles = [
           "package.json",
           "tsconfig.json",
-          ".xcli/",
+          ".grok/",
           "CLAUDE.md",
           ".env",
           ".gitignore",
@@ -18267,7 +18295,7 @@ ${incident.guardrailCreated ? `Guardrail created: ${incident.guardrailCreated}` 
 - [System Critical State](../system/critical-state.md)
 
 ---
-*Generated by X-CLI Self-Healing System*
+*Generated by grok-one-shotSelf-Healing System*
 *Incident ID: ${incident.id}*
 `;
       }
@@ -18349,7 +18377,7 @@ ${guardrail.createdFrom ? `- Created from incident: ${guardrail.createdFrom}` : 
 - Category: ${guardrail.category}
 
 ---
-*Generated by X-CLI Self-Healing System*
+*Generated by grok-one-shotSelf-Healing System*
 `;
       }
       async checkGuardrails(operation, context) {
@@ -18621,7 +18649,7 @@ var init_package = __esm({
         url: "https://github.com/x-cli-team/grok-one-shot/issues"
       },
       homepage: "https://grok-one-shot.org",
-      icon: "docs/assets/logos/x-cli-logo.svg",
+      icon: "apps/site/static/img/logo.svg",
       publishConfig: {
         access: "public"
       },
@@ -19052,7 +19080,7 @@ This documentation provides context for all AI operations, ensuring consistent u
     if (trimmedInput === "/help") {
       const helpEntry = {
         type: "assistant",
-        content: `X-CLI Help:
+        content: `grok-one-shotHelp:
 
 Built-in Commands:
   /clear      - Clear chat history
@@ -19103,7 +19131,7 @@ Direct Commands (executed immediately):
   touch <file>- Create empty file
 
 Model Configuration:
-  Edit ~/.xcli/models.json to add custom models (Claude, GPT, Gemini, etc.)
+  Edit ~/.grok/models.json to add custom models (Claude, GPT, Gemini, etc.)
 
 For complex operations, just describe what you want in natural language.
 Examples:
@@ -19186,7 +19214,7 @@ Available models: ${modelNames.join(", ")}`,
         const versionInfo = await checkForUpdates();
         const versionEntry = {
           type: "assistant",
-          content: `\u{1F4E6} **X-CLI Version Information**
+          content: `\u{1F4E6} **grok-one-shotVersion Information**
 
 Current Version: **${versionInfo.current}**
 Latest Version: **${versionInfo.latest}**
@@ -19509,9 +19537,9 @@ ${commitMessage}`
       setChatHistory((prev) => [...prev, userEntry]);
       setIsProcessing(true);
       try {
-        const isXCli = process.cwd().includes("x-cli") || trimmedInput.includes("--xcli");
-        const projectType = isXCli ? "x-cli" : "external";
-        const projectName = isXCli ? "X CLI" : "Current Project";
+        const isGrokOneShot = process.cwd().includes("grok-one-shot") || trimmedInput.includes("--grok-one-shot");
+        const projectType = isGrokOneShot ? "grok-one-shot" : "external";
+        const projectName = isGrokOneShot ? "Grok One-Shot" : "Current Project";
         const generator = new AgentSystemGenerator({
           projectName,
           projectType,
@@ -20967,14 +20995,14 @@ function useContextInfo(agent) {
 async function getWorkspaceFileCount() {
   try {
     const cwd = process.cwd();
-    const entries = await fs2__default.promises.readdir(cwd, { withFileTypes: true });
+    const entries = await fs7__default.promises.readdir(cwd, { withFileTypes: true });
     let count = 0;
     for (const entry of entries) {
       if (entry.isFile() && !shouldIgnoreFile(entry.name)) {
         count++;
       } else if (entry.isDirectory() && !shouldIgnoreDirectory(entry.name)) {
         try {
-          const subEntries = await fs2__default.promises.readdir(path8__default.join(cwd, entry.name), { withFileTypes: true });
+          const subEntries = await fs7__default.promises.readdir(path8__default.join(cwd, entry.name), { withFileTypes: true });
           count += subEntries.filter((sub) => sub.isFile() && !shouldIgnoreFile(sub.name)).length;
         } catch {
         }
@@ -20994,9 +21022,9 @@ function shouldIgnoreDirectory(dirname5) {
 }
 async function getIndexSize() {
   try {
-    const indexPath = path8__default.join(process.cwd(), ".xcli", "index.json");
-    if (fs2__default.existsSync(indexPath)) {
-      const stats = await fs2__default.promises.stat(indexPath);
+    const indexPath = path8__default.join(process.cwd(), ".grok", "index.json");
+    if (fs7__default.existsSync(indexPath)) {
+      const stats = await fs7__default.promises.stat(indexPath);
       const mb = stats.size / (1024 * 1024);
       return mb > 1 ? `${mb.toFixed(1)} MB` : `${(stats.size / 1024).toFixed(1)} KB`;
     }
@@ -21006,9 +21034,9 @@ async function getIndexSize() {
 }
 async function getSessionFileCount() {
   try {
-    const sessionPath = path8__default.join(os__default.homedir(), ".xcli", "session.log");
-    if (fs2__default.existsSync(sessionPath)) {
-      const content = await fs2__default.promises.readFile(sessionPath, "utf8");
+    const sessionPath = path8__default.join(os__default.homedir(), ".grok", "session.log");
+    if (fs7__default.existsSync(sessionPath)) {
+      const content = await fs7__default.promises.readFile(sessionPath, "utf8");
       return content.split("\n").filter((line) => line.trim()).length;
     }
   } catch {
@@ -21018,8 +21046,8 @@ async function getSessionFileCount() {
 async function getGitBranch() {
   try {
     const gitPath = path8__default.join(process.cwd(), ".git", "HEAD");
-    if (fs2__default.existsSync(gitPath)) {
-      const content = await fs2__default.promises.readFile(gitPath, "utf8");
+    if (fs7__default.existsSync(gitPath)) {
+      const content = await fs7__default.promises.readFile(gitPath, "utf8");
       const match = content.match(/ref: refs\/heads\/(.+)/);
       return match ? match[1].trim() : "detached";
     }
@@ -21030,8 +21058,8 @@ async function getGitBranch() {
 async function getProjectName() {
   try {
     const packagePath = path8__default.join(process.cwd(), "package.json");
-    if (fs2__default.existsSync(packagePath)) {
-      const content = await fs2__default.promises.readFile(packagePath, "utf8");
+    if (fs7__default.existsSync(packagePath)) {
+      const content = await fs7__default.promises.readFile(packagePath, "utf8");
       const pkg = JSON.parse(content);
       return pkg.name;
     }
@@ -21080,14 +21108,14 @@ function useCLAUDEmd(setChatHistory) {
     let totalChars = 0;
     for (const file of filesToLoad) {
       let filePath = file.path;
-      let exists = fs2__default.existsSync(filePath);
+      let exists = fs7__default.existsSync(filePath);
       if (!exists && file.fallback) {
         filePath = file.fallback;
-        exists = fs2__default.existsSync(filePath);
+        exists = fs7__default.existsSync(filePath);
       }
       if (exists) {
         try {
-          const content = fs2__default.readFileSync(filePath, "utf8");
+          const content = fs7__default.readFileSync(filePath, "utf8");
           const charCount = content.length;
           totalChars += charCount;
           loadedDocs.push(file.label);
@@ -21417,7 +21445,7 @@ function useIntroduction(chatHistory, setChatHistory) {
     if (!introductionState.needsIntroduction) return;
     const introMessage = {
       type: "assistant",
-      content: "Hello! I'm x-cli. Before we get started, I'd like to know a bit about you.\n\nWhat's your name?",
+      content: "Hello! I'm Grok One-Shot. Before we get started, I'd like to know a bit about you.\n\nWhat's your name?",
       timestamp: /* @__PURE__ */ new Date()
     };
     setChatHistory((prev) => [...prev, introMessage]);
@@ -21458,14 +21486,14 @@ function useSessionLogging(chatHistory) {
   useEffect(() => {
     const newEntries = chatHistory.slice(lastChatHistoryLength.current);
     if (newEntries.length > 0) {
-      const sessionFile = path8__default.join(os__default.homedir(), ".xcli", "session.log");
+      const sessionFile = path8__default.join(os__default.homedir(), ".grok", "session.log");
       try {
         const dir = path8__default.dirname(sessionFile);
-        if (!fs2__default.existsSync(dir)) {
-          fs2__default.mkdirSync(dir, { recursive: true });
+        if (!fs7__default.existsSync(dir)) {
+          fs7__default.mkdirSync(dir, { recursive: true });
         }
         const lines = newEntries.map((entry) => JSON.stringify(entry)).join("\n") + "\n";
-        fs2__default.appendFileSync(sessionFile, lines);
+        fs7__default.appendFileSync(sessionFile, lines);
       } catch {
       }
     }
@@ -21606,7 +21634,7 @@ function ContextStatus({
       setDynamicInfo(mockInfo);
     };
     updateDynamicInfo();
-    const interval = setInterval(updateDynamicInfo, 1e4);
+    const interval = setInterval(updateDynamicInfo, 3e5);
     return () => clearInterval(interval);
   }, []);
   const getMemoryPressureColor = (pressure) => {
@@ -23202,7 +23230,7 @@ function ChatInterfaceRenderer({
           /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
             "\u2022 ",
             /* @__PURE__ */ jsx(Text, { color: "magenta", children: "Project memory:" }),
-            " Create .xcli/GROK.md to customize behavior"
+            " Create .grok/GROK.md to customize behavior"
           ] }),
           /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
             "\u2022 ",
@@ -23888,7 +23916,7 @@ var require_package = __commonJS({
         url: "https://github.com/x-cli-team/grok-one-shot/issues"
       },
       homepage: "https://grok-one-shot.org",
-      icon: "docs/assets/logos/x-cli-logo.svg",
+      icon: "apps/site/static/img/logo.svg",
       publishConfig: {
         access: "public"
       },
@@ -23912,7 +23940,7 @@ var require_package = __commonJS({
   }
 });
 dotenv.config();
-var logStream = fs2__default.createWriteStream(path8__default.join(process.cwd(), "xcli-startup.log"), { flags: "a" });
+var logStream = fs7__default.createWriteStream(path8__default.join(process.cwd(), "xcli-startup.log"), { flags: "a" });
 var log = (...args) => {
   const timestamp = (/* @__PURE__ */ new Date()).toISOString();
   const msg = `[${timestamp}] ${args.join(" ")}
@@ -23923,7 +23951,7 @@ var log = (...args) => {
   } catch {
   }
 };
-log("\u{1F680} X-CLI Starting Up...");
+log("\u{1F680} grok-one-shotStarting Up...");
 log(`\u{1F4C2} Working directory: ${process.cwd()}`);
 log(`\u{1F5A5}\uFE0F  Node version: ${process.version}`);
 var apiKey = process.env.GROK_API_KEY;
@@ -23994,7 +24022,10 @@ try {
     const model = loadModel();
     const maxToolRounds = parseInt(process.env.MAX_TOOL_ROUNDS || "400");
     log("\u{1F916} Creating GrokAgent instance...");
-    const agent = new GrokAgent2(apiKey, baseURL, model, maxToolRounds);
+    const manager = getSettingsManager2();
+    const verbosityLevel = manager.getUserSetting("verbosityLevel") || "quiet";
+    const explainLevel = manager.getUserSetting("explainLevel") || "brief";
+    const agent = new GrokAgent2(apiKey, baseURL, model, maxToolRounds, void 0, verbosityLevel, explainLevel);
     log("\u{1F4CB} Setting up Commander CLI...");
     program.name("grok one shot").description("AI-powered CLI assistant").version(pkg.default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key").option("-u, --base-url <url>", "Grok API base URL").option("-m, --model <model>", "AI model to use").option("-p, --prompt <prompt>", "process a single prompt and exit (headless mode)").option("--max-tool-rounds <rounds>", "maximum tool rounds", "400").option("-q, --quiet", "suppress startup banner and messages").action(async (message, options) => {
       log("\u{1F3AF} Starting main execution...");

@@ -8,11 +8,11 @@ Grok One-Shot offers a variety of settings to configure its behavior to meet you
 
 The `settings.json` file is the mechanism for configuring Grok One-Shot:
 
-* **User settings** are defined in `~/.x-cli/settings.json` and apply to all projects.
+* **User settings** are defined in `~/.grok/settings.json` and apply to all projects.
 
 > **⚠️ Parity Gap:** Grok One-Shot does not support project-level settings files (`.grok/settings.json` in project directories) or enterprise managed policy settings. All configuration is user-level only.
 
-**Location:** `~/.x-cli/settings.json`
+**Location:** `~/.grok/settings.json`
 
 **Example settings.json:**
 
@@ -119,7 +119,7 @@ Settings are applied in order of precedence (highest to lowest):
    * Override settings file values
    * Example: `GROK_MODEL=grok-beta grok`
 
-3. **User settings** (`~/.x-cli/settings.json`)
+3. **User settings** (`~/.grok/settings.json`)
    * Persistent global settings
 
 > **⚠️ Parity Gap:** Claude Code supports enterprise managed policies and project-level settings that take precedence over user settings. Grok One-Shot only has user-level settings.
@@ -147,12 +147,12 @@ grok mcp remove servername
 
 ```bash
 # View current settings
-cat ~/.x-cli/settings.json
+cat ~/.grok/settings.json
 
 # Edit with your preferred editor
-vim ~/.x-cli/settings.json
-nano ~/.x-cli/settings.json
-code ~/.x-cli/settings.json
+vim ~/.grok/settings.json
+nano ~/.grok/settings.json
+code ~/.grok/settings.json
 ```
 
 **Important:** Valid JSON required. Invalid JSON will cause errors on startup.
@@ -161,13 +161,13 @@ code ~/.x-cli/settings.json
 
 ```bash
 # Backup current settings
-cp ~/.x-cli/settings.json ~/.x-cli/settings.json.backup
+cp ~/.grok/settings.json ~/.grok/settings.json.backup
 
 # Delete settings (will be recreated on next run)
-rm ~/.x-cli/settings.json
+rm ~/.grok/settings.json
 
 # Or reset to defaults
-cat > ~/.x-cli/settings.json << 'EOF'
+cat > ~/.grok/settings.json << 'EOF'
 {
   "confirmations": true
 }
@@ -299,7 +299,7 @@ source .env && grok
 
 ## Session storage
 
-**Location:** `~/.x-cli/sessions/`
+**Location:** `~/.grok/sessions/`
 
 **Contents:**
 - One JSON file per session
@@ -311,17 +311,17 @@ source .env && grok
 
 ```bash
 # View sessions
-ls -la ~/.x-cli/sessions/
+ls -la ~/.grok/sessions/
 
 # View specific session
-cat ~/.x-cli/sessions/session-2025-11-05-14-30.json
+cat ~/.grok/sessions/session-2025-11-05-14-30.json
 
 # Clean old sessions (older than 30 days)
-find ~/.x-cli/sessions/ -name "*.json" -mtime +30 -delete
+find ~/.grok/sessions/ -name "*.json" -mtime +30 -delete
 
 # Archive sessions
 mkdir ~/session-archives
-mv ~/.x-cli/sessions/*.json ~/session-archives/
+mv ~/.grok/sessions/*.json ~/session-archives/
 ```
 
 > **⚠️ Parity Gap:** Claude Code supports automatic cleanup of old sessions via `cleanupPeriodDays` setting (default: 30 days). Grok One-Shot requires manual session cleanup.
@@ -363,9 +363,9 @@ Grok One-Shot has access to a set of powerful tools that help it understand and 
 
 **Check:**
 
-1. File exists: `ls ~/.x-cli/settings.json`
-2. Valid JSON: `python -m json.tool ~/.x-cli/settings.json`
-3. Correct permissions: `chmod 644 ~/.x-cli/settings.json`
+1. File exists: `ls ~/.grok/settings.json`
+2. Valid JSON: `python -m json.tool ~/.grok/settings.json`
+3. Correct permissions: `chmod 644 ~/.grok/settings.json`
 
 ### Environment variables not working
 
@@ -416,7 +416,7 @@ export GROK_API_KEY="your-key"
 grok
 
 # 3. Settings file
-echo '{"apiKey":"your-key"}' > ~/.x-cli/settings.json
+echo '{"apiKey":"your-key"}' > ~/.grok/settings.json
 grok
 
 # 4. Will be prompted interactively
@@ -429,7 +429,7 @@ grok
 
 **Do:**
 - ✅ Use environment variables for API keys
-- ✅ Restrict file permissions: `chmod 600 ~/.x-cli/settings.json`
+- ✅ Restrict file permissions: `chmod 600 ~/.grok/settings.json`
 - ✅ Never commit settings.json to git
 - ✅ Use `${VAR}` references for secrets in MCP config
 - ✅ Review confirmations before approving operations

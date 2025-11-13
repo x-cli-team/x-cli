@@ -53,7 +53,7 @@ grok sessions branch session-xyz --from-message 15
 
 ```bash
 # Manually resume via summary
-cat ~/.x-cli/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[-5:] | .[] | .content | .[0:200]'
+cat ~/.grok/sessions/session-2025-11-05-14-30-12.json | jq -r '.messages[-5:] | .[] | .content | .[0:200]'
 
 grok
 

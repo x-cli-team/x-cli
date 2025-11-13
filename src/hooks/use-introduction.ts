@@ -148,7 +148,7 @@ export function useIntroduction(
     // Add initial introduction message
     const introMessage: ChatEntry = {
       type: "assistant",
-      content: "Hello! I'm x-cli. Before we get started, I'd like to know a bit about you.\n\nWhat's your name?",
+      content: "Hello! I'm Grok One-Shot. Before we get started, I'd like to know a bit about you.\n\nWhat's your name?",
       timestamp: new Date(),
     };
     setChatHistory(prev => [...prev, introMessage]);

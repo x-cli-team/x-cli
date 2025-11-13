@@ -130,7 +130,7 @@ When using Grok One-Shot, you are making API calls to xAI using your own API key
 
 **Security considerations**:
 - ⚠️ Session files contain full conversation history (stored locally)
-- ⚠️ API key stored in plaintext in `~/.x-cli/settings.json` (use `chmod 600`)
+- ⚠️ API key stored in plaintext in `~/.grok/settings.json` (use `chmod 600`)
 - ⚠️ File system access as broad as your user permissions
 - ⚠️ Bash command execution capabilities (by design)
 
@@ -160,7 +160,7 @@ By design, Grok One-Shot can:
 2. Use `.grokignore` or `.gitignore` to exclude sensitive files
 3. Review prompts before confirming operations
 4. Keep API keys secure and rotated regularly
-5. Monitor `~/.x-cli/sessions/` for sensitive data
+5. Monitor `~/.grok/sessions/` for sensitive data
 
 ### What gets sent to xAI
 
@@ -210,8 +210,8 @@ When using Grok One-Shot, the following data is sent to xAI's API:
 ### GDPR (Europe)
 
 **User rights**:
-- **Right to access**: View your local session files in `~/.x-cli/`
-- **Right to deletion**: Delete `~/.x-cli/` directory; contact xAI for API data
+- **Right to access**: View your local session files in `~/.grok/`
+- **Right to deletion**: Delete `~/.grok/` directory; contact xAI for API data
 - **Right to portability**: Session files are JSON (portable format)
 - **Right to object**: Stop using the service at any time
 

@@ -59,7 +59,7 @@ This release includes the complete repository migration with critical streaming 
 A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligence** and advanced tool capabilities.
 
 <div align="center">
-  <img src="apps/site/static/img/logo.svg" alt="Grok One-Shot Logo" width="120" />
+  <img src="apps/site/static/img/logo.png" alt="Grok One-Shot Logo" width="120" />
 </div>
 
 ## 🔗 Quick Links
@@ -202,7 +202,7 @@ A conversational AI CLI tool powered by x.ai with **Claude Code-level intelligen
 - **Research Phase**: Agent explains investigation approach with progress indicators
 - **Options Presentation**: Clear recommendations with pros/cons for complex tasks
 - **Confirmation Workflow**: Keyboard shortcuts (y/n/modify/cancel) for efficient decisions
-- **State Persistence**: Settings saved to `~/.xcli/config.json` across sessions
+- **State Persistence**: Settings saved to `~/.grok/config.json` across sessions
 
 ### 🎨 **Enhanced User Experience**
 
@@ -400,7 +400,7 @@ grok-one-shot --help
 
 ```bash
 git clone <repository>
-cd xcli-cli
+cd grok-one-shot
 npm install
 npm run build
 npm link
@@ -432,7 +432,7 @@ grok-one-shot --api-key your_api_key_here
 ```
 
 **Method 4: User Settings File**
-Create `~/.xcli/user-settings.json`:
+Create `~/.grok/user-settings.json`:
 
 ```json
 {
@@ -474,7 +474,7 @@ grok-one-shot --api-key your_api_key_here --base-url https://your-custom-endpoin
 ```
 
 **Method 3: User Settings File**
-Add to `~/.xcli/user-settings.json`:
+Add to `~/.grok/user-settings.json`:
 
 ```json
 {
@@ -487,7 +487,7 @@ Add to `~/.xcli/user-settings.json`:
 
 Grok One-Shot uses two types of configuration files to manage settings:
 
-### User-Level Settings (`~/.xcli/config.json`)
+### User-Level Settings (`~/.grok/config.json`)
 
 This file stores **global settings** that apply across all projects. These settings rarely change and include:
 
@@ -513,7 +513,7 @@ This file stores **global settings** that apply across all projects. These setti
 }
 ```
 
-### Project-Level Settings (`.xcli/settings.json`)
+### Project-Level Settings (`.grok/settings.json`)
 
 This file stores **project-specific settings** in your current working directory. It includes:
 
@@ -582,7 +582,7 @@ The **`.agent` folder** is the most powerful feature of Grok One-Shot, enabling 
 When you run `npx -y @xagent/one-shot@latest`, the CLI automatically detects and reads `.agent/` documentation:
 
 1. **Auto-Discovery**: Scans for `.agent/` folder in current directory
-2. **Configuration Loading**: Reads `.xcli/auto-read-config.json` (distributed) or `.agent/auto-read-config.json` (project override)
+2. **Configuration Loading**: Reads `.grok/auto-read-config.json` (distributed) or `.agent/auto-read-config.json` (project override)
 3. **Smart Loading**: Reads configured documentation files into chat context
 4. **Context Enhancement**: Provides comprehensive project understanding to AI
 
@@ -796,7 +796,7 @@ grok-one-shot
 ```
 
 **Method 3: User Settings File**
-Add to `~/.xcli/user-settings.json`:
+Add to `~/.grok/user-settings.json`:
 
 ```json
 {

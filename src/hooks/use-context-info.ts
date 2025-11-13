@@ -160,7 +160,7 @@ function shouldIgnoreDirectory(dirname: string): boolean {
 
 async function getIndexSize(): Promise<string> {
   try {
-    const indexPath = path.join(process.cwd(), '.xcli', 'index.json');
+    const indexPath = path.join(process.cwd(), '.grok', 'index.json');
     if (fs.existsSync(indexPath)) {
       const stats = await fs.promises.stat(indexPath);
       const mb = stats.size / (1024 * 1024);
@@ -174,7 +174,7 @@ async function getIndexSize(): Promise<string> {
 
 async function getSessionFileCount(): Promise<number> {
   try {
-    const sessionPath = path.join(os.homedir(), '.xcli', 'session.log');
+    const sessionPath = path.join(os.homedir(), '.grok', 'session.log');
     if (fs.existsSync(sessionPath)) {
       const content = await fs.promises.readFile(sessionPath, 'utf8');
       return content.split('\n').filter(line => line.trim()).length;

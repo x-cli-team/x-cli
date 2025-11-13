@@ -299,9 +299,9 @@ if ! command -v grok &> /dev/null; then
 fi
 
 # Configure
-if [ ! -f ~/.x-cli/settings.json ]; then
+if [ ! -f ~/.grok/settings.json ]; then
   mkdir -p ~/.grok
-  cp /shared/config/grok-settings.json ~/.x-cli/settings.json
+  cp /shared/config/grok-settings.json ~/.grok/settings.json
 fi
 
 # Verify
@@ -326,7 +326,7 @@ echo "✅ Grok One-Shot ready"
     - name: Copy settings template
       copy:
         src: grok-settings.json
-        dest: ~/.x-cli/settings.json
+        dest: ~/.grok/settings.json
         mode: '0600'
 ```
 
@@ -337,7 +337,7 @@ package { '@xagent/one-shot':
   provider => 'npm',
 }
 
-file { '/home/user/.x-cli/settings.json':
+file { '/home/user/.grok/settings.json':
   ensure  => file,
   content => template('xagent/settings.json.erb'),
   mode    => '0600',
@@ -550,7 +550,7 @@ export GROK_API_KEY="test-key"
 grok -p "echo test" || echo "API test failed"
 
 # 5. Settings file created
-ls -la ~/.x-cli/settings.json
+ls -la ~/.grok/settings.json
 ```
 
 ### Integration Testing

@@ -43,7 +43,7 @@ export function ContextStatus({
     };
 
     updateDynamicInfo();
-    const interval = setInterval(updateDynamicInfo, 10000); // Update every 10s
+    const interval = setInterval(updateDynamicInfo, 300000); // Update every 5 minutes - reduced frequency to prevent scroll reset
     return () => clearInterval(interval);
   }, []);
 

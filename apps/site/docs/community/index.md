@@ -19,7 +19,7 @@ Connect with other developers, share tips, and get help in our vibrant Discord c
 
 Help us improve Grok One-Shot by reporting bugs or suggesting new features on GitHub.
 
-[View Issues →](https://github.com/x-cli-team/grok-cli-hurry-mode/issues)
+[View Issues →](https://github.com/x-cli-team/grok-one-shot/issues)
 
 ### 📖 Contribute to Documentation
 

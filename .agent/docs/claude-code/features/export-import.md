@@ -60,10 +60,10 @@ grok export --report --template security-audit
 
 ```bash
 # Manual export
-cat ~/.x-cli/sessions/latest.json | jq '.messages[] | "## \(.role)\n\n\(.content)\n"' > session.md
+cat ~/.grok/sessions/latest.json | jq '.messages[] | "## \(.role)\n\n\(.content)\n"' > session.md
 
 # Copy configuration
-cp ~/.x-cli/settings.json team-settings.json
+cp ~/.grok/settings.json team-settings.json
 ```
 
 ---

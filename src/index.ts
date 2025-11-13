@@ -23,7 +23,7 @@ const log = (...args: string[]) => {
   }
 };
 
-log("🚀 X-CLI Starting Up...");
+log("🚀 grok-one-shotStarting Up...");
 log(`📂 Working directory: ${process.cwd()}`);
 log(`🖥️  Node version: ${process.version}`);
 
@@ -109,7 +109,12 @@ try {
     const maxToolRounds = parseInt(process.env.MAX_TOOL_ROUNDS || "400");
     
     log("🤖 Creating GrokAgent instance...");
-    const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds);
+    // Load user verbosity settings
+    const manager = getSettingsManager();
+    const verbosityLevel = manager.getUserSetting('verbosityLevel') || 'quiet';
+    const explainLevel = manager.getUserSetting('explainLevel') || 'brief';
+    
+    const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds, undefined, verbosityLevel, explainLevel);
 
     log("📋 Setting up Commander CLI...");
     program

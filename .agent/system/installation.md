@@ -11,7 +11,7 @@ Grok CLI is installed globally via npm and includes automated installation scrip
 Use the provided `install.sh` script for automatic handling of installation issues:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/x-cli-team/x-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/x-cli-team/grok-one-shot/main/install.sh | bash
 ```
 
 The script automatically:
@@ -117,7 +117,7 @@ npm cache clean --force
 ```
 
 ### Alternative Installation
-Download pre-built binaries from: https://github.com/x-cli-team/x-cli/releases
+Download pre-built binaries from: https://github.com/x-cli-team/grok-one-shot/releases
 
 ## Requirements
 - Node.js (latest LTS recommended)

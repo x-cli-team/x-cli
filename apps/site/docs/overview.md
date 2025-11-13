@@ -141,10 +141,10 @@ Grok One-Shot is built on a modular architecture with:
 
 ---
 
-Are you looking for a different AI coding assistant? Visit [Claude Code](https://claude.ai/code) or check out our [comparison table](https://github.com/x-cli-team/x-cli#comparison) for the differences.
+Are you looking for a different AI coding assistant? Visit [Claude Code](https://claude.ai/code) or check out our [comparison table](https://github.com/x-cli-team/grok-one-shot#comparison) for the differences.
 
 ## Questions and feedback
 
-If you have any questions or feedback, feel free to create an issue on our [GitHub repository](https://github.com/x-cli-team/x-cli/issues) or join the [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064).
+If you have any questions or feedback, feel free to create an issue on our [GitHub repository](https://github.com/x-cli-team/grok-one-shot/issues) or join the [xAI Community Discord](https://discord.com/channels/1315720379607679066/1315822328139223064).
 
 **Happy Grokking in the Terminal!** ⚡

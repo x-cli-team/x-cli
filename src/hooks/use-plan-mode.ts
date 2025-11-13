@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS: PlanModeSettings = {
   planGenerationTimeout: 30000, // 30 seconds
   enableDetailedLogging: true,
   autoSavePlans: true,
-  planSaveDirectory: '.xcli/plans'
+  planSaveDirectory: '.grok/plans'
 };
 
 // Initial plan mode state

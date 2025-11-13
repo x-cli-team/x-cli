@@ -10,7 +10,7 @@ export function useSessionLogging(chatHistory: ChatEntry[]): void {
   useEffect(() => {
     const newEntries = chatHistory.slice(lastChatHistoryLength.current);
     if (newEntries.length > 0) {
-      const sessionFile = path.join(os.homedir(), '.xcli', 'session.log');
+      const sessionFile = path.join(os.homedir(), '.grok', 'session.log');
       try {
         const dir = path.dirname(sessionFile);
         if (!fs.existsSync(dir)) {

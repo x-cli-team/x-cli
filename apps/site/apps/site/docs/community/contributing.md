@@ -13,7 +13,7 @@ We welcome contributions from the community! Whether you're fixing bugs, adding 
 
 Found a bug? Help us fix it by providing detailed information:
 
-- **[GitHub Issues](https://github.com/x-cli-team/x-cli/issues)** - Report bugs with detailed reproduction steps
+- **[GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues)** - Report bugs with detailed reproduction steps
 - Include your OS, Node.js version, and Grok One-Shot version
 - Provide command output and error messages
 - Share minimal code examples that reproduce the issue
@@ -22,7 +22,7 @@ Found a bug? Help us fix it by providing detailed information:
 
 Have an idea for a new feature or improvement?
 
-- **[GitHub Discussions](https://github.com/x-cli-team/x-cli/discussions)** - Discuss feature ideas with the community
+- **[GitHub Discussions](https://github.com/x-cli-team/grok-one-shot/discussions)** - Discuss feature ideas with the community
 - Check existing issues to avoid duplicates
 - Explain the use case and expected behavior
 - Consider implementation complexity and backward compatibility
@@ -52,11 +52,11 @@ Ready to dive into the code? Here's how to get started:
 
 ```bash
 # Fork the repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/x-cli.git
-cd x-cli
+git clone https://github.com/YOUR_USERNAME/grok-one-shot.git
+cd grok-one-shot
 
 # Add the original repo as upstream
-git remote add upstream https://github.com/x-cli-team/x-cli.git
+git remote add upstream https://github.com/x-cli-team/grok-one-shot.git
 ```
 
 ### Install Dependencies
@@ -141,8 +141,8 @@ refactor: improve code structure
 ### Communication
 
 - **[Discord](https://discord.com/channels/1315720379607679066/1315822328139223064)** - Real-time chat and questions
-- **[GitHub Discussions](https://github.com/x-cli-team/x-cli/discussions)** - Feature discussions and Q&A
-- **[GitHub Issues](https://github.com/x-cli-team/x-cli/issues)** - Bug reports and feature requests
+- **[GitHub Discussions](https://github.com/x-cli-team/grok-one-shot/discussions)** - Feature discussions and Q&A
+- **[GitHub Issues](https://github.com/x-cli-team/grok-one-shot/issues)** - Bug reports and feature requests
 
 ## Recognition
 

@@ -41,7 +41,7 @@ Claude Code hooks are user-defined shell commands that execute at various points
 
 When hooks are implemented in Grok One-Shot, they would likely:
 
-* Use `~/.x-cli/settings.json` or `.grok/settings.json` for configuration
+* Use `~/.grok/settings.json` or `.grok/settings.json` for configuration
 * Support similar hook events (PreToolUse, PostToolUse, SessionStart, etc.)
 * Execute bash commands at defined lifecycle points
 * Allow both user-level and project-level hooks
@@ -49,7 +49,7 @@ When hooks are implemented in Grok One-Shot, they would likely:
 ## Related Features
 
 * **MCP Integration**: Grok One-Shot supports MCP servers which can provide custom tools (see [MCP documentation](./mcp.md))
-* **Settings Configuration**: Current settings are in `~/.x-cli/settings.json` (see [Settings reference](../configuration/settings.md))
+* **Settings Configuration**: Current settings are in `~/.grok/settings.json` (see [Settings reference](../configuration/settings.md))
 
 ## See Also
 

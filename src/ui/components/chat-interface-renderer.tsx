@@ -159,7 +159,7 @@ export function ChatInterfaceRenderer({
                 • <Text color="magenta">Auto-edit mode:</Text> Press Shift+Tab to toggle hands-free editing
               </Text>
               <Text color="gray">
-                • <Text color="magenta">Project memory:</Text> Create .xcli/GROK.md to customize behavior
+                • <Text color="magenta">Project memory:</Text> Create .grok/GROK.md to customize behavior
               </Text>
               <Text color="gray">
                 • <Text color="magenta">Documentation:</Text> Run "/init-agent" for .agent docs system

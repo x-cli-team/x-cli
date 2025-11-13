@@ -107,7 +107,7 @@ Type `Bash` for the matcher.
 Select `+ Add new hook…` and enter this command:
 
 ```bash  theme={null}
-jq -r '"\(.tool_input.command) - \(.tool_input.description // "No description")"' >> ~/.x-cli/bash-command-log.txt
+jq -r '"\(.tool_input.command) - \(.tool_input.description // "No description")"' >> ~/.grok/bash-command-log.txt
 ```
 
 ### Step 4: Save your configuration
@@ -120,7 +120,7 @@ Then press Esc until you return to the REPL. Your hook is now registered!
 
 ### Step 5: Verify your hook
 
-Run `/hooks` again or check `~/.x-cli/settings.json` to see your configuration:
+Run `/hooks` again or check `~/.grok/settings.json` to see your configuration:
 
 ```json  theme={null}
 {
@@ -131,7 +131,7 @@ Run `/hooks` again or check `~/.x-cli/settings.json` to see your configuration:
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '\"\\(.tool_input.command) - \\(.tool_input.description // \"No description\")\"' >> ~/.x-cli/bash-command-log.txt"
+            "command": "jq -r '\"\\(.tool_input.command) - \\(.tool_input.description // \"No description\")\"' >> ~/.grok/bash-command-log.txt"
           }
         ]
       }
@@ -145,7 +145,7 @@ Run `/hooks` again or check `~/.x-cli/settings.json` to see your configuration:
 Ask Grok to run a simple command like `ls` and check your log file:
 
 ```bash  theme={null}
-cat ~/.x-cli/bash-command-log.txt
+cat ~/.grok/bash-command-log.txt
 ```
 
 You should see entries like:

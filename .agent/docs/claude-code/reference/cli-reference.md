@@ -12,7 +12,7 @@
 | `cat file \| grok -p "query"`      | Process piped content                          | `cat logs.txt \| grok -p "explain"`               |
 | `grok mcp`                         | Configure Model Context Protocol (MCP) servers | See the Grok One-Shot MCP documentation.          |
 
-> **⚠️ Parity Gap:** Grok One-Shot does not yet support `-c`/`--continue` or `-r`/`--resume` flags for session continuation. Sessions are auto-saved to `~/.x-cli/sessions/` but resuming must be done manually.
+> **⚠️ Parity Gap:** Grok One-Shot does not yet support `-c`/`--continue` or `-r`/`--resume` flags for session continuation. Sessions are auto-saved to `~/.grok/sessions/` but resuming must be done manually.
 
 > **⚠️ Parity Gap:** No `grok update` command. Updates must be done via package manager (`npm update -g @xagent/one-shot` or `bun update -g @xagent/one-shot`).
 

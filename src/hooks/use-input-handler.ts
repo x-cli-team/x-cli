@@ -450,7 +450,7 @@ This documentation provides context for all AI operations, ensuring consistent u
     if (trimmedInput === "/help") {
       const helpEntry: ChatEntry = {
         type: "assistant",
-        content: `X-CLI Help:
+        content: `grok-one-shotHelp:
 
 Built-in Commands:
   /clear      - Clear chat history
@@ -501,7 +501,7 @@ Direct Commands (executed immediately):
   touch <file>- Create empty file
 
 Model Configuration:
-  Edit ~/.xcli/models.json to add custom models (Claude, GPT, Gemini, etc.)
+  Edit ~/.grok/models.json to add custom models (Claude, GPT, Gemini, etc.)
 
 For complex operations, just describe what you want in natural language.
 Examples:
@@ -593,7 +593,7 @@ Available models: ${modelNames.join(", ")}`,
         const versionInfo = await checkForUpdates();
         const versionEntry: ChatEntry = {
           type: "assistant",
-          content: `📦 **X-CLI Version Information**
+          content: `📦 **grok-one-shotVersion Information**
 
 Current Version: **${versionInfo.current}**
 Latest Version: **${versionInfo.latest}**
@@ -948,11 +948,11 @@ Respond with ONLY the commit message, no additional text.`;
 
       try {
         // Determine project type - assume external project for now, could detect X CLI
-        const isXCli = process.cwd().includes('x-cli') || 
-                         trimmedInput.includes('--xcli');
+        const isGrokOneShot = process.cwd().includes('grok-one-shot') || 
+                         trimmedInput.includes('--grok-one-shot');
         
-        const projectType = isXCli ? 'x-cli' : 'external';
-        const projectName = isXCli ? 'X CLI' : 'Current Project';
+        const projectType = isGrokOneShot ? 'grok-one-shot' : 'external';
+        const projectName = isGrokOneShot ? 'Grok One-Shot' : 'Current Project';
 
         const generator = new AgentSystemGenerator({
           projectName,

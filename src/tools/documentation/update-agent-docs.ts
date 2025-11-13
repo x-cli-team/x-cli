@@ -188,7 +188,7 @@ export class UpdateAgentDocs {
 
   private detectConfigChanges(filesChanged: string[]): boolean {
     const configFiles = [
-      'package.json', 'tsconfig.json', '.xcli/', 'CLAUDE.md',
+      'package.json', 'tsconfig.json', '.grok/', 'CLAUDE.md',
       '.env', '.gitignore', 'README.md'
     ];
     

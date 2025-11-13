@@ -88,7 +88,7 @@ You'll see the welcome screen on first use. That's it! [Continue with Quickstart
 
 ### Terminal Integration
 - React/Ink-based rich terminal UI
-- Session management with auto-save to `~/.x-cli/sessions/`
+- Session management with auto-save to `~/.grok/sessions/`
 - Token usage tracking
 - Interactive confirmation dialogs
 

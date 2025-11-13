@@ -32,32 +32,32 @@ If automated installation fails, try manual methods:
 #### Standard NPM Install (Recommended)
 
 ```bash
-npm install -g @xagent/x-cli@latest
+npm install -g @xagent/one-shot@latest
 ```
 
 #### Try Without Installing
 
 ```bash
-npx @xagent/x-cli@latest
+npx @xagent/one-shot@latest
 ```
 
 #### Alternative Package Managers
 
 ```bash
 # Yarn
-yarn global add @xagent/x-cli@latest
+yarn global add @xagent/one-shot@latest
 
 # pnpm
-pnpm add -g @xagent/x-cli@latest
+pnpm add -g @xagent/one-shot@latest
 
 # Bun
-bun add -g @xagent/x-cli@latest
+bun add -g @xagent/one-shot@latest
 ```
 
 #### Force Installation (if needed)
 
 ```bash
-npm install -g @xagent/x-cli --force
+npm install -g @xagent/one-shot --force
 ```
 
 ## Post-Installation Setup
@@ -65,7 +65,7 @@ npm install -g @xagent/x-cli --force
 ### 1. Verify Installation
 
 ```bash
-x-cli --version
+grok-one-shot --version
 ```
 
 ### 2. Set API Key
@@ -91,20 +91,20 @@ echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # Verify it works
-which x-cli
-x-cli --version
+which grok-one-shot
+grok-one-shot --version
 ```
 
 ### 3. Get Started
 
 ```bash
-x-cli --help
+grok-one-shot --help
 ```
 
 ### 4. First Run
 
 ```bash
-x-cli
+grok-one-shot
 ```
 
 This launches the interactive chat interface.
@@ -126,7 +126,7 @@ If needed, manually clean before reinstalling:
 pkill -f grok
 
 # Remove installation
-npm uninstall -g @xagent/x-cli
+npm uninstall -g @xagent/one-shot
 
 # Clean cache
 npm cache clean --force
@@ -134,7 +134,7 @@ npm cache clean --force
 
 ### Alternative Installation
 
-Download pre-built binaries from: https://github.com/hinetapora/@xagent/x-cli/releases
+Download pre-built binaries from: https://github.com/x-cli-team/grok-one-shot/releases
 
 ## Requirements
 

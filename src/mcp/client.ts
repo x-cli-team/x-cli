@@ -48,7 +48,7 @@ export class MCPManager extends EventEmitter {
       // Create client
       const client = new Client(
         {
-          name: "x-cli",
+          name: "grok-one-shot",
           version: "1.0.0"
         },
         {
