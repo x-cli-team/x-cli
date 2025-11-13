@@ -38,7 +38,7 @@ function GrokOneShotHero() {
             <NavLink href="/docs/overview">Docs</NavLink>
             <NavLink href="/docs/roadmap">Roadmap</NavLink>
             <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
-            <NavLink href="https://github.com/x-cli-team/x-cli">GitHub</NavLink>
+            <NavLink href="https://github.com/x-cli-team/grok-one-shot">GitHub</NavLink>
           </div>
           <div className={styles.navRight}>
             <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
@@ -147,7 +147,7 @@ function GrokOneShotHero() {
               <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v16.19l6.22-6.22a.75.75 0 111.06 1.06l-7.5 7.5a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 111.06-1.06l6.22 6.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
             </svg>
           </button>
-          <ChipBtn variant="outline" label="Join as Collaborator" href="https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml" />
+          <ChipBtn variant="outline" label="Join as Collaborator" href="https://github.com/x-cli-team/grok-one-shot/issues/new?template=testimonial.yml" />
         </div>
       </div>
 
@@ -237,7 +237,7 @@ function CollaborationSection() {
           <div className={styles.collaborationCard}>
             <h3>Submit a Testimonial</h3>
             <p>Share your experience and automatically become a repository collaborator.</p>
-            <a href="https://github.com/x-cli-team/x-cli/issues/new?template=testimonial.yml" className={styles.cardButton}>
+            <a href="https://github.com/x-cli-team/grok-one-shot/issues/new?template=testimonial.yml" className={styles.cardButton}>
               Join as Collaborator
             </a>
           </div>
@@ -310,8 +310,8 @@ function Footer() {
             <h3>Community</h3>
             <ul>
               <li><a href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</a></li>
-              <li><a href="https://github.com/x-cli-team/x-cli/issues">GitHub Issues</a></li>
-              <li><a href="https://www.npmjs.com/package/@xagent/x-cli">NPM Package</a></li>
+              <li><a href="https://github.com/x-cli-team/grok-one-shot/issues">GitHub Issues</a></li>
+              <li><a href="https://www.npmjs.com/package/@xagent/one-shot">NPM Package</a></li>
             </ul>
           </div>
           <div className={styles.footerSection}>
@@ -319,7 +319,7 @@ function Footer() {
             <ul>
               <li><a href="/docs/roadmap">Roadmap</a></li>
               <li><a href="/docs/community/testimonials">Testimonials</a></li>
-              <li><a href="https://github.com/x-cli-team/x-cli">GitHub</a></li>
+              <li><a href="https://github.com/x-cli-team/grok-one-shot">GitHub</a></li>
             </ul>
           </div>
           <div className={styles.footerSection}>

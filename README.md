@@ -1,4 +1,4 @@
-## 1.1.113 – Repository Migration Complete
+## 1.1.116 – Repository Migration Complete
 
 ✅ **Repository Successfully Renamed**: `x-cli-team/x-cli` → `x-cli-team/grok-one-shot`  
 ✅ **Live on NPM**: [@xagent/one-shot](https://www.npmjs.com/package/@xagent/one-shot) - Fully published and ready for global installation  
@@ -40,7 +40,7 @@ This release includes the complete repository migration with critical streaming 
 │  # 1. Set your API key (secure local environment variable)     │
 │  export X_API_KEY="your_xai_api_key_here"                      │
 │                                                                 │
-│  # 2. Run instantly (no installation required!)               │
+│  # 2. Run instantly (no installation required!)                │
 │  npx @xagent/one-shot                                          │
 │                                                                 │
 │  🔐 Tip: Never commit API keys to git. Use local env vars!     │

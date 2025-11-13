@@ -6,7 +6,7 @@ title: Roadmap
 
 Our development roadmap outlines planned features and improvements for Grok One-Shot.
 
-## Current Version: v1.1.113
+## Current Version: v1.1.116
 
 ### Recently Completed
 
