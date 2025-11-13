@@ -78,7 +78,7 @@ grok
 You'll see the Grok One-Shot welcome screen:
 
 ```
-Welcome to grok-one-shotv1.1.101
+Welcome to X-CLI v1.1.101
 
 Claude Code-level intelligence in your terminal!
 

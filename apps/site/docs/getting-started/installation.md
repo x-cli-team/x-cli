@@ -85,7 +85,7 @@ grok "what does this project do?"
 On first launch, you'll see the welcome screen:
 
 ```
-Welcome to grok-one-shotv1.1.105
+Welcome to X-CLI v1.1.105
 
 Claude Code-level intelligence in your terminal!
 
