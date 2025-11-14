@@ -313,5 +313,5 @@ See `.agent/sop/documentation-workflow.md` for complete workflow.
 ---
 
 **Last Updated**: 2025-11-05
-**Version**: 1.1.101
+**Version**: 1.2.0
 **Maintained By**: Grok One-Shot Team

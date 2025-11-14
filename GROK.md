@@ -1,6 +1,6 @@
 # Grok One-Shot - AI-Powered CLI Assistant
 
-**Version**: 1.1.101
+**Version**: 1.2.0
 **Built with**: Grok API (xAI), TypeScript, React/Ink
 **Purpose**: Terminal-based AI assistant for software development
 
