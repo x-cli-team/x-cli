@@ -38,7 +38,7 @@ function GrokOneShotHero() {
             <NavLink href="/docs/overview">Docs</NavLink>
             <NavLink href="/docs/roadmap">Roadmap</NavLink>
             <NavLink href="https://discord.com/channels/1315720379607679066/1315822328139223064">Discord</NavLink>
-            <NavLink href="https://github.com/x-cli-team/grok-one-shot">GitHub</NavLink>
+            <NavLink href="https://github.com/x-cli-team/grok-one-shot">GitHub</NavLink><NavLink href="#powerful-features">PARITY-[62%]</NavLink>
           </div>
           <div className={styles.navRight}>
             <ChipBtn variant="outline" label="Get Started" href="/docs/getting-started/installation" />
@@ -184,7 +184,7 @@ function OpenSourceSection() {
 
 function FeaturesSection() {
   return (
-    <section className={styles.section}>
+    <section id="powerful-features" className={styles.section}>
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>Powerful Features</h2>
         <p className={styles.sectionDescription}>
@@ -192,31 +192,31 @@ function FeaturesSection() {
         </p>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
-            <h3>🎯 Plan Mode</h3>
+            <h3>🎯 Plan Mode<div className={styles.completionBadge}>60% Complete</div></h3>
             <p>Claude Code's signature read-only exploration with Shift+Tab twice activation. Safe codebase analysis and AI-powered implementation planning.</p>
           </div>
           <div className={styles.featureCard}>
-            <h3>Advanced File Operations</h3>
+            <h3>Advanced File Operations<div className={styles.completionBadge}>70% Complete</div></h3>
             <p>Read, write, edit, and search files with intelligent AI assistance.</p>
           </div>
           <div className={styles.featureCard}>
-            <h3>Multi-File Transactions</h3>
+            <h3>Multi-File Transactions<div className={styles.completionBadge}>70% Complete</div></h3>
             <p>Atomic operations across multiple files with rollback capabilities.</p>
           </div>
           <div className={styles.featureCard}>
-            <h3>Web Integration</h3>
+            <h3>Web Integration<div className={styles.completionBadge}>80% Complete</div></h3>
             <p>Fetch and process web content with AI-powered analysis.</p>
           </div>
           <div className={styles.featureCard}>
-            <h3>MCP Protocol</h3>
+            <h3>MCP Protocol<div className={styles.completionBadge}>40% Complete</div></h3>
             <p>Extensible architecture supporting Model Context Protocol servers.</p>
           </div>
           <div className={styles.featureCard}>
-            <h3>Task Management</h3>
+            <h3>Task Management<div className={styles.completionBadge}>50% Complete</div></h3>
             <p>Organize and track complex development workflows.</p>
           </div>
           <div className={styles.featureCard}>
-            <h3>Code-Aware Editing</h3>
+            <h3>Code-Aware Editing<div className={styles.completionBadge}>30% Complete</div></h3>
             <p>Intelligent code modifications with syntax understanding.</p>
           </div>
         </div>
