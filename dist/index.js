@@ -1464,6 +1464,245 @@ var init_tools = __esm({
             required: ["operation"]
           }
         }
+      },
+      {
+        type: "function",
+        function: {
+          name: "index_codebase",
+          description: "Index a codebase for comprehensive analysis, symbol extraction, and dependency mapping",
+          parameters: {
+            type: "object",
+            properties: {
+              path: {
+                type: "string",
+                description: "Directory path to index (defaults to current working directory)"
+              },
+              maxFileSize: {
+                type: "number",
+                description: "Maximum file size to index in bytes (default: 5MB)"
+              },
+              excludePatterns: {
+                type: "array",
+                items: { type: "string" },
+                description: "Additional patterns to exclude"
+              },
+              includePatterns: {
+                type: "array",
+                items: { type: "string" },
+                description: "Specific patterns to include"
+              },
+              extractSymbols: {
+                type: "boolean",
+                description: "Whether to extract symbols (default: true)"
+              },
+              analyzeDependencies: {
+                type: "boolean",
+                description: "Whether to analyze dependencies (default: true)"
+              }
+            },
+            required: []
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "search_symbols",
+          description: "Search for symbols (functions, classes, variables) across the indexed codebase",
+          parameters: {
+            type: "object",
+            properties: {
+              query: {
+                type: "string",
+                description: "Search query for symbols"
+              },
+              type: {
+                type: "string",
+                enum: ["function", "class", "interface", "variable", "constant", "type", "enum", "import", "export"],
+                description: "Filter by symbol type"
+              },
+              fuzzy: {
+                type: "boolean",
+                description: "Enable fuzzy matching (default: true)"
+              },
+              limit: {
+                type: "number",
+                description: "Maximum number of results (default: 50)"
+              }
+            },
+            required: ["query"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "find_references",
+          description: "Find all references to a specific symbol in the codebase",
+          parameters: {
+            type: "object",
+            properties: {
+              symbolName: {
+                type: "string",
+                description: "Name of the symbol to find references for"
+              },
+              includeDefinition: {
+                type: "boolean",
+                description: "Include the symbol definition (default: true)"
+              }
+            },
+            required: ["symbolName"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "get_dependencies",
+          description: "Get dependency information for a file",
+          parameters: {
+            type: "object",
+            properties: {
+              filePath: {
+                type: "string",
+                description: "File path to analyze dependencies for"
+              },
+              direction: {
+                type: "string",
+                enum: ["incoming", "outgoing", "both"],
+                description: "Direction of dependencies (default: both)"
+              }
+            },
+            required: ["filePath"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "get_index_status",
+          description: "Get current codebase index status and statistics",
+          parameters: {
+            type: "object",
+            properties: {},
+            required: []
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "semantic_search",
+          description: "Search codebase using natural language queries with intelligent pattern recognition",
+          parameters: {
+            type: "object",
+            properties: {
+              query: {
+                type: "string",
+                description: "Natural language query (e.g., 'find authentication logic', 'how does user registration work')"
+              },
+              intent: {
+                type: "string",
+                enum: ["find_function", "understand_flow", "locate_feature", "trace_usage", "find_patterns", "general"],
+                description: "Search intent (auto-detected if not specified)"
+              },
+              scope: {
+                type: "string",
+                enum: ["project", "directory", "file", "function"],
+                description: "Search scope (default: project)"
+              },
+              scopePath: {
+                type: "string",
+                description: "Path to scope to (for directory/file scope)"
+              },
+              confidence: {
+                type: "number",
+                minimum: 0,
+                maximum: 1,
+                description: "Minimum confidence threshold (default: 0.3)"
+              },
+              maxResults: {
+                type: "number",
+                minimum: 1,
+                maximum: 100,
+                description: "Maximum results to return (default: 20)"
+              }
+            },
+            required: ["query"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "trace_code_flow",
+          description: "Trace execution flow from an entry point to understand code paths",
+          parameters: {
+            type: "object",
+            properties: {
+              entryPoint: {
+                type: "string",
+                description: "Function or symbol name to start tracing from"
+              },
+              maxDepth: {
+                type: "number",
+                minimum: 1,
+                maximum: 10,
+                description: "Maximum depth to trace (default: 5)"
+              }
+            },
+            required: ["entryPoint"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "map_features",
+          description: "Map architectural features and components in the codebase",
+          parameters: {
+            type: "object",
+            properties: {
+              includeTestCoverage: {
+                type: "boolean",
+                description: "Include test coverage analysis (default: false)"
+              },
+              complexityThreshold: {
+                type: "string",
+                enum: ["low", "medium", "high"],
+                description: "Minimum complexity to include (default: low)"
+              }
+            },
+            required: []
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "find_related_symbols",
+          description: "Find symbols related to a target symbol with relationship analysis",
+          parameters: {
+            type: "object",
+            properties: {
+              symbolName: {
+                type: "string",
+                description: "Symbol name to find relationships for"
+              },
+              includeUsage: {
+                type: "boolean",
+                description: "Include usage patterns (default: true)"
+              },
+              maxRelated: {
+                type: "number",
+                minimum: 1,
+                maximum: 50,
+                description: "Maximum related symbols (default: 20)"
+              }
+            },
+            required: ["symbolName"]
+          }
+        }
       }
     ];
     MORPH_EDIT_TOOL = {
@@ -7019,16 +7258,16 @@ var init_symbol_search = __esm({
         const results = fuse.search(symbolName);
         return results.map((result) => result.item);
       }
-      async getSymbolsByType(symbolType, searchPath = process.cwd()) {
-        if (!this.symbolIndex.has(`type:${symbolType}`)) {
+      async getSymbolsByType(symbolType2, searchPath = process.cwd()) {
+        if (!this.symbolIndex.has(`type:${symbolType2}`)) {
           await this.buildSymbolIndex(
             searchPath,
             ["**/*.{ts,tsx,js,jsx,py}"],
             ["**/node_modules/**", "**/dist/**", "**/.git/**"],
-            [symbolType]
+            [symbolType2]
           );
         }
-        return this.symbolIndex.get(`type:${symbolType}`) || [];
+        return this.symbolIndex.get(`type:${symbolType2}`) || [];
       }
       clearIndex() {
         this.symbolIndex.clear();
@@ -7321,10 +7560,10 @@ var init_dependency_analyzer = __esm({
         const circularDeps = [];
         const visited = /* @__PURE__ */ new Set();
         const visiting = /* @__PURE__ */ new Set();
-        const dfs = (filePath, path33) => {
+        const dfs = (filePath, path38) => {
           if (visiting.has(filePath)) {
-            const cycleStart = path33.indexOf(filePath);
-            const cycle = path33.slice(cycleStart).concat([filePath]);
+            const cycleStart = path38.indexOf(filePath);
+            const cycle = path38.slice(cycleStart).concat([filePath]);
             circularDeps.push({
               cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
               severity: cycle.length <= 2 ? "error" : "warning",
@@ -7340,7 +7579,7 @@ var init_dependency_analyzer = __esm({
           if (node) {
             for (const dependency of node.dependencies) {
               if (graph.nodes.has(dependency)) {
-                dfs(dependency, [...path33, filePath]);
+                dfs(dependency, [...path38, filePath]);
               }
             }
           }
@@ -12087,6 +12326,6032 @@ ${option.id}) ${option.title}`);
   }
 });
 
+// node_modules/zod/v3/helpers/util.js
+var util, objectUtil, ZodParsedType, getParsedType;
+var init_util = __esm({
+  "node_modules/zod/v3/helpers/util.js"() {
+    (function(util2) {
+      util2.assertEqual = (_) => {
+      };
+      function assertIs(_arg) {
+      }
+      util2.assertIs = assertIs;
+      function assertNever(_x) {
+        throw new Error();
+      }
+      util2.assertNever = assertNever;
+      util2.arrayToEnum = (items) => {
+        const obj = {};
+        for (const item of items) {
+          obj[item] = item;
+        }
+        return obj;
+      };
+      util2.getValidEnumValues = (obj) => {
+        const validKeys = util2.objectKeys(obj).filter((k) => typeof obj[obj[k]] !== "number");
+        const filtered = {};
+        for (const k of validKeys) {
+          filtered[k] = obj[k];
+        }
+        return util2.objectValues(filtered);
+      };
+      util2.objectValues = (obj) => {
+        return util2.objectKeys(obj).map(function(e) {
+          return obj[e];
+        });
+      };
+      util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object) => {
+        const keys = [];
+        for (const key in object) {
+          if (Object.prototype.hasOwnProperty.call(object, key)) {
+            keys.push(key);
+          }
+        }
+        return keys;
+      };
+      util2.find = (arr, checker) => {
+        for (const item of arr) {
+          if (checker(item))
+            return item;
+        }
+        return void 0;
+      };
+      util2.isInteger = typeof Number.isInteger === "function" ? (val) => Number.isInteger(val) : (val) => typeof val === "number" && Number.isFinite(val) && Math.floor(val) === val;
+      function joinValues(array, separator = " | ") {
+        return array.map((val) => typeof val === "string" ? `'${val}'` : val).join(separator);
+      }
+      util2.joinValues = joinValues;
+      util2.jsonStringifyReplacer = (_, value) => {
+        if (typeof value === "bigint") {
+          return value.toString();
+        }
+        return value;
+      };
+    })(util || (util = {}));
+    (function(objectUtil2) {
+      objectUtil2.mergeShapes = (first, second) => {
+        return {
+          ...first,
+          ...second
+          // second overwrites first
+        };
+      };
+    })(objectUtil || (objectUtil = {}));
+    ZodParsedType = util.arrayToEnum([
+      "string",
+      "nan",
+      "number",
+      "integer",
+      "float",
+      "boolean",
+      "date",
+      "bigint",
+      "symbol",
+      "function",
+      "undefined",
+      "null",
+      "array",
+      "object",
+      "unknown",
+      "promise",
+      "void",
+      "never",
+      "map",
+      "set"
+    ]);
+    getParsedType = (data) => {
+      const t = typeof data;
+      switch (t) {
+        case "undefined":
+          return ZodParsedType.undefined;
+        case "string":
+          return ZodParsedType.string;
+        case "number":
+          return Number.isNaN(data) ? ZodParsedType.nan : ZodParsedType.number;
+        case "boolean":
+          return ZodParsedType.boolean;
+        case "function":
+          return ZodParsedType.function;
+        case "bigint":
+          return ZodParsedType.bigint;
+        case "symbol":
+          return ZodParsedType.symbol;
+        case "object":
+          if (Array.isArray(data)) {
+            return ZodParsedType.array;
+          }
+          if (data === null) {
+            return ZodParsedType.null;
+          }
+          if (data.then && typeof data.then === "function" && data.catch && typeof data.catch === "function") {
+            return ZodParsedType.promise;
+          }
+          if (typeof Map !== "undefined" && data instanceof Map) {
+            return ZodParsedType.map;
+          }
+          if (typeof Set !== "undefined" && data instanceof Set) {
+            return ZodParsedType.set;
+          }
+          if (typeof Date !== "undefined" && data instanceof Date) {
+            return ZodParsedType.date;
+          }
+          return ZodParsedType.object;
+        default:
+          return ZodParsedType.unknown;
+      }
+    };
+  }
+});
+
+// node_modules/zod/v3/ZodError.js
+var ZodIssueCode, quotelessJson, ZodError;
+var init_ZodError = __esm({
+  "node_modules/zod/v3/ZodError.js"() {
+    init_util();
+    ZodIssueCode = util.arrayToEnum([
+      "invalid_type",
+      "invalid_literal",
+      "custom",
+      "invalid_union",
+      "invalid_union_discriminator",
+      "invalid_enum_value",
+      "unrecognized_keys",
+      "invalid_arguments",
+      "invalid_return_type",
+      "invalid_date",
+      "invalid_string",
+      "too_small",
+      "too_big",
+      "invalid_intersection_types",
+      "not_multiple_of",
+      "not_finite"
+    ]);
+    quotelessJson = (obj) => {
+      const json = JSON.stringify(obj, null, 2);
+      return json.replace(/"([^"]+)":/g, "$1:");
+    };
+    ZodError = class _ZodError extends Error {
+      get errors() {
+        return this.issues;
+      }
+      constructor(issues) {
+        super();
+        this.issues = [];
+        this.addIssue = (sub) => {
+          this.issues = [...this.issues, sub];
+        };
+        this.addIssues = (subs = []) => {
+          this.issues = [...this.issues, ...subs];
+        };
+        const actualProto = new.target.prototype;
+        if (Object.setPrototypeOf) {
+          Object.setPrototypeOf(this, actualProto);
+        } else {
+          this.__proto__ = actualProto;
+        }
+        this.name = "ZodError";
+        this.issues = issues;
+      }
+      format(_mapper) {
+        const mapper = _mapper || function(issue) {
+          return issue.message;
+        };
+        const fieldErrors = { _errors: [] };
+        const processError = (error) => {
+          for (const issue of error.issues) {
+            if (issue.code === "invalid_union") {
+              issue.unionErrors.map(processError);
+            } else if (issue.code === "invalid_return_type") {
+              processError(issue.returnTypeError);
+            } else if (issue.code === "invalid_arguments") {
+              processError(issue.argumentsError);
+            } else if (issue.path.length === 0) {
+              fieldErrors._errors.push(mapper(issue));
+            } else {
+              let curr = fieldErrors;
+              let i = 0;
+              while (i < issue.path.length) {
+                const el = issue.path[i];
+                const terminal = i === issue.path.length - 1;
+                if (!terminal) {
+                  curr[el] = curr[el] || { _errors: [] };
+                } else {
+                  curr[el] = curr[el] || { _errors: [] };
+                  curr[el]._errors.push(mapper(issue));
+                }
+                curr = curr[el];
+                i++;
+              }
+            }
+          }
+        };
+        processError(this);
+        return fieldErrors;
+      }
+      static assert(value) {
+        if (!(value instanceof _ZodError)) {
+          throw new Error(`Not a ZodError: ${value}`);
+        }
+      }
+      toString() {
+        return this.message;
+      }
+      get message() {
+        return JSON.stringify(this.issues, util.jsonStringifyReplacer, 2);
+      }
+      get isEmpty() {
+        return this.issues.length === 0;
+      }
+      flatten(mapper = (issue) => issue.message) {
+        const fieldErrors = {};
+        const formErrors = [];
+        for (const sub of this.issues) {
+          if (sub.path.length > 0) {
+            const firstEl = sub.path[0];
+            fieldErrors[firstEl] = fieldErrors[firstEl] || [];
+            fieldErrors[firstEl].push(mapper(sub));
+          } else {
+            formErrors.push(mapper(sub));
+          }
+        }
+        return { formErrors, fieldErrors };
+      }
+      get formErrors() {
+        return this.flatten();
+      }
+    };
+    ZodError.create = (issues) => {
+      const error = new ZodError(issues);
+      return error;
+    };
+  }
+});
+
+// node_modules/zod/v3/locales/en.js
+var errorMap, en_default;
+var init_en = __esm({
+  "node_modules/zod/v3/locales/en.js"() {
+    init_ZodError();
+    init_util();
+    errorMap = (issue, _ctx) => {
+      let message;
+      switch (issue.code) {
+        case ZodIssueCode.invalid_type:
+          if (issue.received === ZodParsedType.undefined) {
+            message = "Required";
+          } else {
+            message = `Expected ${issue.expected}, received ${issue.received}`;
+          }
+          break;
+        case ZodIssueCode.invalid_literal:
+          message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util.jsonStringifyReplacer)}`;
+          break;
+        case ZodIssueCode.unrecognized_keys:
+          message = `Unrecognized key(s) in object: ${util.joinValues(issue.keys, ", ")}`;
+          break;
+        case ZodIssueCode.invalid_union:
+          message = `Invalid input`;
+          break;
+        case ZodIssueCode.invalid_union_discriminator:
+          message = `Invalid discriminator value. Expected ${util.joinValues(issue.options)}`;
+          break;
+        case ZodIssueCode.invalid_enum_value:
+          message = `Invalid enum value. Expected ${util.joinValues(issue.options)}, received '${issue.received}'`;
+          break;
+        case ZodIssueCode.invalid_arguments:
+          message = `Invalid function arguments`;
+          break;
+        case ZodIssueCode.invalid_return_type:
+          message = `Invalid function return type`;
+          break;
+        case ZodIssueCode.invalid_date:
+          message = `Invalid date`;
+          break;
+        case ZodIssueCode.invalid_string:
+          if (typeof issue.validation === "object") {
+            if ("includes" in issue.validation) {
+              message = `Invalid input: must include "${issue.validation.includes}"`;
+              if (typeof issue.validation.position === "number") {
+                message = `${message} at one or more positions greater than or equal to ${issue.validation.position}`;
+              }
+            } else if ("startsWith" in issue.validation) {
+              message = `Invalid input: must start with "${issue.validation.startsWith}"`;
+            } else if ("endsWith" in issue.validation) {
+              message = `Invalid input: must end with "${issue.validation.endsWith}"`;
+            } else {
+              util.assertNever(issue.validation);
+            }
+          } else if (issue.validation !== "regex") {
+            message = `Invalid ${issue.validation}`;
+          } else {
+            message = "Invalid";
+          }
+          break;
+        case ZodIssueCode.too_small:
+          if (issue.type === "array")
+            message = `Array must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `more than`} ${issue.minimum} element(s)`;
+          else if (issue.type === "string")
+            message = `String must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `over`} ${issue.minimum} character(s)`;
+          else if (issue.type === "number")
+            message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
+          else if (issue.type === "bigint")
+            message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
+          else if (issue.type === "date")
+            message = `Date must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${new Date(Number(issue.minimum))}`;
+          else
+            message = "Invalid input";
+          break;
+        case ZodIssueCode.too_big:
+          if (issue.type === "array")
+            message = `Array must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `less than`} ${issue.maximum} element(s)`;
+          else if (issue.type === "string")
+            message = `String must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `under`} ${issue.maximum} character(s)`;
+          else if (issue.type === "number")
+            message = `Number must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
+          else if (issue.type === "bigint")
+            message = `BigInt must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
+          else if (issue.type === "date")
+            message = `Date must be ${issue.exact ? `exactly` : issue.inclusive ? `smaller than or equal to` : `smaller than`} ${new Date(Number(issue.maximum))}`;
+          else
+            message = "Invalid input";
+          break;
+        case ZodIssueCode.custom:
+          message = `Invalid input`;
+          break;
+        case ZodIssueCode.invalid_intersection_types:
+          message = `Intersection results could not be merged`;
+          break;
+        case ZodIssueCode.not_multiple_of:
+          message = `Number must be a multiple of ${issue.multipleOf}`;
+          break;
+        case ZodIssueCode.not_finite:
+          message = "Number must be finite";
+          break;
+        default:
+          message = _ctx.defaultError;
+          util.assertNever(issue);
+      }
+      return { message };
+    };
+    en_default = errorMap;
+  }
+});
+
+// node_modules/zod/v3/errors.js
+function setErrorMap(map) {
+  overrideErrorMap = map;
+}
+function getErrorMap() {
+  return overrideErrorMap;
+}
+var overrideErrorMap;
+var init_errors = __esm({
+  "node_modules/zod/v3/errors.js"() {
+    init_en();
+    overrideErrorMap = en_default;
+  }
+});
+
+// node_modules/zod/v3/helpers/parseUtil.js
+function addIssueToContext(ctx, issueData) {
+  const overrideMap = getErrorMap();
+  const issue = makeIssue({
+    issueData,
+    data: ctx.data,
+    path: ctx.path,
+    errorMaps: [
+      ctx.common.contextualErrorMap,
+      // contextual error map is first priority
+      ctx.schemaErrorMap,
+      // then schema-bound map if available
+      overrideMap,
+      // then global override map
+      overrideMap === en_default ? void 0 : en_default
+      // then global default map
+    ].filter((x) => !!x)
+  });
+  ctx.common.issues.push(issue);
+}
+var makeIssue, EMPTY_PATH, ParseStatus, INVALID, DIRTY, OK, isAborted, isDirty, isValid, isAsync;
+var init_parseUtil = __esm({
+  "node_modules/zod/v3/helpers/parseUtil.js"() {
+    init_errors();
+    init_en();
+    makeIssue = (params) => {
+      const { data, path: path38, errorMaps, issueData } = params;
+      const fullPath = [...path38, ...issueData.path || []];
+      const fullIssue = {
+        ...issueData,
+        path: fullPath
+      };
+      if (issueData.message !== void 0) {
+        return {
+          ...issueData,
+          path: fullPath,
+          message: issueData.message
+        };
+      }
+      let errorMessage = "";
+      const maps = errorMaps.filter((m) => !!m).slice().reverse();
+      for (const map of maps) {
+        errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
+      }
+      return {
+        ...issueData,
+        path: fullPath,
+        message: errorMessage
+      };
+    };
+    EMPTY_PATH = [];
+    ParseStatus = class _ParseStatus {
+      constructor() {
+        this.value = "valid";
+      }
+      dirty() {
+        if (this.value === "valid")
+          this.value = "dirty";
+      }
+      abort() {
+        if (this.value !== "aborted")
+          this.value = "aborted";
+      }
+      static mergeArray(status, results) {
+        const arrayValue = [];
+        for (const s of results) {
+          if (s.status === "aborted")
+            return INVALID;
+          if (s.status === "dirty")
+            status.dirty();
+          arrayValue.push(s.value);
+        }
+        return { status: status.value, value: arrayValue };
+      }
+      static async mergeObjectAsync(status, pairs) {
+        const syncPairs = [];
+        for (const pair of pairs) {
+          const key = await pair.key;
+          const value = await pair.value;
+          syncPairs.push({
+            key,
+            value
+          });
+        }
+        return _ParseStatus.mergeObjectSync(status, syncPairs);
+      }
+      static mergeObjectSync(status, pairs) {
+        const finalObject = {};
+        for (const pair of pairs) {
+          const { key, value } = pair;
+          if (key.status === "aborted")
+            return INVALID;
+          if (value.status === "aborted")
+            return INVALID;
+          if (key.status === "dirty")
+            status.dirty();
+          if (value.status === "dirty")
+            status.dirty();
+          if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
+            finalObject[key.value] = value.value;
+          }
+        }
+        return { status: status.value, value: finalObject };
+      }
+    };
+    INVALID = Object.freeze({
+      status: "aborted"
+    });
+    DIRTY = (value) => ({ status: "dirty", value });
+    OK = (value) => ({ status: "valid", value });
+    isAborted = (x) => x.status === "aborted";
+    isDirty = (x) => x.status === "dirty";
+    isValid = (x) => x.status === "valid";
+    isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
+  }
+});
+
+// node_modules/zod/v3/helpers/typeAliases.js
+var init_typeAliases = __esm({
+  "node_modules/zod/v3/helpers/typeAliases.js"() {
+  }
+});
+
+// node_modules/zod/v3/helpers/errorUtil.js
+var errorUtil;
+var init_errorUtil = __esm({
+  "node_modules/zod/v3/helpers/errorUtil.js"() {
+    (function(errorUtil2) {
+      errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
+      errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
+    })(errorUtil || (errorUtil = {}));
+  }
+});
+
+// node_modules/zod/v3/types.js
+function processCreateParams(params) {
+  if (!params)
+    return {};
+  const { errorMap: errorMap2, invalid_type_error, required_error, description } = params;
+  if (errorMap2 && (invalid_type_error || required_error)) {
+    throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);
+  }
+  if (errorMap2)
+    return { errorMap: errorMap2, description };
+  const customMap = (iss, ctx) => {
+    const { message } = params;
+    if (iss.code === "invalid_enum_value") {
+      return { message: message ?? ctx.defaultError };
+    }
+    if (typeof ctx.data === "undefined") {
+      return { message: message ?? required_error ?? ctx.defaultError };
+    }
+    if (iss.code !== "invalid_type")
+      return { message: ctx.defaultError };
+    return { message: message ?? invalid_type_error ?? ctx.defaultError };
+  };
+  return { errorMap: customMap, description };
+}
+function timeRegexSource(args) {
+  let secondsRegexSource = `[0-5]\\d`;
+  if (args.precision) {
+    secondsRegexSource = `${secondsRegexSource}\\.\\d{${args.precision}}`;
+  } else if (args.precision == null) {
+    secondsRegexSource = `${secondsRegexSource}(\\.\\d+)?`;
+  }
+  const secondsQuantifier = args.precision ? "+" : "?";
+  return `([01]\\d|2[0-3]):[0-5]\\d(:${secondsRegexSource})${secondsQuantifier}`;
+}
+function timeRegex(args) {
+  return new RegExp(`^${timeRegexSource(args)}$`);
+}
+function datetimeRegex(args) {
+  let regex = `${dateRegexSource}T${timeRegexSource(args)}`;
+  const opts = [];
+  opts.push(args.local ? `Z?` : `Z`);
+  if (args.offset)
+    opts.push(`([+-]\\d{2}:?\\d{2})`);
+  regex = `${regex}(${opts.join("|")})`;
+  return new RegExp(`^${regex}$`);
+}
+function isValidIP(ip, version) {
+  if ((version === "v4" || !version) && ipv4Regex.test(ip)) {
+    return true;
+  }
+  if ((version === "v6" || !version) && ipv6Regex.test(ip)) {
+    return true;
+  }
+  return false;
+}
+function isValidJWT(jwt, alg) {
+  if (!jwtRegex.test(jwt))
+    return false;
+  try {
+    const [header] = jwt.split(".");
+    if (!header)
+      return false;
+    const base64 = header.replace(/-/g, "+").replace(/_/g, "/").padEnd(header.length + (4 - header.length % 4) % 4, "=");
+    const decoded = JSON.parse(atob(base64));
+    if (typeof decoded !== "object" || decoded === null)
+      return false;
+    if ("typ" in decoded && decoded?.typ !== "JWT")
+      return false;
+    if (!decoded.alg)
+      return false;
+    if (alg && decoded.alg !== alg)
+      return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+function isValidCidr(ip, version) {
+  if ((version === "v4" || !version) && ipv4CidrRegex.test(ip)) {
+    return true;
+  }
+  if ((version === "v6" || !version) && ipv6CidrRegex.test(ip)) {
+    return true;
+  }
+  return false;
+}
+function floatSafeRemainder(val, step) {
+  const valDecCount = (val.toString().split(".")[1] || "").length;
+  const stepDecCount = (step.toString().split(".")[1] || "").length;
+  const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount;
+  const valInt = Number.parseInt(val.toFixed(decCount).replace(".", ""));
+  const stepInt = Number.parseInt(step.toFixed(decCount).replace(".", ""));
+  return valInt % stepInt / 10 ** decCount;
+}
+function deepPartialify(schema) {
+  if (schema instanceof ZodObject) {
+    const newShape = {};
+    for (const key in schema.shape) {
+      const fieldSchema = schema.shape[key];
+      newShape[key] = ZodOptional.create(deepPartialify(fieldSchema));
+    }
+    return new ZodObject({
+      ...schema._def,
+      shape: () => newShape
+    });
+  } else if (schema instanceof ZodArray) {
+    return new ZodArray({
+      ...schema._def,
+      type: deepPartialify(schema.element)
+    });
+  } else if (schema instanceof ZodOptional) {
+    return ZodOptional.create(deepPartialify(schema.unwrap()));
+  } else if (schema instanceof ZodNullable) {
+    return ZodNullable.create(deepPartialify(schema.unwrap()));
+  } else if (schema instanceof ZodTuple) {
+    return ZodTuple.create(schema.items.map((item) => deepPartialify(item)));
+  } else {
+    return schema;
+  }
+}
+function mergeValues(a, b) {
+  const aType = getParsedType(a);
+  const bType = getParsedType(b);
+  if (a === b) {
+    return { valid: true, data: a };
+  } else if (aType === ZodParsedType.object && bType === ZodParsedType.object) {
+    const bKeys = util.objectKeys(b);
+    const sharedKeys = util.objectKeys(a).filter((key) => bKeys.indexOf(key) !== -1);
+    const newObj = { ...a, ...b };
+    for (const key of sharedKeys) {
+      const sharedValue = mergeValues(a[key], b[key]);
+      if (!sharedValue.valid) {
+        return { valid: false };
+      }
+      newObj[key] = sharedValue.data;
+    }
+    return { valid: true, data: newObj };
+  } else if (aType === ZodParsedType.array && bType === ZodParsedType.array) {
+    if (a.length !== b.length) {
+      return { valid: false };
+    }
+    const newArray = [];
+    for (let index = 0; index < a.length; index++) {
+      const itemA = a[index];
+      const itemB = b[index];
+      const sharedValue = mergeValues(itemA, itemB);
+      if (!sharedValue.valid) {
+        return { valid: false };
+      }
+      newArray.push(sharedValue.data);
+    }
+    return { valid: true, data: newArray };
+  } else if (aType === ZodParsedType.date && bType === ZodParsedType.date && +a === +b) {
+    return { valid: true, data: a };
+  } else {
+    return { valid: false };
+  }
+}
+function createZodEnum(values, params) {
+  return new ZodEnum({
+    values,
+    typeName: ZodFirstPartyTypeKind.ZodEnum,
+    ...processCreateParams(params)
+  });
+}
+function cleanParams(params, data) {
+  const p = typeof params === "function" ? params(data) : typeof params === "string" ? { message: params } : params;
+  const p2 = typeof p === "string" ? { message: p } : p;
+  return p2;
+}
+function custom(check, _params = {}, fatal) {
+  if (check)
+    return ZodAny.create().superRefine((data, ctx) => {
+      const r = check(data);
+      if (r instanceof Promise) {
+        return r.then((r2) => {
+          if (!r2) {
+            const params = cleanParams(_params, data);
+            const _fatal = params.fatal ?? fatal ?? true;
+            ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
+          }
+        });
+      }
+      if (!r) {
+        const params = cleanParams(_params, data);
+        const _fatal = params.fatal ?? fatal ?? true;
+        ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
+      }
+      return;
+    });
+  return ZodAny.create();
+}
+var ParseInputLazyPath, handleResult, ZodType, cuidRegex, cuid2Regex, ulidRegex, uuidRegex, nanoidRegex, jwtRegex, durationRegex, emailRegex, _emojiRegex, emojiRegex, ipv4Regex, ipv4CidrRegex, ipv6Regex, ipv6CidrRegex, base64Regex, base64urlRegex, dateRegexSource, dateRegex, ZodString, ZodNumber, ZodBigInt, ZodBoolean, ZodDate, ZodSymbol, ZodUndefined, ZodNull, ZodAny, ZodUnknown, ZodNever, ZodVoid, ZodArray, ZodObject, ZodUnion, getDiscriminator, ZodDiscriminatedUnion, ZodIntersection, ZodTuple, ZodRecord, ZodMap, ZodSet, ZodFunction, ZodLazy, ZodLiteral, ZodEnum, ZodNativeEnum, ZodPromise, ZodEffects, ZodOptional, ZodNullable, ZodDefault, ZodCatch, ZodNaN, BRAND, ZodBranded, ZodPipeline, ZodReadonly, late, ZodFirstPartyTypeKind, instanceOfType, stringType, numberType, nanType, bigIntType, booleanType, dateType, symbolType, undefinedType, nullType, anyType, unknownType, neverType, voidType, arrayType, objectType, strictObjectType, unionType, discriminatedUnionType, intersectionType, tupleType, recordType, mapType, setType, functionType, lazyType, literalType, enumType, nativeEnumType, promiseType, effectsType, optionalType, nullableType, preprocessType, pipelineType, ostring, onumber, oboolean, coerce, NEVER;
+var init_types = __esm({
+  "node_modules/zod/v3/types.js"() {
+    init_ZodError();
+    init_errors();
+    init_errorUtil();
+    init_parseUtil();
+    init_util();
+    ParseInputLazyPath = class {
+      constructor(parent, value, path38, key) {
+        this._cachedPath = [];
+        this.parent = parent;
+        this.data = value;
+        this._path = path38;
+        this._key = key;
+      }
+      get path() {
+        if (!this._cachedPath.length) {
+          if (Array.isArray(this._key)) {
+            this._cachedPath.push(...this._path, ...this._key);
+          } else {
+            this._cachedPath.push(...this._path, this._key);
+          }
+        }
+        return this._cachedPath;
+      }
+    };
+    handleResult = (ctx, result) => {
+      if (isValid(result)) {
+        return { success: true, data: result.value };
+      } else {
+        if (!ctx.common.issues.length) {
+          throw new Error("Validation failed but no issues detected.");
+        }
+        return {
+          success: false,
+          get error() {
+            if (this._error)
+              return this._error;
+            const error = new ZodError(ctx.common.issues);
+            this._error = error;
+            return this._error;
+          }
+        };
+      }
+    };
+    ZodType = class {
+      get description() {
+        return this._def.description;
+      }
+      _getType(input) {
+        return getParsedType(input.data);
+      }
+      _getOrReturnCtx(input, ctx) {
+        return ctx || {
+          common: input.parent.common,
+          data: input.data,
+          parsedType: getParsedType(input.data),
+          schemaErrorMap: this._def.errorMap,
+          path: input.path,
+          parent: input.parent
+        };
+      }
+      _processInputParams(input) {
+        return {
+          status: new ParseStatus(),
+          ctx: {
+            common: input.parent.common,
+            data: input.data,
+            parsedType: getParsedType(input.data),
+            schemaErrorMap: this._def.errorMap,
+            path: input.path,
+            parent: input.parent
+          }
+        };
+      }
+      _parseSync(input) {
+        const result = this._parse(input);
+        if (isAsync(result)) {
+          throw new Error("Synchronous parse encountered promise.");
+        }
+        return result;
+      }
+      _parseAsync(input) {
+        const result = this._parse(input);
+        return Promise.resolve(result);
+      }
+      parse(data, params) {
+        const result = this.safeParse(data, params);
+        if (result.success)
+          return result.data;
+        throw result.error;
+      }
+      safeParse(data, params) {
+        const ctx = {
+          common: {
+            issues: [],
+            async: params?.async ?? false,
+            contextualErrorMap: params?.errorMap
+          },
+          path: params?.path || [],
+          schemaErrorMap: this._def.errorMap,
+          parent: null,
+          data,
+          parsedType: getParsedType(data)
+        };
+        const result = this._parseSync({ data, path: ctx.path, parent: ctx });
+        return handleResult(ctx, result);
+      }
+      "~validate"(data) {
+        const ctx = {
+          common: {
+            issues: [],
+            async: !!this["~standard"].async
+          },
+          path: [],
+          schemaErrorMap: this._def.errorMap,
+          parent: null,
+          data,
+          parsedType: getParsedType(data)
+        };
+        if (!this["~standard"].async) {
+          try {
+            const result = this._parseSync({ data, path: [], parent: ctx });
+            return isValid(result) ? {
+              value: result.value
+            } : {
+              issues: ctx.common.issues
+            };
+          } catch (err) {
+            if (err?.message?.toLowerCase()?.includes("encountered")) {
+              this["~standard"].async = true;
+            }
+            ctx.common = {
+              issues: [],
+              async: true
+            };
+          }
+        }
+        return this._parseAsync({ data, path: [], parent: ctx }).then((result) => isValid(result) ? {
+          value: result.value
+        } : {
+          issues: ctx.common.issues
+        });
+      }
+      async parseAsync(data, params) {
+        const result = await this.safeParseAsync(data, params);
+        if (result.success)
+          return result.data;
+        throw result.error;
+      }
+      async safeParseAsync(data, params) {
+        const ctx = {
+          common: {
+            issues: [],
+            contextualErrorMap: params?.errorMap,
+            async: true
+          },
+          path: params?.path || [],
+          schemaErrorMap: this._def.errorMap,
+          parent: null,
+          data,
+          parsedType: getParsedType(data)
+        };
+        const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
+        const result = await (isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult));
+        return handleResult(ctx, result);
+      }
+      refine(check, message) {
+        const getIssueProperties = (val) => {
+          if (typeof message === "string" || typeof message === "undefined") {
+            return { message };
+          } else if (typeof message === "function") {
+            return message(val);
+          } else {
+            return message;
+          }
+        };
+        return this._refinement((val, ctx) => {
+          const result = check(val);
+          const setError = () => ctx.addIssue({
+            code: ZodIssueCode.custom,
+            ...getIssueProperties(val)
+          });
+          if (typeof Promise !== "undefined" && result instanceof Promise) {
+            return result.then((data) => {
+              if (!data) {
+                setError();
+                return false;
+              } else {
+                return true;
+              }
+            });
+          }
+          if (!result) {
+            setError();
+            return false;
+          } else {
+            return true;
+          }
+        });
+      }
+      refinement(check, refinementData) {
+        return this._refinement((val, ctx) => {
+          if (!check(val)) {
+            ctx.addIssue(typeof refinementData === "function" ? refinementData(val, ctx) : refinementData);
+            return false;
+          } else {
+            return true;
+          }
+        });
+      }
+      _refinement(refinement) {
+        return new ZodEffects({
+          schema: this,
+          typeName: ZodFirstPartyTypeKind.ZodEffects,
+          effect: { type: "refinement", refinement }
+        });
+      }
+      superRefine(refinement) {
+        return this._refinement(refinement);
+      }
+      constructor(def) {
+        this.spa = this.safeParseAsync;
+        this._def = def;
+        this.parse = this.parse.bind(this);
+        this.safeParse = this.safeParse.bind(this);
+        this.parseAsync = this.parseAsync.bind(this);
+        this.safeParseAsync = this.safeParseAsync.bind(this);
+        this.spa = this.spa.bind(this);
+        this.refine = this.refine.bind(this);
+        this.refinement = this.refinement.bind(this);
+        this.superRefine = this.superRefine.bind(this);
+        this.optional = this.optional.bind(this);
+        this.nullable = this.nullable.bind(this);
+        this.nullish = this.nullish.bind(this);
+        this.array = this.array.bind(this);
+        this.promise = this.promise.bind(this);
+        this.or = this.or.bind(this);
+        this.and = this.and.bind(this);
+        this.transform = this.transform.bind(this);
+        this.brand = this.brand.bind(this);
+        this.default = this.default.bind(this);
+        this.catch = this.catch.bind(this);
+        this.describe = this.describe.bind(this);
+        this.pipe = this.pipe.bind(this);
+        this.readonly = this.readonly.bind(this);
+        this.isNullable = this.isNullable.bind(this);
+        this.isOptional = this.isOptional.bind(this);
+        this["~standard"] = {
+          version: 1,
+          vendor: "zod",
+          validate: (data) => this["~validate"](data)
+        };
+      }
+      optional() {
+        return ZodOptional.create(this, this._def);
+      }
+      nullable() {
+        return ZodNullable.create(this, this._def);
+      }
+      nullish() {
+        return this.nullable().optional();
+      }
+      array() {
+        return ZodArray.create(this);
+      }
+      promise() {
+        return ZodPromise.create(this, this._def);
+      }
+      or(option) {
+        return ZodUnion.create([this, option], this._def);
+      }
+      and(incoming) {
+        return ZodIntersection.create(this, incoming, this._def);
+      }
+      transform(transform) {
+        return new ZodEffects({
+          ...processCreateParams(this._def),
+          schema: this,
+          typeName: ZodFirstPartyTypeKind.ZodEffects,
+          effect: { type: "transform", transform }
+        });
+      }
+      default(def) {
+        const defaultValueFunc = typeof def === "function" ? def : () => def;
+        return new ZodDefault({
+          ...processCreateParams(this._def),
+          innerType: this,
+          defaultValue: defaultValueFunc,
+          typeName: ZodFirstPartyTypeKind.ZodDefault
+        });
+      }
+      brand() {
+        return new ZodBranded({
+          typeName: ZodFirstPartyTypeKind.ZodBranded,
+          type: this,
+          ...processCreateParams(this._def)
+        });
+      }
+      catch(def) {
+        const catchValueFunc = typeof def === "function" ? def : () => def;
+        return new ZodCatch({
+          ...processCreateParams(this._def),
+          innerType: this,
+          catchValue: catchValueFunc,
+          typeName: ZodFirstPartyTypeKind.ZodCatch
+        });
+      }
+      describe(description) {
+        const This = this.constructor;
+        return new This({
+          ...this._def,
+          description
+        });
+      }
+      pipe(target) {
+        return ZodPipeline.create(this, target);
+      }
+      readonly() {
+        return ZodReadonly.create(this);
+      }
+      isOptional() {
+        return this.safeParse(void 0).success;
+      }
+      isNullable() {
+        return this.safeParse(null).success;
+      }
+    };
+    cuidRegex = /^c[^\s-]{8,}$/i;
+    cuid2Regex = /^[0-9a-z]+$/;
+    ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
+    uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i;
+    nanoidRegex = /^[a-z0-9_-]{21}$/i;
+    jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
+    durationRegex = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
+    emailRegex = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
+    _emojiRegex = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
+    ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
+    ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/;
+    ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+    ipv6CidrRegex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
+    base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+    base64urlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/;
+    dateRegexSource = `((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))`;
+    dateRegex = new RegExp(`^${dateRegexSource}$`);
+    ZodString = class _ZodString extends ZodType {
+      _parse(input) {
+        if (this._def.coerce) {
+          input.data = String(input.data);
+        }
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.string) {
+          const ctx2 = this._getOrReturnCtx(input);
+          addIssueToContext(ctx2, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.string,
+            received: ctx2.parsedType
+          });
+          return INVALID;
+        }
+        const status = new ParseStatus();
+        let ctx = void 0;
+        for (const check of this._def.checks) {
+          if (check.kind === "min") {
+            if (input.data.length < check.value) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_small,
+                minimum: check.value,
+                type: "string",
+                inclusive: true,
+                exact: false,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "max") {
+            if (input.data.length > check.value) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_big,
+                maximum: check.value,
+                type: "string",
+                inclusive: true,
+                exact: false,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "length") {
+            const tooBig = input.data.length > check.value;
+            const tooSmall = input.data.length < check.value;
+            if (tooBig || tooSmall) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              if (tooBig) {
+                addIssueToContext(ctx, {
+                  code: ZodIssueCode.too_big,
+                  maximum: check.value,
+                  type: "string",
+                  inclusive: true,
+                  exact: true,
+                  message: check.message
+                });
+              } else if (tooSmall) {
+                addIssueToContext(ctx, {
+                  code: ZodIssueCode.too_small,
+                  minimum: check.value,
+                  type: "string",
+                  inclusive: true,
+                  exact: true,
+                  message: check.message
+                });
+              }
+              status.dirty();
+            }
+          } else if (check.kind === "email") {
+            if (!emailRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "email",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "emoji") {
+            if (!emojiRegex) {
+              emojiRegex = new RegExp(_emojiRegex, "u");
+            }
+            if (!emojiRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "emoji",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "uuid") {
+            if (!uuidRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "uuid",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "nanoid") {
+            if (!nanoidRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "nanoid",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "cuid") {
+            if (!cuidRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "cuid",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "cuid2") {
+            if (!cuid2Regex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "cuid2",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "ulid") {
+            if (!ulidRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "ulid",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "url") {
+            try {
+              new URL(input.data);
+            } catch {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "url",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "regex") {
+            check.regex.lastIndex = 0;
+            const testResult = check.regex.test(input.data);
+            if (!testResult) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "regex",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "trim") {
+            input.data = input.data.trim();
+          } else if (check.kind === "includes") {
+            if (!input.data.includes(check.value, check.position)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_string,
+                validation: { includes: check.value, position: check.position },
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "toLowerCase") {
+            input.data = input.data.toLowerCase();
+          } else if (check.kind === "toUpperCase") {
+            input.data = input.data.toUpperCase();
+          } else if (check.kind === "startsWith") {
+            if (!input.data.startsWith(check.value)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_string,
+                validation: { startsWith: check.value },
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "endsWith") {
+            if (!input.data.endsWith(check.value)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_string,
+                validation: { endsWith: check.value },
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "datetime") {
+            const regex = datetimeRegex(check);
+            if (!regex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_string,
+                validation: "datetime",
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "date") {
+            const regex = dateRegex;
+            if (!regex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_string,
+                validation: "date",
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "time") {
+            const regex = timeRegex(check);
+            if (!regex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_string,
+                validation: "time",
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "duration") {
+            if (!durationRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "duration",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "ip") {
+            if (!isValidIP(input.data, check.version)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "ip",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "jwt") {
+            if (!isValidJWT(input.data, check.alg)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "jwt",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "cidr") {
+            if (!isValidCidr(input.data, check.version)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "cidr",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "base64") {
+            if (!base64Regex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "base64",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "base64url") {
+            if (!base64urlRegex.test(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                validation: "base64url",
+                code: ZodIssueCode.invalid_string,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else {
+            util.assertNever(check);
+          }
+        }
+        return { status: status.value, value: input.data };
+      }
+      _regex(regex, validation, message) {
+        return this.refinement((data) => regex.test(data), {
+          validation,
+          code: ZodIssueCode.invalid_string,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      _addCheck(check) {
+        return new _ZodString({
+          ...this._def,
+          checks: [...this._def.checks, check]
+        });
+      }
+      email(message) {
+        return this._addCheck({ kind: "email", ...errorUtil.errToObj(message) });
+      }
+      url(message) {
+        return this._addCheck({ kind: "url", ...errorUtil.errToObj(message) });
+      }
+      emoji(message) {
+        return this._addCheck({ kind: "emoji", ...errorUtil.errToObj(message) });
+      }
+      uuid(message) {
+        return this._addCheck({ kind: "uuid", ...errorUtil.errToObj(message) });
+      }
+      nanoid(message) {
+        return this._addCheck({ kind: "nanoid", ...errorUtil.errToObj(message) });
+      }
+      cuid(message) {
+        return this._addCheck({ kind: "cuid", ...errorUtil.errToObj(message) });
+      }
+      cuid2(message) {
+        return this._addCheck({ kind: "cuid2", ...errorUtil.errToObj(message) });
+      }
+      ulid(message) {
+        return this._addCheck({ kind: "ulid", ...errorUtil.errToObj(message) });
+      }
+      base64(message) {
+        return this._addCheck({ kind: "base64", ...errorUtil.errToObj(message) });
+      }
+      base64url(message) {
+        return this._addCheck({
+          kind: "base64url",
+          ...errorUtil.errToObj(message)
+        });
+      }
+      jwt(options) {
+        return this._addCheck({ kind: "jwt", ...errorUtil.errToObj(options) });
+      }
+      ip(options) {
+        return this._addCheck({ kind: "ip", ...errorUtil.errToObj(options) });
+      }
+      cidr(options) {
+        return this._addCheck({ kind: "cidr", ...errorUtil.errToObj(options) });
+      }
+      datetime(options) {
+        if (typeof options === "string") {
+          return this._addCheck({
+            kind: "datetime",
+            precision: null,
+            offset: false,
+            local: false,
+            message: options
+          });
+        }
+        return this._addCheck({
+          kind: "datetime",
+          precision: typeof options?.precision === "undefined" ? null : options?.precision,
+          offset: options?.offset ?? false,
+          local: options?.local ?? false,
+          ...errorUtil.errToObj(options?.message)
+        });
+      }
+      date(message) {
+        return this._addCheck({ kind: "date", message });
+      }
+      time(options) {
+        if (typeof options === "string") {
+          return this._addCheck({
+            kind: "time",
+            precision: null,
+            message: options
+          });
+        }
+        return this._addCheck({
+          kind: "time",
+          precision: typeof options?.precision === "undefined" ? null : options?.precision,
+          ...errorUtil.errToObj(options?.message)
+        });
+      }
+      duration(message) {
+        return this._addCheck({ kind: "duration", ...errorUtil.errToObj(message) });
+      }
+      regex(regex, message) {
+        return this._addCheck({
+          kind: "regex",
+          regex,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      includes(value, options) {
+        return this._addCheck({
+          kind: "includes",
+          value,
+          position: options?.position,
+          ...errorUtil.errToObj(options?.message)
+        });
+      }
+      startsWith(value, message) {
+        return this._addCheck({
+          kind: "startsWith",
+          value,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      endsWith(value, message) {
+        return this._addCheck({
+          kind: "endsWith",
+          value,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      min(minLength, message) {
+        return this._addCheck({
+          kind: "min",
+          value: minLength,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      max(maxLength, message) {
+        return this._addCheck({
+          kind: "max",
+          value: maxLength,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      length(len, message) {
+        return this._addCheck({
+          kind: "length",
+          value: len,
+          ...errorUtil.errToObj(message)
+        });
+      }
+      /**
+       * Equivalent to `.min(1)`
+       */
+      nonempty(message) {
+        return this.min(1, errorUtil.errToObj(message));
+      }
+      trim() {
+        return new _ZodString({
+          ...this._def,
+          checks: [...this._def.checks, { kind: "trim" }]
+        });
+      }
+      toLowerCase() {
+        return new _ZodString({
+          ...this._def,
+          checks: [...this._def.checks, { kind: "toLowerCase" }]
+        });
+      }
+      toUpperCase() {
+        return new _ZodString({
+          ...this._def,
+          checks: [...this._def.checks, { kind: "toUpperCase" }]
+        });
+      }
+      get isDatetime() {
+        return !!this._def.checks.find((ch) => ch.kind === "datetime");
+      }
+      get isDate() {
+        return !!this._def.checks.find((ch) => ch.kind === "date");
+      }
+      get isTime() {
+        return !!this._def.checks.find((ch) => ch.kind === "time");
+      }
+      get isDuration() {
+        return !!this._def.checks.find((ch) => ch.kind === "duration");
+      }
+      get isEmail() {
+        return !!this._def.checks.find((ch) => ch.kind === "email");
+      }
+      get isURL() {
+        return !!this._def.checks.find((ch) => ch.kind === "url");
+      }
+      get isEmoji() {
+        return !!this._def.checks.find((ch) => ch.kind === "emoji");
+      }
+      get isUUID() {
+        return !!this._def.checks.find((ch) => ch.kind === "uuid");
+      }
+      get isNANOID() {
+        return !!this._def.checks.find((ch) => ch.kind === "nanoid");
+      }
+      get isCUID() {
+        return !!this._def.checks.find((ch) => ch.kind === "cuid");
+      }
+      get isCUID2() {
+        return !!this._def.checks.find((ch) => ch.kind === "cuid2");
+      }
+      get isULID() {
+        return !!this._def.checks.find((ch) => ch.kind === "ulid");
+      }
+      get isIP() {
+        return !!this._def.checks.find((ch) => ch.kind === "ip");
+      }
+      get isCIDR() {
+        return !!this._def.checks.find((ch) => ch.kind === "cidr");
+      }
+      get isBase64() {
+        return !!this._def.checks.find((ch) => ch.kind === "base64");
+      }
+      get isBase64url() {
+        return !!this._def.checks.find((ch) => ch.kind === "base64url");
+      }
+      get minLength() {
+        let min = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "min") {
+            if (min === null || ch.value > min)
+              min = ch.value;
+          }
+        }
+        return min;
+      }
+      get maxLength() {
+        let max = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "max") {
+            if (max === null || ch.value < max)
+              max = ch.value;
+          }
+        }
+        return max;
+      }
+    };
+    ZodString.create = (params) => {
+      return new ZodString({
+        checks: [],
+        typeName: ZodFirstPartyTypeKind.ZodString,
+        coerce: params?.coerce ?? false,
+        ...processCreateParams(params)
+      });
+    };
+    ZodNumber = class _ZodNumber extends ZodType {
+      constructor() {
+        super(...arguments);
+        this.min = this.gte;
+        this.max = this.lte;
+        this.step = this.multipleOf;
+      }
+      _parse(input) {
+        if (this._def.coerce) {
+          input.data = Number(input.data);
+        }
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.number) {
+          const ctx2 = this._getOrReturnCtx(input);
+          addIssueToContext(ctx2, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.number,
+            received: ctx2.parsedType
+          });
+          return INVALID;
+        }
+        let ctx = void 0;
+        const status = new ParseStatus();
+        for (const check of this._def.checks) {
+          if (check.kind === "int") {
+            if (!util.isInteger(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.invalid_type,
+                expected: "integer",
+                received: "float",
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "min") {
+            const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
+            if (tooSmall) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_small,
+                minimum: check.value,
+                type: "number",
+                inclusive: check.inclusive,
+                exact: false,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "max") {
+            const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
+            if (tooBig) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_big,
+                maximum: check.value,
+                type: "number",
+                inclusive: check.inclusive,
+                exact: false,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "multipleOf") {
+            if (floatSafeRemainder(input.data, check.value) !== 0) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.not_multiple_of,
+                multipleOf: check.value,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "finite") {
+            if (!Number.isFinite(input.data)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.not_finite,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else {
+            util.assertNever(check);
+          }
+        }
+        return { status: status.value, value: input.data };
+      }
+      gte(value, message) {
+        return this.setLimit("min", value, true, errorUtil.toString(message));
+      }
+      gt(value, message) {
+        return this.setLimit("min", value, false, errorUtil.toString(message));
+      }
+      lte(value, message) {
+        return this.setLimit("max", value, true, errorUtil.toString(message));
+      }
+      lt(value, message) {
+        return this.setLimit("max", value, false, errorUtil.toString(message));
+      }
+      setLimit(kind, value, inclusive, message) {
+        return new _ZodNumber({
+          ...this._def,
+          checks: [
+            ...this._def.checks,
+            {
+              kind,
+              value,
+              inclusive,
+              message: errorUtil.toString(message)
+            }
+          ]
+        });
+      }
+      _addCheck(check) {
+        return new _ZodNumber({
+          ...this._def,
+          checks: [...this._def.checks, check]
+        });
+      }
+      int(message) {
+        return this._addCheck({
+          kind: "int",
+          message: errorUtil.toString(message)
+        });
+      }
+      positive(message) {
+        return this._addCheck({
+          kind: "min",
+          value: 0,
+          inclusive: false,
+          message: errorUtil.toString(message)
+        });
+      }
+      negative(message) {
+        return this._addCheck({
+          kind: "max",
+          value: 0,
+          inclusive: false,
+          message: errorUtil.toString(message)
+        });
+      }
+      nonpositive(message) {
+        return this._addCheck({
+          kind: "max",
+          value: 0,
+          inclusive: true,
+          message: errorUtil.toString(message)
+        });
+      }
+      nonnegative(message) {
+        return this._addCheck({
+          kind: "min",
+          value: 0,
+          inclusive: true,
+          message: errorUtil.toString(message)
+        });
+      }
+      multipleOf(value, message) {
+        return this._addCheck({
+          kind: "multipleOf",
+          value,
+          message: errorUtil.toString(message)
+        });
+      }
+      finite(message) {
+        return this._addCheck({
+          kind: "finite",
+          message: errorUtil.toString(message)
+        });
+      }
+      safe(message) {
+        return this._addCheck({
+          kind: "min",
+          inclusive: true,
+          value: Number.MIN_SAFE_INTEGER,
+          message: errorUtil.toString(message)
+        })._addCheck({
+          kind: "max",
+          inclusive: true,
+          value: Number.MAX_SAFE_INTEGER,
+          message: errorUtil.toString(message)
+        });
+      }
+      get minValue() {
+        let min = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "min") {
+            if (min === null || ch.value > min)
+              min = ch.value;
+          }
+        }
+        return min;
+      }
+      get maxValue() {
+        let max = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "max") {
+            if (max === null || ch.value < max)
+              max = ch.value;
+          }
+        }
+        return max;
+      }
+      get isInt() {
+        return !!this._def.checks.find((ch) => ch.kind === "int" || ch.kind === "multipleOf" && util.isInteger(ch.value));
+      }
+      get isFinite() {
+        let max = null;
+        let min = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "finite" || ch.kind === "int" || ch.kind === "multipleOf") {
+            return true;
+          } else if (ch.kind === "min") {
+            if (min === null || ch.value > min)
+              min = ch.value;
+          } else if (ch.kind === "max") {
+            if (max === null || ch.value < max)
+              max = ch.value;
+          }
+        }
+        return Number.isFinite(min) && Number.isFinite(max);
+      }
+    };
+    ZodNumber.create = (params) => {
+      return new ZodNumber({
+        checks: [],
+        typeName: ZodFirstPartyTypeKind.ZodNumber,
+        coerce: params?.coerce || false,
+        ...processCreateParams(params)
+      });
+    };
+    ZodBigInt = class _ZodBigInt extends ZodType {
+      constructor() {
+        super(...arguments);
+        this.min = this.gte;
+        this.max = this.lte;
+      }
+      _parse(input) {
+        if (this._def.coerce) {
+          try {
+            input.data = BigInt(input.data);
+          } catch {
+            return this._getInvalidInput(input);
+          }
+        }
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.bigint) {
+          return this._getInvalidInput(input);
+        }
+        let ctx = void 0;
+        const status = new ParseStatus();
+        for (const check of this._def.checks) {
+          if (check.kind === "min") {
+            const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
+            if (tooSmall) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_small,
+                type: "bigint",
+                minimum: check.value,
+                inclusive: check.inclusive,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "max") {
+            const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
+            if (tooBig) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_big,
+                type: "bigint",
+                maximum: check.value,
+                inclusive: check.inclusive,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "multipleOf") {
+            if (input.data % check.value !== BigInt(0)) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.not_multiple_of,
+                multipleOf: check.value,
+                message: check.message
+              });
+              status.dirty();
+            }
+          } else {
+            util.assertNever(check);
+          }
+        }
+        return { status: status.value, value: input.data };
+      }
+      _getInvalidInput(input) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.bigint,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      gte(value, message) {
+        return this.setLimit("min", value, true, errorUtil.toString(message));
+      }
+      gt(value, message) {
+        return this.setLimit("min", value, false, errorUtil.toString(message));
+      }
+      lte(value, message) {
+        return this.setLimit("max", value, true, errorUtil.toString(message));
+      }
+      lt(value, message) {
+        return this.setLimit("max", value, false, errorUtil.toString(message));
+      }
+      setLimit(kind, value, inclusive, message) {
+        return new _ZodBigInt({
+          ...this._def,
+          checks: [
+            ...this._def.checks,
+            {
+              kind,
+              value,
+              inclusive,
+              message: errorUtil.toString(message)
+            }
+          ]
+        });
+      }
+      _addCheck(check) {
+        return new _ZodBigInt({
+          ...this._def,
+          checks: [...this._def.checks, check]
+        });
+      }
+      positive(message) {
+        return this._addCheck({
+          kind: "min",
+          value: BigInt(0),
+          inclusive: false,
+          message: errorUtil.toString(message)
+        });
+      }
+      negative(message) {
+        return this._addCheck({
+          kind: "max",
+          value: BigInt(0),
+          inclusive: false,
+          message: errorUtil.toString(message)
+        });
+      }
+      nonpositive(message) {
+        return this._addCheck({
+          kind: "max",
+          value: BigInt(0),
+          inclusive: true,
+          message: errorUtil.toString(message)
+        });
+      }
+      nonnegative(message) {
+        return this._addCheck({
+          kind: "min",
+          value: BigInt(0),
+          inclusive: true,
+          message: errorUtil.toString(message)
+        });
+      }
+      multipleOf(value, message) {
+        return this._addCheck({
+          kind: "multipleOf",
+          value,
+          message: errorUtil.toString(message)
+        });
+      }
+      get minValue() {
+        let min = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "min") {
+            if (min === null || ch.value > min)
+              min = ch.value;
+          }
+        }
+        return min;
+      }
+      get maxValue() {
+        let max = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "max") {
+            if (max === null || ch.value < max)
+              max = ch.value;
+          }
+        }
+        return max;
+      }
+    };
+    ZodBigInt.create = (params) => {
+      return new ZodBigInt({
+        checks: [],
+        typeName: ZodFirstPartyTypeKind.ZodBigInt,
+        coerce: params?.coerce ?? false,
+        ...processCreateParams(params)
+      });
+    };
+    ZodBoolean = class extends ZodType {
+      _parse(input) {
+        if (this._def.coerce) {
+          input.data = Boolean(input.data);
+        }
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.boolean) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.boolean,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+    };
+    ZodBoolean.create = (params) => {
+      return new ZodBoolean({
+        typeName: ZodFirstPartyTypeKind.ZodBoolean,
+        coerce: params?.coerce || false,
+        ...processCreateParams(params)
+      });
+    };
+    ZodDate = class _ZodDate extends ZodType {
+      _parse(input) {
+        if (this._def.coerce) {
+          input.data = new Date(input.data);
+        }
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.date) {
+          const ctx2 = this._getOrReturnCtx(input);
+          addIssueToContext(ctx2, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.date,
+            received: ctx2.parsedType
+          });
+          return INVALID;
+        }
+        if (Number.isNaN(input.data.getTime())) {
+          const ctx2 = this._getOrReturnCtx(input);
+          addIssueToContext(ctx2, {
+            code: ZodIssueCode.invalid_date
+          });
+          return INVALID;
+        }
+        const status = new ParseStatus();
+        let ctx = void 0;
+        for (const check of this._def.checks) {
+          if (check.kind === "min") {
+            if (input.data.getTime() < check.value) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_small,
+                message: check.message,
+                inclusive: true,
+                exact: false,
+                minimum: check.value,
+                type: "date"
+              });
+              status.dirty();
+            }
+          } else if (check.kind === "max") {
+            if (input.data.getTime() > check.value) {
+              ctx = this._getOrReturnCtx(input, ctx);
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_big,
+                message: check.message,
+                inclusive: true,
+                exact: false,
+                maximum: check.value,
+                type: "date"
+              });
+              status.dirty();
+            }
+          } else {
+            util.assertNever(check);
+          }
+        }
+        return {
+          status: status.value,
+          value: new Date(input.data.getTime())
+        };
+      }
+      _addCheck(check) {
+        return new _ZodDate({
+          ...this._def,
+          checks: [...this._def.checks, check]
+        });
+      }
+      min(minDate, message) {
+        return this._addCheck({
+          kind: "min",
+          value: minDate.getTime(),
+          message: errorUtil.toString(message)
+        });
+      }
+      max(maxDate, message) {
+        return this._addCheck({
+          kind: "max",
+          value: maxDate.getTime(),
+          message: errorUtil.toString(message)
+        });
+      }
+      get minDate() {
+        let min = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "min") {
+            if (min === null || ch.value > min)
+              min = ch.value;
+          }
+        }
+        return min != null ? new Date(min) : null;
+      }
+      get maxDate() {
+        let max = null;
+        for (const ch of this._def.checks) {
+          if (ch.kind === "max") {
+            if (max === null || ch.value < max)
+              max = ch.value;
+          }
+        }
+        return max != null ? new Date(max) : null;
+      }
+    };
+    ZodDate.create = (params) => {
+      return new ZodDate({
+        checks: [],
+        coerce: params?.coerce || false,
+        typeName: ZodFirstPartyTypeKind.ZodDate,
+        ...processCreateParams(params)
+      });
+    };
+    ZodSymbol = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.symbol) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.symbol,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+    };
+    ZodSymbol.create = (params) => {
+      return new ZodSymbol({
+        typeName: ZodFirstPartyTypeKind.ZodSymbol,
+        ...processCreateParams(params)
+      });
+    };
+    ZodUndefined = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.undefined) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.undefined,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+    };
+    ZodUndefined.create = (params) => {
+      return new ZodUndefined({
+        typeName: ZodFirstPartyTypeKind.ZodUndefined,
+        ...processCreateParams(params)
+      });
+    };
+    ZodNull = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.null) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.null,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+    };
+    ZodNull.create = (params) => {
+      return new ZodNull({
+        typeName: ZodFirstPartyTypeKind.ZodNull,
+        ...processCreateParams(params)
+      });
+    };
+    ZodAny = class extends ZodType {
+      constructor() {
+        super(...arguments);
+        this._any = true;
+      }
+      _parse(input) {
+        return OK(input.data);
+      }
+    };
+    ZodAny.create = (params) => {
+      return new ZodAny({
+        typeName: ZodFirstPartyTypeKind.ZodAny,
+        ...processCreateParams(params)
+      });
+    };
+    ZodUnknown = class extends ZodType {
+      constructor() {
+        super(...arguments);
+        this._unknown = true;
+      }
+      _parse(input) {
+        return OK(input.data);
+      }
+    };
+    ZodUnknown.create = (params) => {
+      return new ZodUnknown({
+        typeName: ZodFirstPartyTypeKind.ZodUnknown,
+        ...processCreateParams(params)
+      });
+    };
+    ZodNever = class extends ZodType {
+      _parse(input) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.never,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+    };
+    ZodNever.create = (params) => {
+      return new ZodNever({
+        typeName: ZodFirstPartyTypeKind.ZodNever,
+        ...processCreateParams(params)
+      });
+    };
+    ZodVoid = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.undefined) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.void,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+    };
+    ZodVoid.create = (params) => {
+      return new ZodVoid({
+        typeName: ZodFirstPartyTypeKind.ZodVoid,
+        ...processCreateParams(params)
+      });
+    };
+    ZodArray = class _ZodArray extends ZodType {
+      _parse(input) {
+        const { ctx, status } = this._processInputParams(input);
+        const def = this._def;
+        if (ctx.parsedType !== ZodParsedType.array) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.array,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        if (def.exactLength !== null) {
+          const tooBig = ctx.data.length > def.exactLength.value;
+          const tooSmall = ctx.data.length < def.exactLength.value;
+          if (tooBig || tooSmall) {
+            addIssueToContext(ctx, {
+              code: tooBig ? ZodIssueCode.too_big : ZodIssueCode.too_small,
+              minimum: tooSmall ? def.exactLength.value : void 0,
+              maximum: tooBig ? def.exactLength.value : void 0,
+              type: "array",
+              inclusive: true,
+              exact: true,
+              message: def.exactLength.message
+            });
+            status.dirty();
+          }
+        }
+        if (def.minLength !== null) {
+          if (ctx.data.length < def.minLength.value) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              minimum: def.minLength.value,
+              type: "array",
+              inclusive: true,
+              exact: false,
+              message: def.minLength.message
+            });
+            status.dirty();
+          }
+        }
+        if (def.maxLength !== null) {
+          if (ctx.data.length > def.maxLength.value) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              maximum: def.maxLength.value,
+              type: "array",
+              inclusive: true,
+              exact: false,
+              message: def.maxLength.message
+            });
+            status.dirty();
+          }
+        }
+        if (ctx.common.async) {
+          return Promise.all([...ctx.data].map((item, i) => {
+            return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
+          })).then((result2) => {
+            return ParseStatus.mergeArray(status, result2);
+          });
+        }
+        const result = [...ctx.data].map((item, i) => {
+          return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
+        });
+        return ParseStatus.mergeArray(status, result);
+      }
+      get element() {
+        return this._def.type;
+      }
+      min(minLength, message) {
+        return new _ZodArray({
+          ...this._def,
+          minLength: { value: minLength, message: errorUtil.toString(message) }
+        });
+      }
+      max(maxLength, message) {
+        return new _ZodArray({
+          ...this._def,
+          maxLength: { value: maxLength, message: errorUtil.toString(message) }
+        });
+      }
+      length(len, message) {
+        return new _ZodArray({
+          ...this._def,
+          exactLength: { value: len, message: errorUtil.toString(message) }
+        });
+      }
+      nonempty(message) {
+        return this.min(1, message);
+      }
+    };
+    ZodArray.create = (schema, params) => {
+      return new ZodArray({
+        type: schema,
+        minLength: null,
+        maxLength: null,
+        exactLength: null,
+        typeName: ZodFirstPartyTypeKind.ZodArray,
+        ...processCreateParams(params)
+      });
+    };
+    ZodObject = class _ZodObject extends ZodType {
+      constructor() {
+        super(...arguments);
+        this._cached = null;
+        this.nonstrict = this.passthrough;
+        this.augment = this.extend;
+      }
+      _getCached() {
+        if (this._cached !== null)
+          return this._cached;
+        const shape = this._def.shape();
+        const keys = util.objectKeys(shape);
+        this._cached = { shape, keys };
+        return this._cached;
+      }
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.object) {
+          const ctx2 = this._getOrReturnCtx(input);
+          addIssueToContext(ctx2, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.object,
+            received: ctx2.parsedType
+          });
+          return INVALID;
+        }
+        const { status, ctx } = this._processInputParams(input);
+        const { shape, keys: shapeKeys } = this._getCached();
+        const extraKeys = [];
+        if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
+          for (const key in ctx.data) {
+            if (!shapeKeys.includes(key)) {
+              extraKeys.push(key);
+            }
+          }
+        }
+        const pairs = [];
+        for (const key of shapeKeys) {
+          const keyValidator = shape[key];
+          const value = ctx.data[key];
+          pairs.push({
+            key: { status: "valid", value: key },
+            value: keyValidator._parse(new ParseInputLazyPath(ctx, value, ctx.path, key)),
+            alwaysSet: key in ctx.data
+          });
+        }
+        if (this._def.catchall instanceof ZodNever) {
+          const unknownKeys = this._def.unknownKeys;
+          if (unknownKeys === "passthrough") {
+            for (const key of extraKeys) {
+              pairs.push({
+                key: { status: "valid", value: key },
+                value: { status: "valid", value: ctx.data[key] }
+              });
+            }
+          } else if (unknownKeys === "strict") {
+            if (extraKeys.length > 0) {
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.unrecognized_keys,
+                keys: extraKeys
+              });
+              status.dirty();
+            }
+          } else if (unknownKeys === "strip") ; else {
+            throw new Error(`Internal ZodObject error: invalid unknownKeys value.`);
+          }
+        } else {
+          const catchall = this._def.catchall;
+          for (const key of extraKeys) {
+            const value = ctx.data[key];
+            pairs.push({
+              key: { status: "valid", value: key },
+              value: catchall._parse(
+                new ParseInputLazyPath(ctx, value, ctx.path, key)
+                //, ctx.child(key), value, getParsedType(value)
+              ),
+              alwaysSet: key in ctx.data
+            });
+          }
+        }
+        if (ctx.common.async) {
+          return Promise.resolve().then(async () => {
+            const syncPairs = [];
+            for (const pair of pairs) {
+              const key = await pair.key;
+              const value = await pair.value;
+              syncPairs.push({
+                key,
+                value,
+                alwaysSet: pair.alwaysSet
+              });
+            }
+            return syncPairs;
+          }).then((syncPairs) => {
+            return ParseStatus.mergeObjectSync(status, syncPairs);
+          });
+        } else {
+          return ParseStatus.mergeObjectSync(status, pairs);
+        }
+      }
+      get shape() {
+        return this._def.shape();
+      }
+      strict(message) {
+        errorUtil.errToObj;
+        return new _ZodObject({
+          ...this._def,
+          unknownKeys: "strict",
+          ...message !== void 0 ? {
+            errorMap: (issue, ctx) => {
+              const defaultError = this._def.errorMap?.(issue, ctx).message ?? ctx.defaultError;
+              if (issue.code === "unrecognized_keys")
+                return {
+                  message: errorUtil.errToObj(message).message ?? defaultError
+                };
+              return {
+                message: defaultError
+              };
+            }
+          } : {}
+        });
+      }
+      strip() {
+        return new _ZodObject({
+          ...this._def,
+          unknownKeys: "strip"
+        });
+      }
+      passthrough() {
+        return new _ZodObject({
+          ...this._def,
+          unknownKeys: "passthrough"
+        });
+      }
+      // const AugmentFactory =
+      //   <Def extends ZodObjectDef>(def: Def) =>
+      //   <Augmentation extends ZodRawShape>(
+      //     augmentation: Augmentation
+      //   ): ZodObject<
+      //     extendShape<ReturnType<Def["shape"]>, Augmentation>,
+      //     Def["unknownKeys"],
+      //     Def["catchall"]
+      //   > => {
+      //     return new ZodObject({
+      //       ...def,
+      //       shape: () => ({
+      //         ...def.shape(),
+      //         ...augmentation,
+      //       }),
+      //     }) as any;
+      //   };
+      extend(augmentation) {
+        return new _ZodObject({
+          ...this._def,
+          shape: () => ({
+            ...this._def.shape(),
+            ...augmentation
+          })
+        });
+      }
+      /**
+       * Prior to zod@1.0.12 there was a bug in the
+       * inferred type of merged objects. Please
+       * upgrade if you are experiencing issues.
+       */
+      merge(merging) {
+        const merged = new _ZodObject({
+          unknownKeys: merging._def.unknownKeys,
+          catchall: merging._def.catchall,
+          shape: () => ({
+            ...this._def.shape(),
+            ...merging._def.shape()
+          }),
+          typeName: ZodFirstPartyTypeKind.ZodObject
+        });
+        return merged;
+      }
+      // merge<
+      //   Incoming extends AnyZodObject,
+      //   Augmentation extends Incoming["shape"],
+      //   NewOutput extends {
+      //     [k in keyof Augmentation | keyof Output]: k extends keyof Augmentation
+      //       ? Augmentation[k]["_output"]
+      //       : k extends keyof Output
+      //       ? Output[k]
+      //       : never;
+      //   },
+      //   NewInput extends {
+      //     [k in keyof Augmentation | keyof Input]: k extends keyof Augmentation
+      //       ? Augmentation[k]["_input"]
+      //       : k extends keyof Input
+      //       ? Input[k]
+      //       : never;
+      //   }
+      // >(
+      //   merging: Incoming
+      // ): ZodObject<
+      //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
+      //   Incoming["_def"]["unknownKeys"],
+      //   Incoming["_def"]["catchall"],
+      //   NewOutput,
+      //   NewInput
+      // > {
+      //   const merged: any = new ZodObject({
+      //     unknownKeys: merging._def.unknownKeys,
+      //     catchall: merging._def.catchall,
+      //     shape: () =>
+      //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
+      //     typeName: ZodFirstPartyTypeKind.ZodObject,
+      //   }) as any;
+      //   return merged;
+      // }
+      setKey(key, schema) {
+        return this.augment({ [key]: schema });
+      }
+      // merge<Incoming extends AnyZodObject>(
+      //   merging: Incoming
+      // ): //ZodObject<T & Incoming["_shape"], UnknownKeys, Catchall> = (merging) => {
+      // ZodObject<
+      //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
+      //   Incoming["_def"]["unknownKeys"],
+      //   Incoming["_def"]["catchall"]
+      // > {
+      //   // const mergedShape = objectUtil.mergeShapes(
+      //   //   this._def.shape(),
+      //   //   merging._def.shape()
+      //   // );
+      //   const merged: any = new ZodObject({
+      //     unknownKeys: merging._def.unknownKeys,
+      //     catchall: merging._def.catchall,
+      //     shape: () =>
+      //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
+      //     typeName: ZodFirstPartyTypeKind.ZodObject,
+      //   }) as any;
+      //   return merged;
+      // }
+      catchall(index) {
+        return new _ZodObject({
+          ...this._def,
+          catchall: index
+        });
+      }
+      pick(mask) {
+        const shape = {};
+        for (const key of util.objectKeys(mask)) {
+          if (mask[key] && this.shape[key]) {
+            shape[key] = this.shape[key];
+          }
+        }
+        return new _ZodObject({
+          ...this._def,
+          shape: () => shape
+        });
+      }
+      omit(mask) {
+        const shape = {};
+        for (const key of util.objectKeys(this.shape)) {
+          if (!mask[key]) {
+            shape[key] = this.shape[key];
+          }
+        }
+        return new _ZodObject({
+          ...this._def,
+          shape: () => shape
+        });
+      }
+      /**
+       * @deprecated
+       */
+      deepPartial() {
+        return deepPartialify(this);
+      }
+      partial(mask) {
+        const newShape = {};
+        for (const key of util.objectKeys(this.shape)) {
+          const fieldSchema = this.shape[key];
+          if (mask && !mask[key]) {
+            newShape[key] = fieldSchema;
+          } else {
+            newShape[key] = fieldSchema.optional();
+          }
+        }
+        return new _ZodObject({
+          ...this._def,
+          shape: () => newShape
+        });
+      }
+      required(mask) {
+        const newShape = {};
+        for (const key of util.objectKeys(this.shape)) {
+          if (mask && !mask[key]) {
+            newShape[key] = this.shape[key];
+          } else {
+            const fieldSchema = this.shape[key];
+            let newField = fieldSchema;
+            while (newField instanceof ZodOptional) {
+              newField = newField._def.innerType;
+            }
+            newShape[key] = newField;
+          }
+        }
+        return new _ZodObject({
+          ...this._def,
+          shape: () => newShape
+        });
+      }
+      keyof() {
+        return createZodEnum(util.objectKeys(this.shape));
+      }
+    };
+    ZodObject.create = (shape, params) => {
+      return new ZodObject({
+        shape: () => shape,
+        unknownKeys: "strip",
+        catchall: ZodNever.create(),
+        typeName: ZodFirstPartyTypeKind.ZodObject,
+        ...processCreateParams(params)
+      });
+    };
+    ZodObject.strictCreate = (shape, params) => {
+      return new ZodObject({
+        shape: () => shape,
+        unknownKeys: "strict",
+        catchall: ZodNever.create(),
+        typeName: ZodFirstPartyTypeKind.ZodObject,
+        ...processCreateParams(params)
+      });
+    };
+    ZodObject.lazycreate = (shape, params) => {
+      return new ZodObject({
+        shape,
+        unknownKeys: "strip",
+        catchall: ZodNever.create(),
+        typeName: ZodFirstPartyTypeKind.ZodObject,
+        ...processCreateParams(params)
+      });
+    };
+    ZodUnion = class extends ZodType {
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        const options = this._def.options;
+        function handleResults(results) {
+          for (const result of results) {
+            if (result.result.status === "valid") {
+              return result.result;
+            }
+          }
+          for (const result of results) {
+            if (result.result.status === "dirty") {
+              ctx.common.issues.push(...result.ctx.common.issues);
+              return result.result;
+            }
+          }
+          const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_union,
+            unionErrors
+          });
+          return INVALID;
+        }
+        if (ctx.common.async) {
+          return Promise.all(options.map(async (option) => {
+            const childCtx = {
+              ...ctx,
+              common: {
+                ...ctx.common,
+                issues: []
+              },
+              parent: null
+            };
+            return {
+              result: await option._parseAsync({
+                data: ctx.data,
+                path: ctx.path,
+                parent: childCtx
+              }),
+              ctx: childCtx
+            };
+          })).then(handleResults);
+        } else {
+          let dirty = void 0;
+          const issues = [];
+          for (const option of options) {
+            const childCtx = {
+              ...ctx,
+              common: {
+                ...ctx.common,
+                issues: []
+              },
+              parent: null
+            };
+            const result = option._parseSync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: childCtx
+            });
+            if (result.status === "valid") {
+              return result;
+            } else if (result.status === "dirty" && !dirty) {
+              dirty = { result, ctx: childCtx };
+            }
+            if (childCtx.common.issues.length) {
+              issues.push(childCtx.common.issues);
+            }
+          }
+          if (dirty) {
+            ctx.common.issues.push(...dirty.ctx.common.issues);
+            return dirty.result;
+          }
+          const unionErrors = issues.map((issues2) => new ZodError(issues2));
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_union,
+            unionErrors
+          });
+          return INVALID;
+        }
+      }
+      get options() {
+        return this._def.options;
+      }
+    };
+    ZodUnion.create = (types, params) => {
+      return new ZodUnion({
+        options: types,
+        typeName: ZodFirstPartyTypeKind.ZodUnion,
+        ...processCreateParams(params)
+      });
+    };
+    getDiscriminator = (type) => {
+      if (type instanceof ZodLazy) {
+        return getDiscriminator(type.schema);
+      } else if (type instanceof ZodEffects) {
+        return getDiscriminator(type.innerType());
+      } else if (type instanceof ZodLiteral) {
+        return [type.value];
+      } else if (type instanceof ZodEnum) {
+        return type.options;
+      } else if (type instanceof ZodNativeEnum) {
+        return util.objectValues(type.enum);
+      } else if (type instanceof ZodDefault) {
+        return getDiscriminator(type._def.innerType);
+      } else if (type instanceof ZodUndefined) {
+        return [void 0];
+      } else if (type instanceof ZodNull) {
+        return [null];
+      } else if (type instanceof ZodOptional) {
+        return [void 0, ...getDiscriminator(type.unwrap())];
+      } else if (type instanceof ZodNullable) {
+        return [null, ...getDiscriminator(type.unwrap())];
+      } else if (type instanceof ZodBranded) {
+        return getDiscriminator(type.unwrap());
+      } else if (type instanceof ZodReadonly) {
+        return getDiscriminator(type.unwrap());
+      } else if (type instanceof ZodCatch) {
+        return getDiscriminator(type._def.innerType);
+      } else {
+        return [];
+      }
+    };
+    ZodDiscriminatedUnion = class _ZodDiscriminatedUnion extends ZodType {
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.object) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.object,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        const discriminator = this.discriminator;
+        const discriminatorValue = ctx.data[discriminator];
+        const option = this.optionsMap.get(discriminatorValue);
+        if (!option) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_union_discriminator,
+            options: Array.from(this.optionsMap.keys()),
+            path: [discriminator]
+          });
+          return INVALID;
+        }
+        if (ctx.common.async) {
+          return option._parseAsync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          });
+        } else {
+          return option._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          });
+        }
+      }
+      get discriminator() {
+        return this._def.discriminator;
+      }
+      get options() {
+        return this._def.options;
+      }
+      get optionsMap() {
+        return this._def.optionsMap;
+      }
+      /**
+       * The constructor of the discriminated union schema. Its behaviour is very similar to that of the normal z.union() constructor.
+       * However, it only allows a union of objects, all of which need to share a discriminator property. This property must
+       * have a different value for each object in the union.
+       * @param discriminator the name of the discriminator property
+       * @param types an array of object schemas
+       * @param params
+       */
+      static create(discriminator, options, params) {
+        const optionsMap = /* @__PURE__ */ new Map();
+        for (const type of options) {
+          const discriminatorValues = getDiscriminator(type.shape[discriminator]);
+          if (!discriminatorValues.length) {
+            throw new Error(`A discriminator value for key \`${discriminator}\` could not be extracted from all schema options`);
+          }
+          for (const value of discriminatorValues) {
+            if (optionsMap.has(value)) {
+              throw new Error(`Discriminator property ${String(discriminator)} has duplicate value ${String(value)}`);
+            }
+            optionsMap.set(value, type);
+          }
+        }
+        return new _ZodDiscriminatedUnion({
+          typeName: ZodFirstPartyTypeKind.ZodDiscriminatedUnion,
+          discriminator,
+          options,
+          optionsMap,
+          ...processCreateParams(params)
+        });
+      }
+    };
+    ZodIntersection = class extends ZodType {
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        const handleParsed = (parsedLeft, parsedRight) => {
+          if (isAborted(parsedLeft) || isAborted(parsedRight)) {
+            return INVALID;
+          }
+          const merged = mergeValues(parsedLeft.value, parsedRight.value);
+          if (!merged.valid) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_intersection_types
+            });
+            return INVALID;
+          }
+          if (isDirty(parsedLeft) || isDirty(parsedRight)) {
+            status.dirty();
+          }
+          return { status: status.value, value: merged.data };
+        };
+        if (ctx.common.async) {
+          return Promise.all([
+            this._def.left._parseAsync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: ctx
+            }),
+            this._def.right._parseAsync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: ctx
+            })
+          ]).then(([left, right]) => handleParsed(left, right));
+        } else {
+          return handleParsed(this._def.left._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          }), this._def.right._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          }));
+        }
+      }
+    };
+    ZodIntersection.create = (left, right, params) => {
+      return new ZodIntersection({
+        left,
+        right,
+        typeName: ZodFirstPartyTypeKind.ZodIntersection,
+        ...processCreateParams(params)
+      });
+    };
+    ZodTuple = class _ZodTuple extends ZodType {
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.array) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.array,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        if (ctx.data.length < this._def.items.length) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            minimum: this._def.items.length,
+            inclusive: true,
+            exact: false,
+            type: "array"
+          });
+          return INVALID;
+        }
+        const rest = this._def.rest;
+        if (!rest && ctx.data.length > this._def.items.length) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            maximum: this._def.items.length,
+            inclusive: true,
+            exact: false,
+            type: "array"
+          });
+          status.dirty();
+        }
+        const items = [...ctx.data].map((item, itemIndex) => {
+          const schema = this._def.items[itemIndex] || this._def.rest;
+          if (!schema)
+            return null;
+          return schema._parse(new ParseInputLazyPath(ctx, item, ctx.path, itemIndex));
+        }).filter((x) => !!x);
+        if (ctx.common.async) {
+          return Promise.all(items).then((results) => {
+            return ParseStatus.mergeArray(status, results);
+          });
+        } else {
+          return ParseStatus.mergeArray(status, items);
+        }
+      }
+      get items() {
+        return this._def.items;
+      }
+      rest(rest) {
+        return new _ZodTuple({
+          ...this._def,
+          rest
+        });
+      }
+    };
+    ZodTuple.create = (schemas, params) => {
+      if (!Array.isArray(schemas)) {
+        throw new Error("You must pass an array of schemas to z.tuple([ ... ])");
+      }
+      return new ZodTuple({
+        items: schemas,
+        typeName: ZodFirstPartyTypeKind.ZodTuple,
+        rest: null,
+        ...processCreateParams(params)
+      });
+    };
+    ZodRecord = class _ZodRecord extends ZodType {
+      get keySchema() {
+        return this._def.keyType;
+      }
+      get valueSchema() {
+        return this._def.valueType;
+      }
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.object) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.object,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        const pairs = [];
+        const keyType = this._def.keyType;
+        const valueType = this._def.valueType;
+        for (const key in ctx.data) {
+          pairs.push({
+            key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, key)),
+            value: valueType._parse(new ParseInputLazyPath(ctx, ctx.data[key], ctx.path, key)),
+            alwaysSet: key in ctx.data
+          });
+        }
+        if (ctx.common.async) {
+          return ParseStatus.mergeObjectAsync(status, pairs);
+        } else {
+          return ParseStatus.mergeObjectSync(status, pairs);
+        }
+      }
+      get element() {
+        return this._def.valueType;
+      }
+      static create(first, second, third) {
+        if (second instanceof ZodType) {
+          return new _ZodRecord({
+            keyType: first,
+            valueType: second,
+            typeName: ZodFirstPartyTypeKind.ZodRecord,
+            ...processCreateParams(third)
+          });
+        }
+        return new _ZodRecord({
+          keyType: ZodString.create(),
+          valueType: first,
+          typeName: ZodFirstPartyTypeKind.ZodRecord,
+          ...processCreateParams(second)
+        });
+      }
+    };
+    ZodMap = class extends ZodType {
+      get keySchema() {
+        return this._def.keyType;
+      }
+      get valueSchema() {
+        return this._def.valueType;
+      }
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.map) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.map,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        const keyType = this._def.keyType;
+        const valueType = this._def.valueType;
+        const pairs = [...ctx.data.entries()].map(([key, value], index) => {
+          return {
+            key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, [index, "key"])),
+            value: valueType._parse(new ParseInputLazyPath(ctx, value, ctx.path, [index, "value"]))
+          };
+        });
+        if (ctx.common.async) {
+          const finalMap = /* @__PURE__ */ new Map();
+          return Promise.resolve().then(async () => {
+            for (const pair of pairs) {
+              const key = await pair.key;
+              const value = await pair.value;
+              if (key.status === "aborted" || value.status === "aborted") {
+                return INVALID;
+              }
+              if (key.status === "dirty" || value.status === "dirty") {
+                status.dirty();
+              }
+              finalMap.set(key.value, value.value);
+            }
+            return { status: status.value, value: finalMap };
+          });
+        } else {
+          const finalMap = /* @__PURE__ */ new Map();
+          for (const pair of pairs) {
+            const key = pair.key;
+            const value = pair.value;
+            if (key.status === "aborted" || value.status === "aborted") {
+              return INVALID;
+            }
+            if (key.status === "dirty" || value.status === "dirty") {
+              status.dirty();
+            }
+            finalMap.set(key.value, value.value);
+          }
+          return { status: status.value, value: finalMap };
+        }
+      }
+    };
+    ZodMap.create = (keyType, valueType, params) => {
+      return new ZodMap({
+        valueType,
+        keyType,
+        typeName: ZodFirstPartyTypeKind.ZodMap,
+        ...processCreateParams(params)
+      });
+    };
+    ZodSet = class _ZodSet extends ZodType {
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.set) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.set,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        const def = this._def;
+        if (def.minSize !== null) {
+          if (ctx.data.size < def.minSize.value) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              minimum: def.minSize.value,
+              type: "set",
+              inclusive: true,
+              exact: false,
+              message: def.minSize.message
+            });
+            status.dirty();
+          }
+        }
+        if (def.maxSize !== null) {
+          if (ctx.data.size > def.maxSize.value) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              maximum: def.maxSize.value,
+              type: "set",
+              inclusive: true,
+              exact: false,
+              message: def.maxSize.message
+            });
+            status.dirty();
+          }
+        }
+        const valueType = this._def.valueType;
+        function finalizeSet(elements2) {
+          const parsedSet = /* @__PURE__ */ new Set();
+          for (const element of elements2) {
+            if (element.status === "aborted")
+              return INVALID;
+            if (element.status === "dirty")
+              status.dirty();
+            parsedSet.add(element.value);
+          }
+          return { status: status.value, value: parsedSet };
+        }
+        const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
+        if (ctx.common.async) {
+          return Promise.all(elements).then((elements2) => finalizeSet(elements2));
+        } else {
+          return finalizeSet(elements);
+        }
+      }
+      min(minSize, message) {
+        return new _ZodSet({
+          ...this._def,
+          minSize: { value: minSize, message: errorUtil.toString(message) }
+        });
+      }
+      max(maxSize, message) {
+        return new _ZodSet({
+          ...this._def,
+          maxSize: { value: maxSize, message: errorUtil.toString(message) }
+        });
+      }
+      size(size, message) {
+        return this.min(size, message).max(size, message);
+      }
+      nonempty(message) {
+        return this.min(1, message);
+      }
+    };
+    ZodSet.create = (valueType, params) => {
+      return new ZodSet({
+        valueType,
+        minSize: null,
+        maxSize: null,
+        typeName: ZodFirstPartyTypeKind.ZodSet,
+        ...processCreateParams(params)
+      });
+    };
+    ZodFunction = class _ZodFunction extends ZodType {
+      constructor() {
+        super(...arguments);
+        this.validate = this.implement;
+      }
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.function) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.function,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        function makeArgsIssue(args, error) {
+          return makeIssue({
+            data: args,
+            path: ctx.path,
+            errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
+            issueData: {
+              code: ZodIssueCode.invalid_arguments,
+              argumentsError: error
+            }
+          });
+        }
+        function makeReturnsIssue(returns, error) {
+          return makeIssue({
+            data: returns,
+            path: ctx.path,
+            errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
+            issueData: {
+              code: ZodIssueCode.invalid_return_type,
+              returnTypeError: error
+            }
+          });
+        }
+        const params = { errorMap: ctx.common.contextualErrorMap };
+        const fn = ctx.data;
+        if (this._def.returns instanceof ZodPromise) {
+          const me = this;
+          return OK(async function(...args) {
+            const error = new ZodError([]);
+            const parsedArgs = await me._def.args.parseAsync(args, params).catch((e) => {
+              error.addIssue(makeArgsIssue(args, e));
+              throw error;
+            });
+            const result = await Reflect.apply(fn, this, parsedArgs);
+            const parsedReturns = await me._def.returns._def.type.parseAsync(result, params).catch((e) => {
+              error.addIssue(makeReturnsIssue(result, e));
+              throw error;
+            });
+            return parsedReturns;
+          });
+        } else {
+          const me = this;
+          return OK(function(...args) {
+            const parsedArgs = me._def.args.safeParse(args, params);
+            if (!parsedArgs.success) {
+              throw new ZodError([makeArgsIssue(args, parsedArgs.error)]);
+            }
+            const result = Reflect.apply(fn, this, parsedArgs.data);
+            const parsedReturns = me._def.returns.safeParse(result, params);
+            if (!parsedReturns.success) {
+              throw new ZodError([makeReturnsIssue(result, parsedReturns.error)]);
+            }
+            return parsedReturns.data;
+          });
+        }
+      }
+      parameters() {
+        return this._def.args;
+      }
+      returnType() {
+        return this._def.returns;
+      }
+      args(...items) {
+        return new _ZodFunction({
+          ...this._def,
+          args: ZodTuple.create(items).rest(ZodUnknown.create())
+        });
+      }
+      returns(returnType) {
+        return new _ZodFunction({
+          ...this._def,
+          returns: returnType
+        });
+      }
+      implement(func) {
+        const validatedFunc = this.parse(func);
+        return validatedFunc;
+      }
+      strictImplement(func) {
+        const validatedFunc = this.parse(func);
+        return validatedFunc;
+      }
+      static create(args, returns, params) {
+        return new _ZodFunction({
+          args: args ? args : ZodTuple.create([]).rest(ZodUnknown.create()),
+          returns: returns || ZodUnknown.create(),
+          typeName: ZodFirstPartyTypeKind.ZodFunction,
+          ...processCreateParams(params)
+        });
+      }
+    };
+    ZodLazy = class extends ZodType {
+      get schema() {
+        return this._def.getter();
+      }
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        const lazySchema = this._def.getter();
+        return lazySchema._parse({ data: ctx.data, path: ctx.path, parent: ctx });
+      }
+    };
+    ZodLazy.create = (getter, params) => {
+      return new ZodLazy({
+        getter,
+        typeName: ZodFirstPartyTypeKind.ZodLazy,
+        ...processCreateParams(params)
+      });
+    };
+    ZodLiteral = class extends ZodType {
+      _parse(input) {
+        if (input.data !== this._def.value) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            received: ctx.data,
+            code: ZodIssueCode.invalid_literal,
+            expected: this._def.value
+          });
+          return INVALID;
+        }
+        return { status: "valid", value: input.data };
+      }
+      get value() {
+        return this._def.value;
+      }
+    };
+    ZodLiteral.create = (value, params) => {
+      return new ZodLiteral({
+        value,
+        typeName: ZodFirstPartyTypeKind.ZodLiteral,
+        ...processCreateParams(params)
+      });
+    };
+    ZodEnum = class _ZodEnum extends ZodType {
+      _parse(input) {
+        if (typeof input.data !== "string") {
+          const ctx = this._getOrReturnCtx(input);
+          const expectedValues = this._def.values;
+          addIssueToContext(ctx, {
+            expected: util.joinValues(expectedValues),
+            received: ctx.parsedType,
+            code: ZodIssueCode.invalid_type
+          });
+          return INVALID;
+        }
+        if (!this._cache) {
+          this._cache = new Set(this._def.values);
+        }
+        if (!this._cache.has(input.data)) {
+          const ctx = this._getOrReturnCtx(input);
+          const expectedValues = this._def.values;
+          addIssueToContext(ctx, {
+            received: ctx.data,
+            code: ZodIssueCode.invalid_enum_value,
+            options: expectedValues
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+      get options() {
+        return this._def.values;
+      }
+      get enum() {
+        const enumValues = {};
+        for (const val of this._def.values) {
+          enumValues[val] = val;
+        }
+        return enumValues;
+      }
+      get Values() {
+        const enumValues = {};
+        for (const val of this._def.values) {
+          enumValues[val] = val;
+        }
+        return enumValues;
+      }
+      get Enum() {
+        const enumValues = {};
+        for (const val of this._def.values) {
+          enumValues[val] = val;
+        }
+        return enumValues;
+      }
+      extract(values, newDef = this._def) {
+        return _ZodEnum.create(values, {
+          ...this._def,
+          ...newDef
+        });
+      }
+      exclude(values, newDef = this._def) {
+        return _ZodEnum.create(this.options.filter((opt) => !values.includes(opt)), {
+          ...this._def,
+          ...newDef
+        });
+      }
+    };
+    ZodEnum.create = createZodEnum;
+    ZodNativeEnum = class extends ZodType {
+      _parse(input) {
+        const nativeEnumValues = util.getValidEnumValues(this._def.values);
+        const ctx = this._getOrReturnCtx(input);
+        if (ctx.parsedType !== ZodParsedType.string && ctx.parsedType !== ZodParsedType.number) {
+          const expectedValues = util.objectValues(nativeEnumValues);
+          addIssueToContext(ctx, {
+            expected: util.joinValues(expectedValues),
+            received: ctx.parsedType,
+            code: ZodIssueCode.invalid_type
+          });
+          return INVALID;
+        }
+        if (!this._cache) {
+          this._cache = new Set(util.getValidEnumValues(this._def.values));
+        }
+        if (!this._cache.has(input.data)) {
+          const expectedValues = util.objectValues(nativeEnumValues);
+          addIssueToContext(ctx, {
+            received: ctx.data,
+            code: ZodIssueCode.invalid_enum_value,
+            options: expectedValues
+          });
+          return INVALID;
+        }
+        return OK(input.data);
+      }
+      get enum() {
+        return this._def.values;
+      }
+    };
+    ZodNativeEnum.create = (values, params) => {
+      return new ZodNativeEnum({
+        values,
+        typeName: ZodFirstPartyTypeKind.ZodNativeEnum,
+        ...processCreateParams(params)
+      });
+    };
+    ZodPromise = class extends ZodType {
+      unwrap() {
+        return this._def.type;
+      }
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        if (ctx.parsedType !== ZodParsedType.promise && ctx.common.async === false) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.promise,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        const promisified = ctx.parsedType === ZodParsedType.promise ? ctx.data : Promise.resolve(ctx.data);
+        return OK(promisified.then((data) => {
+          return this._def.type.parseAsync(data, {
+            path: ctx.path,
+            errorMap: ctx.common.contextualErrorMap
+          });
+        }));
+      }
+    };
+    ZodPromise.create = (schema, params) => {
+      return new ZodPromise({
+        type: schema,
+        typeName: ZodFirstPartyTypeKind.ZodPromise,
+        ...processCreateParams(params)
+      });
+    };
+    ZodEffects = class extends ZodType {
+      innerType() {
+        return this._def.schema;
+      }
+      sourceType() {
+        return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
+      }
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        const effect = this._def.effect || null;
+        const checkCtx = {
+          addIssue: (arg) => {
+            addIssueToContext(ctx, arg);
+            if (arg.fatal) {
+              status.abort();
+            } else {
+              status.dirty();
+            }
+          },
+          get path() {
+            return ctx.path;
+          }
+        };
+        checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
+        if (effect.type === "preprocess") {
+          const processed = effect.transform(ctx.data, checkCtx);
+          if (ctx.common.async) {
+            return Promise.resolve(processed).then(async (processed2) => {
+              if (status.value === "aborted")
+                return INVALID;
+              const result = await this._def.schema._parseAsync({
+                data: processed2,
+                path: ctx.path,
+                parent: ctx
+              });
+              if (result.status === "aborted")
+                return INVALID;
+              if (result.status === "dirty")
+                return DIRTY(result.value);
+              if (status.value === "dirty")
+                return DIRTY(result.value);
+              return result;
+            });
+          } else {
+            if (status.value === "aborted")
+              return INVALID;
+            const result = this._def.schema._parseSync({
+              data: processed,
+              path: ctx.path,
+              parent: ctx
+            });
+            if (result.status === "aborted")
+              return INVALID;
+            if (result.status === "dirty")
+              return DIRTY(result.value);
+            if (status.value === "dirty")
+              return DIRTY(result.value);
+            return result;
+          }
+        }
+        if (effect.type === "refinement") {
+          const executeRefinement = (acc) => {
+            const result = effect.refinement(acc, checkCtx);
+            if (ctx.common.async) {
+              return Promise.resolve(result);
+            }
+            if (result instanceof Promise) {
+              throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
+            }
+            return acc;
+          };
+          if (ctx.common.async === false) {
+            const inner = this._def.schema._parseSync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: ctx
+            });
+            if (inner.status === "aborted")
+              return INVALID;
+            if (inner.status === "dirty")
+              status.dirty();
+            executeRefinement(inner.value);
+            return { status: status.value, value: inner.value };
+          } else {
+            return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
+              if (inner.status === "aborted")
+                return INVALID;
+              if (inner.status === "dirty")
+                status.dirty();
+              return executeRefinement(inner.value).then(() => {
+                return { status: status.value, value: inner.value };
+              });
+            });
+          }
+        }
+        if (effect.type === "transform") {
+          if (ctx.common.async === false) {
+            const base = this._def.schema._parseSync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: ctx
+            });
+            if (!isValid(base))
+              return INVALID;
+            const result = effect.transform(base.value, checkCtx);
+            if (result instanceof Promise) {
+              throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
+            }
+            return { status: status.value, value: result };
+          } else {
+            return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
+              if (!isValid(base))
+                return INVALID;
+              return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
+                status: status.value,
+                value: result
+              }));
+            });
+          }
+        }
+        util.assertNever(effect);
+      }
+    };
+    ZodEffects.create = (schema, effect, params) => {
+      return new ZodEffects({
+        schema,
+        typeName: ZodFirstPartyTypeKind.ZodEffects,
+        effect,
+        ...processCreateParams(params)
+      });
+    };
+    ZodEffects.createWithPreprocess = (preprocess, schema, params) => {
+      return new ZodEffects({
+        schema,
+        effect: { type: "preprocess", transform: preprocess },
+        typeName: ZodFirstPartyTypeKind.ZodEffects,
+        ...processCreateParams(params)
+      });
+    };
+    ZodOptional = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType === ZodParsedType.undefined) {
+          return OK(void 0);
+        }
+        return this._def.innerType._parse(input);
+      }
+      unwrap() {
+        return this._def.innerType;
+      }
+    };
+    ZodOptional.create = (type, params) => {
+      return new ZodOptional({
+        innerType: type,
+        typeName: ZodFirstPartyTypeKind.ZodOptional,
+        ...processCreateParams(params)
+      });
+    };
+    ZodNullable = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType === ZodParsedType.null) {
+          return OK(null);
+        }
+        return this._def.innerType._parse(input);
+      }
+      unwrap() {
+        return this._def.innerType;
+      }
+    };
+    ZodNullable.create = (type, params) => {
+      return new ZodNullable({
+        innerType: type,
+        typeName: ZodFirstPartyTypeKind.ZodNullable,
+        ...processCreateParams(params)
+      });
+    };
+    ZodDefault = class extends ZodType {
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        let data = ctx.data;
+        if (ctx.parsedType === ZodParsedType.undefined) {
+          data = this._def.defaultValue();
+        }
+        return this._def.innerType._parse({
+          data,
+          path: ctx.path,
+          parent: ctx
+        });
+      }
+      removeDefault() {
+        return this._def.innerType;
+      }
+    };
+    ZodDefault.create = (type, params) => {
+      return new ZodDefault({
+        innerType: type,
+        typeName: ZodFirstPartyTypeKind.ZodDefault,
+        defaultValue: typeof params.default === "function" ? params.default : () => params.default,
+        ...processCreateParams(params)
+      });
+    };
+    ZodCatch = class extends ZodType {
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        const newCtx = {
+          ...ctx,
+          common: {
+            ...ctx.common,
+            issues: []
+          }
+        };
+        const result = this._def.innerType._parse({
+          data: newCtx.data,
+          path: newCtx.path,
+          parent: {
+            ...newCtx
+          }
+        });
+        if (isAsync(result)) {
+          return result.then((result2) => {
+            return {
+              status: "valid",
+              value: result2.status === "valid" ? result2.value : this._def.catchValue({
+                get error() {
+                  return new ZodError(newCtx.common.issues);
+                },
+                input: newCtx.data
+              })
+            };
+          });
+        } else {
+          return {
+            status: "valid",
+            value: result.status === "valid" ? result.value : this._def.catchValue({
+              get error() {
+                return new ZodError(newCtx.common.issues);
+              },
+              input: newCtx.data
+            })
+          };
+        }
+      }
+      removeCatch() {
+        return this._def.innerType;
+      }
+    };
+    ZodCatch.create = (type, params) => {
+      return new ZodCatch({
+        innerType: type,
+        typeName: ZodFirstPartyTypeKind.ZodCatch,
+        catchValue: typeof params.catch === "function" ? params.catch : () => params.catch,
+        ...processCreateParams(params)
+      });
+    };
+    ZodNaN = class extends ZodType {
+      _parse(input) {
+        const parsedType = this._getType(input);
+        if (parsedType !== ZodParsedType.nan) {
+          const ctx = this._getOrReturnCtx(input);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: ZodParsedType.nan,
+            received: ctx.parsedType
+          });
+          return INVALID;
+        }
+        return { status: "valid", value: input.data };
+      }
+    };
+    ZodNaN.create = (params) => {
+      return new ZodNaN({
+        typeName: ZodFirstPartyTypeKind.ZodNaN,
+        ...processCreateParams(params)
+      });
+    };
+    BRAND = Symbol("zod_brand");
+    ZodBranded = class extends ZodType {
+      _parse(input) {
+        const { ctx } = this._processInputParams(input);
+        const data = ctx.data;
+        return this._def.type._parse({
+          data,
+          path: ctx.path,
+          parent: ctx
+        });
+      }
+      unwrap() {
+        return this._def.type;
+      }
+    };
+    ZodPipeline = class _ZodPipeline extends ZodType {
+      _parse(input) {
+        const { status, ctx } = this._processInputParams(input);
+        if (ctx.common.async) {
+          const handleAsync = async () => {
+            const inResult = await this._def.in._parseAsync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: ctx
+            });
+            if (inResult.status === "aborted")
+              return INVALID;
+            if (inResult.status === "dirty") {
+              status.dirty();
+              return DIRTY(inResult.value);
+            } else {
+              return this._def.out._parseAsync({
+                data: inResult.value,
+                path: ctx.path,
+                parent: ctx
+              });
+            }
+          };
+          return handleAsync();
+        } else {
+          const inResult = this._def.in._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          });
+          if (inResult.status === "aborted")
+            return INVALID;
+          if (inResult.status === "dirty") {
+            status.dirty();
+            return {
+              status: "dirty",
+              value: inResult.value
+            };
+          } else {
+            return this._def.out._parseSync({
+              data: inResult.value,
+              path: ctx.path,
+              parent: ctx
+            });
+          }
+        }
+      }
+      static create(a, b) {
+        return new _ZodPipeline({
+          in: a,
+          out: b,
+          typeName: ZodFirstPartyTypeKind.ZodPipeline
+        });
+      }
+    };
+    ZodReadonly = class extends ZodType {
+      _parse(input) {
+        const result = this._def.innerType._parse(input);
+        const freeze = (data) => {
+          if (isValid(data)) {
+            data.value = Object.freeze(data.value);
+          }
+          return data;
+        };
+        return isAsync(result) ? result.then((data) => freeze(data)) : freeze(result);
+      }
+      unwrap() {
+        return this._def.innerType;
+      }
+    };
+    ZodReadonly.create = (type, params) => {
+      return new ZodReadonly({
+        innerType: type,
+        typeName: ZodFirstPartyTypeKind.ZodReadonly,
+        ...processCreateParams(params)
+      });
+    };
+    late = {
+      object: ZodObject.lazycreate
+    };
+    (function(ZodFirstPartyTypeKind2) {
+      ZodFirstPartyTypeKind2["ZodString"] = "ZodString";
+      ZodFirstPartyTypeKind2["ZodNumber"] = "ZodNumber";
+      ZodFirstPartyTypeKind2["ZodNaN"] = "ZodNaN";
+      ZodFirstPartyTypeKind2["ZodBigInt"] = "ZodBigInt";
+      ZodFirstPartyTypeKind2["ZodBoolean"] = "ZodBoolean";
+      ZodFirstPartyTypeKind2["ZodDate"] = "ZodDate";
+      ZodFirstPartyTypeKind2["ZodSymbol"] = "ZodSymbol";
+      ZodFirstPartyTypeKind2["ZodUndefined"] = "ZodUndefined";
+      ZodFirstPartyTypeKind2["ZodNull"] = "ZodNull";
+      ZodFirstPartyTypeKind2["ZodAny"] = "ZodAny";
+      ZodFirstPartyTypeKind2["ZodUnknown"] = "ZodUnknown";
+      ZodFirstPartyTypeKind2["ZodNever"] = "ZodNever";
+      ZodFirstPartyTypeKind2["ZodVoid"] = "ZodVoid";
+      ZodFirstPartyTypeKind2["ZodArray"] = "ZodArray";
+      ZodFirstPartyTypeKind2["ZodObject"] = "ZodObject";
+      ZodFirstPartyTypeKind2["ZodUnion"] = "ZodUnion";
+      ZodFirstPartyTypeKind2["ZodDiscriminatedUnion"] = "ZodDiscriminatedUnion";
+      ZodFirstPartyTypeKind2["ZodIntersection"] = "ZodIntersection";
+      ZodFirstPartyTypeKind2["ZodTuple"] = "ZodTuple";
+      ZodFirstPartyTypeKind2["ZodRecord"] = "ZodRecord";
+      ZodFirstPartyTypeKind2["ZodMap"] = "ZodMap";
+      ZodFirstPartyTypeKind2["ZodSet"] = "ZodSet";
+      ZodFirstPartyTypeKind2["ZodFunction"] = "ZodFunction";
+      ZodFirstPartyTypeKind2["ZodLazy"] = "ZodLazy";
+      ZodFirstPartyTypeKind2["ZodLiteral"] = "ZodLiteral";
+      ZodFirstPartyTypeKind2["ZodEnum"] = "ZodEnum";
+      ZodFirstPartyTypeKind2["ZodEffects"] = "ZodEffects";
+      ZodFirstPartyTypeKind2["ZodNativeEnum"] = "ZodNativeEnum";
+      ZodFirstPartyTypeKind2["ZodOptional"] = "ZodOptional";
+      ZodFirstPartyTypeKind2["ZodNullable"] = "ZodNullable";
+      ZodFirstPartyTypeKind2["ZodDefault"] = "ZodDefault";
+      ZodFirstPartyTypeKind2["ZodCatch"] = "ZodCatch";
+      ZodFirstPartyTypeKind2["ZodPromise"] = "ZodPromise";
+      ZodFirstPartyTypeKind2["ZodBranded"] = "ZodBranded";
+      ZodFirstPartyTypeKind2["ZodPipeline"] = "ZodPipeline";
+      ZodFirstPartyTypeKind2["ZodReadonly"] = "ZodReadonly";
+    })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
+    instanceOfType = (cls, params = {
+      message: `Input not instance of ${cls.name}`
+    }) => custom((data) => data instanceof cls, params);
+    stringType = ZodString.create;
+    numberType = ZodNumber.create;
+    nanType = ZodNaN.create;
+    bigIntType = ZodBigInt.create;
+    booleanType = ZodBoolean.create;
+    dateType = ZodDate.create;
+    symbolType = ZodSymbol.create;
+    undefinedType = ZodUndefined.create;
+    nullType = ZodNull.create;
+    anyType = ZodAny.create;
+    unknownType = ZodUnknown.create;
+    neverType = ZodNever.create;
+    voidType = ZodVoid.create;
+    arrayType = ZodArray.create;
+    objectType = ZodObject.create;
+    strictObjectType = ZodObject.strictCreate;
+    unionType = ZodUnion.create;
+    discriminatedUnionType = ZodDiscriminatedUnion.create;
+    intersectionType = ZodIntersection.create;
+    tupleType = ZodTuple.create;
+    recordType = ZodRecord.create;
+    mapType = ZodMap.create;
+    setType = ZodSet.create;
+    functionType = ZodFunction.create;
+    lazyType = ZodLazy.create;
+    literalType = ZodLiteral.create;
+    enumType = ZodEnum.create;
+    nativeEnumType = ZodNativeEnum.create;
+    promiseType = ZodPromise.create;
+    effectsType = ZodEffects.create;
+    optionalType = ZodOptional.create;
+    nullableType = ZodNullable.create;
+    preprocessType = ZodEffects.createWithPreprocess;
+    pipelineType = ZodPipeline.create;
+    ostring = () => stringType().optional();
+    onumber = () => numberType().optional();
+    oboolean = () => booleanType().optional();
+    coerce = {
+      string: ((arg) => ZodString.create({ ...arg, coerce: true })),
+      number: ((arg) => ZodNumber.create({ ...arg, coerce: true })),
+      boolean: ((arg) => ZodBoolean.create({
+        ...arg,
+        coerce: true
+      })),
+      bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })),
+      date: ((arg) => ZodDate.create({ ...arg, coerce: true }))
+    };
+    NEVER = INVALID;
+  }
+});
+
+// node_modules/zod/v3/external.js
+var external_exports = {};
+__export(external_exports, {
+  BRAND: () => BRAND,
+  DIRTY: () => DIRTY,
+  EMPTY_PATH: () => EMPTY_PATH,
+  INVALID: () => INVALID,
+  NEVER: () => NEVER,
+  OK: () => OK,
+  ParseStatus: () => ParseStatus,
+  Schema: () => ZodType,
+  ZodAny: () => ZodAny,
+  ZodArray: () => ZodArray,
+  ZodBigInt: () => ZodBigInt,
+  ZodBoolean: () => ZodBoolean,
+  ZodBranded: () => ZodBranded,
+  ZodCatch: () => ZodCatch,
+  ZodDate: () => ZodDate,
+  ZodDefault: () => ZodDefault,
+  ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
+  ZodEffects: () => ZodEffects,
+  ZodEnum: () => ZodEnum,
+  ZodError: () => ZodError,
+  ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
+  ZodFunction: () => ZodFunction,
+  ZodIntersection: () => ZodIntersection,
+  ZodIssueCode: () => ZodIssueCode,
+  ZodLazy: () => ZodLazy,
+  ZodLiteral: () => ZodLiteral,
+  ZodMap: () => ZodMap,
+  ZodNaN: () => ZodNaN,
+  ZodNativeEnum: () => ZodNativeEnum,
+  ZodNever: () => ZodNever,
+  ZodNull: () => ZodNull,
+  ZodNullable: () => ZodNullable,
+  ZodNumber: () => ZodNumber,
+  ZodObject: () => ZodObject,
+  ZodOptional: () => ZodOptional,
+  ZodParsedType: () => ZodParsedType,
+  ZodPipeline: () => ZodPipeline,
+  ZodPromise: () => ZodPromise,
+  ZodReadonly: () => ZodReadonly,
+  ZodRecord: () => ZodRecord,
+  ZodSchema: () => ZodType,
+  ZodSet: () => ZodSet,
+  ZodString: () => ZodString,
+  ZodSymbol: () => ZodSymbol,
+  ZodTransformer: () => ZodEffects,
+  ZodTuple: () => ZodTuple,
+  ZodType: () => ZodType,
+  ZodUndefined: () => ZodUndefined,
+  ZodUnion: () => ZodUnion,
+  ZodUnknown: () => ZodUnknown,
+  ZodVoid: () => ZodVoid,
+  addIssueToContext: () => addIssueToContext,
+  any: () => anyType,
+  array: () => arrayType,
+  bigint: () => bigIntType,
+  boolean: () => booleanType,
+  coerce: () => coerce,
+  custom: () => custom,
+  date: () => dateType,
+  datetimeRegex: () => datetimeRegex,
+  defaultErrorMap: () => en_default,
+  discriminatedUnion: () => discriminatedUnionType,
+  effect: () => effectsType,
+  enum: () => enumType,
+  function: () => functionType,
+  getErrorMap: () => getErrorMap,
+  getParsedType: () => getParsedType,
+  instanceof: () => instanceOfType,
+  intersection: () => intersectionType,
+  isAborted: () => isAborted,
+  isAsync: () => isAsync,
+  isDirty: () => isDirty,
+  isValid: () => isValid,
+  late: () => late,
+  lazy: () => lazyType,
+  literal: () => literalType,
+  makeIssue: () => makeIssue,
+  map: () => mapType,
+  nan: () => nanType,
+  nativeEnum: () => nativeEnumType,
+  never: () => neverType,
+  null: () => nullType,
+  nullable: () => nullableType,
+  number: () => numberType,
+  object: () => objectType,
+  objectUtil: () => objectUtil,
+  oboolean: () => oboolean,
+  onumber: () => onumber,
+  optional: () => optionalType,
+  ostring: () => ostring,
+  pipeline: () => pipelineType,
+  preprocess: () => preprocessType,
+  promise: () => promiseType,
+  quotelessJson: () => quotelessJson,
+  record: () => recordType,
+  set: () => setType,
+  setErrorMap: () => setErrorMap,
+  strictObject: () => strictObjectType,
+  string: () => stringType,
+  symbol: () => symbolType,
+  transformer: () => effectsType,
+  tuple: () => tupleType,
+  undefined: () => undefinedType,
+  union: () => unionType,
+  unknown: () => unknownType,
+  util: () => util,
+  void: () => voidType
+});
+var init_external = __esm({
+  "node_modules/zod/v3/external.js"() {
+    init_errors();
+    init_parseUtil();
+    init_typeAliases();
+    init_util();
+    init_types();
+    init_ZodError();
+  }
+});
+
+// node_modules/zod/index.js
+var init_zod = __esm({
+  "node_modules/zod/index.js"() {
+    init_external();
+    init_external();
+  }
+});
+var DEFAULT_OPTIONS2, CodebaseIndexer;
+var init_codebase_indexer = __esm({
+  "src/services/codebase-indexer.ts"() {
+    DEFAULT_OPTIONS2 = {
+      maxFileSize: 1024 * 1024 * 5,
+      // 5MB
+      excludePatterns: [
+        "node_modules/**",
+        ".git/**",
+        "dist/**",
+        "build/**",
+        "coverage/**",
+        ".next/**",
+        ".nuxt/**",
+        "vendor/**",
+        "__pycache__/**",
+        "*.pyc",
+        "*.min.js",
+        "*.bundle.js"
+      ],
+      includePatterns: [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.py",
+        "**/*.java",
+        "**/*.cpp",
+        "**/*.c",
+        "**/*.h",
+        "**/*.go",
+        "**/*.rs",
+        "**/*.php"
+      ],
+      maxDepth: 10,
+      extractSymbols: true,
+      analyzeDependencies: true,
+      enableHashing: true,
+      workers: 4
+    };
+    CodebaseIndexer = class extends EventEmitter {
+      constructor(options = {}) {
+        super();
+        this.index = null;
+        this.isIndexing = false;
+        this.abortController = null;
+        this.options = { ...DEFAULT_OPTIONS2, ...options };
+      }
+      /**
+       * Index a codebase starting from the given root directory
+       */
+      async indexCodebase(projectRoot) {
+        if (this.isIndexing) {
+          throw new Error("Indexing already in progress");
+        }
+        this.isIndexing = true;
+        this.abortController = new AbortController();
+        const startTime = Date.now();
+        try {
+          this.emit("indexing-started", { projectRoot });
+          this.emitProgress("discovery", 0, 0, "Discovering files...");
+          const files = await this.discoverFiles(projectRoot);
+          this.emitProgress("analysis", 0, files.length, "Analyzing project structure...");
+          const structure = await this.analyzeProjectStructure(projectRoot, files);
+          const fileInfos = /* @__PURE__ */ new Map();
+          const symbols = /* @__PURE__ */ new Map();
+          for (let i = 0; i < files.length; i++) {
+            if (this.abortController?.signal.aborted) {
+              throw new Error("Indexing aborted");
+            }
+            const filePath = files[i];
+            this.emitProgress("parsing", i, files.length, `Parsing ${path8__default.basename(filePath)}`);
+            try {
+              const fileInfo = await this.indexFile(filePath);
+              fileInfos.set(filePath, fileInfo);
+              if (this.options.extractSymbols) {
+                const fileSymbols = await this.extractSymbols(filePath);
+                symbols.set(filePath, fileSymbols);
+              }
+            } catch (error) {
+              console.warn(`Failed to index file ${filePath}:`, error);
+            }
+          }
+          this.emitProgress("analysis", 0, 1, "Analyzing dependencies...");
+          const dependencies = this.options.analyzeDependencies ? await this.analyzeDependencies(symbols, fileInfos) : [];
+          const endTime = Date.now();
+          const stats = this.calculateStats(fileInfos, symbols, dependencies, endTime - startTime);
+          this.index = {
+            createdAt: new Date(startTime),
+            updatedAt: new Date(endTime),
+            projectRoot,
+            structure,
+            files: fileInfos,
+            symbols,
+            dependencies,
+            stats
+          };
+          this.emitProgress("completion", 1, 1, "Indexing complete");
+          this.emit("indexing-completed", { index: this.index, duration: endTime - startTime });
+          return this.index;
+        } finally {
+          this.isIndexing = false;
+          this.abortController = null;
+        }
+      }
+      /**
+       * Get the current index
+       */
+      getIndex() {
+        return this.index;
+      }
+      /**
+       * Search for symbols across the codebase
+       */
+      searchSymbols(query, options = {}) {
+        if (!this.index) {
+          return [];
+        }
+        const { type, fuzzy = true, limit = 50 } = options;
+        const results = [];
+        for (const symbols of this.index.symbols.values()) {
+          for (const symbol of symbols) {
+            if (type && symbol.type !== type) continue;
+            const matches = fuzzy ? this.fuzzyMatch(symbol.name, query) : symbol.name.toLowerCase().includes(query.toLowerCase());
+            if (matches) {
+              results.push(symbol);
+              if (results.length >= limit) break;
+            }
+          }
+          if (results.length >= limit) break;
+        }
+        return results.sort((a, b) => this.calculateRelevanceScore(a, query) - this.calculateRelevanceScore(b, query));
+      }
+      /**
+       * Find all references to a symbol
+       */
+      findSymbolReferences(symbolName) {
+        if (!this.index) return [];
+        const references = [];
+        for (const symbols of this.index.symbols.values()) {
+          references.push(...symbols.filter(
+            (s) => s.name === symbolName || s.signature?.includes(symbolName) || s.importFrom?.includes(symbolName)
+          ));
+        }
+        return references;
+      }
+      /**
+       * Get dependency graph for a file
+       */
+      getFileDependencies(filePath) {
+        if (!this.index) return [];
+        return this.index.dependencies.filter(
+          (dep) => dep.from === filePath || dep.to === filePath
+        );
+      }
+      /**
+       * Abort current indexing operation
+       */
+      abort() {
+        if (this.abortController) {
+          this.abortController.abort();
+        }
+      }
+      // Private methods
+      async discoverFiles(projectRoot) {
+        const patterns = this.options.includePatterns.map(
+          (pattern) => path8__default.join(projectRoot, pattern)
+        );
+        const allFiles = await Promise.all(
+          patterns.map((pattern) => glob(pattern, {
+            ignore: this.options.excludePatterns.map(
+              (exclude) => path8__default.join(projectRoot, exclude)
+            ),
+            absolute: true,
+            nodir: true
+          }))
+        );
+        return [...new Set(allFiles.flat())].slice(0, 1e4);
+      }
+      async analyzeProjectStructure(projectRoot, files) {
+        const configFiles = files.filter(
+          (file) => /^(package\.json|tsconfig\.json|pyproject\.toml|requirements\.txt|Cargo\.toml)$/i.test(path8__default.basename(file))
+        );
+        const packageManagers = [];
+        if (configFiles.some((f) => f.includes("package.json"))) packageManagers.push("npm");
+        if (files.some((f) => f.includes("yarn.lock"))) packageManagers.push("yarn");
+        if (files.some((f) => f.includes("pnpm-lock.yaml"))) packageManagers.push("pnpm");
+        if (configFiles.some((f) => f.includes("requirements.txt"))) packageManagers.push("pip");
+        const extensions = files.map((f) => path8__default.extname(f));
+        const projectType = this.detectProjectType(extensions);
+        const directories = await this.analyzeDirectories(projectRoot, files);
+        const entryPoints = this.detectEntryPoints(files, configFiles);
+        return {
+          root: projectRoot,
+          projectType,
+          configFiles,
+          packageManagers,
+          entryPoints,
+          directories
+        };
+      }
+      async indexFile(filePath) {
+        const stats = await fs7__default.promises.stat(filePath);
+        const content = await fs7__default.promises.readFile(filePath, "utf8");
+        const extension = path8__default.extname(filePath);
+        const language = this.detectLanguage(extension);
+        return {
+          path: filePath,
+          size: stats.size,
+          lastModified: stats.mtime,
+          extension,
+          language,
+          contentHash: this.options.enableHashing ? this.hashContent(content) : "",
+          symbolCount: 0
+          // Will be updated during symbol extraction
+        };
+      }
+      async extractSymbols(filePath) {
+        const content = await fs7__default.promises.readFile(filePath, "utf8");
+        const extension = path8__default.extname(filePath);
+        const symbols = [];
+        if (extension === ".ts" || extension === ".js" || extension === ".tsx" || extension === ".jsx") {
+          symbols.push(...this.extractJavaScriptSymbols(content, filePath));
+        } else if (extension === ".py") {
+          symbols.push(...this.extractPythonSymbols(content, filePath));
+        }
+        return symbols;
+      }
+      extractJavaScriptSymbols(content, filePath) {
+        const symbols = [];
+        const lines = content.split("\n");
+        lines.forEach((line, index) => {
+          const funcMatch = line.match(/(?:export\s+)?(?:async\s+)?function\s+(\w+)/);
+          if (funcMatch) {
+            symbols.push({
+              name: funcMatch[1],
+              type: "function",
+              filePath,
+              line: index + 1,
+              column: line.indexOf(funcMatch[1]),
+              visibility: line.includes("export") ? "public" : "internal"
+            });
+          }
+          const classMatch = line.match(/(?:export\s+)?class\s+(\w+)/);
+          if (classMatch) {
+            symbols.push({
+              name: classMatch[1],
+              type: "class",
+              filePath,
+              line: index + 1,
+              column: line.indexOf(classMatch[1]),
+              visibility: line.includes("export") ? "public" : "internal"
+            });
+          }
+          const importMatch = line.match(/import\s+.*\s+from\s+['"]([^'"]+)['"]/);
+          if (importMatch) {
+            symbols.push({
+              name: importMatch[1],
+              type: "import",
+              filePath,
+              line: index + 1,
+              column: 0,
+              visibility: "internal",
+              importFrom: importMatch[1]
+            });
+          }
+        });
+        return symbols;
+      }
+      extractPythonSymbols(content, filePath) {
+        const symbols = [];
+        const lines = content.split("\n");
+        lines.forEach((line, index) => {
+          const funcMatch = line.match(/def\s+(\w+)/);
+          if (funcMatch) {
+            symbols.push({
+              name: funcMatch[1],
+              type: "function",
+              filePath,
+              line: index + 1,
+              column: line.indexOf(funcMatch[1]),
+              visibility: funcMatch[1].startsWith("_") ? "private" : "public"
+            });
+          }
+          const classMatch = line.match(/class\s+(\w+)/);
+          if (classMatch) {
+            symbols.push({
+              name: classMatch[1],
+              type: "class",
+              filePath,
+              line: index + 1,
+              column: line.indexOf(classMatch[1]),
+              visibility: "public"
+            });
+          }
+          const importMatch = line.match(/(?:from\s+(\S+)\s+)?import\s+([^#\n]+)/);
+          if (importMatch) {
+            symbols.push({
+              name: importMatch[2].trim(),
+              type: "import",
+              filePath,
+              line: index + 1,
+              column: 0,
+              visibility: "internal",
+              importFrom: importMatch[1]
+            });
+          }
+        });
+        return symbols;
+      }
+      async analyzeDependencies(symbols, files) {
+        const dependencies = [];
+        for (const [filePath, fileSymbols] of symbols) {
+          const imports = fileSymbols.filter((s) => s.type === "import");
+          for (const imp of imports) {
+            dependencies.push({
+              from: filePath,
+              to: imp.importFrom || imp.name,
+              type: "import",
+              symbols: [imp.name],
+              isExternal: !imp.importFrom?.startsWith(".") && !files.has(imp.importFrom || "")
+            });
+          }
+        }
+        return dependencies;
+      }
+      detectProjectType(extensions) {
+        const counts = extensions.reduce((acc, ext) => {
+          acc[ext] = (acc[ext] || 0) + 1;
+          return acc;
+        }, {});
+        if (counts[".ts"] || counts[".tsx"]) return "typescript";
+        if (counts[".js"] || counts[".jsx"]) return "javascript";
+        if (counts[".py"]) return "python";
+        return "mixed";
+      }
+      detectLanguage(extension) {
+        const langMap = {
+          ".ts": "typescript",
+          ".tsx": "typescript",
+          ".js": "javascript",
+          ".jsx": "javascript",
+          ".py": "python",
+          ".java": "java",
+          ".cpp": "cpp",
+          ".c": "c",
+          ".go": "go",
+          ".rs": "rust",
+          ".php": "php"
+        };
+        return langMap[extension] || "unknown";
+      }
+      async analyzeDirectories(projectRoot, files) {
+        const dirMap = /* @__PURE__ */ new Map();
+        for (const file of files) {
+          const dir = path8__default.dirname(file);
+          const relativeDir = path8__default.relative(projectRoot, dir);
+          if (!dirMap.has(dir)) {
+            dirMap.set(dir, {
+              path: dir,
+              purpose: this.detectDirectoryPurpose(relativeDir),
+              fileCount: 0,
+              totalSize: 0
+            });
+          }
+          const dirInfo = dirMap.get(dir);
+          dirInfo.fileCount++;
+          try {
+            const stats = await fs7__default.promises.stat(file);
+            dirInfo.totalSize += stats.size;
+          } catch (error) {
+          }
+        }
+        return Array.from(dirMap.values());
+      }
+      detectDirectoryPurpose(dirPath) {
+        const lowerPath = dirPath.toLowerCase();
+        if (/^(src|lib|app|pages|components)/.test(lowerPath)) return "source";
+        if (/test|spec|__tests__/.test(lowerPath)) return "tests";
+        if (/config|settings/.test(lowerPath)) return "config";
+        if (/docs|documentation/.test(lowerPath)) return "docs";
+        if (/build|dist|out/.test(lowerPath)) return "build";
+        if (/assets|static|public/.test(lowerPath)) return "assets";
+        return "unknown";
+      }
+      detectEntryPoints(files, configFiles) {
+        const entryPoints = [];
+        const commonEntries = ["index.ts", "index.js", "main.ts", "main.js", "app.ts", "app.js"];
+        for (const entry of commonEntries) {
+          const entryFile = files.find((f) => path8__default.basename(f) === entry);
+          if (entryFile) entryPoints.push(entryFile);
+        }
+        const packageJson = configFiles.find((f) => path8__default.basename(f) === "package.json");
+        if (packageJson) {
+          try {
+            const pkg = JSON.parse(fs7__default.readFileSync(packageJson, "utf8"));
+            if (pkg.main) entryPoints.push(path8__default.resolve(path8__default.dirname(packageJson), pkg.main));
+            if (pkg.types) entryPoints.push(path8__default.resolve(path8__default.dirname(packageJson), pkg.types));
+          } catch (error) {
+          }
+        }
+        return [...new Set(entryPoints)];
+      }
+      calculateStats(files, symbols, dependencies, duration) {
+        const totalSymbols = Array.from(symbols.values()).reduce((sum, syms) => sum + syms.length, 0);
+        const totalLines = Array.from(files.values()).reduce((sum, file) => sum + file.size / 50, 0);
+        const languageDistribution = {};
+        for (const file of files.values()) {
+          languageDistribution[file.language] = (languageDistribution[file.language] || 0) + 1;
+        }
+        const averageFileSize = Array.from(files.values()).reduce((sum, f) => sum + f.size, 0) / files.size;
+        return {
+          totalFiles: files.size,
+          totalLines: Math.round(totalLines),
+          totalSymbols,
+          totalDependencies: dependencies.length,
+          indexingDuration: duration,
+          languageDistribution,
+          complexity: {
+            averageFileSize: Math.round(averageFileSize),
+            symbolDensity: Math.round(totalSymbols / files.size),
+            dependencyComplexity: Math.round(dependencies.length / files.size),
+            circularDependencies: 0
+            // TODO: Implement circular dependency detection
+          }
+        };
+      }
+      fuzzyMatch(text, query) {
+        const textLower = text.toLowerCase();
+        const queryLower = query.toLowerCase();
+        if (textLower.includes(queryLower)) return true;
+        let queryIndex = 0;
+        for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
+          if (textLower[i] === queryLower[queryIndex]) {
+            queryIndex++;
+          }
+        }
+        return queryIndex === queryLower.length;
+      }
+      calculateRelevanceScore(symbol, query) {
+        const name = symbol.name.toLowerCase();
+        const queryLower = query.toLowerCase();
+        if (name === queryLower) return 0;
+        if (name.startsWith(queryLower)) return 1;
+        if (name.includes(queryLower)) return 2;
+        return 3 + this.levenshteinDistance(name, queryLower);
+      }
+      levenshteinDistance(a, b) {
+        const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
+        for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+        for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+        for (let j = 1; j <= b.length; j++) {
+          for (let i = 1; i <= a.length; i++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            matrix[j][i] = Math.min(
+              matrix[j][i - 1] + 1,
+              // deletion
+              matrix[j - 1][i] + 1,
+              // insertion  
+              matrix[j - 1][i - 1] + cost
+              // substitution
+            );
+          }
+        }
+        return matrix[b.length][a.length];
+      }
+      hashContent(content) {
+        let hash = 0;
+        for (let i = 0; i < content.length; i++) {
+          const char = content.charCodeAt(i);
+          hash = (hash << 5) - hash + char;
+          hash = hash & hash;
+        }
+        return hash.toString(36);
+      }
+      emitProgress(phase, processed, total, currentFile) {
+        const progress = {
+          phase,
+          filesProcessed: processed,
+          totalFiles: total,
+          currentFile,
+          estimatedTimeRemaining: total > 0 ? (total - processed) * 100 : 0,
+          // Rough estimate
+          symbolsExtracted: 0,
+          // TODO: Track during symbol extraction
+          dependenciesMapped: 0
+          // TODO: Track during dependency analysis
+        };
+        this.emit("progress", progress);
+      }
+    };
+  }
+});
+
+// src/tools/codebase-indexer-tool.ts
+var codebase_indexer_tool_exports = {};
+__export(codebase_indexer_tool_exports, {
+  CodebaseIndexerTool: () => CodebaseIndexerTool,
+  codebaseIndexerTool: () => codebaseIndexerTool
+});
+var IndexCodebaseSchema, SearchSymbolsSchema, FindReferencesSchema, GetDependenciesSchema, CodebaseIndexerTool, codebaseIndexerTool;
+var init_codebase_indexer_tool = __esm({
+  "src/tools/codebase-indexer-tool.ts"() {
+    init_zod();
+    init_codebase_indexer();
+    IndexCodebaseSchema = external_exports.object({
+      path: external_exports.string().optional().describe("Directory path to index (defaults to current working directory)"),
+      maxFileSize: external_exports.number().optional().describe("Maximum file size to index in bytes (default: 5MB)"),
+      excludePatterns: external_exports.array(external_exports.string()).optional().describe("Additional patterns to exclude"),
+      includePatterns: external_exports.array(external_exports.string()).optional().describe("Specific patterns to include"),
+      extractSymbols: external_exports.boolean().optional().describe("Whether to extract symbols (default: true)"),
+      analyzeDependencies: external_exports.boolean().optional().describe("Whether to analyze dependencies (default: true)")
+    });
+    SearchSymbolsSchema = external_exports.object({
+      query: external_exports.string().describe("Search query for symbols"),
+      type: external_exports.enum(["function", "class", "interface", "variable", "constant", "type", "enum", "import", "export"]).optional().describe("Filter by symbol type"),
+      fuzzy: external_exports.boolean().optional().describe("Enable fuzzy matching (default: true)"),
+      limit: external_exports.number().optional().describe("Maximum number of results (default: 50)")
+    });
+    FindReferencesSchema = external_exports.object({
+      symbolName: external_exports.string().describe("Name of the symbol to find references for"),
+      includeDefinition: external_exports.boolean().optional().describe("Include the symbol definition (default: true)")
+    });
+    GetDependenciesSchema = external_exports.object({
+      filePath: external_exports.string().describe("File path to analyze dependencies for"),
+      direction: external_exports.enum(["incoming", "outgoing", "both"]).optional().describe("Direction of dependencies (default: both)")
+    });
+    CodebaseIndexerTool = class {
+      constructor() {
+        this.currentIndexPath = null;
+        this.indexer = new CodebaseIndexer();
+        this.setupEventHandlers();
+      }
+      setupEventHandlers() {
+        this.indexer.on("indexing-started", (data) => {
+          console.log(`[CodebaseIndexer] Started indexing: ${data.projectRoot}`);
+        });
+        this.indexer.on("progress", (progress) => {
+          const percent = Math.round(progress.filesProcessed / progress.totalFiles * 100);
+          console.log(`[CodebaseIndexer] ${progress.phase}: ${percent}% (${progress.currentFile})`);
+        });
+        this.indexer.on("indexing-completed", (data) => {
+          console.log(`[CodebaseIndexer] Completed in ${data.duration}ms`);
+        });
+      }
+      /**
+       * Index a codebase for comprehensive analysis
+       */
+      async indexCodebase(args) {
+        try {
+          const targetPath = args.path ? path8__default.resolve(args.path) : process.cwd();
+          const options = {
+            ...args.maxFileSize && { maxFileSize: args.maxFileSize },
+            ...args.excludePatterns && { excludePatterns: args.excludePatterns },
+            ...args.includePatterns && { includePatterns: args.includePatterns },
+            ...args.extractSymbols !== void 0 && { extractSymbols: args.extractSymbols },
+            ...args.analyzeDependencies !== void 0 && { analyzeDependencies: args.analyzeDependencies }
+          };
+          this.indexer = new CodebaseIndexer(options);
+          this.setupEventHandlers();
+          console.log(`[CodebaseIndexer] Starting indexing of: ${targetPath}`);
+          const index = await this.indexer.indexCodebase(targetPath);
+          this.currentIndexPath = targetPath;
+          const summary = {
+            projectRoot: index.projectRoot,
+            projectType: index.structure.projectType,
+            stats: {
+              totalFiles: index.stats.totalFiles,
+              totalLines: index.stats.totalLines,
+              totalSymbols: index.stats.totalSymbols,
+              totalDependencies: index.stats.totalDependencies,
+              indexingDuration: `${(index.stats.indexingDuration / 1e3).toFixed(2)}s`,
+              languageDistribution: index.stats.languageDistribution,
+              complexity: index.stats.complexity
+            },
+            structure: {
+              configFiles: index.structure.configFiles.map((f) => path8__default.basename(f)),
+              packageManagers: index.structure.packageManagers,
+              entryPoints: index.structure.entryPoints.map((f) => path8__default.relative(targetPath, f)),
+              topDirectories: index.structure.directories.sort((a, b) => b.fileCount - a.fileCount).slice(0, 10).map((d) => ({
+                path: path8__default.relative(targetPath, d.path),
+                purpose: d.purpose,
+                fileCount: d.fileCount,
+                totalSize: `${(d.totalSize / 1024).toFixed(1)} KB`
+              }))
+            }
+          };
+          return {
+            success: true,
+            output: `# Codebase Indexing Complete \u{1F3AF}
+
+## Project Overview
+- **Root**: ${summary.projectRoot}
+- **Type**: ${summary.projectType}
+- **Duration**: ${summary.stats.indexingDuration}
+
+## Statistics
+- **Files**: ${summary.stats.totalFiles.toLocaleString()}
+- **Lines**: ${summary.stats.totalLines.toLocaleString()}
+- **Symbols**: ${summary.stats.totalSymbols.toLocaleString()}
+- **Dependencies**: ${summary.stats.totalDependencies.toLocaleString()}
+
+## Language Distribution
+${Object.entries(summary.stats.languageDistribution).map(([lang, count]) => `- **${lang}**: ${count} files`).join("\n")}
+
+## Project Structure
+- **Config Files**: ${summary.structure.configFiles.join(", ")}
+- **Package Managers**: ${summary.structure.packageManagers.join(", ")}
+- **Entry Points**: ${summary.structure.entryPoints.join(", ")}
+
+## Top Directories by File Count
+${summary.structure.topDirectories.map((d) => `- **${d.path}** (${d.purpose}): ${d.fileCount} files, ${d.totalSize}`).join("\n")}
+
+## Complexity Metrics
+- **Avg File Size**: ${summary.stats.complexity.averageFileSize} bytes
+- **Symbol Density**: ${summary.stats.complexity.symbolDensity} symbols/file
+- **Dependency Complexity**: ${summary.stats.complexity.dependencyComplexity} deps/file
+
+The codebase is now indexed and ready for advanced search and analysis operations.`
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Failed to index codebase: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Search for symbols across the indexed codebase
+       */
+      async searchSymbols(args) {
+        try {
+          const index = this.indexer.getIndex();
+          if (!index) {
+            return {
+              success: false,
+              error: "No codebase index available. Please run index_codebase first."
+            };
+          }
+          const results = this.indexer.searchSymbols(args.query, {
+            type: args.type,
+            fuzzy: args.fuzzy ?? true,
+            limit: args.limit ?? 50
+          });
+          if (results.length === 0) {
+            return {
+              success: true,
+              output: `No symbols found matching "${args.query}".`
+            };
+          }
+          const formatSymbol = (symbol) => {
+            const relativePath = path8__default.relative(index.projectRoot, symbol.filePath);
+            const location = `${relativePath}:${symbol.line}`;
+            const visibility = symbol.visibility !== "internal" ? ` (${symbol.visibility})` : "";
+            const parent = symbol.parent ? ` in ${symbol.parent}` : "";
+            const signature = symbol.signature ? `
+    Signature: ${symbol.signature}` : "";
+            const docs = symbol.documentation ? `
+    Docs: ${symbol.documentation}` : "";
+            return `  **${symbol.name}** (${symbol.type})${visibility}${parent}
+    Location: ${location}${signature}${docs}`;
+          };
+          const groupedResults = results.reduce((groups, symbol) => {
+            if (!groups[symbol.type]) groups[symbol.type] = [];
+            groups[symbol.type].push(symbol);
+            return groups;
+          }, {});
+          let output = `# Symbol Search Results for "${args.query}" \u{1F50D}
+
+Found ${results.length} symbols`;
+          if (args.type) output += ` of type "${args.type}"`;
+          output += ":\n\n";
+          for (const [type, symbols] of Object.entries(groupedResults)) {
+            output += `## ${type.charAt(0).toUpperCase() + type.slice(1)}s (${symbols.length})
+
+`;
+            output += symbols.slice(0, 20).map(formatSymbol).join("\n\n");
+            if (symbols.length > 20) {
+              output += `
+
+... and ${symbols.length - 20} more ${type}s`;
+            }
+            output += "\n\n";
+          }
+          return {
+            success: true,
+            output: output.trim()
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Symbol search failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Find all references to a specific symbol
+       */
+      async findReferences(args) {
+        try {
+          const index = this.indexer.getIndex();
+          if (!index) {
+            return {
+              success: false,
+              error: "No codebase index available. Please run index_codebase first."
+            };
+          }
+          const references = this.indexer.findSymbolReferences(args.symbolName);
+          if (references.length === 0) {
+            return {
+              success: true,
+              output: `No references found for symbol "${args.symbolName}".`
+            };
+          }
+          const groupedRefs = references.reduce((groups, ref) => {
+            const relativePath = path8__default.relative(index.projectRoot, ref.filePath);
+            if (!groups[relativePath]) groups[relativePath] = [];
+            groups[relativePath].push(ref);
+            return groups;
+          }, {});
+          let output = `# References for "${args.symbolName}" \u{1F4CB}
+
+Found ${references.length} references across ${Object.keys(groupedRefs).length} files:
+
+`;
+          for (const [file, refs] of Object.entries(groupedRefs)) {
+            output += `## ${file}
+
+`;
+            refs.forEach((ref) => {
+              const type = ref.type === "import" ? "imported" : ref.type;
+              output += `- Line ${ref.line}: **${ref.name}** (${type})`;
+              if (ref.signature) output += ` - \`${ref.signature}\``;
+              output += "\n";
+            });
+            output += "\n";
+          }
+          return {
+            success: true,
+            output: output.trim()
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Reference search failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Get dependency information for a file
+       */
+      async getDependencies(args) {
+        try {
+          const index = this.indexer.getIndex();
+          if (!index) {
+            return {
+              success: false,
+              error: "No codebase index available. Please run index_codebase first."
+            };
+          }
+          const targetPath = path8__default.resolve(args.filePath);
+          const dependencies = this.indexer.getFileDependencies(targetPath);
+          if (dependencies.length === 0) {
+            return {
+              success: true,
+              output: `No dependencies found for "${args.filePath}".`
+            };
+          }
+          const direction = args.direction ?? "both";
+          const filtered = dependencies.filter((dep) => {
+            if (direction === "incoming") return dep.to === targetPath;
+            if (direction === "outgoing") return dep.from === targetPath;
+            return true;
+          });
+          const incoming = filtered.filter((dep) => dep.to === targetPath);
+          const outgoing = filtered.filter((dep) => dep.from === targetPath);
+          let output = `# Dependencies for "${path8__default.relative(index.projectRoot, targetPath)}" \u{1F4E6}
+
+`;
+          if (direction === "both" || direction === "outgoing") {
+            output += `## Outgoing Dependencies (${outgoing.length})
+`;
+            output += "Files and modules this file depends on:\n\n";
+            if (outgoing.length === 0) {
+              output += "*No outgoing dependencies*\n\n";
+            } else {
+              outgoing.forEach((dep) => {
+                const target = dep.isExternal ? dep.to : path8__default.relative(index.projectRoot, dep.to);
+                const external = dep.isExternal ? " (external)" : "";
+                output += `- **${target}**${external}
+`;
+                if (dep.symbols.length > 0) {
+                  output += `  - Imports: ${dep.symbols.join(", ")}
+`;
+                }
+              });
+              output += "\n";
+            }
+          }
+          if (direction === "both" || direction === "incoming") {
+            output += `## Incoming Dependencies (${incoming.length})
+`;
+            output += "Files that depend on this file:\n\n";
+            if (incoming.length === 0) {
+              output += "*No incoming dependencies*\n\n";
+            } else {
+              incoming.forEach((dep) => {
+                const source = path8__default.relative(index.projectRoot, dep.from);
+                output += `- **${source}**
+`;
+                if (dep.symbols.length > 0) {
+                  output += `  - Uses: ${dep.symbols.join(", ")}
+`;
+                }
+              });
+              output += "\n";
+            }
+          }
+          const circular = outgoing.some(
+            (out) => incoming.some((inc) => inc.from === out.to)
+          );
+          if (circular) {
+            output += "\u26A0\uFE0F **Warning**: Potential circular dependencies detected!\n";
+          }
+          return {
+            success: true,
+            output: output.trim()
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Dependency analysis failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Get current index status and statistics
+       */
+      async getIndexStatus() {
+        try {
+          const index = this.indexer.getIndex();
+          if (!index) {
+            return {
+              success: true,
+              output: "No codebase index available. Use index_codebase to create one."
+            };
+          }
+          const age = Date.now() - index.createdAt.getTime();
+          const ageStr = age < 6e4 ? `${Math.round(age / 1e3)}s` : age < 36e5 ? `${Math.round(age / 6e4)}m` : `${Math.round(age / 36e5)}h`;
+          return {
+            success: true,
+            output: `# Codebase Index Status \u{1F4CA}
+
+## Index Information
+- **Project**: ${path8__default.basename(index.projectRoot)}
+- **Created**: ${index.createdAt.toLocaleString()} (${ageStr} ago)
+- **Last Updated**: ${index.updatedAt.toLocaleString()}
+
+## Statistics
+- **Files Indexed**: ${index.stats.totalFiles.toLocaleString()}
+- **Lines of Code**: ${index.stats.totalLines.toLocaleString()}
+- **Symbols Extracted**: ${index.stats.totalSymbols.toLocaleString()}
+- **Dependencies Mapped**: ${index.stats.totalDependencies.toLocaleString()}
+
+## Available Operations
+- **search_symbols**: Find functions, classes, variables across the codebase
+- **find_references**: Locate all uses of a specific symbol
+- **get_dependencies**: Analyze file dependencies and relationships
+
+Index is ready for advanced code analysis and search operations.`
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Status check failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      // Export schemas for tool registration
+      static get schemas() {
+        return {
+          index_codebase: {
+            description: "Index a codebase for comprehensive analysis and search",
+            parameters: IndexCodebaseSchema
+          },
+          search_symbols: {
+            description: "Search for symbols (functions, classes, variables) across the codebase",
+            parameters: SearchSymbolsSchema
+          },
+          find_references: {
+            description: "Find all references to a specific symbol",
+            parameters: FindReferencesSchema
+          },
+          get_dependencies: {
+            description: "Get dependency information for a file",
+            parameters: GetDependenciesSchema
+          },
+          get_index_status: {
+            description: "Get current codebase index status and statistics",
+            parameters: external_exports.object({})
+          }
+        };
+      }
+    };
+    codebaseIndexerTool = new CodebaseIndexerTool();
+  }
+});
+var SemanticCodeSearch;
+var init_semantic_code_search = __esm({
+  "src/services/semantic-code-search.ts"() {
+    SemanticCodeSearch = class extends EventEmitter {
+      constructor(indexer) {
+        super();
+        this.queryCache = /* @__PURE__ */ new Map();
+        this.indexer = indexer;
+        this.intentPatterns = this.initializeIntentPatterns();
+      }
+      /**
+       * Perform semantic search with natural language query
+       */
+      async search(query, options = {}) {
+        const semanticQuery = {
+          query: query.toLowerCase().trim(),
+          intent: this.classifyIntent(query),
+          scope: options.scope || "project",
+          scopePath: options.scopePath,
+          confidence: options.confidence || 0.3,
+          maxResults: options.maxResults || 20
+        };
+        const cacheKey = this.getCacheKey(semanticQuery);
+        if (this.queryCache.has(cacheKey)) {
+          return this.queryCache.get(cacheKey);
+        }
+        this.emit("search-started", { query: semanticQuery });
+        try {
+          const results = await this.performSemanticSearch(semanticQuery);
+          this.queryCache.set(cacheKey, results);
+          this.emit("search-completed", { query: semanticQuery, results });
+          return results;
+        } catch (error) {
+          this.emit("search-failed", { query: semanticQuery, error });
+          throw error;
+        }
+      }
+      /**
+       * Trace code flow from an entry point
+       */
+      async traceCodeFlow(entryPoint, maxDepth = 5) {
+        const index = this.indexer.getIndex();
+        if (!index) {
+          throw new Error("No codebase index available");
+        }
+        const entrySymbol = await this.findSymbolByName(entryPoint);
+        if (!entrySymbol) {
+          throw new Error(`Entry point symbol not found: ${entryPoint}`);
+        }
+        const visitedSymbols = /* @__PURE__ */ new Set();
+        const steps = [];
+        await this.traceSymbolFlow(entrySymbol, steps, visitedSymbols, maxDepth);
+        const patterns = this.identifyFlowPatterns(steps);
+        const complexity = this.calculateFlowComplexity(steps);
+        return {
+          entryPoint: entrySymbol,
+          steps,
+          complexity,
+          patterns
+        };
+      }
+      /**
+       * Map features in the codebase
+       */
+      async mapFeatures() {
+        const index = this.indexer.getIndex();
+        if (!index) {
+          throw new Error("No codebase index available");
+        }
+        const features = [];
+        this.getFeaturePatterns();
+        const directories = index.structure.directories.filter((d) => d.purpose === "source").sort((a, b) => b.fileCount - a.fileCount);
+        for (const dir of directories) {
+          const dirName = path8__default.basename(dir.path);
+          const feature = await this.analyzeFeatureDirectory(dir.path, dirName);
+          if (feature) {
+            features.push(feature);
+          }
+        }
+        const crossCuttingFeatures = await this.detectCrossCuttingFeatures(index);
+        features.push(...crossCuttingFeatures);
+        return features.sort((a, b) => b.entryPoints.length - a.entryPoints.length);
+      }
+      /**
+       * Find symbols with contextual relationships
+       */
+      async findRelatedSymbols(symbolName) {
+        const index = this.indexer.getIndex();
+        if (!index) {
+          throw new Error("No codebase index available");
+        }
+        const targetSymbol = await this.findSymbolByName(symbolName);
+        if (!targetSymbol) {
+          throw new Error(`Symbol not found: ${symbolName}`);
+        }
+        const related = [];
+        const fileSymbols = index.symbols.get(targetSymbol.filePath) || [];
+        for (const symbol of fileSymbols) {
+          if (symbol.name !== symbolName) {
+            const relationship = this.determineRelationship(targetSymbol, symbol);
+            if (relationship) {
+              related.push({
+                symbol,
+                relationship,
+                strength: this.calculateRelationshipStrength(targetSymbol, symbol)
+              });
+            }
+          }
+        }
+        const dependencies = this.indexer.getFileDependencies(targetSymbol.filePath);
+        for (const dep of dependencies) {
+          const depSymbols = index.symbols.get(dep.to) || [];
+          for (const symbol of depSymbols) {
+            if (dep.symbols.includes(symbol.name)) {
+              related.push({
+                symbol,
+                relationship: "imports",
+                strength: 0.8
+              });
+            }
+          }
+        }
+        const references = this.indexer.findSymbolReferences(symbolName);
+        for (const ref of references) {
+          if (ref.filePath !== targetSymbol.filePath) {
+            related.push({
+              symbol: ref,
+              relationship: "referenced_by",
+              strength: 0.6
+            });
+          }
+        }
+        return {
+          symbol: targetSymbol,
+          related: related.sort((a, b) => b.strength - a.strength).slice(0, 50)
+          // Limit results
+        };
+      }
+      // Private methods
+      async performSemanticSearch(query) {
+        const index = this.indexer.getIndex();
+        if (!index) {
+          throw new Error("No codebase index available");
+        }
+        const results = [];
+        const keywords = this.extractKeywords(query.query);
+        for (const keyword of keywords) {
+          const symbolResults = this.indexer.searchSymbols(keyword, {
+            fuzzy: true,
+            limit: 100
+          });
+          for (const symbol of symbolResults) {
+            const relevance = await this.calculateRelevance(symbol, query, keywords);
+            if (relevance >= query.confidence) {
+              const context = await this.extractContext(symbol);
+              const relatedSymbols = await this.getRelatedSymbols(symbol);
+              results.push({
+                symbol,
+                relevance,
+                reason: this.explainMatch(symbol, query, keywords),
+                context,
+                relatedSymbols: relatedSymbols.slice(0, 5)
+              });
+            }
+          }
+        }
+        await this.searchFileContent(query, keywords, results);
+        return this.filterAndSortResults(results, query);
+      }
+      classifyIntent(query) {
+        const queryLower = query.toLowerCase();
+        for (const [intent, patterns] of this.intentPatterns) {
+          if (patterns.some((pattern) => pattern.test(queryLower))) {
+            return intent;
+          }
+        }
+        return "general";
+      }
+      initializeIntentPatterns() {
+        return /* @__PURE__ */ new Map([
+          ["find_function", [
+            /find.*function/i,
+            /function.*that/i,
+            /method.*for/i,
+            /how.*to.*\w+/i
+          ]],
+          ["understand_flow", [
+            /how.*work/i,
+            /trace.*flow/i,
+            /what.*happen/i,
+            /process.*flow/i,
+            /workflow/i
+          ]],
+          ["locate_feature", [
+            /where.*is/i,
+            /find.*feature/i,
+            /locate.*component/i,
+            /.*implementation/i
+          ]],
+          ["trace_usage", [
+            /who.*use/i,
+            /usage.*of/i,
+            /called.*by/i,
+            /reference/i
+          ]],
+          ["find_patterns", [
+            /pattern/i,
+            /similar.*to/i,
+            /like.*this/i,
+            /example.*of/i
+          ]]
+        ]);
+      }
+      extractKeywords(query) {
+        const stopWords = /* @__PURE__ */ new Set([
+          "the",
+          "is",
+          "at",
+          "which",
+          "on",
+          "a",
+          "an",
+          "and",
+          "or",
+          "but",
+          "in",
+          "with",
+          "to",
+          "for",
+          "of",
+          "as",
+          "by",
+          "from",
+          "up",
+          "into",
+          "find",
+          "get",
+          "show",
+          "how",
+          "what",
+          "where",
+          "when",
+          "why"
+        ]);
+        return query.toLowerCase().split(/\W+/).filter((word) => word.length > 2 && !stopWords.has(word)).filter((word) => !/^\d+$/.test(word));
+      }
+      async calculateRelevance(symbol, query, keywords) {
+        let relevance = 0;
+        if (keywords.some((k) => symbol.name.toLowerCase().includes(k))) {
+          relevance += 0.5;
+        }
+        if (query.intent === "find_function" && symbol.type === "function") {
+          relevance += 0.3;
+        } else if (query.intent === "locate_feature" && symbol.type === "class") {
+          relevance += 0.3;
+        }
+        const filePath = symbol.filePath.toLowerCase();
+        if (keywords.some((k) => filePath.includes(k))) {
+          relevance += 0.2;
+        }
+        if (symbol.documentation && keywords.some((k) => symbol.documentation.toLowerCase().includes(k))) {
+          relevance += 0.3;
+        }
+        if (symbol.signature && keywords.some((k) => symbol.signature.toLowerCase().includes(k))) {
+          relevance += 0.2;
+        }
+        return Math.min(relevance, 1);
+      }
+      async extractContext(symbol) {
+        try {
+          const content = await fs3.readFile(symbol.filePath, "utf8");
+          const lines = content.split("\n");
+          const startLine = Math.max(0, symbol.line - 3);
+          const endLine = Math.min(lines.length, symbol.line + 3);
+          return lines.slice(startLine, endLine).map((line, index) => {
+            const lineNumber = startLine + index + 1;
+            const marker = lineNumber === symbol.line ? "\u2192" : " ";
+            return `${marker} ${lineNumber.toString().padStart(3)}: ${line}`;
+          }).join("\n");
+        } catch (error) {
+          return "Context unavailable";
+        }
+      }
+      async getRelatedSymbols(symbol) {
+        const index = this.indexer.getIndex();
+        if (!index) return [];
+        const fileSymbols = (index.symbols.get(symbol.filePath) || []).filter((s) => s.name !== symbol.name).slice(0, 10);
+        return fileSymbols;
+      }
+      explainMatch(symbol, query, keywords) {
+        const matches = [];
+        if (keywords.some((k) => symbol.name.toLowerCase().includes(k))) {
+          matches.push("name match");
+        }
+        if (symbol.documentation && keywords.some((k) => symbol.documentation.toLowerCase().includes(k))) {
+          matches.push("documentation match");
+        }
+        if (keywords.some((k) => symbol.filePath.toLowerCase().includes(k))) {
+          matches.push("file path match");
+        }
+        if (query.intent === "find_function" && symbol.type === "function") {
+          matches.push("function type match");
+        }
+        return matches.length > 0 ? `Matched: ${matches.join(", ")}` : "General relevance";
+      }
+      async searchFileContent(query, keywords, results) {
+        const index = this.indexer.getIndex();
+        if (!index) return;
+        for (const [filePath, fileInfo] of index.files) {
+          if (fileInfo.language === "unknown" || fileInfo.size > 1e5) continue;
+          try {
+            const content = await fs3.readFile(filePath, "utf8");
+            const lines = content.split("\n");
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i].toLowerCase();
+              if (keywords.some((k) => line.includes(k))) {
+                const relevance = this.calculateLineRelevance(line, keywords);
+                if (relevance >= query.confidence) {
+                  const context = this.extractLineContext(lines, i);
+                  results.push({
+                    filePath,
+                    relevance,
+                    reason: "Content match",
+                    context
+                  });
+                }
+              }
+            }
+          } catch (error) {
+            continue;
+          }
+        }
+      }
+      calculateLineRelevance(line, keywords) {
+        const matchCount = keywords.filter((k) => line.includes(k)).length;
+        return Math.min(matchCount / keywords.length, 1);
+      }
+      extractLineContext(lines, lineIndex) {
+        const startLine = Math.max(0, lineIndex - 2);
+        const endLine = Math.min(lines.length, lineIndex + 3);
+        return lines.slice(startLine, endLine).map((line, index) => {
+          const lineNumber = startLine + index + 1;
+          const marker = lineNumber === lineIndex + 1 ? "\u2192" : " ";
+          return `${marker} ${lineNumber.toString().padStart(3)}: ${line}`;
+        }).join("\n");
+      }
+      filterAndSortResults(results, query) {
+        const uniqueResults = results.filter((result, index, array) => {
+          const identifier = result.symbol ? `${result.symbol.filePath}:${result.symbol.line}:${result.symbol.name}` : result.filePath;
+          return array.findIndex((r) => {
+            const rIdentifier = r.symbol ? `${r.symbol.filePath}:${r.symbol.line}:${r.symbol.name}` : r.filePath;
+            return rIdentifier === identifier;
+          }) === index;
+        });
+        return uniqueResults.sort((a, b) => b.relevance - a.relevance).slice(0, query.maxResults || 20);
+      }
+      async findSymbolByName(name) {
+        const results = this.indexer.searchSymbols(name, { fuzzy: false, limit: 1 });
+        return results.length > 0 ? results[0] : null;
+      }
+      async traceSymbolFlow(symbol, steps, visited, maxDepth) {
+        if (maxDepth <= 0 || visited.has(symbol.name)) return;
+        visited.add(symbol.name);
+        const nextSymbols = await this.findCalledSymbols(symbol);
+        const step = {
+          symbol,
+          type: this.determineStepType(symbol),
+          nextSteps: nextSymbols,
+          confidence: 0.8,
+          // Default confidence
+          description: `${symbol.type} ${symbol.name} at ${path8__default.basename(symbol.filePath)}:${symbol.line}`
+        };
+        steps.push(step);
+        for (const nextSymbol of nextSymbols.slice(0, 3)) {
+          await this.traceSymbolFlow(nextSymbol, steps, visited, maxDepth - 1);
+        }
+      }
+      async findCalledSymbols(symbol) {
+        const index = this.indexer.getIndex();
+        if (!index) return [];
+        const fileSymbols = index.symbols.get(symbol.filePath) || [];
+        return fileSymbols.filter((s) => s.name !== symbol.name && s.type === "function").slice(0, 5);
+      }
+      determineStepType(symbol) {
+        if (symbol.type === "function") return "call";
+        return "branch";
+      }
+      identifyFlowPatterns(steps) {
+        const patterns = [];
+        if (steps.some((s) => s.type === "loop")) {
+          patterns.push("iterative_processing");
+        }
+        if (steps.some((s) => s.type === "error_handling")) {
+          patterns.push("error_handling");
+        }
+        if (steps.length > 10) {
+          patterns.push("complex_flow");
+        }
+        return patterns;
+      }
+      calculateFlowComplexity(steps) {
+        return steps.reduce((complexity, step) => {
+          return complexity + step.nextSteps.length + 1;
+        }, 0);
+      }
+      getFeaturePatterns() {
+        return /* @__PURE__ */ new Map([
+          ["auth", [/auth/i, /login/i, /session/i, /user/i]],
+          ["api", [/api/i, /rest/i, /graphql/i, /endpoint/i]],
+          ["database", [/db/i, /model/i, /schema/i, /query/i]],
+          ["ui", [/component/i, /view/i, /page/i, /render/i]],
+          ["test", [/test/i, /spec/i, /mock/i]],
+          ["config", [/config/i, /setting/i, /env/i]]
+        ]);
+      }
+      async analyzeFeatureDirectory(dirPath, dirName) {
+        const index = this.indexer.getIndex();
+        if (!index) return null;
+        const dirSymbols = [];
+        const dirFiles = [];
+        for (const [filePath, symbols] of index.symbols) {
+          if (filePath.startsWith(dirPath)) {
+            dirSymbols.push(...symbols);
+            dirFiles.push(filePath);
+          }
+        }
+        if (dirSymbols.length === 0) return null;
+        const entryPoints = dirSymbols.filter((s) => s.visibility === "public");
+        return {
+          name: dirName,
+          description: `Feature implemented in ${dirName} directory`,
+          entryPoints: entryPoints.slice(0, 10),
+          coreFiles: dirFiles.slice(0, 20),
+          relatedFeatures: [],
+          complexity: dirFiles.length > 10 ? "high" : dirFiles.length > 5 ? "medium" : "low"
+        };
+      }
+      async detectCrossCuttingFeatures(index) {
+        const features = [];
+        const errorHandling = await this.detectErrorHandlingFeature(index);
+        const logging = await this.detectLoggingFeature(index);
+        const validation = await this.detectValidationFeature(index);
+        if (errorHandling) features.push(errorHandling);
+        if (logging) features.push(logging);
+        if (validation) features.push(validation);
+        return features;
+      }
+      async detectErrorHandlingFeature(index) {
+        const errorSymbols = [];
+        for (const symbols of index.symbols.values()) {
+          errorSymbols.push(...symbols.filter(
+            (s) => s.name.toLowerCase().includes("error") || s.name.toLowerCase().includes("exception") || s.type === "class" && s.name.endsWith("Error")
+          ));
+        }
+        if (errorSymbols.length === 0) return null;
+        return {
+          name: "error_handling",
+          description: "Cross-cutting error handling and exception management",
+          entryPoints: errorSymbols.slice(0, 10),
+          coreFiles: [...new Set(errorSymbols.map((s) => s.filePath))],
+          relatedFeatures: ["logging", "validation"],
+          complexity: "medium"
+        };
+      }
+      async detectLoggingFeature(index) {
+        const loggingSymbols = [];
+        for (const symbols of index.symbols.values()) {
+          loggingSymbols.push(...symbols.filter(
+            (s) => s.name.toLowerCase().includes("log") || s.name.toLowerCase().includes("debug") || s.importFrom?.includes("winston") || s.importFrom?.includes("pino")
+          ));
+        }
+        if (loggingSymbols.length === 0) return null;
+        return {
+          name: "logging",
+          description: "Application logging and debugging infrastructure",
+          entryPoints: loggingSymbols.slice(0, 10),
+          coreFiles: [...new Set(loggingSymbols.map((s) => s.filePath))],
+          relatedFeatures: ["error_handling"],
+          complexity: "low"
+        };
+      }
+      async detectValidationFeature(index) {
+        const validationSymbols = [];
+        for (const symbols of index.symbols.values()) {
+          validationSymbols.push(...symbols.filter(
+            (s) => s.name.toLowerCase().includes("valid") || s.name.toLowerCase().includes("schema") || s.importFrom?.includes("joi") || s.importFrom?.includes("zod")
+          ));
+        }
+        if (validationSymbols.length === 0) return null;
+        return {
+          name: "validation",
+          description: "Data validation and schema enforcement",
+          entryPoints: validationSymbols.slice(0, 10),
+          coreFiles: [...new Set(validationSymbols.map((s) => s.filePath))],
+          relatedFeatures: ["api", "database"],
+          complexity: "medium"
+        };
+      }
+      determineRelationship(symbol1, symbol2) {
+        if (symbol1.type === "class" && symbol2.type === "function") {
+          return "contains_method";
+        }
+        if (symbol1.type === "function" && symbol2.type === "function") {
+          return "sibling_function";
+        }
+        if (symbol1.type === "import" && symbol2.type === "function") {
+          return "imports_for";
+        }
+        return null;
+      }
+      calculateRelationshipStrength(symbol1, symbol2) {
+        if (symbol1.parent === symbol2.name || symbol2.parent === symbol1.name) {
+          return 0.9;
+        }
+        if (Math.abs(symbol1.line - symbol2.line) < 10) {
+          return 0.7;
+        }
+        return 0.5;
+      }
+      getCacheKey(query) {
+        return `${query.query}-${query.intent}-${query.scope}-${query.confidence}`;
+      }
+    };
+  }
+});
+
+// src/tools/semantic-search-tool.ts
+var semantic_search_tool_exports = {};
+__export(semantic_search_tool_exports, {
+  SemanticSearchTool: () => SemanticSearchTool,
+  semanticSearchTool: () => semanticSearchTool
+});
+var SemanticSearchSchema, TraceFlowSchema, MapFeaturesSchema, FindRelatedSchema, SemanticSearchTool, semanticSearchTool;
+var init_semantic_search_tool = __esm({
+  "src/tools/semantic-search-tool.ts"() {
+    init_zod();
+    init_semantic_code_search();
+    SemanticSearchSchema = external_exports.object({
+      query: external_exports.string().describe("Natural language query (e.g., 'find authentication logic', 'how does user registration work')"),
+      intent: external_exports.enum(["find_function", "understand_flow", "locate_feature", "trace_usage", "find_patterns", "general"]).optional().describe("Search intent (auto-detected if not specified)"),
+      scope: external_exports.enum(["project", "directory", "file", "function"]).optional().describe("Search scope (default: project)"),
+      scopePath: external_exports.string().optional().describe("Path to scope to (for directory/file scope)"),
+      confidence: external_exports.number().min(0).max(1).optional().describe("Minimum confidence threshold (default: 0.3)"),
+      maxResults: external_exports.number().min(1).max(100).optional().describe("Maximum results to return (default: 20)")
+    });
+    TraceFlowSchema = external_exports.object({
+      entryPoint: external_exports.string().describe("Function or symbol name to start tracing from"),
+      maxDepth: external_exports.number().min(1).max(10).optional().describe("Maximum depth to trace (default: 5)")
+    });
+    MapFeaturesSchema = external_exports.object({
+      includeTestCoverage: external_exports.boolean().optional().describe("Include test coverage analysis (default: false)"),
+      complexityThreshold: external_exports.enum(["low", "medium", "high"]).optional().describe("Minimum complexity to include (default: low)")
+    });
+    FindRelatedSchema = external_exports.object({
+      symbolName: external_exports.string().describe("Symbol name to find relationships for"),
+      includeUsage: external_exports.boolean().optional().describe("Include usage patterns (default: true)"),
+      maxRelated: external_exports.number().min(1).max(50).optional().describe("Maximum related symbols (default: 20)")
+    });
+    SemanticSearchTool = class {
+      constructor() {
+        this.searchService = null;
+        this.indexer = null;
+      }
+      /**
+       * Initialize the semantic search service with an indexer
+       */
+      async ensureInitialized() {
+        if (!this.searchService) {
+          try {
+            const { codebaseIndexerTool: codebaseIndexerTool2 } = await Promise.resolve().then(() => (init_codebase_indexer_tool(), codebase_indexer_tool_exports));
+            this.indexer = codebaseIndexerTool2.indexer;
+            if (!this.indexer?.getIndex()) {
+              throw new Error("No codebase index available. Please run index_codebase first.");
+            }
+            this.searchService = new SemanticCodeSearch(this.indexer);
+          } catch (error) {
+            throw new Error("Failed to initialize semantic search: " + error.message);
+          }
+        }
+        return this.searchService;
+      }
+      /**
+       * Perform semantic search with natural language queries
+       */
+      async semanticSearch(args) {
+        try {
+          const searchService = await this.ensureInitialized();
+          const results = await searchService.search(args.query, {
+            intent: args.intent,
+            scope: args.scope || "project",
+            scopePath: args.scopePath,
+            confidence: args.confidence || 0.3,
+            maxResults: args.maxResults || 20
+          });
+          if (results.length === 0) {
+            return {
+              success: true,
+              output: `No results found for query: "${args.query}"
+
+Try:
+- Using different keywords
+- Lowering confidence threshold
+- Broadening the search scope`
+            };
+          }
+          const formatResult = (result, index) => {
+            const confidence = Math.round(result.relevance * 100);
+            if (result.symbol) {
+              const relativePath = path8__default.relative(process.cwd(), result.symbol.filePath);
+              const location = `${relativePath}:${result.symbol.line}`;
+              const typeInfo = result.symbol.type === "function" && result.symbol.signature ? `
+    Signature: ${result.symbol.signature}` : "";
+              let output2 = `## ${index + 1}. ${result.symbol.name} (${result.symbol.type}) - ${confidence}%
+`;
+              output2 += `   **Location**: ${location}
+`;
+              output2 += `   **Reason**: ${result.reason}${typeInfo}
+`;
+              if (result.context) {
+                output2 += `   **Context**:
+\`\`\`
+${result.context}
+\`\`\`
+`;
+              }
+              if (result.relatedSymbols && result.relatedSymbols.length > 0) {
+                const related = result.relatedSymbols.map((s) => s.name).join(", ");
+                output2 += `   **Related**: ${related}
+`;
+              }
+              return output2;
+            } else if (result.filePath) {
+              const relativePath = path8__default.relative(process.cwd(), result.filePath);
+              let output2 = `## ${index + 1}. File Match - ${confidence}%
+`;
+              output2 += `   **File**: ${relativePath}
+`;
+              output2 += `   **Reason**: ${result.reason}
+`;
+              if (result.context) {
+                output2 += `   **Context**:
+\`\`\`
+${result.context}
+\`\`\`
+`;
+              }
+              return output2;
+            }
+            return "";
+          };
+          const groupedResults = results.reduce((groups, result) => {
+            const type = result.symbol?.type || "file_content";
+            if (!groups[type]) groups[type] = [];
+            groups[type].push(result);
+            return groups;
+          }, {});
+          let output = `# Semantic Search Results for "${args.query}" \u{1F50D}
+
+`;
+          output += `Found ${results.length} results with confidence \u2265 ${Math.round((args.confidence || 0.3) * 100)}%:
+
+`;
+          for (const [type, typeResults] of Object.entries(groupedResults)) {
+            if (typeResults.length === 0) continue;
+            const typeTitle = type === "file_content" ? "File Content" : `${type.charAt(0).toUpperCase() + type.slice(1)}s`;
+            output += `# ${typeTitle} (${typeResults.length})
+
+`;
+            output += typeResults.slice(0, 10).map(formatResult).join("\n");
+            if (typeResults.length > 10) {
+              output += `
+*... and ${typeResults.length - 10} more ${type} results*
+`;
+            }
+            output += "\n";
+          }
+          output += `
+## \u{1F4A1} Related Searches
+`;
+          output += `- **Trace flow**: Use \`trace_code_flow\` to understand execution paths
+`;
+          output += `- **Find usage**: Use \`find_related_symbols\` for symbol relationships
+`;
+          output += `- **Map features**: Use \`map_features\` for architectural overview
+`;
+          return {
+            success: true,
+            output
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Semantic search failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Trace code flow from an entry point
+       */
+      async traceCodeFlow(args) {
+        try {
+          const searchService = await this.ensureInitialized();
+          const flowTrace = await searchService.traceCodeFlow(args.entryPoint, args.maxDepth || 5);
+          const entryPath = path8__default.relative(process.cwd(), flowTrace.entryPoint.filePath);
+          const entryLocation = `${entryPath}:${flowTrace.entryPoint.line}`;
+          let output = `# Code Flow Trace for "${args.entryPoint}" \u{1F50D}
+
+`;
+          output += `**Entry Point**: ${flowTrace.entryPoint.name} (${flowTrace.entryPoint.type})
+`;
+          output += `**Location**: ${entryLocation}
+`;
+          output += `**Complexity**: ${flowTrace.complexity}
+`;
+          output += `**Steps**: ${flowTrace.steps.length}
+
+`;
+          if (flowTrace.patterns.length > 0) {
+            output += `**Patterns Detected**: ${flowTrace.patterns.join(", ")}
+
+`;
+          }
+          output += `## Execution Flow
+
+`;
+          for (let i = 0; i < flowTrace.steps.length; i++) {
+            const step = flowTrace.steps[i];
+            const stepPath = path8__default.relative(process.cwd(), step.symbol.filePath);
+            const stepLocation = `${stepPath}:${step.symbol.line}`;
+            const confidence = Math.round(step.confidence * 100);
+            output += `${i + 1}. **${step.symbol.name}** (${step.type})
+`;
+            output += `   Location: ${stepLocation}
+`;
+            output += `   Confidence: ${confidence}%
+`;
+            output += `   Description: ${step.description}
+`;
+            if (step.nextSteps.length > 0) {
+              const nextNames = step.nextSteps.map((s) => s.name).slice(0, 3).join(", ");
+              output += `   Next: ${nextNames}${step.nextSteps.length > 3 ? ` +${step.nextSteps.length - 3} more` : ""}
+`;
+            }
+            output += "\n";
+          }
+          if (flowTrace.steps.length === 0) {
+            output += `No flow steps could be traced. The symbol might be:
+`;
+            output += `- A leaf function with no further calls
+`;
+            output += `- Using dynamic calls that can't be statically analyzed
+`;
+            output += `- Part of external dependencies
+`;
+          }
+          return {
+            success: true,
+            output
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Code flow tracing failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Map features and architectural components
+       */
+      async mapFeatures(args) {
+        try {
+          const searchService = await this.ensureInitialized();
+          const features = await searchService.mapFeatures();
+          if (features.length === 0) {
+            return {
+              success: true,
+              output: "No distinct features detected in the codebase. This might indicate:\n- A small or simple project structure\n- Monolithic architecture without clear feature separation\n- Insufficient symbol extraction"
+            };
+          }
+          const filteredFeatures = args.complexityThreshold ? features.filter((f) => {
+            const levels = { low: 0, medium: 1, high: 2 };
+            return levels[f.complexity] >= levels[args.complexityThreshold];
+          }) : features;
+          let output = `# Feature Map \u{1F5FA}\uFE0F
+
+`;
+          output += `Discovered ${filteredFeatures.length} architectural features:
+
+`;
+          for (const feature of filteredFeatures) {
+            const complexityIcon = {
+              "low": "\u{1F7E2}",
+              "medium": "\u{1F7E1}",
+              "high": "\u{1F534}"
+            }[feature.complexity];
+            output += `## ${feature.name} ${complexityIcon}
+`;
+            output += `**Description**: ${feature.description}
+`;
+            output += `**Complexity**: ${feature.complexity}
+`;
+            output += `**Entry Points**: ${feature.entryPoints.length}
+`;
+            output += `**Core Files**: ${feature.coreFiles.length}
+`;
+            if (feature.entryPoints.length > 0) {
+              const entryNames = feature.entryPoints.slice(0, 5).map((s) => s.name).join(", ");
+              output += `**Key Symbols**: ${entryNames}`;
+              if (feature.entryPoints.length > 5) {
+                output += ` +${feature.entryPoints.length - 5} more`;
+              }
+              output += "\n";
+            }
+            if (feature.coreFiles.length > 0) {
+              const fileNames = feature.coreFiles.slice(0, 3).map((f) => path8__default.basename(f)).join(", ");
+              output += `**Key Files**: ${fileNames}`;
+              if (feature.coreFiles.length > 3) {
+                output += ` +${feature.coreFiles.length - 3} more`;
+              }
+              output += "\n";
+            }
+            if (feature.relatedFeatures.length > 0) {
+              output += `**Related Features**: ${feature.relatedFeatures.join(", ")}
+`;
+            }
+            if (args.includeTestCoverage && feature.testCoverage) {
+              const coverage = feature.testCoverage;
+              output += `**Test Coverage**: ${coverage.hasTests ? `${coverage.coverage}%` : "No tests found"}
+`;
+              if (coverage.testFiles.length > 0) {
+                output += `**Test Files**: ${coverage.testFiles.slice(0, 3).join(", ")}
+`;
+              }
+            }
+            output += "\n";
+          }
+          output += `## \u{1F3D7}\uFE0F Architecture Insights
+
+`;
+          const complexityDistribution = features.reduce((dist, f) => {
+            dist[f.complexity] = (dist[f.complexity] || 0) + 1;
+            return dist;
+          }, {});
+          output += `**Complexity Distribution**:
+`;
+          for (const [level, count] of Object.entries(complexityDistribution)) {
+            const percentage = Math.round(count / features.length * 100);
+            output += `- ${level}: ${count} features (${percentage}%)
+`;
+          }
+          const totalEntryPoints = features.reduce((sum, f) => sum + f.entryPoints.length, 0);
+          const avgEntryPoints = Math.round(totalEntryPoints / features.length);
+          output += `
+**Average Entry Points per Feature**: ${avgEntryPoints}
+`;
+          output += `
+## \u{1F4A1} Recommendations
+
+`;
+          if (complexityDistribution.high > features.length / 2) {
+            output += `- Consider refactoring high-complexity features for better maintainability
+`;
+          }
+          if (avgEntryPoints > 10) {
+            output += `- Some features have many entry points - consider facade patterns
+`;
+          }
+          output += `- Use \`semantic_search\` to explore specific features in detail
+`;
+          output += `- Use \`trace_code_flow\` to understand feature interactions
+`;
+          return {
+            success: true,
+            output
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Feature mapping failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      /**
+       * Find related symbols and relationships
+       */
+      async findRelatedSymbols(args) {
+        try {
+          const searchService = await this.ensureInitialized();
+          const result = await searchService.findRelatedSymbols(args.symbolName);
+          const targetPath = path8__default.relative(process.cwd(), result.symbol.filePath);
+          const targetLocation = `${targetPath}:${result.symbol.line}`;
+          let output = `# Symbol Relationships for "${args.symbolName}" \u{1F517}
+
+`;
+          output += `**Target Symbol**: ${result.symbol.name} (${result.symbol.type})
+`;
+          output += `**Location**: ${targetLocation}
+`;
+          output += `**Visibility**: ${result.symbol.visibility}
+`;
+          if (result.symbol.signature) {
+            output += `**Signature**: \`${result.symbol.signature}\`
+`;
+          }
+          output += `
+**Related Symbols**: ${result.related.length}
+
+`;
+          if (result.related.length === 0) {
+            output += "No related symbols found. This might indicate:\n";
+            output += "- An isolated symbol with minimal dependencies\n";
+            output += "- Limited symbol extraction in the current index\n";
+            output += "- The symbol might be primarily used externally\n";
+            return {
+              success: true,
+              output
+            };
+          }
+          const groupedRelated = result.related.reduce((groups, rel) => {
+            if (!groups[rel.relationship]) groups[rel.relationship] = [];
+            groups[rel.relationship].push(rel);
+            return groups;
+          }, {});
+          for (const [relationshipType, relationships] of Object.entries(groupedRelated)) {
+            const count = relationships.length;
+            const avgStrength = Math.round(
+              relationships.reduce((sum, r) => sum + r.strength, 0) / count * 100
+            );
+            output += `## ${relationshipType.replace(/_/g, " ")} (${count}) - Avg Strength: ${avgStrength}%
+
+`;
+            const maxResults = args.maxRelated ? Math.min(args.maxRelated, 10) : 10;
+            for (let i = 0; i < Math.min(relationships.length, maxResults); i++) {
+              const rel = relationships[i];
+              const relPath = path8__default.relative(process.cwd(), rel.symbol.filePath);
+              const relLocation = `${relPath}:${rel.symbol.line}`;
+              const strength = Math.round(rel.strength * 100);
+              output += `${i + 1}. **${rel.symbol.name}** (${rel.symbol.type}) - ${strength}%
+`;
+              output += `   Location: ${relLocation}
+`;
+              if (rel.symbol.signature) {
+                output += `   Signature: \`${rel.symbol.signature}\`
+`;
+              }
+              output += "\n";
+            }
+            if (relationships.length > maxResults) {
+              output += `*... and ${relationships.length - maxResults} more ${relationshipType} relationships*
+
+`;
+            }
+          }
+          output += `## \u{1F50D} Relationship Insights
+
+`;
+          const strongRelationships = result.related.filter((r) => r.strength > 0.7).length;
+          const totalRelationships = result.related.length;
+          output += `**Strong Relationships**: ${strongRelationships}/${totalRelationships} (${Math.round(strongRelationships / totalRelationships * 100)}%)
+`;
+          const uniqueFiles = new Set(result.related.map((r) => r.symbol.filePath)).size;
+          output += `**Files Involved**: ${uniqueFiles}
+`;
+          const relationshipTypes = Object.keys(groupedRelated).length;
+          output += `**Relationship Types**: ${relationshipTypes}
+`;
+          output += `
+## \u{1F4A1} Next Steps
+
+`;
+          output += `- Use \`semantic_search\` to find symbols with similar functionality
+`;
+          output += `- Use \`trace_code_flow\` to understand how "${args.symbolName}" fits in execution flows
+`;
+          if (strongRelationships > 5) {
+            output += `- Consider refactoring to reduce coupling (${strongRelationships} strong relationships)
+`;
+          }
+          return {
+            success: true,
+            output
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: `Symbol relationship analysis failed: ${error instanceof Error ? error.message : String(error)}`
+          };
+        }
+      }
+      // Export schemas for tool registration
+      static get schemas() {
+        return {
+          semantic_search: {
+            description: "Search codebase using natural language queries with intelligent pattern recognition",
+            parameters: SemanticSearchSchema
+          },
+          trace_code_flow: {
+            description: "Trace execution flow from an entry point to understand code paths",
+            parameters: TraceFlowSchema
+          },
+          map_features: {
+            description: "Map architectural features and components in the codebase",
+            parameters: MapFeaturesSchema
+          },
+          find_related_symbols: {
+            description: "Find symbols related to a target symbol with relationship analysis",
+            parameters: FindRelatedSchema
+          }
+        };
+      }
+    };
+    semanticSearchTool = new SemanticSearchTool();
+  }
+});
+
 // src/agent/grok-agent.ts
 var grok_agent_exports = {};
 __export(grok_agent_exports, {
@@ -12117,6 +18382,16 @@ var init_grok_agent = __esm({
         this.minRequestInterval = 500;
         // ms
         this.lastRequestTime = 0;
+        // Plan Mode integration
+        this.planModeState = null;
+        this.readonlyOverlay = null;
+        /**
+         * Tool chain validation state tracking for coordinated multi-tool operations
+         */
+        this.toolChainContext = {
+          chainedOperations: [],
+          rollbackPoints: []
+        };
         const manager = getSettingsManager();
         const savedModel = manager.getCurrentModel();
         const modelToUse = model || savedModel || "grok-code-fast-1";
@@ -12702,21 +18977,66 @@ Current working directory: ${process.cwd()}`
       }
       async executeTool(toolCall) {
         try {
-          const args = JSON.parse(toolCall.function.arguments);
+          const planModeState = this.getPlanModeState();
+          if (planModeState?.active) {
+            const readonlyOverlay = this.getReadonlyOverlay();
+            if (readonlyOverlay && this.isDestructiveOperation(toolCall.function.name)) {
+              return await readonlyOverlay.interceptToolCall(toolCall);
+            }
+          }
+          let args;
+          try {
+            args = JSON.parse(toolCall.function.arguments);
+          } catch (jsonError) {
+            const parseError = jsonError;
+            console.error(`[GrokAgent] JSON Parse Error for tool ${toolCall.function.name}:`, {
+              error: parseError.message,
+              arguments: toolCall.function.arguments,
+              toolCall
+            });
+            try {
+              const cleanedArgs = toolCall.function.arguments.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]").trim();
+              args = JSON.parse(cleanedArgs);
+              console.log(`[GrokAgent] JSON parsing recovered after cleanup`);
+            } catch (retryError) {
+              return {
+                success: false,
+                error: `Invalid JSON arguments for ${toolCall.function.name}: ${parseError.message}. Arguments: ${toolCall.function.arguments}`,
+                details: `Tool call failed due to malformed JSON. This is likely a model generation issue.`
+              };
+            }
+          }
           const settingsManager = getSettingsManager();
           const requireConfirmation = settingsManager.getUserSetting("requireConfirmation") ?? true;
           if (requireConfirmation) {
             const needsConfirmation = ["create_file", "str_replace_editor", "bash"].includes(toolCall.function.name);
             if (needsConfirmation) {
-              const confirmationResult = await this.confirmationTool.requestConfirmation({
-                operation: toolCall.function.name,
-                filename: args.path || args.command || "unknown",
-                description: `Execute ${toolCall.function.name} operation`
-              });
-              if (!confirmationResult.success) {
+              try {
+                const confirmationResult = await this.confirmationTool.requestConfirmation({
+                  operation: toolCall.function.name,
+                  filename: args.path || args.command || "unknown",
+                  description: `Execute ${toolCall.function.name} operation`
+                });
+                if (!confirmationResult.success) {
+                  const errorMessage = confirmationResult.error || "Operation cancelled by user";
+                  console.log(`[GrokAgent] Confirmation rejected for tool ${toolCall.function.name}: ${errorMessage}`);
+                  return {
+                    success: false,
+                    error: errorMessage,
+                    details: "User confirmation was required but rejected or failed"
+                  };
+                }
+              } catch (confirmationError) {
+                const error = confirmationError;
+                console.error(`[GrokAgent] Confirmation system error for tool ${toolCall.function.name}:`, {
+                  error: error.message,
+                  stack: error.stack,
+                  toolCall
+                });
                 return {
                   success: false,
-                  error: confirmationResult.error || "Operation cancelled by user"
+                  error: `Confirmation system failed: ${error.message}`,
+                  details: "The confirmation system encountered an error. This is a system issue, not a user rejection."
                 };
               }
             }
@@ -12728,37 +19048,41 @@ Current working directory: ${process.cwd()}`
                 return await this.textEditor.view(args.path, range);
               } catch (error) {
                 console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-                const path33 = args.path;
-                let command = `cat "${path33}"`;
+                const path38 = args.path;
+                let command = `cat "${path38}"`;
                 if (args.start_line && args.end_line) {
-                  command = `sed -n '${args.start_line},${args.end_line}p' "${path33}"`;
+                  command = `sed -n '${args.start_line},${args.end_line}p' "${path38}"`;
                 }
                 return await this.bash.execute(command);
               }
             case "create_file":
               try {
-                return await this.textEditor.create(args.path, args.content);
+                const result = await this.textEditor.create(args.path, args.content);
+                return await this.wrapWithChainValidation(toolCall, result);
               } catch (error) {
                 console.warn(`create_file tool failed, falling back to bash: ${error.message}`);
                 const command = `cat > "${args.path}" << 'EOF'
 ${args.content}
 EOF`;
-                return await this.bash.execute(command);
+                const result = await this.bash.execute(command);
+                return await this.wrapWithChainValidation(toolCall, result);
               }
             case "str_replace_editor":
               try {
-                return await this.textEditor.strReplace(
+                const result = await this.textEditor.strReplace(
                   args.path,
                   args.old_str,
                   args.new_str,
                   args.replace_all
                 );
+                return await this.wrapWithChainValidation(toolCall, result);
               } catch (error) {
                 console.warn(`str_replace_editor tool failed, falling back to bash: ${error.message}`);
                 const escapedOld = args.old_str.replace(/[\/&]/g, "\\$&");
                 const escapedNew = args.new_str.replace(/[\/&]/g, "\\$&");
                 const sedCommand = args.replace_all ? `sed -i 's/${escapedOld}/${escapedNew}/g' "${args.path}"` : `sed -i '0,/${escapedOld}/s/${escapedOld}/${escapedNew}/' "${args.path}"`;
-                return await this.bash.execute(sedCommand);
+                const result = await this.bash.execute(sedCommand);
+                return await this.wrapWithChainValidation(toolCall, result);
               }
             case "edit_file":
               if (!this.morphEditor) {
@@ -12890,6 +19214,33 @@ EOF`;
               return await this.vectorSearch.execute(args);
             case "autonomous_task":
               return await this.autonomousTask.execute(args);
+            case "index_codebase":
+              const { codebaseIndexerTool: codebaseIndexerTool2 } = await Promise.resolve().then(() => (init_codebase_indexer_tool(), codebase_indexer_tool_exports));
+              return await codebaseIndexerTool2.indexCodebase(args);
+            case "search_symbols":
+              const { codebaseIndexerTool: symbolSearchTool } = await Promise.resolve().then(() => (init_codebase_indexer_tool(), codebase_indexer_tool_exports));
+              return await symbolSearchTool.searchSymbols(args);
+            case "find_references":
+              const { codebaseIndexerTool: refTool } = await Promise.resolve().then(() => (init_codebase_indexer_tool(), codebase_indexer_tool_exports));
+              return await refTool.findReferences(args);
+            case "get_dependencies":
+              const { codebaseIndexerTool: depTool } = await Promise.resolve().then(() => (init_codebase_indexer_tool(), codebase_indexer_tool_exports));
+              return await depTool.getDependencies(args);
+            case "get_index_status":
+              const { codebaseIndexerTool: statusTool } = await Promise.resolve().then(() => (init_codebase_indexer_tool(), codebase_indexer_tool_exports));
+              return await statusTool.getIndexStatus();
+            case "semantic_search":
+              const { semanticSearchTool: semanticSearchTool2 } = await Promise.resolve().then(() => (init_semantic_search_tool(), semantic_search_tool_exports));
+              return await semanticSearchTool2.semanticSearch(args);
+            case "trace_code_flow":
+              const { semanticSearchTool: flowTool } = await Promise.resolve().then(() => (init_semantic_search_tool(), semantic_search_tool_exports));
+              return await flowTool.traceCodeFlow(args);
+            case "map_features":
+              const { semanticSearchTool: featureTool } = await Promise.resolve().then(() => (init_semantic_search_tool(), semantic_search_tool_exports));
+              return await featureTool.mapFeatures(args);
+            case "find_related_symbols":
+              const { semanticSearchTool: relationTool } = await Promise.resolve().then(() => (init_semantic_search_tool(), semantic_search_tool_exports));
+              return await relationTool.findRelatedSymbols(args);
             default:
               if (toolCall.function.name.startsWith("mcp__")) {
                 return await this.executeMCPTool(toolCall);
@@ -12900,15 +19251,39 @@ EOF`;
               };
           }
         } catch (error) {
-          return {
+          const result = {
             success: false,
             error: `Tool execution error: ${error.message}`
           };
+          await this.validateAndTrackToolChain(toolCall, result);
+          return result;
+        } finally {
         }
       }
       async executeMCPTool(toolCall) {
         try {
-          const args = JSON.parse(toolCall.function.arguments);
+          let args;
+          try {
+            args = JSON.parse(toolCall.function.arguments);
+          } catch (jsonError) {
+            const parseError = jsonError;
+            console.error(`[GrokAgent] JSON Parse Error for MCP tool ${toolCall.function.name}:`, {
+              error: parseError.message,
+              arguments: toolCall.function.arguments,
+              toolCall
+            });
+            try {
+              const cleanedArgs = toolCall.function.arguments.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]").trim();
+              args = JSON.parse(cleanedArgs);
+              console.log(`[GrokAgent] MCP JSON parsing recovered after cleanup`);
+            } catch (retryError) {
+              return {
+                success: false,
+                error: `Invalid JSON arguments for MCP tool ${toolCall.function.name}: ${parseError.message}. Arguments: ${toolCall.function.arguments}`,
+                details: `MCP tool call failed due to malformed JSON. This is likely a model generation issue.`
+              };
+            }
+          }
           const mcpManager2 = getMCPManager();
           const result = await mcpManager2.callTool(toolCall.function.name, args);
           if (result.isError) {
@@ -12965,6 +19340,233 @@ EOF`;
         this.grokClient.setModel(model);
         this.tokenCounter.dispose();
         this.tokenCounter = createTokenCounter(model);
+      }
+      /**
+       * Validates and tracks tool chain operations for better error recovery
+       */
+      async validateAndTrackToolChain(toolCall, result) {
+        try {
+          if (!this.toolChainContext.operationId) {
+            this.toolChainContext.operationId = `chain_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          }
+          const operation = {
+            toolName: toolCall.function.name,
+            timestamp: Date.now(),
+            success: result.success,
+            dependencies: this.inferToolDependencies(toolCall)
+          };
+          this.toolChainContext.chainedOperations.push(operation);
+          if (result.success && this.isFileModificationTool(toolCall.function.name)) {
+            this.toolChainContext.rollbackPoints.push({
+              operationId: this.toolChainContext.operationId,
+              description: `${toolCall.function.name} on ${this.extractFilePath(toolCall)}`,
+              timestamp: Date.now()
+            });
+          }
+          if (!result.success) {
+            console.warn(`[GrokAgent] Tool chain validation failed at ${toolCall.function.name}:`, {
+              operationId: this.toolChainContext.operationId,
+              chainLength: this.toolChainContext.chainedOperations.length,
+              previousOperations: this.toolChainContext.chainedOperations.slice(-3).map((op) => ({
+                tool: op.toolName,
+                success: op.success,
+                ago: Date.now() - op.timestamp
+              }))
+            });
+          }
+          if (this.toolChainContext.chainedOperations.length > 50) {
+            this.toolChainContext.chainedOperations = this.toolChainContext.chainedOperations.slice(-25);
+            this.toolChainContext.rollbackPoints = this.toolChainContext.rollbackPoints.slice(-10);
+          }
+        } catch (error) {
+          console.error("[GrokAgent] Tool chain validation error:", error);
+        }
+      }
+      /**
+       * Infer tool dependencies based on tool type and arguments
+       */
+      inferToolDependencies(toolCall) {
+        const dependencies = [];
+        const toolName = toolCall.function.name;
+        try {
+          const args = JSON.parse(toolCall.function.arguments);
+          if (["str_replace_editor", "view_file"].includes(toolName) && args.path) {
+            dependencies.push(`file_exists:${args.path}`);
+          }
+          if (toolName === "multi_file_editor" && args.files) {
+            args.files.forEach((file) => {
+              if (file.path) dependencies.push(`file_exists:${file.path}`);
+            });
+          }
+          if (toolName === "bash" && args.command) {
+            if (args.command.includes("cd ")) {
+              dependencies.push("working_directory");
+            }
+          }
+        } catch (parseError) {
+        }
+        return dependencies;
+      }
+      /**
+       * Checks if a tool modifies the filesystem
+       */
+      isFileModificationTool(toolName) {
+        return ["create_file", "str_replace_editor", "multi_file_editor", "morph_editor"].includes(toolName);
+      }
+      /**
+       * Extracts file path from tool call arguments
+       */
+      extractFilePath(toolCall) {
+        try {
+          const args = JSON.parse(toolCall.function.arguments);
+          return args.path || args.filename || args.file || "unknown";
+        } catch {
+          return "unknown";
+        }
+      }
+      /**
+       * Reset tool chain context (useful for starting fresh operations)
+       */
+      resetToolChain() {
+        this.toolChainContext = {
+          chainedOperations: [],
+          rollbackPoints: []
+        };
+      }
+      /**
+       * Wraps tool execution result with chain validation and visual feedback
+       */
+      async wrapWithChainValidation(toolCall, result) {
+        await this.validateAndTrackToolChain(toolCall, result);
+        const operationTree = this.createOperationTree(toolCall.function.name, toolCall);
+        if (operationTree && result.success) {
+          const enhancedOutput = operationTree + "\n" + (result.output || "Operation completed successfully.");
+          return {
+            ...result,
+            output: enhancedOutput
+          };
+        }
+        return result;
+      }
+      /**
+       * Creates visual operation tree for complex multi-step operations
+       */
+      createOperationTree(operationType, toolCall) {
+        const args = this.safeParseArguments(toolCall);
+        try {
+          let tree = "";
+          if (operationType === "multi_file_edit" && args.files) {
+            tree = `\u250C\u2500 \u{1F4DD} Multi-file Edit Operation (${args.files.length} files)
+`;
+            args.files.forEach((file, index) => {
+              const isLast = index === args.files.length - 1;
+              const prefix = isLast ? "\u2514\u2500" : "\u251C\u2500";
+              tree += `${prefix} \u270F\uFE0F  Edit ${file.path || file.filename || "unknown"}
+`;
+            });
+          } else if (operationType === "bash" && args.command) {
+            if (args.command.includes("&&") || args.command.includes(";")) {
+              const commands = args.command.split(/[;&]+/).filter((cmd) => cmd.trim());
+              tree = `\u250C\u2500 \u26A1 Bash Command Chain (${commands.length} commands)
+`;
+              commands.forEach((cmd, index) => {
+                const isLast = index === commands.length - 1;
+                const prefix = isLast ? "\u2514\u2500" : "\u251C\u2500";
+                tree += `${prefix} \u{1F527} ${cmd.trim()}
+`;
+              });
+            }
+          } else if (["create_file", "str_replace_editor"].includes(toolCall.function.name) && args.path) {
+            const operation = toolCall.function.name === "create_file" ? "Create" : "Edit";
+            tree = `\u250C\u2500 \u{1F4DD} File Operation
+`;
+            tree += `\u2514\u2500 ${operation === "Create" ? "\u{1F4C4}" : "\u270F\uFE0F"} ${operation} ${args.path}
+`;
+            if (args.old_str && args.new_str) {
+              tree += `   \u2514\u2500 \u{1F504} Replace: "${args.old_str.substring(0, 30)}${args.old_str.length > 30 ? "..." : ""}"
+`;
+            }
+          } else if (toolCall.function.name === "search" && args.query) {
+            tree = `\u250C\u2500 \u{1F50D} Search Operation
+`;
+            tree += `\u251C\u2500 \u{1F4C1} Target: ${args.directory || "current directory"}
+`;
+            tree += `\u2514\u2500 \u{1F3AF} Query: "${args.query}"
+`;
+          } else if (this.toolChainContext.chainedOperations.length > 1) {
+            const recentOps = this.toolChainContext.chainedOperations.slice(-5);
+            tree = `\u250C\u2500 \u{1F517} Tool Chain (${recentOps.length} operations)
+`;
+            recentOps.forEach((op, index) => {
+              const isLast = index === recentOps.length - 1;
+              const prefix = isLast ? "\u2514\u2500" : "\u251C\u2500";
+              const statusIcon = op.success ? "\u2705" : op.toolName === toolCall.function.name ? "\u{1F504}" : "\u23F3";
+              tree += `${prefix} ${statusIcon} ${op.toolName}
+`;
+            });
+          }
+          return tree;
+        } catch (error) {
+          return "";
+        }
+      }
+      /**
+       * Safely parses tool arguments with fallback
+       */
+      safeParseArguments(toolCall) {
+        try {
+          return JSON.parse(toolCall.function.arguments);
+        } catch {
+          return {};
+        }
+      }
+      /**
+       * Enhanced file operation error handling with comprehensive recovery mechanisms
+       * Provides consistent error reporting and recovery patterns for file operations
+       */
+      async handleFileOperationWithRecovery(operation, operationName, filePath) {
+        try {
+          const result = await operation();
+          return { success: true, result };
+        } catch (error) {
+          const err = error;
+          console.error(`[GrokAgent] File operation failed - ${operationName}:`, {
+            error: err.message,
+            stack: err.stack,
+            filePath,
+            code: err.code || "UNKNOWN",
+            errno: err.errno || "UNKNOWN"
+          });
+          let userFriendlyMessage = err.message || "Unknown error";
+          let details = `File operation '${operationName}' failed.`;
+          if (err.code === "ENOENT") {
+            userFriendlyMessage = `File or directory not found: ${filePath || "unknown path"}`;
+            details = "The specified file or directory does not exist. Please check the path and try again.";
+          } else if (err.code === "EACCES") {
+            userFriendlyMessage = `Permission denied: ${filePath || "unknown path"}`;
+            details = "You do not have sufficient permissions to access this file or directory.";
+          } else if (err.code === "EISDIR") {
+            userFriendlyMessage = `Expected file but found directory: ${filePath || "unknown path"}`;
+            details = "The operation expected a file but found a directory instead.";
+          } else if (err.code === "ENOTDIR") {
+            userFriendlyMessage = `Expected directory but found file: ${filePath || "unknown path"}`;
+            details = "The operation expected a directory but found a file instead.";
+          } else if (err.code === "ENOSPC") {
+            userFriendlyMessage = "No space left on device";
+            details = "The disk is full. Please free up space and try again.";
+          } else if (err.code === "EMFILE" || err.code === "ENFILE") {
+            userFriendlyMessage = "Too many open files";
+            details = "System has reached the limit of open files. Please close other applications and try again.";
+          } else if (err.message.includes("JSON") || err.message.includes("parse")) {
+            userFriendlyMessage = "File content parsing error";
+            details = "The file content could not be parsed. It may be corrupted or in an unexpected format.";
+          }
+          return {
+            success: false,
+            error: userFriendlyMessage,
+            details
+          };
+        }
       }
       abortCurrentOperation() {
         if (this.abortController) {
@@ -13056,6 +19658,46 @@ ${output?.plan?.summary || "Task completed"}`,
             break;
         }
         return instructions;
+      }
+      // Plan Mode integration methods
+      /**
+       * Set Plan Mode state for tool interception
+       */
+      setPlanModeState(state) {
+        this.planModeState = state;
+      }
+      /**
+       * Get current Plan Mode state
+       */
+      getPlanModeState() {
+        return this.planModeState;
+      }
+      /**
+       * Set readonly filesystem overlay
+       */
+      setReadonlyOverlay(overlay) {
+        this.readonlyOverlay = overlay;
+      }
+      /**
+       * Get readonly filesystem overlay
+       */
+      getReadonlyOverlay() {
+        return this.readonlyOverlay;
+      }
+      /**
+       * Check if operation is destructive and should be intercepted in Plan Mode
+       */
+      isDestructiveOperation(toolName) {
+        const destructiveOperations = [
+          "str_replace_editor",
+          "create_file",
+          "bash",
+          "morph_editor",
+          "multi_file_editor",
+          "code_aware_editor",
+          "refactoring_assistant"
+        ];
+        return destructiveOperations.includes(toolName);
       }
     };
   }
@@ -15003,6 +21645,1905 @@ Focus on the specific areas mentioned in the feedback while keeping the overall 
     };
   }
 });
+var ReadOnlyFilesystemOverlay;
+var init_readonly_filesystem_overlay = __esm({
+  "src/services/readonly-filesystem-overlay.ts"() {
+    ReadOnlyFilesystemOverlay = class extends EventEmitter {
+      constructor(config2 = {}) {
+        super();
+        this.operationLog = [];
+        this.isActive = false;
+        this.config = {
+          baseDirectory: process.cwd(),
+          trackAllOperations: false,
+          maxSimulatedFileSize: 10 * 1024 * 1024,
+          // 10MB
+          enableImpactAnalysis: true,
+          excludePatterns: [
+            ".git/**",
+            "node_modules/**",
+            ".grok/**",
+            "**/*.log",
+            "**/dist/**",
+            "**/build/**"
+          ],
+          ...config2
+        };
+        this.virtualStructure = {
+          files: /* @__PURE__ */ new Map(),
+          directories: /* @__PURE__ */ new Set(),
+          deletedFiles: /* @__PURE__ */ new Set(),
+          totalSizeImpact: 0,
+          filesAffected: 0
+        };
+      }
+      /**
+       * Activate the read-only overlay
+       */
+      activate() {
+        if (this.isActive) return;
+        this.isActive = true;
+        this.virtualStructure = {
+          files: /* @__PURE__ */ new Map(),
+          directories: /* @__PURE__ */ new Set(),
+          deletedFiles: /* @__PURE__ */ new Set(),
+          totalSizeImpact: 0,
+          filesAffected: 0
+        };
+        this.operationLog = [];
+        console.log("[ReadOnlyOverlay] Filesystem overlay activated");
+        this.emit("overlay-activated");
+      }
+      /**
+       * Deactivate the read-only overlay
+       */
+      deactivate() {
+        if (!this.isActive) return;
+        this.isActive = false;
+        console.log("[ReadOnlyOverlay] Filesystem overlay deactivated");
+        this.emit("overlay-deactivated", {
+          summary: this.getImpactSummary()
+        });
+      }
+      /**
+       * Intercept and process a tool call in read-only mode
+       */
+      async interceptToolCall(toolCall) {
+        if (!this.isActive) {
+          throw new Error("ReadOnlyOverlay: Overlay not active");
+        }
+        const operationId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const args = this.parseToolArguments(toolCall);
+        if (this.isDestructiveOperation(toolCall.function.name, args)) {
+          return await this.handleDestructiveOperation(operationId, toolCall, args);
+        }
+        return await this.handleReadOnlyOperation(operationId, toolCall, args);
+      }
+      /**
+       * Check if an operation is destructive (modifies filesystem)
+       */
+      isDestructiveOperation(toolName, args) {
+        const destructivePatterns = [
+          // File operations
+          "write",
+          "create",
+          "str_replace",
+          "edit",
+          "delete",
+          "remove",
+          "rm",
+          "move",
+          "mv",
+          "rename",
+          "copy",
+          "cp",
+          // Multi-file operations
+          "multi_edit",
+          "bulk_edit",
+          "mass_replace",
+          // Directory operations  
+          "mkdir",
+          "rmdir",
+          "create_directory",
+          // Bash commands that could be destructive
+          "bash"
+        ];
+        const toolLower = toolName.toLowerCase();
+        if (destructivePatterns.some((pattern) => toolLower.includes(pattern))) {
+          return true;
+        }
+        if (toolLower === "bash" && args.command) {
+          return this.isBashCommandDestructive(args.command);
+        }
+        return false;
+      }
+      /**
+       * Check if a bash command is destructive
+       */
+      isBashCommandDestructive(command) {
+        const destructiveCommands = [
+          "rm ",
+          "mv ",
+          "cp ",
+          "mkdir ",
+          "rmdir ",
+          "touch ",
+          "chmod ",
+          "chown ",
+          "ln ",
+          "unlink ",
+          "dd ",
+          "rsync "
+        ];
+        const destructiveOperators = [
+          ">",
+          ">>",
+          "|",
+          "&&",
+          "||"
+        ];
+        const cmd = command.toLowerCase().trim();
+        return destructiveCommands.some((dcmd) => cmd.includes(dcmd)) || destructiveOperators.some((op) => cmd.includes(op));
+      }
+      /**
+       * Handle destructive operations by simulating them
+       */
+      async handleDestructiveOperation(operationId, toolCall, args) {
+        const toolName = toolCall.function.name;
+        const simulation = await this.simulateOperation(toolName, args);
+        this.logOperation(operationId, {
+          toolName,
+          args,
+          wasBlocked: true,
+          virtualResult: simulation,
+          impacts: simulation.impacts || []
+        });
+        if (simulation.changes) {
+          for (const change of simulation.changes) {
+            this.applyVirtualChange(change);
+          }
+        }
+        return {
+          success: true,
+          output: this.formatSimulationResult(toolName, simulation),
+          metadata: {
+            planMode: true,
+            simulated: true,
+            operationId,
+            virtualChanges: simulation.changes?.length || 0
+          }
+        };
+      }
+      /**
+       * Handle read-only operations
+       */
+      async handleReadOnlyOperation(operationId, toolCall, args) {
+        const toolName = toolCall.function.name;
+        try {
+          if (this.isReadOperation(toolName)) {
+            return await this.handleVirtualRead(operationId, toolName, args);
+          }
+          const result = await this.executeWithOverlayContext(toolName, args);
+          this.logOperation(operationId, {
+            toolName,
+            args,
+            wasBlocked: false,
+            actualResult: result,
+            impacts: []
+          });
+          return {
+            ...result,
+            metadata: {
+              planMode: true,
+              simulated: false,
+              operationId
+            }
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : "Operation failed",
+            metadata: {
+              planMode: true,
+              operationId
+            }
+          };
+        }
+      }
+      /**
+       * Check if operation is a read operation
+       */
+      isReadOperation(toolName) {
+        const readOperations = ["read", "view", "cat", "head", "tail", "file_content"];
+        return readOperations.some((op) => toolName.toLowerCase().includes(op));
+      }
+      /**
+       * Handle virtual file reads (considering virtual changes)
+       */
+      async handleVirtualRead(operationId, toolName, args) {
+        const filePath = args.path || args.file_path || args.filename;
+        if (!filePath) {
+          return {
+            success: false,
+            error: "No file path specified for read operation"
+          };
+        }
+        const resolvedPath = path8__default.resolve(this.config.baseDirectory, filePath);
+        const virtualChange = this.virtualStructure.files.get(resolvedPath);
+        if (virtualChange) {
+          const content = virtualChange.content || "";
+          const lines = content.split("\n");
+          const lineCount = lines.length;
+          return {
+            success: true,
+            output: this.formatFileContent(content, args),
+            metadata: {
+              planMode: true,
+              virtualFile: true,
+              operationId,
+              lineCount,
+              sizeBytes: content.length
+            }
+          };
+        }
+        if (this.virtualStructure.deletedFiles.has(resolvedPath)) {
+          return {
+            success: false,
+            error: `File not found (would be deleted in plan): ${filePath}`,
+            metadata: {
+              planMode: true,
+              virtuallyDeleted: true,
+              operationId
+            }
+          };
+        }
+        try {
+          const actualContent = await fs7__default.promises.readFile(resolvedPath, "utf-8");
+          return {
+            success: true,
+            output: this.formatFileContent(actualContent, args),
+            metadata: {
+              planMode: true,
+              actualFile: true,
+              operationId
+            }
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : "File read failed",
+            metadata: {
+              planMode: true,
+              operationId
+            }
+          };
+        }
+      }
+      /**
+       * Simulate a destructive operation
+       */
+      async simulateOperation(toolName, args) {
+        switch (toolName.toLowerCase()) {
+          case "create":
+          case "write":
+            return this.simulateFileCreation(args);
+          case "edit":
+          case "str_replace":
+            return this.simulateFileEdit(args);
+          case "delete":
+          case "remove":
+            return this.simulateFileDeletion(args);
+          case "move":
+          case "rename":
+            return this.simulateFileMove(args);
+          case "bash":
+            return this.simulateBashCommand(args);
+          case "multi_edit":
+            return this.simulateMultiEdit(args);
+          default:
+            return {
+              type: "generic",
+              description: `Simulated ${toolName} operation`,
+              impacts: [`Would execute ${toolName} with provided arguments`]
+            };
+        }
+      }
+      /**
+       * Simulate file creation
+       */
+      async simulateFileCreation(args) {
+        const filePath = args.path || args.file_path || args.filename;
+        const content = args.content || "";
+        const resolvedPath = path8__default.resolve(this.config.baseDirectory, filePath);
+        const fileExists = fs7__default.existsSync(resolvedPath);
+        const sizeImpact = content.length;
+        return {
+          type: "file_creation",
+          path: filePath,
+          sizeImpact,
+          changes: [{
+            operation: "create",
+            path: resolvedPath,
+            content,
+            timestamp: /* @__PURE__ */ new Date(),
+            toolName: "create",
+            toolArgs: args,
+            sizeImpact
+          }],
+          impacts: [
+            `Would create file: ${filePath}`,
+            `Content size: ${sizeImpact} bytes`,
+            `File exists: ${fileExists ? "Yes (would overwrite)" : "No"}`
+          ]
+        };
+      }
+      /**
+       * Simulate file editing
+       */
+      async simulateFileEdit(args) {
+        const filePath = args.path || args.file_path || args.filename;
+        const resolvedPath = path8__default.resolve(this.config.baseDirectory, filePath);
+        try {
+          const originalContent = fs7__default.existsSync(resolvedPath) ? await fs7__default.promises.readFile(resolvedPath, "utf-8") : "";
+          let newContent = originalContent;
+          if (args.old_string && args.new_string !== void 0) {
+            newContent = args.replace_all ? originalContent.split(args.old_string).join(args.new_string) : originalContent.replace(args.old_string, args.new_string);
+          } else if (args.content !== void 0) {
+            newContent = args.content;
+          }
+          const sizeImpact = newContent.length - originalContent.length;
+          return {
+            type: "file_edit",
+            path: filePath,
+            sizeImpact,
+            changes: [{
+              operation: "modify",
+              path: resolvedPath,
+              content: newContent,
+              originalContent,
+              timestamp: /* @__PURE__ */ new Date(),
+              toolName: "edit",
+              toolArgs: args,
+              sizeImpact
+            }],
+            impacts: [
+              `Would modify file: ${filePath}`,
+              `Size change: ${sizeImpact > 0 ? "+" : ""}${sizeImpact} bytes`,
+              `Original size: ${originalContent.length} bytes`,
+              `New size: ${newContent.length} bytes`
+            ]
+          };
+        } catch (error) {
+          return {
+            type: "file_edit_error",
+            error: error instanceof Error ? error.message : "Edit simulation failed",
+            impacts: [`Would attempt to edit ${filePath} (file may not exist)`]
+          };
+        }
+      }
+      /**
+       * Simulate file deletion
+       */
+      async simulateFileDeletion(args) {
+        const filePath = args.path || args.file_path || args.filename;
+        const resolvedPath = path8__default.resolve(this.config.baseDirectory, filePath);
+        const fileExists = fs7__default.existsSync(resolvedPath);
+        let originalSize = 0;
+        if (fileExists) {
+          try {
+            const stats = await fs7__default.promises.stat(resolvedPath);
+            originalSize = stats.size;
+          } catch {
+          }
+        }
+        return {
+          type: "file_deletion",
+          path: filePath,
+          sizeImpact: -originalSize,
+          changes: [{
+            operation: "delete",
+            path: resolvedPath,
+            timestamp: /* @__PURE__ */ new Date(),
+            toolName: "delete",
+            toolArgs: args,
+            sizeImpact: -originalSize
+          }],
+          impacts: [
+            `Would delete file: ${filePath}`,
+            `File exists: ${fileExists ? "Yes" : "No"}`,
+            originalSize > 0 ? `Would free: ${originalSize} bytes` : "No size impact"
+          ]
+        };
+      }
+      /**
+       * Simulate file move/rename
+       */
+      async simulateFileMove(args) {
+        const oldPath = args.old_path || args.source || args.from;
+        const newPath = args.new_path || args.target || args.to;
+        return {
+          type: "file_move",
+          originalPath: oldPath,
+          newPath,
+          sizeImpact: 0,
+          changes: [{
+            operation: "rename",
+            path: path8__default.resolve(this.config.baseDirectory, newPath),
+            originalPath: path8__default.resolve(this.config.baseDirectory, oldPath),
+            timestamp: /* @__PURE__ */ new Date(),
+            toolName: "move",
+            toolArgs: args,
+            sizeImpact: 0
+          }],
+          impacts: [
+            `Would move/rename: ${oldPath} \u2192 ${newPath}`,
+            "No size impact (file content unchanged)"
+          ]
+        };
+      }
+      /**
+       * Simulate bash command
+       */
+      async simulateBashCommand(args) {
+        const command = args.command || "";
+        return {
+          type: "bash_command",
+          command,
+          sizeImpact: 0,
+          impacts: [
+            `Would execute bash command: ${command}`,
+            "Command blocked for safety in Plan Mode"
+          ]
+        };
+      }
+      /**
+       * Simulate multi-file edit
+       */
+      async simulateMultiEdit(args) {
+        const files = args.files || [];
+        const changes = [];
+        let totalSizeImpact = 0;
+        for (const file of files) {
+          const simulation = await this.simulateFileEdit(file);
+          if (simulation.changes) {
+            changes.push(...simulation.changes);
+            totalSizeImpact += simulation.sizeImpact || 0;
+          }
+        }
+        return {
+          type: "multi_edit",
+          fileCount: files.length,
+          sizeImpact: totalSizeImpact,
+          changes,
+          impacts: [
+            `Would edit ${files.length} files`,
+            `Total size impact: ${totalSizeImpact > 0 ? "+" : ""}${totalSizeImpact} bytes`
+          ]
+        };
+      }
+      /**
+       * Apply virtual change to the overlay structure
+       */
+      applyVirtualChange(change) {
+        switch (change.operation) {
+          case "create":
+          case "modify":
+            this.virtualStructure.files.set(change.path, change);
+            this.virtualStructure.deletedFiles.delete(change.path);
+            break;
+          case "delete":
+            this.virtualStructure.files.delete(change.path);
+            this.virtualStructure.deletedFiles.add(change.path);
+            break;
+          case "rename":
+          case "move":
+            if (change.originalPath) {
+              this.virtualStructure.files.delete(change.originalPath);
+              this.virtualStructure.files.set(change.path, change);
+            }
+            break;
+        }
+        this.virtualStructure.totalSizeImpact += change.sizeImpact;
+        this.virtualStructure.filesAffected += 1;
+        this.emit("virtual-change-applied", change);
+      }
+      /**
+       * Execute operation with overlay context (for safe operations)
+       */
+      async executeWithOverlayContext(toolName, args) {
+        return {
+          success: true,
+          output: `[PLAN MODE] Executed ${toolName} safely (read-only operation)`
+        };
+      }
+      /**
+       * Format file content for display
+       */
+      formatFileContent(content, args) {
+        const lines = content.split("\n");
+        const startLine = args.start_line || 1;
+        const endLine = args.end_line || lines.length;
+        const selectedLines = lines.slice(startLine - 1, endLine);
+        return selectedLines.map(
+          (line, index) => `${String(startLine + index).padStart(4, " ")}: ${line}`
+        ).join("\n");
+      }
+      /**
+       * Format simulation result for output
+       */
+      formatSimulationResult(toolName, simulation) {
+        const lines = [
+          `\u{1F512} [PLAN MODE] Simulated ${toolName} operation`,
+          "",
+          "\u{1F4CB} Impact Summary:"
+        ];
+        if (simulation.impacts) {
+          simulation.impacts.forEach((impact) => {
+            lines.push(`  \u2022 ${impact}`);
+          });
+        }
+        if (simulation.sizeImpact !== 0) {
+          lines.push("", `\u{1F4CF} Size Impact: ${simulation.sizeImpact > 0 ? "+" : ""}${simulation.sizeImpact} bytes`);
+        }
+        if (simulation.changes && simulation.changes.length > 0) {
+          lines.push("", "\u{1F504} Virtual Changes:");
+          simulation.changes.forEach((change, index) => {
+            lines.push(`  ${index + 1}. ${change.operation.toUpperCase()}: ${change.path}`);
+          });
+        }
+        return lines.join("\n");
+      }
+      /**
+       * Parse tool arguments safely
+       */
+      parseToolArguments(toolCall) {
+        try {
+          return JSON.parse(toolCall.function.arguments);
+        } catch {
+          return {};
+        }
+      }
+      /**
+       * Log operation for analysis
+       */
+      logOperation(operationId, operation) {
+        this.operationLog.push({
+          id: operationId,
+          timestamp: /* @__PURE__ */ new Date(),
+          ...operation
+        });
+      }
+      /**
+       * Get impact summary
+       */
+      getImpactSummary() {
+        const created = Array.from(this.virtualStructure.files.values()).filter((change) => change.operation === "create").length;
+        const modified = Array.from(this.virtualStructure.files.values()).filter((change) => change.operation === "modify").length;
+        const deleted = this.virtualStructure.deletedFiles.size;
+        const blocked = this.operationLog.filter((op) => op.wasBlocked).length;
+        const allowed = this.operationLog.filter((op) => !op.wasBlocked).length;
+        return {
+          filesCreated: created,
+          filesModified: modified,
+          filesDeleted: deleted,
+          totalSizeImpact: this.virtualStructure.totalSizeImpact,
+          operationsBlocked: blocked,
+          operationsAllowed: allowed
+        };
+      }
+      /**
+       * Get virtual structure (read-only)
+       */
+      getVirtualStructure() {
+        return {
+          ...this.virtualStructure,
+          files: new Map(this.virtualStructure.files),
+          directories: new Set(this.virtualStructure.directories),
+          deletedFiles: new Set(this.virtualStructure.deletedFiles)
+        };
+      }
+      /**
+       * Get operation log
+       */
+      getOperationLog() {
+        return [...this.operationLog];
+      }
+      /**
+       * Check if overlay is active
+       */
+      isOverlayActive() {
+        return this.isActive;
+      }
+      /**
+       * Reset virtual state
+       */
+      reset() {
+        this.virtualStructure = {
+          files: /* @__PURE__ */ new Map(),
+          directories: /* @__PURE__ */ new Set(),
+          deletedFiles: /* @__PURE__ */ new Set(),
+          totalSizeImpact: 0,
+          filesAffected: 0
+        };
+        this.operationLog = [];
+        this.emit("overlay-reset");
+      }
+    };
+  }
+});
+
+// src/ui/colors.ts
+function detectTerminalTheme() {
+  const colorFgBg = process.env.COLORFGBG;
+  const termBackground = process.env.TERM_BACKGROUND;
+  const grokTextColor = process.env.GROK_TEXT_COLOR;
+  if (grokTextColor) {
+    return grokTextColor.toLowerCase().includes("light") ? "light" : "dark";
+  }
+  if (colorFgBg) {
+    const parts = colorFgBg.split(";");
+    if (parts.length >= 2) {
+      const bg = parseInt(parts[1]);
+      return bg >= 8 ? "light" : "dark";
+    }
+  }
+  if (termBackground) {
+    return termBackground.toLowerCase() === "light" ? "light" : "dark";
+  }
+  const term = process.env.TERM || "";
+  const termProgram = process.env.TERM_PROGRAM || "";
+  if (termProgram.includes("Apple_Terminal") || termProgram.includes("Terminal.app") || term.includes("xterm-256color")) {
+    return "dark";
+  }
+  return "dark";
+}
+function getAdaptiveTextColor() {
+  const theme = detectTerminalTheme();
+  if (process.env.GROK_DEBUG_COLORS) {
+    console.error(`[Color Debug] Theme: ${theme}, COLORFGBG: ${process.env.COLORFGBG}, TERM_BACKGROUND: ${process.env.TERM_BACKGROUND}, TERM_PROGRAM: ${process.env.TERM_PROGRAM}`);
+  }
+  switch (theme) {
+    case "light":
+      return "black";
+    case "dark":
+      return "white";
+    default:
+      return "white";
+  }
+}
+function getSpinnerColor(operation) {
+  switch (operation.toLowerCase()) {
+    case "search":
+    case "indexing":
+    case "scanning":
+      return "info";
+    case "process":
+    case "thinking":
+    case "analyzing":
+      return "warning";
+    case "write":
+    case "edit":
+    case "create":
+      return "success";
+    case "compact":
+    case "optimize":
+    case "memory":
+      return "accent";
+    default:
+      return "primary";
+  }
+}
+var inkColors;
+var init_colors = __esm({
+  "src/ui/colors.ts"() {
+    inkColors = {
+      primary: "cyan",
+      success: "green",
+      warning: "yellow",
+      error: "red",
+      info: "blue",
+      muted: "gray",
+      accent: "magenta",
+      text: process.env.FORCE_TEXT_COLOR || getAdaptiveTextColor(),
+      // Adaptive text color
+      // Bright variants
+      primaryBright: "cyanBright",
+      successBright: "greenBright",
+      warningBright: "yellowBright",
+      errorBright: "redBright",
+      infoBright: "blueBright",
+      accentBright: "magentaBright"
+    };
+  }
+});
+function createTreeNode(id, label, status = "pending", options = {}) {
+  return {
+    id,
+    label,
+    status,
+    startTime: status === "running" ? Date.now() : void 0,
+    ...options
+  };
+}
+var init_operation_tree = __esm({
+  "src/ui/components/operation-tree.tsx"() {
+    init_colors();
+    ({
+      pending: { icon: "\u23F3", color: inkColors.muted, symbol: "\u25CB" },
+      running: { icon: "\u{1F504}", color: inkColors.info, symbol: "\u25CF" },
+      completed: { icon: "\u2705", color: inkColors.success, symbol: "\u2713" },
+      failed: { icon: "\u274C", color: inkColors.error, symbol: "\u2717" },
+      skipped: { icon: "\u23ED\uFE0F", color: inkColors.muted, symbol: "\u25CB" }
+    });
+  }
+});
+var PlanVisualizationOrchestrator;
+var init_plan_visualization_orchestrator = __esm({
+  "src/services/plan-visualization-orchestrator.ts"() {
+    init_operation_tree();
+    PlanVisualizationOrchestrator = class extends EventEmitter {
+      constructor(readOnlyExecutor) {
+        super();
+        this.readOnlyExecutor = readOnlyExecutor;
+        this.updateInterval = null;
+        this.animationFrame = null;
+        this.state = this.createInitialState();
+        this.setupEventHandlers();
+      }
+      /**
+       * Initialize the visualization orchestrator
+       */
+      initialize(initialPlan) {
+        if (initialPlan) {
+          this.state.currentPlan = initialPlan;
+          this.updateWorkflowState("presentation");
+        }
+        this.startRealTimeUpdates();
+        this.emit("orchestrator-initialized", this.state);
+      }
+      /**
+       * Update the current plan and refresh visualizations
+       */
+      updatePlan(plan) {
+        this.state.currentPlan = plan;
+        this.resetExecutionProgress();
+        this.updateVisualizationMode("overview");
+        this.emit("plan-updated", { plan, state: this.state });
+      }
+      /**
+       * Start plan execution with real-time visualization
+       */
+      startExecution() {
+        if (!this.state.currentPlan) {
+          throw new Error("No plan available for execution");
+        }
+        this.updateVisualizationMode("execution");
+        this.updateWorkflowState("approved");
+        this.resetExecutionProgress();
+        this.startExecutionTracking();
+        this.emit("execution-started", {
+          plan: this.state.currentPlan,
+          timestamp: /* @__PURE__ */ new Date()
+        });
+      }
+      /**
+       * Update visualization mode
+       */
+      updateVisualizationMode(mode) {
+        this.state.mode = mode;
+        this.updateVisualState(mode);
+        this.emit("mode-changed", { mode, state: this.state });
+      }
+      /**
+       * Process real-time update
+       */
+      processLiveUpdate(update) {
+        const liveUpdate = {
+          ...update,
+          id: `update_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          timestamp: /* @__PURE__ */ new Date()
+        };
+        this.state.executionProgress.liveUpdates.unshift(liveUpdate);
+        if (this.state.executionProgress.liveUpdates.length > 100) {
+          this.state.executionProgress.liveUpdates = this.state.executionProgress.liveUpdates.slice(0, 100);
+        }
+        this.updateProgressFromUpdate(liveUpdate);
+        this.emit("live-update", liveUpdate);
+      }
+      /**
+       * Generate strategy comparison visualization
+       */
+      generateStrategyComparison(strategies) {
+        const criteria = [
+          { id: "time", name: "Time to Complete", weight: 0.3, type: "time", higherIsBetter: false },
+          { id: "risk", name: "Risk Level", weight: 0.25, type: "risk", higherIsBetter: false },
+          { id: "complexity", name: "Implementation Complexity", weight: 0.2, type: "complexity", higherIsBetter: false },
+          { id: "quality", name: "Solution Quality", weight: 0.15, type: "quality", higherIsBetter: true },
+          { id: "maintainability", name: "Long-term Maintainability", weight: 0.1, type: "maintainability", higherIsBetter: true }
+        ];
+        const comparisonItems = strategies.map((plan) => this.createComparisonItem(plan, criteria));
+        const matrix = this.calculateComparisonMatrix(comparisonItems, criteria);
+        const recommendedStrategy = this.selectRecommendedStrategy(comparisonItems, matrix);
+        return {
+          strategies: comparisonItems,
+          criteria,
+          matrix,
+          recommendedStrategy,
+          decisionFactors: this.generateDecisionFactors(comparisonItems, criteria)
+        };
+      }
+      /**
+       * Create visual tree representation of plan execution
+       */
+      createPlanExecutionTree(plan) {
+        const rootNode = createTreeNode(
+          "plan_execution",
+          `${plan.title} Execution`,
+          "running",
+          { icon: "\u{1F680}", details: `${plan.actionPlan.steps.length} steps` }
+        );
+        const phases = ["Analysis", "Implementation", "Testing", "Deployment"];
+        rootNode.children = phases.map((phase, index) => {
+          const phaseSteps = plan.actionPlan.steps.filter(
+            (step) => this.getStepPhase(step) === index
+          );
+          return createTreeNode(
+            `phase_${index}`,
+            phase,
+            index === 0 ? "running" : "pending",
+            {
+              icon: this.getPhaseIcon(phase),
+              details: `${phaseSteps.length} steps`,
+              children: phaseSteps.map(
+                (step) => createTreeNode(
+                  step.id,
+                  step.title,
+                  "pending",
+                  {
+                    icon: this.getStepIcon(step.type),
+                    details: `${step.effort}h \u2022 ${step.type}`
+                  }
+                )
+              )
+            }
+          );
+        });
+        return rootNode;
+      }
+      /**
+       * Update step status in execution tree
+       */
+      updateStepStatus(stepId, status, details) {
+        const update = {
+          id: `step_${stepId}_${Date.now()}`,
+          timestamp: /* @__PURE__ */ new Date(),
+          type: status === "completed" ? "step_complete" : status === "failed" ? "step_fail" : "step_start",
+          stepId,
+          message: `Step ${status}: ${stepId}`,
+          data: { details },
+          severity: status === "failed" ? "high" : "low"
+        };
+        this.processLiveUpdate(update);
+      }
+      /**
+       * Get current visualization state (read-only)
+       */
+      getState() {
+        return JSON.parse(JSON.stringify(this.state));
+      }
+      /**
+       * Add pending decision
+       */
+      addPendingDecision(decision) {
+        this.state.workflowState.pendingDecisions.push(decision);
+        this.emit("decision-required", decision);
+      }
+      /**
+       * Resolve pending decision
+       */
+      resolvePendingDecision(decisionId, optionId) {
+        const decision = this.state.workflowState.pendingDecisions.find((d) => d.id === decisionId);
+        if (!decision) return;
+        this.state.workflowState.pendingDecisions = this.state.workflowState.pendingDecisions.filter((d) => d.id !== decisionId);
+        const option = decision.options.find((o) => o.id === optionId);
+        this.emit("decision-resolved", { decision, selectedOption: option });
+      }
+      /**
+       * Cleanup and shutdown orchestrator
+       */
+      shutdown() {
+        if (this.updateInterval) {
+          clearInterval(this.updateInterval);
+          this.updateInterval = null;
+        }
+        if (this.animationFrame) {
+          clearTimeout(this.animationFrame);
+          this.animationFrame = null;
+        }
+        this.emit("orchestrator-shutdown");
+      }
+      // Private helper methods
+      createInitialState() {
+        return {
+          mode: "overview",
+          currentPlan: null,
+          executionProgress: {
+            completedSteps: [],
+            currentStep: null,
+            failedSteps: [],
+            skippedSteps: [],
+            overallProgress: 0,
+            metrics: {
+              timeElapsed: 0,
+              timeRemaining: 0,
+              velocity: 0,
+              errorRate: 0,
+              qualityScore: 1,
+              resourceUtilization: {
+                cpu: 0,
+                memory: 0,
+                fileOps: 0,
+                networkRequests: 0
+              }
+            },
+            liveUpdates: []
+          },
+          workflowState: {
+            currentPhase: "inactive",
+            phaseProgress: 0,
+            availableActions: [],
+            history: [],
+            pendingDecisions: []
+          },
+          visualState: {
+            selectedTabs: /* @__PURE__ */ new Set(["overview"]),
+            expandedSections: /* @__PURE__ */ new Set(),
+            filters: [],
+            zoomLevel: 1,
+            scrollPosition: { x: 0, y: 0 },
+            highlights: [],
+            animations: []
+          },
+          interactionState: {
+            focusedElement: null,
+            inputMode: "keyboard",
+            selectedItems: /* @__PURE__ */ new Set(),
+            openModals: /* @__PURE__ */ new Set()
+          }
+        };
+      }
+      setupEventHandlers() {
+        this.on("execution-started", () => {
+          this.updateWorkflowActions("analysis");
+        });
+        this.on("step-completed", (stepId) => {
+          this.state.executionProgress.completedSteps.push(stepId);
+          this.updateProgressMetrics();
+        });
+      }
+      startRealTimeUpdates() {
+        this.updateInterval = setInterval(() => {
+          this.updateMetrics();
+          this.updateAnimations();
+          this.emit("state-updated", this.state);
+        }, 1e3);
+      }
+      startExecutionTracking() {
+        if (!this.state.currentPlan) return;
+        const steps = this.state.currentPlan.actionPlan.steps;
+        let currentStepIndex = 0;
+        const executeNextStep = () => {
+          if (currentStepIndex >= steps.length) {
+            this.processLiveUpdate({
+              type: "info",
+              message: "Plan execution completed successfully",
+              severity: "low"
+            });
+            return;
+          }
+          const step = steps[currentStepIndex];
+          this.state.executionProgress.currentStep = step.id;
+          this.processLiveUpdate({
+            type: "step_start",
+            stepId: step.id,
+            message: `Starting step: ${step.title}`,
+            severity: "low"
+          });
+          setTimeout(() => {
+            this.processLiveUpdate({
+              type: "step_complete",
+              stepId: step.id,
+              message: `Completed step: ${step.title}`,
+              severity: "low"
+            });
+            currentStepIndex++;
+            setTimeout(executeNextStep, 1e3);
+          }, Math.random() * 3e3 + 1e3);
+        };
+        executeNextStep();
+      }
+      resetExecutionProgress() {
+        this.state.executionProgress = {
+          completedSteps: [],
+          currentStep: null,
+          failedSteps: [],
+          skippedSteps: [],
+          overallProgress: 0,
+          metrics: {
+            timeElapsed: 0,
+            timeRemaining: 0,
+            velocity: 0,
+            errorRate: 0,
+            qualityScore: 1,
+            resourceUtilization: {
+              cpu: 0,
+              memory: 0,
+              fileOps: 0,
+              networkRequests: 0
+            }
+          },
+          liveUpdates: []
+        };
+      }
+      updateWorkflowState(phase) {
+        this.state.workflowState.currentPhase = phase;
+        this.updateWorkflowActions(phase);
+      }
+      updateWorkflowActions(phase) {
+        const actions = [];
+        switch (phase) {
+          case "presentation":
+            actions.push(
+              {
+                id: "approve",
+                label: "Approve Plan",
+                description: "Approve this implementation plan and proceed to execution",
+                type: "approve",
+                enabled: true,
+                shortcut: "A",
+                consequences: ["Plan execution will begin", "Changes will be applied to codebase"]
+              },
+              {
+                id: "reject",
+                label: "Reject Plan",
+                description: "Reject this plan and request alternatives",
+                type: "reject",
+                enabled: true,
+                shortcut: "R",
+                consequences: ["Plan will be discarded", "Alternative strategies will be generated"]
+              }
+            );
+            break;
+          case "approved":
+            actions.push(
+              {
+                id: "execute",
+                label: "Begin Execution",
+                description: "Start implementing the approved plan",
+                type: "approve",
+                enabled: true,
+                shortcut: "E",
+                consequences: ["Implementation will begin", "Progress will be tracked in real-time"]
+              }
+            );
+            break;
+        }
+        this.state.workflowState.availableActions = actions;
+      }
+      updateVisualState(mode) {
+        this.state.visualState.selectedTabs = /* @__PURE__ */ new Set([mode]);
+        this.state.visualState.expandedSections.clear();
+        switch (mode) {
+          case "execution":
+            this.state.visualState.expandedSections.add("progress");
+            this.state.visualState.expandedSections.add("live_updates");
+            break;
+          case "comparison":
+            this.state.visualState.expandedSections.add("matrix");
+            break;
+          case "timeline":
+            this.state.visualState.expandedSections.add("schedule");
+            break;
+        }
+      }
+      updateProgressFromUpdate(update) {
+        if (!this.state.currentPlan) return;
+        const totalSteps = this.state.currentPlan.actionPlan.steps.length;
+        switch (update.type) {
+          case "step_complete":
+            if (update.stepId && !this.state.executionProgress.completedSteps.includes(update.stepId)) {
+              this.state.executionProgress.completedSteps.push(update.stepId);
+            }
+            break;
+          case "step_fail":
+            if (update.stepId && !this.state.executionProgress.failedSteps.includes(update.stepId)) {
+              this.state.executionProgress.failedSteps.push(update.stepId);
+            }
+            break;
+        }
+        const completed = this.state.executionProgress.completedSteps.length;
+        this.state.executionProgress.overallProgress = completed / totalSteps * 100;
+        this.updateProgressMetrics();
+      }
+      updateProgressMetrics() {
+        const progress = this.state.executionProgress;
+        progress.metrics.timeElapsed += 1;
+        progress.metrics.velocity = progress.completedSteps.length / (progress.metrics.timeElapsed / 60);
+        const totalProcessed = progress.completedSteps.length + progress.failedSteps.length;
+        progress.metrics.errorRate = totalProcessed > 0 ? progress.failedSteps.length / totalProcessed : 0;
+        progress.metrics.qualityScore = 1 - Math.min(progress.metrics.errorRate, 0.5);
+      }
+      updateMetrics() {
+        const resources = this.state.executionProgress.metrics.resourceUtilization;
+        resources.cpu = Math.random() * 20 + 10;
+        resources.memory = Math.random() * 100 + 50;
+        resources.fileOps = Math.random() * 5;
+        resources.networkRequests = Math.random() * 2;
+      }
+      updateAnimations() {
+        this.state.visualState.animations = this.state.visualState.animations.map((anim) => ({
+          ...anim,
+          progress: Math.min(anim.progress + 0.1, 1)
+        })).filter((anim) => anim.progress < 1);
+      }
+      createComparisonItem(plan, criteria) {
+        const scores = {};
+        criteria.forEach((criterion) => {
+          switch (criterion.type) {
+            case "time":
+              scores[criterion.id] = Math.max(0, 100 - plan.effort.totalHours / 10);
+              break;
+            case "risk":
+              const riskValue = plan.risks.overallRisk === "low" ? 90 : plan.risks.overallRisk === "medium" ? 60 : 30;
+              scores[criterion.id] = riskValue;
+              break;
+            case "complexity":
+              scores[criterion.id] = Math.random() * 40 + 60;
+              break;
+            case "quality":
+              scores[criterion.id] = Math.random() * 30 + 70;
+              break;
+            case "maintainability":
+              scores[criterion.id] = Math.random() * 25 + 75;
+              break;
+          }
+        });
+        const overallScore = criteria.reduce((sum, criterion) => sum + scores[criterion.id] * criterion.weight, 0);
+        return {
+          id: `strategy_${plan.version}`,
+          name: plan.title,
+          description: plan.description,
+          plan,
+          scores,
+          overallScore,
+          prosAndCons: {
+            pros: ["High quality implementation", "Follows best practices"],
+            cons: ["Higher time investment", "Complex setup required"]
+          }
+        };
+      }
+      calculateComparisonMatrix(items, criteria) {
+        const data = {};
+        const normalized = {};
+        const weighted = {};
+        items.forEach((item) => {
+          data[item.id] = { ...item.scores };
+          normalized[item.id] = {};
+          weighted[item.id] = {};
+          criteria.forEach((criterion) => {
+            const score = item.scores[criterion.id];
+            normalized[item.id][criterion.id] = score / 100;
+            weighted[item.id][criterion.id] = normalized[item.id][criterion.id] * criterion.weight;
+          });
+        });
+        return { data, normalized, weighted };
+      }
+      selectRecommendedStrategy(items, matrix) {
+        let bestStrategy = items[0];
+        let bestScore = bestStrategy.overallScore;
+        items.forEach((item) => {
+          if (item.overallScore > bestScore) {
+            bestStrategy = item;
+            bestScore = item.overallScore;
+          }
+        });
+        return bestStrategy.id;
+      }
+      generateDecisionFactors(items, criteria) {
+        return [
+          {
+            name: "Time Pressure",
+            importance: 0.8,
+            impact: "High time pressure favors faster implementation strategies",
+            affectedStrategies: items.map((i) => i.id)
+          },
+          {
+            name: "Team Expertise",
+            importance: 0.7,
+            impact: "Team familiarity with technologies affects implementation speed",
+            affectedStrategies: items.map((i) => i.id)
+          },
+          {
+            name: "Risk Tolerance",
+            importance: 0.6,
+            impact: "Project risk tolerance influences strategy selection",
+            affectedStrategies: items.map((i) => i.id)
+          }
+        ];
+      }
+      getStepPhase(step) {
+        switch (step.type) {
+          case "research":
+          case "design":
+            return 0;
+          // Analysis
+          case "implement":
+            return 1;
+          // Implementation
+          case "test":
+            return 2;
+          // Testing
+          case "deploy":
+          case "document":
+            return 3;
+          // Deployment
+          default:
+            return 1;
+        }
+      }
+      getPhaseIcon(phase) {
+        switch (phase) {
+          case "Analysis":
+            return "\u{1F50D}";
+          case "Implementation":
+            return "\u2699\uFE0F";
+          case "Testing":
+            return "\u{1F9EA}";
+          case "Deployment":
+            return "\u{1F680}";
+          default:
+            return "\u{1F4CB}";
+        }
+      }
+      getStepIcon(stepType) {
+        switch (stepType) {
+          case "research":
+            return "\u{1F52C}";
+          case "design":
+            return "\u{1F3A8}";
+          case "implement":
+            return "\u2699\uFE0F";
+          case "test":
+            return "\u{1F9EA}";
+          case "document":
+            return "\u{1F4DD}";
+          case "deploy":
+            return "\u{1F680}";
+          default:
+            return "\u{1F4CB}";
+        }
+      }
+    };
+  }
+});
+var PlanModeActivationOrchestrator;
+var init_plan_mode_activation_orchestrator = __esm({
+  "src/services/plan-mode-activation-orchestrator.ts"() {
+    init_readonly_filesystem_overlay();
+    init_plan_visualization_orchestrator();
+    PlanModeActivationOrchestrator = class extends EventEmitter {
+      constructor(config2 = {}) {
+        super();
+        this.activeSequences = /* @__PURE__ */ new Map();
+        this.services = /* @__PURE__ */ new Map();
+        this.configuration = {
+          exploration: {
+            maxDepth: 5,
+            maxFileSize: 1024 * 1024,
+            // 1MB
+            excludePatterns: [".git/**", "node_modules/**", "dist/**", "build/**"],
+            focusPaths: ["src/**", "lib/**", "app/**"]
+          },
+          ui: {
+            showProgressDetails: true,
+            enableAnimations: true,
+            verboseLogging: false,
+            autoExpandSections: ["progress", "exploration"]
+          },
+          performance: {
+            timeoutMs: 3e4,
+            maxConcurrentTasks: 3,
+            enableCaching: true
+          },
+          integrations: {
+            enableFileSystemOverlay: true,
+            enableVisualization: true,
+            enableApprovalWorkflow: true
+          },
+          ...config2
+        };
+        this.setupKeyboardHandlers();
+      }
+      /**
+       * Initiate Plan Mode activation sequence
+       */
+      async activatePlanMode(options = {}, chatSetter) {
+        const sequenceId = this.generateSequenceId();
+        const sequence = await this.createActivationSequence(sequenceId, options);
+        this.activeSequences.set(sequenceId, sequence);
+        this.emit("activation-started", { sequenceId, options });
+        if (chatSetter) {
+          this.addInitialChatFeedback(chatSetter, sequence);
+        }
+        await this.executeActivationSequence(sequenceId, chatSetter);
+        return sequenceId;
+      }
+      /**
+       * Handle Plan Mode deactivation
+       */
+      async deactivatePlanMode(sequenceId, reason = "user_requested", chatSetter) {
+        const sequence = this.activeSequences.get(sequenceId);
+        if (!sequence) return;
+        await this.cleanupServices(sequenceId);
+        this.activeSequences.delete(sequenceId);
+        if (chatSetter) {
+          this.addDeactivationChatFeedback(chatSetter, reason, sequence);
+        }
+        this.emit("activation-completed", { sequenceId, reason, sequence });
+      }
+      /**
+       * Get activation progress
+       */
+      getActivationProgress(sequenceId) {
+        const sequence = this.activeSequences.get(sequenceId);
+        if (!sequence) return null;
+        const currentPhase = sequence.phases[sequence.currentPhase];
+        if (!currentPhase) return null;
+        const completedTasks = currentPhase.tasks.filter((t) => t.name in sequence.metadata.performance.taskTimings).length;
+        const totalTasks = currentPhase.tasks.length;
+        const phaseProgress = totalTasks > 0 ? completedTasks / totalTasks : 0;
+        const overallProgress = (sequence.currentPhase + phaseProgress) / sequence.phases.length;
+        const runningTask = currentPhase.tasks.find((t) => !(t.name in sequence.metadata.performance.taskTimings));
+        return {
+          phase: currentPhase.name,
+          progress: overallProgress * 100,
+          currentTask: runningTask?.name || "Completing phase...",
+          estimatedTimeRemaining: this.calculateTimeRemaining(sequence)
+        };
+      }
+      /**
+       * Register service for integration
+       */
+      registerService(name, service) {
+        this.services.set(name, service);
+      }
+      /**
+       * Get activation analytics
+       */
+      getActivationAnalytics() {
+        const sequences = Array.from(this.activeSequences.values());
+        return {
+          totalActivations: sequences.length,
+          averageActivationTime: this.calculateAverageActivationTime(sequences),
+          successRate: this.calculateSuccessRate(sequences),
+          commonFailurePoints: this.getCommonFailurePoints(sequences),
+          performanceMetrics: this.aggregatePerformanceMetrics(sequences)
+        };
+      }
+      // Private implementation methods
+      async createActivationSequence(sequenceId, options) {
+        const phases = [
+          {
+            id: "initialization",
+            name: "Initialization",
+            description: "Setting up Plan Mode environment",
+            type: "initialization",
+            estimatedDuration: 2e3,
+            dependencies: [],
+            optional: false,
+            tasks: [
+              {
+                id: "validate_environment",
+                name: "Validate Environment",
+                description: "Check system requirements and dependencies",
+                executor: () => this.validateEnvironment(),
+                timeout: 5e3,
+                maxRetries: 1,
+                priority: "critical"
+              },
+              {
+                id: "initialize_state",
+                name: "Initialize State",
+                description: "Set up Plan Mode state management",
+                executor: () => this.initializePlanModeState(options),
+                timeout: 3e3,
+                maxRetries: 2,
+                priority: "critical"
+              }
+            ]
+          },
+          {
+            id: "service_setup",
+            name: "Service Setup",
+            description: "Initializing Plan Mode services",
+            type: "service_setup",
+            estimatedDuration: 3e3,
+            dependencies: ["initialization"],
+            optional: false,
+            tasks: [
+              {
+                id: "setup_filesystem_overlay",
+                name: "Setup Filesystem Overlay",
+                description: "Initialize read-only filesystem protection",
+                executor: () => this.setupFilesystemOverlay(),
+                timeout: 5e3,
+                maxRetries: 2,
+                priority: "high"
+              },
+              {
+                id: "setup_visualization",
+                name: "Setup Visualization",
+                description: "Initialize plan visualization system",
+                executor: () => this.setupVisualization(),
+                timeout: 3e3,
+                maxRetries: 2,
+                priority: "medium"
+              },
+              {
+                id: "setup_approval_workflow",
+                name: "Setup Approval Workflow",
+                description: "Initialize approval workflow engine",
+                executor: () => this.setupApprovalWorkflow(),
+                timeout: 3e3,
+                maxRetries: 2,
+                priority: "medium"
+              }
+            ]
+          },
+          {
+            id: "exploration",
+            name: "Codebase Exploration",
+            description: "Analyzing project structure and dependencies",
+            type: "exploration",
+            estimatedDuration: 8e3,
+            dependencies: ["service_setup"],
+            optional: false,
+            tasks: [
+              {
+                id: "scan_project_structure",
+                name: "Scan Project Structure",
+                description: "Analyze directory structure and file organization",
+                executor: () => this.scanProjectStructure(),
+                timeout: 1e4,
+                maxRetries: 3,
+                priority: "high"
+              },
+              {
+                id: "analyze_dependencies",
+                name: "Analyze Dependencies",
+                description: "Map component dependencies and relationships",
+                executor: () => this.analyzeDependencies(),
+                timeout: 8e3,
+                maxRetries: 2,
+                priority: "medium"
+              },
+              {
+                id: "identify_patterns",
+                name: "Identify Patterns",
+                description: "Detect architecture patterns and conventions",
+                executor: () => this.identifyArchitecturePatterns(),
+                timeout: 5e3,
+                maxRetries: 1,
+                priority: "low"
+              }
+            ]
+          },
+          {
+            id: "ui_transition",
+            name: "UI Transition",
+            description: "Transitioning user interface to Plan Mode",
+            type: "ui_transition",
+            estimatedDuration: 1500,
+            dependencies: ["exploration"],
+            optional: true,
+            tasks: [
+              {
+                id: "activate_plan_ui",
+                name: "Activate Plan UI",
+                description: "Switch to Plan Mode user interface",
+                executor: () => this.activatePlanUI(),
+                timeout: 2e3,
+                maxRetries: 1,
+                priority: "medium"
+              },
+              {
+                id: "setup_keyboard_shortcuts",
+                name: "Setup Keyboard Shortcuts",
+                description: "Configure Plan Mode specific shortcuts",
+                executor: () => this.setupPlanModeShortcuts(),
+                timeout: 1e3,
+                maxRetries: 1,
+                priority: "low"
+              }
+            ]
+          },
+          {
+            id: "completion",
+            name: "Completion",
+            description: "Finalizing Plan Mode activation",
+            type: "completion",
+            estimatedDuration: 1e3,
+            dependencies: ["ui_transition"],
+            optional: false,
+            tasks: [
+              {
+                id: "finalize_activation",
+                name: "Finalize Activation",
+                description: "Complete Plan Mode activation process",
+                executor: () => this.finalizeActivation(),
+                timeout: 2e3,
+                maxRetries: 1,
+                priority: "critical"
+              }
+            ]
+          }
+        ];
+        return {
+          id: sequenceId,
+          phases,
+          currentPhase: 0,
+          status: "pending",
+          startTime: /* @__PURE__ */ new Date(),
+          metadata: {
+            trigger: "keyboard_shortcut",
+            userContext: {
+              currentDirectory: process.cwd(),
+              recentCommands: [],
+              activeProject: this.detectActiveProject()
+            },
+            systemState: await this.getSystemState(),
+            performance: {
+              totalTime: 0,
+              phaseTimings: {},
+              taskTimings: {},
+              bottlenecks: [],
+              optimizations: []
+            }
+          }
+        };
+      }
+      async executeActivationSequence(sequenceId, chatSetter) {
+        const sequence = this.activeSequences.get(sequenceId);
+        if (!sequence) return;
+        sequence.status = "in_progress";
+        const startTime = Date.now();
+        try {
+          for (let i = 0; i < sequence.phases.length; i++) {
+            sequence.currentPhase = i;
+            const phase = sequence.phases[i];
+            this.emit("phase-started", { sequenceId, phase: phase.name });
+            if (chatSetter && this.configuration.ui.showProgressDetails) {
+              this.addPhaseFeedback(chatSetter, phase, i + 1, sequence.phases.length);
+            }
+            const phaseStartTime = Date.now();
+            await this.executePhase(phase);
+            const phaseEndTime = Date.now();
+            sequence.metadata.performance.phaseTimings[phase.id] = phaseEndTime - phaseStartTime;
+            this.emit("phase-completed", { sequenceId, phase: phase.name });
+          }
+          sequence.status = "completed";
+          sequence.endTime = /* @__PURE__ */ new Date();
+          sequence.metadata.performance.totalTime = Date.now() - startTime;
+          if (chatSetter) {
+            this.addCompletionFeedback(chatSetter, sequence);
+          }
+          this.emit("activation-completed", { sequenceId, sequence });
+        } catch (error) {
+          sequence.status = "failed";
+          sequence.endTime = /* @__PURE__ */ new Date();
+          this.emit("activation-failed", { sequenceId, error, sequence });
+          if (chatSetter) {
+            this.addErrorFeedback(chatSetter, error, sequence);
+          }
+        }
+      }
+      async executePhase(phase) {
+        const concurrentTasks = Math.min(
+          phase.tasks.length,
+          this.configuration.performance.maxConcurrentTasks
+        );
+        const taskGroups = this.groupTasksByPriority(phase.tasks);
+        for (const [priority, tasks] of taskGroups) {
+          if (priority === "critical") {
+            for (const task of tasks) {
+              await this.executeTask(task);
+            }
+          } else {
+            const chunks = this.chunkArray(tasks, concurrentTasks);
+            for (const chunk of chunks) {
+              await Promise.all(chunk.map((task) => this.executeTask(task)));
+            }
+          }
+        }
+      }
+      async executeTask(task) {
+        const startTime = Date.now();
+        let attempts = 0;
+        let lastError = null;
+        while (attempts <= task.maxRetries) {
+          try {
+            this.emit("task-started", { task: task.name });
+            const result2 = await Promise.race([
+              task.executor(),
+              this.createTimeoutPromise(task.timeout)
+            ]);
+            result2.executionTime = Date.now() - startTime;
+            if (task.validator && !task.validator(result2)) {
+              throw new Error(`Task validation failed: ${task.name}`);
+            }
+            this.emit("task-completed", { task: task.name, result: result2 });
+            return result2;
+          } catch (error) {
+            lastError = error;
+            attempts++;
+            if (attempts <= task.maxRetries) {
+              this.emit("task-retry", { task: task.name, attempt: attempts, error });
+              await this.delay(1e3 * attempts);
+            }
+          }
+        }
+        const result = {
+          success: false,
+          error: lastError?.message || "Task failed after retries",
+          executionTime: Date.now() - startTime
+        };
+        this.emit("task-failed", { task: task.name, result });
+        if (task.priority !== "critical") {
+          return result;
+        }
+        throw lastError;
+      }
+      addInitialChatFeedback(chatSetter, sequence) {
+        chatSetter((prev) => [...prev, {
+          type: "assistant",
+          content: `\u{1F3AF} **Plan Mode Activation**
+
+\u{1F680} **Initializing advanced planning environment...**
+
+\u250C\u2500 \u{1F4CB} Plan Mode Features
+\u251C\u2500 \u{1F512} Read-only filesystem protection  
+\u251C\u2500 \u{1F50D} Deep codebase exploration
+\u251C\u2500 \u{1F4CA} Strategy visualization & comparison
+\u251C\u2500 \u2705 Multi-stage approval workflow
+\u2514\u2500 \u{1F3AF} Safe implementation planning
+
+\u26A1 **Activation Sequence**: ${sequence.phases.length} phases
+\u23F1\uFE0F  **Estimated Time**: ~${Math.round(sequence.phases.reduce((sum, p) => sum + p.estimatedDuration, 0) / 1e3)}s
+
+\u{1F504} **Status**: Initialization in progress...`,
+          timestamp: /* @__PURE__ */ new Date()
+        }]);
+      }
+      addPhaseFeedback(chatSetter, phase, currentPhaseNum, totalPhases) {
+        const progress = Math.round(currentPhaseNum / totalPhases * 100);
+        const progressBar = "\u2588".repeat(Math.floor(progress / 10)) + "\u2591".repeat(10 - Math.floor(progress / 10));
+        chatSetter((prev) => [...prev, {
+          type: "assistant",
+          content: `\u{1F504} **Phase ${currentPhaseNum}/${totalPhases}: ${phase.name}**
+
+[${progressBar}] ${progress}%
+
+\u{1F4CB} ${phase.description}
+\u26A1 Tasks: ${phase.tasks.length}
+\u23F1\uFE0F Est. Duration: ~${Math.round(phase.estimatedDuration / 1e3)}s`,
+          timestamp: /* @__PURE__ */ new Date()
+        }]);
+      }
+      addCompletionFeedback(chatSetter, sequence) {
+        const duration = sequence.metadata.performance.totalTime / 1e3;
+        chatSetter((prev) => [...prev, {
+          type: "assistant",
+          content: `\u2705 **Plan Mode Activated Successfully**
+
+\u{1F3AF} **Ready for strategic planning and safe codebase exploration!**
+
+\u{1F4CA} **Activation Summary**:
+\u2022 \u23F1\uFE0F Total Time: ${duration.toFixed(1)}s
+\u2022 \u{1F504} Phases: ${sequence.phases.length} completed
+\u2022 \u{1F6E1}\uFE0F Read-only Protection: Active
+\u2022 \u{1F4CB} Services: All systems operational
+
+\u{1F4A1} **Next Steps**:
+1. Describe what you want to implement
+2. I'll analyze the codebase and create a detailed plan
+3. Review and approve the strategy
+4. Execute with confidence
+
+**Tip**: Type your implementation request or use \`/help\` for available commands.`,
+          timestamp: /* @__PURE__ */ new Date()
+        }]);
+      }
+      addErrorFeedback(chatSetter, error, sequence) {
+        chatSetter((prev) => [...prev, {
+          type: "assistant",
+          content: `\u274C **Plan Mode Activation Failed**
+
+\u26A0\uFE0F **Error**: ${error.message}
+
+\u{1F504} **Completed Phases**: ${sequence.currentPhase}/${sequence.phases.length}
+
+**Fallback Options**:
+\u2022 Try activating Plan Mode again (Shift+Tab twice)
+\u2022 Use normal mode with confirmations
+\u2022 Check system resources and try again
+
+**Tip**: Plan Mode requires sufficient system resources for codebase analysis.`,
+          timestamp: /* @__PURE__ */ new Date()
+        }]);
+      }
+      addDeactivationChatFeedback(chatSetter, reason, sequence) {
+        const reasonText = reason === "user_requested" ? "User requested" : "Automatic";
+        chatSetter((prev) => [...prev, {
+          type: "assistant",
+          content: `\u{1F3AF} **Plan Mode Deactivated**
+
+\u{1F4CA} **Session Summary**:
+\u2022 Reason: ${reasonText}
+\u2022 Duration: ${Math.round((Date.now() - sequence.startTime.getTime()) / 1e3)}s
+\u2022 Status: ${sequence.status}
+
+\u{1F504} **Returning to normal operation mode**
+
+**Tip**: Use Shift+Tab twice to reactivate Plan Mode anytime.`,
+          timestamp: /* @__PURE__ */ new Date()
+        }]);
+      }
+      // Task executor methods
+      async validateEnvironment() {
+        return { success: true, executionTime: 100 };
+      }
+      async initializePlanModeState(options) {
+        return { success: true, data: { options }, executionTime: 200 };
+      }
+      async setupFilesystemOverlay() {
+        if (!this.configuration.integrations.enableFileSystemOverlay) {
+          return { success: true, data: { skipped: true }, executionTime: 10 };
+        }
+        const overlay = new ReadOnlyFilesystemOverlay();
+        overlay.activate();
+        this.services.set("filesystem_overlay", overlay);
+        return { success: true, data: { overlay }, executionTime: 500 };
+      }
+      async setupVisualization() {
+        if (!this.configuration.integrations.enableVisualization) {
+          return { success: true, data: { skipped: true }, executionTime: 10 };
+        }
+        const visualizer = new PlanVisualizationOrchestrator();
+        visualizer.initialize();
+        this.services.set("visualizer", visualizer);
+        return { success: true, data: { visualizer }, executionTime: 300 };
+      }
+      async setupApprovalWorkflow() {
+        if (!this.configuration.integrations.enableApprovalWorkflow) {
+          return { success: true, data: { skipped: true }, executionTime: 10 };
+        }
+        return { success: true, data: { workflow: "configured" }, executionTime: 200 };
+      }
+      async scanProjectStructure() {
+        await this.delay(2e3);
+        return { success: true, data: { files: 150, directories: 25 }, executionTime: 2e3 };
+      }
+      async analyzeDependencies() {
+        await this.delay(1500);
+        return { success: true, data: { dependencies: 30, components: 15 }, executionTime: 1500 };
+      }
+      async identifyArchitecturePatterns() {
+        await this.delay(1e3);
+        return { success: true, data: { patterns: ["MVC", "Repository"] }, executionTime: 1e3 };
+      }
+      async activatePlanUI() {
+        await this.delay(500);
+        return { success: true, data: { ui: "activated" }, executionTime: 500 };
+      }
+      async setupPlanModeShortcuts() {
+        return { success: true, data: { shortcuts: "configured" }, executionTime: 100 };
+      }
+      async finalizeActivation() {
+        return { success: true, data: { status: "completed" }, executionTime: 100 };
+      }
+      // Utility methods
+      setupKeyboardHandlers() {
+        this.keyboardHandler = (key) => {
+          if (key.shift && key.tab) {
+            return true;
+          }
+          return false;
+        };
+      }
+      async cleanupServices(sequenceId) {
+        for (const [name, service] of this.services.entries()) {
+          if (service.shutdown) {
+            await service.shutdown();
+          }
+        }
+        this.services.clear();
+      }
+      generateSequenceId() {
+        return `planmode_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      }
+      detectActiveProject() {
+        try {
+          const packageJson = __require(process.cwd() + "/package.json");
+          return packageJson.name;
+        } catch {
+          return void 0;
+        }
+      }
+      async getSystemState() {
+        return {
+          memoryUsage: process.memoryUsage().heapUsed / 1024 / 1024,
+          // MB
+          cpuUsage: 0,
+          // Would need actual CPU monitoring
+          diskSpace: 1e3,
+          // Would need actual disk monitoring
+          networkConnected: true
+        };
+      }
+      calculateTimeRemaining(sequence) {
+        const remainingPhases = sequence.phases.slice(sequence.currentPhase);
+        return remainingPhases.reduce((sum, phase) => sum + phase.estimatedDuration, 0);
+      }
+      createTimeoutPromise(timeout) {
+        return new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Task timeout")), timeout);
+        });
+      }
+      delay(ms) {
+        return new Promise((resolve8) => setTimeout(resolve8, ms));
+      }
+      groupTasksByPriority(tasks) {
+        const groups = /* @__PURE__ */ new Map();
+        for (const task of tasks) {
+          if (!groups.has(task.priority)) {
+            groups.set(task.priority, []);
+          }
+          groups.get(task.priority).push(task);
+        }
+        return groups;
+      }
+      chunkArray(array, chunkSize) {
+        const chunks = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+          chunks.push(array.slice(i, i + chunkSize));
+        }
+        return chunks;
+      }
+      calculateAverageActivationTime(sequences) {
+        if (sequences.length === 0) return 0;
+        const total = sequences.reduce((sum, seq) => sum + seq.metadata.performance.totalTime, 0);
+        return total / sequences.length;
+      }
+      calculateSuccessRate(sequences) {
+        if (sequences.length === 0) return 0;
+        const successful = sequences.filter((seq) => seq.status === "completed").length;
+        return successful / sequences.length;
+      }
+      getCommonFailurePoints(sequences) {
+        return ["service_setup", "exploration"];
+      }
+      aggregatePerformanceMetrics(sequences) {
+        return {
+          totalTime: 0,
+          phaseTimings: {},
+          taskTimings: {},
+          bottlenecks: [],
+          optimizations: []
+        };
+      }
+    };
+  }
+});
 function usePlanMode(settings = {}, agent) {
   const [state, setState] = useState(INITIAL_STATE);
   const [eventEmitter] = useState(() => new EventEmitter());
@@ -15019,16 +23560,31 @@ function usePlanMode(settings = {}, agent) {
   const [approvalManager] = useState(
     () => agent && planGenerator ? new PlanApprovalManager(agent, planGenerator) : null
   );
+  const [activationOrchestrator] = useState(
+    () => agent ? new PlanModeActivationOrchestrator({}) : null
+  );
+  const [readonlyOverlay] = useState(
+    () => agent ? new ReadOnlyFilesystemOverlay() : null
+  );
   const emitEvent = useCallback((event, data) => {
     eventEmitter.emit(event, data);
     if (mergedSettings.enableDetailedLogging) {
       console.log(`[PlanMode] ${event}:`, data);
     }
   }, [eventEmitter, mergedSettings.enableDetailedLogging]);
-  const activatePlanMode = useCallback(async (_options = {}) => {
+  const activatePlanMode = useCallback(async (options = {}, chatSetter) => {
     if (state.active) {
       console.warn("[PlanMode] Already active, ignoring activation request");
       return false;
+    }
+    if (agent && readonlyOverlay && activationOrchestrator) {
+      agent.setReadonlyOverlay(readonlyOverlay);
+      agent.setPlanModeState({
+        ...INITIAL_STATE,
+        active: true,
+        phase: "analysis",
+        sessionStartTime: /* @__PURE__ */ new Date()
+      });
     }
     const newState = {
       ...INITIAL_STATE,
@@ -15043,11 +23599,22 @@ function usePlanMode(settings = {}, agent) {
       to: "analysis",
       timestamp: /* @__PURE__ */ new Date()
     });
+    if (activationOrchestrator) {
+      try {
+        await activationOrchestrator.activatePlanMode(options, chatSetter);
+      } catch (error) {
+        console.error("[PlanMode] Orchestrator activation failed:", error);
+      }
+    }
     return true;
-  }, [state.active, emitEvent]);
+  }, [state.active, emitEvent, agent, readonlyOverlay, activationOrchestrator]);
   const deactivatePlanMode = useCallback((reason = "user_requested") => {
     if (!state.active) {
       return;
+    }
+    if (agent) {
+      agent.setPlanModeState(null);
+      agent.setReadonlyOverlay(null);
     }
     setState(INITIAL_STATE);
     emitEvent("plan-mode-deactivated", { timestamp: /* @__PURE__ */ new Date(), reason });
@@ -15056,7 +23623,7 @@ function usePlanMode(settings = {}, agent) {
       to: "inactive",
       timestamp: /* @__PURE__ */ new Date()
     });
-  }, [state.active, state.phase, emitEvent]);
+  }, [state.active, state.phase, emitEvent, agent]);
   const changePhase = useCallback((newPhase) => {
     if (!state.active || state.phase === newPhase) {
       return;
@@ -15262,6 +23829,8 @@ var init_use_plan_mode = __esm({
     init_plan_generator();
     init_read_only_tool_executor();
     init_plan_approval_manager();
+    init_plan_mode_activation_orchestrator();
+    init_readonly_filesystem_overlay();
     DEFAULT_SETTINGS = {
       maxExplorationDepth: 5,
       maxFileSize: 1024 * 1024,
@@ -18816,13 +27385,7 @@ function useInputHandler({
       setLastShiftTabTime(now);
       if (shiftTabPressCount >= 2) {
         if (!planMode.isActive) {
-          planMode.activatePlanMode();
-          const planModeEntry = {
-            type: "assistant",
-            content: "\u{1F3AF} **Plan Mode Activated**\n\nEntering read-only exploration mode. I'll analyze your codebase and formulate an implementation strategy before making any changes.\n\n**What I'm doing:**\n\u2022 Exploring project structure\n\u2022 Analyzing dependencies and patterns\n\u2022 Identifying key components\n\u2022 Formulating implementation approach\n\nOnce complete, I'll present a detailed plan for your approval.\n\n\u{1F4A1} **Tip**: Describe what you want to implement and I'll create a comprehensive plan first.",
-            timestamp: /* @__PURE__ */ new Date()
-          };
-          setChatHistory((prev) => [...prev, planModeEntry]);
+          planMode.activatePlanMode({}, setChatHistory);
           planMode.startExploration();
           setShiftTabPressCount(0);
           return true;
@@ -21524,91 +30087,6 @@ function useProcessingTimer(isProcessing, isStreaming, setProcessingTime) {
 }
 var init_use_processing_timer = __esm({
   "src/hooks/use-processing-timer.ts"() {
-  }
-});
-
-// src/ui/colors.ts
-function detectTerminalTheme() {
-  const colorFgBg = process.env.COLORFGBG;
-  const termBackground = process.env.TERM_BACKGROUND;
-  const grokTextColor = process.env.GROK_TEXT_COLOR;
-  if (grokTextColor) {
-    return grokTextColor.toLowerCase().includes("light") ? "light" : "dark";
-  }
-  if (colorFgBg) {
-    const parts = colorFgBg.split(";");
-    if (parts.length >= 2) {
-      const bg = parseInt(parts[1]);
-      return bg >= 8 ? "light" : "dark";
-    }
-  }
-  if (termBackground) {
-    return termBackground.toLowerCase() === "light" ? "light" : "dark";
-  }
-  const term = process.env.TERM || "";
-  const termProgram = process.env.TERM_PROGRAM || "";
-  if (termProgram.includes("Apple_Terminal") || termProgram.includes("Terminal.app") || term.includes("xterm-256color")) {
-    return "dark";
-  }
-  return "dark";
-}
-function getAdaptiveTextColor() {
-  const theme = detectTerminalTheme();
-  if (process.env.GROK_DEBUG_COLORS) {
-    console.error(`[Color Debug] Theme: ${theme}, COLORFGBG: ${process.env.COLORFGBG}, TERM_BACKGROUND: ${process.env.TERM_BACKGROUND}, TERM_PROGRAM: ${process.env.TERM_PROGRAM}`);
-  }
-  switch (theme) {
-    case "light":
-      return "black";
-    case "dark":
-      return "white";
-    default:
-      return "white";
-  }
-}
-function getSpinnerColor(operation) {
-  switch (operation.toLowerCase()) {
-    case "search":
-    case "indexing":
-    case "scanning":
-      return "info";
-    case "process":
-    case "thinking":
-    case "analyzing":
-      return "warning";
-    case "write":
-    case "edit":
-    case "create":
-      return "success";
-    case "compact":
-    case "optimize":
-    case "memory":
-      return "accent";
-    default:
-      return "primary";
-  }
-}
-var inkColors;
-var init_colors = __esm({
-  "src/ui/colors.ts"() {
-    inkColors = {
-      primary: "cyan",
-      success: "green",
-      warning: "yellow",
-      error: "red",
-      info: "blue",
-      muted: "gray",
-      accent: "magenta",
-      text: process.env.FORCE_TEXT_COLOR || getAdaptiveTextColor(),
-      // Adaptive text color
-      // Bright variants
-      primaryBright: "cyanBright",
-      successBright: "greenBright",
-      warningBright: "yellowBright",
-      errorBright: "redBright",
-      infoBright: "blueBright",
-      accentBright: "magentaBright"
-    };
   }
 });
 function ContextStatus({

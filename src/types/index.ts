@@ -3,6 +3,8 @@ export interface ToolResult {
   output?: string;
   error?: string;
   data?: any;
+  details?: string;
+  metadata?: any;
 }
 
 export interface Tool {

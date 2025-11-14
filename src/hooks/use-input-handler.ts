@@ -131,14 +131,8 @@ export function useInputHandler({
       if (shiftTabPressCount >= 2) {
         // Second shift+tab press - activate plan mode
         if (!planMode.isActive) {
-          planMode.activatePlanMode();
-          
-          const planModeEntry: ChatEntry = {
-            type: "assistant",
-            content: "🎯 **Plan Mode Activated**\n\nEntering read-only exploration mode. I'll analyze your codebase and formulate an implementation strategy before making any changes.\n\n**What I'm doing:**\n• Exploring project structure\n• Analyzing dependencies and patterns\n• Identifying key components\n• Formulating implementation approach\n\nOnce complete, I'll present a detailed plan for your approval.\n\n💡 **Tip**: Describe what you want to implement and I'll create a comprehensive plan first.",
-            timestamp: new Date(),
-          };
-          setChatHistory((prev) => [...prev, planModeEntry]);
+          // Pass the setChatHistory function to enable rich activation feedback
+          planMode.activatePlanMode({}, setChatHistory);
           
           // Start exploration automatically
           planMode.startExploration();

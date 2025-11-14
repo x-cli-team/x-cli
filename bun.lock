@@ -47,7 +47,7 @@
       },
       "optionalDependencies": {
         "tree-sitter": "^0.21.1",
-        "tree-sitter-javascript": "^0.21.4",
+        "tree-sitter-javascript": "^0.23.4",
         "tree-sitter-python": "^0.21.0",
         "tree-sitter-typescript": "^0.21.2",
       },
@@ -57,7 +57,6 @@
     "tree-sitter-python",
     "esbuild",
     "tree-sitter",
-    "tree-sitter-javascript",
     "tree-sitter-typescript",
   ],
   "packages": {
@@ -1034,8 +1033,6 @@
     "tree-kill": ["tree-kill@1.2.2", "", { "bin": { "tree-kill": "cli.js" } }, "sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A=="],
 
     "tree-sitter": ["tree-sitter@0.21.1", "", { "dependencies": { "node-addon-api": "^8.0.0", "node-gyp-build": "^4.8.0" } }, "sha512-7dxoA6kYvtgWw80265MyqJlkRl4yawIjO7S5MigytjELkX43fV2WsAXzsNfO7sBpPPCF5Gp0+XzHk0DwLCq3xQ=="],
-
-    "tree-sitter-javascript": ["tree-sitter-javascript@0.21.4", "", { "dependencies": { "node-addon-api": "^8.0.0", "node-gyp-build": "^4.8.1" }, "peerDependencies": { "tree-sitter": "^0.21.1" } }, "sha512-Lrk8yahebwrwc1sWJE9xPcz1OnnqiEV7Dh5fbN6EN3wNAdu9r06HpTqLqDwUUbnG4EB46Sfk+FJFAOldfoKLOw=="],
 
     "tree-sitter-python": ["tree-sitter-python@0.21.0", "", { "dependencies": { "node-addon-api": "^7.1.0", "node-gyp-build": "^4.8.0" }, "peerDependencies": { "tree-sitter": "^0.21.0" } }, "sha512-IUKx7JcTVbByUx1iHGFS/QsIjx7pqwTMHL9bl/NGyhyyydbfNrpruo2C7W6V4KZrbkkCOlX8QVrCoGOFW5qecg=="],
 

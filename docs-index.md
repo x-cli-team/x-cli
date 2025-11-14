@@ -22,41 +22,50 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 ### User Documentation (`.agent/docs/claude-code/`)
 
 **Getting Started**
+
 - `getting-started/overview.md` - Project overview and introduction
 - `getting-started/quickstart.md` - Quick start guide (5-minute setup)
 - `getting-started/common-workflows.md` - Real-world usage patterns
 
 **Building with Grok One-Shot**
+
 - `build-with-claude-code/subagents.md` - Autonomous task execution
 - `build-with-claude-code/mcp.md` - Model Context Protocol integration
 - `build-with-claude-code/troubleshooting.md` - Common issues and solutions
 
 **Deployment**
+
 - `deployment/overview.md` - Deployment strategies and environments
 
 **Administration**
+
 - `administration/advanced-installation.md` - Complex installation scenarios
 - `administration/data-usage.md` - Data handling and privacy
 
 **Configuration**
+
 - `configuration/settings.md` - Configuration and settings
 - `configuration/terminal-configuration.md` - Terminal setup and optimization
 - `configuration/model-configuration.md` - Model selection and tuning
 - `configuration/profiles.md` - Configuration profiles (TBD)
 
 **Reference**
+
 - `reference/cli-reference.md` - Complete CLI command reference
 - `reference/interactive-mode.md` - Interactive session guide
 - `reference/slash-commands.md` - Slash command reference
 - `reference/advanced-slash-commands.md` - Advanced slash commands (TBD)
 
 **Features**
+
 - `features/context-management.md` - Context loading and optimization
 - `features/tool-system.md` - Built-in tool capabilities
 - `features/session-management.md` - Session handling and storage
 - `features/git-integration.md` - Git operations and workflows
 - `features/workflow-automation.md` - Automation patterns
 - `features/research-mode.md` - Codebase exploration
+- `features/codebase-intelligence.md` - Advanced indexing and semantic search ⭐ **NEW**
+- `features/plan-mode.md` - Claude Code Plan Mode implementation ⭐ **COMPLETE**
 - `features/error-handling.md` - Error handling and recovery
 - `features/plan-mode.md` - Plan mode (TBD)
 - `features/ide-integration.md` - IDE extensions (TBD)
@@ -74,57 +83,68 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 - `features/cloud-sync.md` - Cloud synchronization (TBD)
 
 **Resources**
+
 - `resources/legal-and-compliance.md` - Legal information and compliance
 
 ### System Architecture (`.agent/system/`)
 
 **Core System Design**
+
 - `architecture.md` - System architecture, data flow, module structure
 - `critical-state.md` - Critical system state and health monitoring
 - `api-schema.md` - API schemas and data structures
 
 **Installation & Configuration**
+
 - `installation.md` - Installation guide and setup
 - `version-synchronization.md` - Version management across monorepo
 
 **User Experience**
+
 - `ux-feedback-system.md` - User feedback collection and analysis
 
 ### Standard Operating Procedures (`.agent/sop/`)
 
 **Development Workflows**
+
 - `documentation-workflow.md` - How to write and sync documentation
 - `git-workflow.md` - Git branching, commits, and collaboration
 - `automation-protection.md` - Protecting automated processes
 
 **Release Management**
+
 - `release-management.md` - Release process and checklist
 - `version-management.md` - Version numbering and synchronization
 - `npm-publishing-troubleshooting.md` - NPM publish issues and solutions
 
 **Feature Development**
+
 - `adding-new-command.md` - How to add new CLI commands
 - `ux-feedback-system-maintenance.md` - Maintaining UX feedback system
 
 ### Feature Parity Analysis (`.agent/parity/`)
 
 **Competitive Analysis**
+
 - `README.md` - Overview of parity analysis
 - `competitive-matrix.md` - Feature comparison matrix
 - `gap-analysis.md` - Feature gaps and priorities
 
 **Tool-Specific Analysis**
+
 - `claude-code-features.md` - Claude Code feature breakdown
 - `cursor-features.md` - Cursor feature breakdown
 - `codex-features.md` - GitHub Copilot/Codex features
 - `grok-cli-current-state.md` - Current Grok One-Shot capabilities
 
 **Planning**
+
 - `implementation-roadmap.md` - Feature implementation roadmap
 
 ### Active Tasks (`.agent/tasks/`)
 
 **Current Sprint (November 2025)**
+
 - `2025-11-05-sprint-claude-md-migration-and-docs-alignment.md` - Current epic
 - `2025-11-05-claude-code-docs-mapping.md` - Claude Code docs mapping
 - `2025-11-05-epic-status-summary.md` - Current status summary
@@ -132,6 +152,7 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 - `2025-11-05-align-docs-to-claude-code-standards.md` - Initial alignment plan
 
 **October 2025 Sprints**
+
 - `2025-10-24-sprint-build-agent-claude-code-parity.md` - Agent parity work
 - `2025-10-24-sprint-ux-refinement-claude-feel.md` - UX improvements
 - `2025-10-23-sprint-git-integration-enhancement.md` - Git improvements
@@ -146,6 +167,7 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 - `2025-10-16-sprint-stop-screen-glitch-cpu-spikes.md` - Performance issues
 
 **Planning Documents**
+
 - `2025-10-18-roadmap-claude-code-parity.md` - Long-term roadmap
 - `2025-10-16-prd-example.md` - PRD template example
 - `2025-10-16-prd-tool-inventory.md` - Tool inventory PRD
@@ -155,6 +177,7 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 ### Incident Reports (`.agent/incidents/`)
 
 **Resolved Incidents**
+
 - `incident-npm-publish-failure.md` - NPM publish 403 error resolution
 - `paste-detection-issues-v1123.md` - Paste detection problems
 - `tool-reliability-fix-issue.md` - Tool reliability incident
@@ -162,11 +185,13 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 ### Session Logs (`.agent/sessions/`)
 
 **Agent Sessions**
+
 - `2025-10-27-agent-session-og-tags-fix.md` - OpenGraph tags fix session
 
 ### Commands (`.agent/commands/`)
 
 **Agent Initialization**
+
 - `init-agent.md` - Agent initialization command documentation
 
 ## Documentation by Use Case
@@ -215,9 +240,11 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 ## File Naming Conventions
 
 ### Task Files
+
 Format: `YYYY-MM-DD-{type}-{description}.md`
 
 Types:
+
 - `sprint-` - Sprint implementation plans
 - `plan-` - General planning documents
 - `prd-` - Product requirement documents
@@ -226,9 +253,11 @@ Types:
 - `epic-` - Epic status documents
 
 ### Incident Files
+
 Format: `incident-{description}.md` or `{description}-v{version}.md`
 
 ### Session Files
+
 Format: `YYYY-MM-DD-agent-session-{description}.md`
 
 ## Documentation Standards
@@ -251,6 +280,7 @@ Format: `YYYY-MM-DD-agent-session-{description}.md`
 ### Auto-Sync Process
 
 The Husky pre-commit hook automatically:
+
 1. Syncs `.agent/docs/` → `apps/site/docs/`
 2. Updates documentation indexes
 3. Validates markdown structure

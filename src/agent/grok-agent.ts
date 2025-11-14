@@ -35,6 +35,8 @@ import { getSettingsManager } from "../utils/settings-manager.js";
 import { ContextPack } from "../utils/context-loader.js";
 import { ResearchRecommendService } from "../services/research-recommend.js";
 import { ExecutionOrchestrator } from "../services/execution-orchestrator.js";
+import { PlanModeState } from "../types/plan-mode.js";
+import { ReadOnlyFilesystemOverlay } from "../services/readonly-filesystem-overlay.js";
 
 export interface ChatEntry {
   type: "user" | "assistant" | "tool_result" | "tool_call";
@@ -99,6 +101,10 @@ export class GrokAgent extends EventEmitter {
   private readonly minRequestInterval: number = 500; // ms
   private lastRequestTime: number = 0;
   private sessionLogPath: string;
+  
+  // Plan Mode integration
+  private planModeState: PlanModeState | null = null;
+  private readonlyOverlay: ReadOnlyFilesystemOverlay | null = null;
 
   constructor(
     apiKey: string,
@@ -857,7 +863,44 @@ Current working directory: ${process.cwd()}`,
 
   private async executeTool(toolCall: GrokToolCall): Promise<ToolResult> {
     try {
-      const args = JSON.parse(toolCall.function.arguments);
+      // Check for Plan Mode and intercept destructive operations
+      const planModeState = this.getPlanModeState();
+      if (planModeState?.active) {
+        const readonlyOverlay = this.getReadonlyOverlay();
+        if (readonlyOverlay && this.isDestructiveOperation(toolCall.function.name)) {
+          return await readonlyOverlay.interceptToolCall(toolCall);
+        }
+      }
+
+      // Robust JSON parsing with detailed error handling
+      let args: any;
+      try {
+        args = JSON.parse(toolCall.function.arguments);
+      } catch (jsonError) {
+        const parseError = jsonError as Error;
+        console.error(`[GrokAgent] JSON Parse Error for tool ${toolCall.function.name}:`, {
+          error: parseError.message,
+          arguments: toolCall.function.arguments,
+          toolCall: toolCall
+        });
+        
+        // Attempt to fix common JSON issues
+        try {
+          // Remove trailing commas and fix common formatting issues
+          const cleanedArgs = toolCall.function.arguments
+            .replace(/,\s*}/g, '}')
+            .replace(/,\s*]/g, ']')
+            .trim();
+          args = JSON.parse(cleanedArgs);
+          console.log(`[GrokAgent] JSON parsing recovered after cleanup`);
+        } catch (retryError) {
+          return {
+            success: false,
+            error: `Invalid JSON arguments for ${toolCall.function.name}: ${parseError.message}. Arguments: ${toolCall.function.arguments}`,
+            details: `Tool call failed due to malformed JSON. This is likely a model generation issue.`
+          };
+        }
+      }
 
       // Check if confirmation is required for file operations and bash commands
       const settingsManager = getSettingsManager();
@@ -866,15 +909,34 @@ Current working directory: ${process.cwd()}`,
       if (requireConfirmation) {
         const needsConfirmation = ['create_file', 'str_replace_editor', 'bash'].includes(toolCall.function.name);
         if (needsConfirmation) {
-          const confirmationResult = await this.confirmationTool.requestConfirmation({
-            operation: toolCall.function.name,
-            filename: args.path || args.command || 'unknown',
-            description: `Execute ${toolCall.function.name} operation`,
-          });
-          if (!confirmationResult.success) {
+          // Robust confirmation handling with comprehensive error recovery
+          try {
+            const confirmationResult = await this.confirmationTool.requestConfirmation({
+              operation: toolCall.function.name,
+              filename: args.path || args.command || 'unknown',
+              description: `Execute ${toolCall.function.name} operation`,
+            });
+            
+            if (!confirmationResult.success) {
+              const errorMessage = confirmationResult.error || 'Operation cancelled by user';
+              console.log(`[GrokAgent] Confirmation rejected for tool ${toolCall.function.name}: ${errorMessage}`);
+              return {
+                success: false,
+                error: errorMessage,
+                details: 'User confirmation was required but rejected or failed'
+              };
+            }
+          } catch (confirmationError) {
+            const error = confirmationError as Error;
+            console.error(`[GrokAgent] Confirmation system error for tool ${toolCall.function.name}:`, {
+              error: error.message,
+              stack: error.stack,
+              toolCall: toolCall
+            });
             return {
               success: false,
-              error: confirmationResult.error || 'Operation cancelled by user',
+              error: `Confirmation system failed: ${error.message}`,
+              details: 'The confirmation system encountered an error. This is a system issue, not a user rejection.'
             };
           }
         }
@@ -901,22 +963,25 @@ Current working directory: ${process.cwd()}`,
 
         case "create_file":
           try {
-            return await this.textEditor.create(args.path, args.content);
+            const result = await this.textEditor.create(args.path, args.content);
+            return await this.wrapWithChainValidation(toolCall, result);
           } catch (error: any) {
             console.warn(`create_file tool failed, falling back to bash: ${error.message}`);
             // Fallback to bash echo/redirect
             const command = `cat > "${args.path}" << 'EOF'\n${args.content}\nEOF`;
-            return await this.bash.execute(command);
+            const result = await this.bash.execute(command);
+            return await this.wrapWithChainValidation(toolCall, result);
           }
 
         case "str_replace_editor":
           try {
-            return await this.textEditor.strReplace(
+            const result = await this.textEditor.strReplace(
               args.path,
               args.old_str,
               args.new_str,
               args.replace_all
             );
+            return await this.wrapWithChainValidation(toolCall, result);
           } catch (error: any) {
             console.warn(`str_replace_editor tool failed, falling back to bash: ${error.message}`);
             // Fallback to bash sed for replacement
@@ -925,7 +990,8 @@ Current working directory: ${process.cwd()}`,
             const sedCommand = args.replace_all
               ? `sed -i 's/${escapedOld}/${escapedNew}/g' "${args.path}"`
               : `sed -i '0,/${escapedOld}/s/${escapedOld}/${escapedNew}/' "${args.path}"`;
-            return await this.bash.execute(sedCommand);
+            const result = await this.bash.execute(sedCommand);
+            return await this.wrapWithChainValidation(toolCall, result);
           }
 
         case "edit_file":
@@ -1077,6 +1143,42 @@ Current working directory: ${process.cwd()}`,
         case "autonomous_task":
           return await this.autonomousTask.execute(args);
 
+        case "index_codebase":
+          const { codebaseIndexerTool } = await import('../tools/codebase-indexer-tool.js');
+          return await codebaseIndexerTool.indexCodebase(args);
+
+        case "search_symbols":
+          const { codebaseIndexerTool: symbolSearchTool } = await import('../tools/codebase-indexer-tool.js');
+          return await symbolSearchTool.searchSymbols(args);
+
+        case "find_references":
+          const { codebaseIndexerTool: refTool } = await import('../tools/codebase-indexer-tool.js');
+          return await refTool.findReferences(args);
+
+        case "get_dependencies":
+          const { codebaseIndexerTool: depTool } = await import('../tools/codebase-indexer-tool.js');
+          return await depTool.getDependencies(args);
+
+        case "get_index_status":
+          const { codebaseIndexerTool: statusTool } = await import('../tools/codebase-indexer-tool.js');
+          return await statusTool.getIndexStatus();
+
+        case "semantic_search":
+          const { semanticSearchTool } = await import('../tools/semantic-search-tool.js');
+          return await semanticSearchTool.semanticSearch(args);
+
+        case "trace_code_flow":
+          const { semanticSearchTool: flowTool } = await import('../tools/semantic-search-tool.js');
+          return await flowTool.traceCodeFlow(args);
+
+        case "map_features":
+          const { semanticSearchTool: featureTool } = await import('../tools/semantic-search-tool.js');
+          return await featureTool.mapFeatures(args);
+
+        case "find_related_symbols":
+          const { semanticSearchTool: relationTool } = await import('../tools/semantic-search-tool.js');
+          return await relationTool.findRelatedSymbols(args);
+
         default:
           // Check if this is an MCP tool
           if (toolCall.function.name.startsWith("mcp__")) {
@@ -1089,16 +1191,53 @@ Current working directory: ${process.cwd()}`,
           };
       }
     } catch (error: any) {
-      return {
+      const result: ToolResult = {
         success: false,
         error: `Tool execution error: ${error.message}`,
       };
+      
+      // Validate and track tool chain even for failed operations
+      await this.validateAndTrackToolChain(toolCall, result);
+      
+      return result;
+    } finally {
+      // For successful operations, validation happens in the switch case return path
+      // This ensures all tool executions are tracked for chain validation
     }
   }
 
   private async executeMCPTool(toolCall: GrokToolCall): Promise<ToolResult> {
     try {
-      const args = JSON.parse(toolCall.function.arguments);
+      // Robust JSON parsing with detailed error handling
+      let args: any;
+      try {
+        args = JSON.parse(toolCall.function.arguments);
+      } catch (jsonError) {
+        const parseError = jsonError as Error;
+        console.error(`[GrokAgent] JSON Parse Error for MCP tool ${toolCall.function.name}:`, {
+          error: parseError.message,
+          arguments: toolCall.function.arguments,
+          toolCall: toolCall
+        });
+        
+        // Attempt to fix common JSON issues
+        try {
+          // Remove trailing commas and fix common formatting issues
+          const cleanedArgs = toolCall.function.arguments
+            .replace(/,\s*}/g, '}')
+            .replace(/,\s*]/g, ']')
+            .trim();
+          args = JSON.parse(cleanedArgs);
+          console.log(`[GrokAgent] MCP JSON parsing recovered after cleanup`);
+        } catch (retryError) {
+          return {
+            success: false,
+            error: `Invalid JSON arguments for MCP tool ${toolCall.function.name}: ${parseError.message}. Arguments: ${toolCall.function.arguments}`,
+            details: `MCP tool call failed due to malformed JSON. This is likely a model generation issue.`
+          };
+        }
+      }
+
       const mcpManager = getMCPManager();
 
       const result = await mcpManager.callTool(toolCall.function.name, args);
@@ -1170,6 +1309,298 @@ Current working directory: ${process.cwd()}`,
     // Update token counter for new model
     this.tokenCounter.dispose();
     this.tokenCounter = createTokenCounter(model);
+  }
+
+  /**
+   * Tool chain validation state tracking for coordinated multi-tool operations
+   */
+  private toolChainContext: {
+    operationId?: string;
+    chainedOperations: Array<{
+      toolName: string;
+      timestamp: number;
+      success: boolean;
+      dependencies?: string[];
+    }>;
+    rollbackPoints: Array<{
+      operationId: string;
+      description: string;
+      timestamp: number;
+    }>;
+  } = {
+    chainedOperations: [],
+    rollbackPoints: []
+  };
+
+  /**
+   * Validates and tracks tool chain operations for better error recovery
+   */
+  private async validateAndTrackToolChain(
+    toolCall: GrokToolCall,
+    result: ToolResult
+  ): Promise<void> {
+    try {
+      // Generate operation ID if this is a new chain
+      if (!this.toolChainContext.operationId) {
+        this.toolChainContext.operationId = `chain_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      }
+
+      // Track this operation
+      const operation = {
+        toolName: toolCall.function.name,
+        timestamp: Date.now(),
+        success: result.success,
+        dependencies: this.inferToolDependencies(toolCall)
+      };
+
+      this.toolChainContext.chainedOperations.push(operation);
+
+      // Create rollback point for successful file operations
+      if (result.success && this.isFileModificationTool(toolCall.function.name)) {
+        this.toolChainContext.rollbackPoints.push({
+          operationId: this.toolChainContext.operationId,
+          description: `${toolCall.function.name} on ${this.extractFilePath(toolCall)}`,
+          timestamp: Date.now()
+        });
+      }
+
+      // If operation failed, log chain context for debugging
+      if (!result.success) {
+        console.warn(`[GrokAgent] Tool chain validation failed at ${toolCall.function.name}:`, {
+          operationId: this.toolChainContext.operationId,
+          chainLength: this.toolChainContext.chainedOperations.length,
+          previousOperations: this.toolChainContext.chainedOperations.slice(-3).map(op => ({
+            tool: op.toolName,
+            success: op.success,
+            ago: Date.now() - op.timestamp
+          }))
+        });
+      }
+
+      // Clean up old chain data after 50 operations to prevent memory leaks
+      if (this.toolChainContext.chainedOperations.length > 50) {
+        this.toolChainContext.chainedOperations = this.toolChainContext.chainedOperations.slice(-25);
+        this.toolChainContext.rollbackPoints = this.toolChainContext.rollbackPoints.slice(-10);
+      }
+
+    } catch (error) {
+      console.error('[GrokAgent] Tool chain validation error:', error);
+      // Don't let validation errors break the main flow
+    }
+  }
+
+  /**
+   * Infer tool dependencies based on tool type and arguments
+   */
+  private inferToolDependencies(toolCall: GrokToolCall): string[] {
+    const dependencies: string[] = [];
+    const toolName = toolCall.function.name;
+    
+    try {
+      const args = JSON.parse(toolCall.function.arguments);
+      
+      // File operations depend on the target file existing (for edits)
+      if (['str_replace_editor', 'view_file'].includes(toolName) && args.path) {
+        dependencies.push(`file_exists:${args.path}`);
+      }
+      
+      // Multi-file operations may have cross-dependencies
+      if (toolName === 'multi_file_editor' && args.files) {
+        args.files.forEach((file: any) => {
+          if (file.path) dependencies.push(`file_exists:${file.path}`);
+        });
+      }
+      
+      // Bash commands may depend on working directory
+      if (toolName === 'bash' && args.command) {
+        if (args.command.includes('cd ')) {
+          dependencies.push('working_directory');
+        }
+      }
+    } catch (parseError) {
+      // If we can't parse arguments, assume no specific dependencies
+    }
+    
+    return dependencies;
+  }
+
+  /**
+   * Checks if a tool modifies the filesystem
+   */
+  private isFileModificationTool(toolName: string): boolean {
+    return ['create_file', 'str_replace_editor', 'multi_file_editor', 'morph_editor'].includes(toolName);
+  }
+
+  /**
+   * Extracts file path from tool call arguments
+   */
+  private extractFilePath(toolCall: GrokToolCall): string {
+    try {
+      const args = JSON.parse(toolCall.function.arguments);
+      return args.path || args.filename || args.file || 'unknown';
+    } catch {
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Reset tool chain context (useful for starting fresh operations)
+   */
+  private resetToolChain(): void {
+    this.toolChainContext = {
+      chainedOperations: [],
+      rollbackPoints: []
+    };
+  }
+
+  /**
+   * Wraps tool execution result with chain validation and visual feedback
+   */
+  private async wrapWithChainValidation(
+    toolCall: GrokToolCall,
+    result: ToolResult
+  ): Promise<ToolResult> {
+    await this.validateAndTrackToolChain(toolCall, result);
+    
+    // Add visual tree for complex operations
+    const operationTree = this.createOperationTree(toolCall.function.name, toolCall);
+    if (operationTree && result.success) {
+      const enhancedOutput = operationTree + '\n' + (result.output || 'Operation completed successfully.');
+      return {
+        ...result,
+        output: enhancedOutput
+      };
+    }
+    
+    return result;
+  }
+
+  /**
+   * Creates visual operation tree for complex multi-step operations
+   */
+  private createOperationTree(
+    operationType: string,
+    toolCall: GrokToolCall
+  ): string {
+    const args = this.safeParseArguments(toolCall);
+    
+    try {
+      let tree = '';
+      
+      if (operationType === 'multi_file_edit' && args.files) {
+        tree = `┌─ 📝 Multi-file Edit Operation (${args.files.length} files)\n`;
+        args.files.forEach((file: any, index: number) => {
+          const isLast = index === args.files.length - 1;
+          const prefix = isLast ? '└─' : '├─';
+          tree += `${prefix} ✏️  Edit ${file.path || file.filename || 'unknown'}\n`;
+        });
+      } else if (operationType === 'bash' && args.command) {
+        if (args.command.includes('&&') || args.command.includes(';')) {
+          // Multi-command bash execution
+          const commands = args.command.split(/[;&]+/).filter((cmd: string) => cmd.trim());
+          tree = `┌─ ⚡ Bash Command Chain (${commands.length} commands)\n`;
+          commands.forEach((cmd: string, index: number) => {
+            const isLast = index === commands.length - 1;
+            const prefix = isLast ? '└─' : '├─';
+            tree += `${prefix} 🔧 ${cmd.trim()}\n`;
+          });
+        }
+      } else if (['create_file', 'str_replace_editor'].includes(toolCall.function.name) && args.path) {
+        const operation = toolCall.function.name === 'create_file' ? 'Create' : 'Edit';
+        tree = `┌─ 📝 File Operation\n`;
+        tree += `└─ ${operation === 'Create' ? '📄' : '✏️'} ${operation} ${args.path}\n`;
+        if (args.old_str && args.new_str) {
+          tree += `   └─ 🔄 Replace: "${args.old_str.substring(0, 30)}${args.old_str.length > 30 ? '...' : ''}"\n`;
+        }
+      } else if (toolCall.function.name === 'search' && args.query) {
+        tree = `┌─ 🔍 Search Operation\n`;
+        tree += `├─ 📁 Target: ${args.directory || 'current directory'}\n`;
+        tree += `└─ 🎯 Query: "${args.query}"\n`;
+      } else if (this.toolChainContext.chainedOperations.length > 1) {
+        // Generic chain visualization
+        const recentOps = this.toolChainContext.chainedOperations.slice(-5);
+        tree = `┌─ 🔗 Tool Chain (${recentOps.length} operations)\n`;
+        recentOps.forEach((op, index) => {
+          const isLast = index === recentOps.length - 1;
+          const prefix = isLast ? '└─' : '├─';
+          const statusIcon = op.success ? '✅' : op.toolName === toolCall.function.name ? '🔄' : '⏳';
+          tree += `${prefix} ${statusIcon} ${op.toolName}\n`;
+        });
+      }
+      
+      return tree;
+    } catch (error) {
+      // If tree generation fails, return empty string
+      return '';
+    }
+  }
+
+  /**
+   * Safely parses tool arguments with fallback
+   */
+  private safeParseArguments(toolCall: GrokToolCall): any {
+    try {
+      return JSON.parse(toolCall.function.arguments);
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Enhanced file operation error handling with comprehensive recovery mechanisms
+   * Provides consistent error reporting and recovery patterns for file operations
+   */
+  private async handleFileOperationWithRecovery<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    filePath?: string
+  ): Promise<{ success: boolean; result?: T; error?: string; details?: string }> {
+    try {
+      const result = await operation();
+      return { success: true, result };
+    } catch (error: any) {
+      const err = error as Error & { code?: string; errno?: number };
+      console.error(`[GrokAgent] File operation failed - ${operationName}:`, {
+        error: err.message,
+        stack: err.stack,
+        filePath,
+        code: err.code || 'UNKNOWN',
+        errno: err.errno || 'UNKNOWN'
+      });
+
+      // Categorize error types for better user feedback
+      let userFriendlyMessage = err.message || 'Unknown error';
+      let details = `File operation '${operationName}' failed.`;
+      
+      if (err.code === 'ENOENT') {
+        userFriendlyMessage = `File or directory not found: ${filePath || 'unknown path'}`;
+        details = 'The specified file or directory does not exist. Please check the path and try again.';
+      } else if (err.code === 'EACCES') {
+        userFriendlyMessage = `Permission denied: ${filePath || 'unknown path'}`;
+        details = 'You do not have sufficient permissions to access this file or directory.';
+      } else if (err.code === 'EISDIR') {
+        userFriendlyMessage = `Expected file but found directory: ${filePath || 'unknown path'}`;
+        details = 'The operation expected a file but found a directory instead.';
+      } else if (err.code === 'ENOTDIR') {
+        userFriendlyMessage = `Expected directory but found file: ${filePath || 'unknown path'}`;
+        details = 'The operation expected a directory but found a file instead.';
+      } else if (err.code === 'ENOSPC') {
+        userFriendlyMessage = 'No space left on device';
+        details = 'The disk is full. Please free up space and try again.';
+      } else if (err.code === 'EMFILE' || err.code === 'ENFILE') {
+        userFriendlyMessage = 'Too many open files';
+        details = 'System has reached the limit of open files. Please close other applications and try again.';
+      } else if (err.message.includes('JSON') || err.message.includes('parse')) {
+        userFriendlyMessage = 'File content parsing error';
+        details = 'The file content could not be parsed. It may be corrupted or in an unexpected format.';
+      }
+
+      return {
+        success: false,
+        error: userFriendlyMessage,
+        details
+      };
+    }
   }
 
   abortCurrentOperation(): void {
@@ -1287,5 +1718,51 @@ Current working directory: ${process.cwd()}`,
     }
     
     return instructions;
+  }
+
+  // Plan Mode integration methods
+  
+  /**
+   * Set Plan Mode state for tool interception
+   */
+  setPlanModeState(state: PlanModeState | null): void {
+    this.planModeState = state;
+  }
+
+  /**
+   * Get current Plan Mode state
+   */
+  getPlanModeState(): PlanModeState | null {
+    return this.planModeState;
+  }
+
+  /**
+   * Set readonly filesystem overlay
+   */
+  setReadonlyOverlay(overlay: ReadOnlyFilesystemOverlay | null): void {
+    this.readonlyOverlay = overlay;
+  }
+
+  /**
+   * Get readonly filesystem overlay
+   */
+  getReadonlyOverlay(): ReadOnlyFilesystemOverlay | null {
+    return this.readonlyOverlay;
+  }
+
+  /**
+   * Check if operation is destructive and should be intercepted in Plan Mode
+   */
+  private isDestructiveOperation(toolName: string): boolean {
+    const destructiveOperations = [
+      'str_replace_editor',
+      'create_file', 
+      'bash',
+      'morph_editor',
+      'multi_file_editor',
+      'code_aware_editor',
+      'refactoring_assistant'
+    ];
+    return destructiveOperations.includes(toolName);
   }
 }

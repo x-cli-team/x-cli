@@ -583,6 +583,245 @@ const BASE_GROK_TOOLS: GrokTool[] = [
         required: ["operation"]
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "index_codebase",
+      description: "Index a codebase for comprehensive analysis, symbol extraction, and dependency mapping",
+      parameters: {
+        type: "object",
+        properties: {
+          path: {
+            type: "string",
+            description: "Directory path to index (defaults to current working directory)"
+          },
+          maxFileSize: {
+            type: "number", 
+            description: "Maximum file size to index in bytes (default: 5MB)"
+          },
+          excludePatterns: {
+            type: "array",
+            items: { type: "string" },
+            description: "Additional patterns to exclude"
+          },
+          includePatterns: {
+            type: "array", 
+            items: { type: "string" },
+            description: "Specific patterns to include"
+          },
+          extractSymbols: {
+            type: "boolean",
+            description: "Whether to extract symbols (default: true)"
+          },
+          analyzeDependencies: {
+            type: "boolean", 
+            description: "Whether to analyze dependencies (default: true)"
+          }
+        },
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_symbols",
+      description: "Search for symbols (functions, classes, variables) across the indexed codebase",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Search query for symbols"
+          },
+          type: {
+            type: "string",
+            enum: ["function", "class", "interface", "variable", "constant", "type", "enum", "import", "export"],
+            description: "Filter by symbol type"
+          },
+          fuzzy: {
+            type: "boolean", 
+            description: "Enable fuzzy matching (default: true)"
+          },
+          limit: {
+            type: "number",
+            description: "Maximum number of results (default: 50)"
+          }
+        },
+        required: ["query"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "find_references",
+      description: "Find all references to a specific symbol in the codebase",
+      parameters: {
+        type: "object",
+        properties: {
+          symbolName: {
+            type: "string",
+            description: "Name of the symbol to find references for"
+          },
+          includeDefinition: {
+            type: "boolean",
+            description: "Include the symbol definition (default: true)"
+          }
+        },
+        required: ["symbolName"]
+      }
+    }
+  },
+  {
+    type: "function", 
+    function: {
+      name: "get_dependencies",
+      description: "Get dependency information for a file",
+      parameters: {
+        type: "object",
+        properties: {
+          filePath: {
+            type: "string",
+            description: "File path to analyze dependencies for"
+          },
+          direction: {
+            type: "string",
+            enum: ["incoming", "outgoing", "both"],
+            description: "Direction of dependencies (default: both)"
+          }
+        },
+        required: ["filePath"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_index_status", 
+      description: "Get current codebase index status and statistics",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "semantic_search",
+      description: "Search codebase using natural language queries with intelligent pattern recognition",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Natural language query (e.g., 'find authentication logic', 'how does user registration work')"
+          },
+          intent: {
+            type: "string",
+            enum: ["find_function", "understand_flow", "locate_feature", "trace_usage", "find_patterns", "general"],
+            description: "Search intent (auto-detected if not specified)"
+          },
+          scope: {
+            type: "string", 
+            enum: ["project", "directory", "file", "function"],
+            description: "Search scope (default: project)"
+          },
+          scopePath: {
+            type: "string",
+            description: "Path to scope to (for directory/file scope)"
+          },
+          confidence: {
+            type: "number",
+            minimum: 0,
+            maximum: 1,
+            description: "Minimum confidence threshold (default: 0.3)"
+          },
+          maxResults: {
+            type: "number",
+            minimum: 1,
+            maximum: 100,
+            description: "Maximum results to return (default: 20)"
+          }
+        },
+        required: ["query"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "trace_code_flow",
+      description: "Trace execution flow from an entry point to understand code paths",
+      parameters: {
+        type: "object",
+        properties: {
+          entryPoint: {
+            type: "string",
+            description: "Function or symbol name to start tracing from"
+          },
+          maxDepth: {
+            type: "number",
+            minimum: 1,
+            maximum: 10,
+            description: "Maximum depth to trace (default: 5)"
+          }
+        },
+        required: ["entryPoint"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "map_features",
+      description: "Map architectural features and components in the codebase",
+      parameters: {
+        type: "object",
+        properties: {
+          includeTestCoverage: {
+            type: "boolean",
+            description: "Include test coverage analysis (default: false)"
+          },
+          complexityThreshold: {
+            type: "string",
+            enum: ["low", "medium", "high"], 
+            description: "Minimum complexity to include (default: low)"
+          }
+        },
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "find_related_symbols",
+      description: "Find symbols related to a target symbol with relationship analysis",
+      parameters: {
+        type: "object",
+        properties: {
+          symbolName: {
+            type: "string",
+            description: "Symbol name to find relationships for"
+          },
+          includeUsage: {
+            type: "boolean",
+            description: "Include usage patterns (default: true)"
+          },
+          maxRelated: {
+            type: "number",
+            minimum: 1,
+            maximum: 50,
+            description: "Maximum related symbols (default: 20)"
+          }
+        },
+        required: ["symbolName"]
+      }
+    }
   }
 ];
 

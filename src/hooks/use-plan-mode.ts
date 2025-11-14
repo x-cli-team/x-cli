@@ -21,6 +21,8 @@ import { PlanGenerator } from '../services/plan-generator.js';
 import { ReadOnlyToolExecutor } from '../services/read-only-tool-executor.js';
 import { PlanApprovalManager, ApprovalResult } from '../services/plan-approval-manager.js';
 import { GrokAgent } from '../agent/grok-agent.js';
+import { PlanModeActivationOrchestrator } from '../services/plan-mode-activation-orchestrator.js';
+import { ReadOnlyFilesystemOverlay } from '../services/readonly-filesystem-overlay.js';
 
 // Default plan mode settings
 const DEFAULT_SETTINGS: PlanModeSettings = {
@@ -63,6 +65,12 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
   const [approvalManager] = useState(() => 
     agent && planGenerator ? new PlanApprovalManager(agent, planGenerator) : null
   );
+  const [activationOrchestrator] = useState(() => 
+    agent ? new PlanModeActivationOrchestrator({}) : null
+  );
+  const [readonlyOverlay] = useState(() => 
+    agent ? new ReadOnlyFilesystemOverlay() : null
+  );
 
   // Emit events for state changes
   const emitEvent = useCallback(<K extends keyof PlanModeEvents>(
@@ -78,10 +86,21 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
   }, [eventEmitter, mergedSettings.enableDetailedLogging]);
 
   // Activate plan mode
-  const activatePlanMode = useCallback(async (_options: PlanModeActivationOptions = {}) => {
+  const activatePlanMode = useCallback(async (options: PlanModeActivationOptions = {}, chatSetter?: (setter: (prev: any[]) => any[]) => void) => {
     if (state.active) {
       console.warn('[PlanMode] Already active, ignoring activation request');
       return false;
+    }
+
+    // Setup agent integration
+    if (agent && readonlyOverlay && activationOrchestrator) {
+      agent.setReadonlyOverlay(readonlyOverlay);
+      agent.setPlanModeState({
+        ...INITIAL_STATE,
+        active: true,
+        phase: 'analysis',
+        sessionStartTime: new Date()
+      });
     }
 
     const newState: PlanModeState = {
@@ -99,13 +118,29 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
       timestamp: new Date() 
     });
 
+    // Use orchestrator for comprehensive activation if available
+    if (activationOrchestrator) {
+      try {
+        await activationOrchestrator.activatePlanMode(options, chatSetter);
+      } catch (error) {
+        console.error('[PlanMode] Orchestrator activation failed:', error);
+        // Fall back to basic activation
+      }
+    }
+
     return true;
-  }, [state.active, emitEvent]);
+  }, [state.active, emitEvent, agent, readonlyOverlay, activationOrchestrator]);
 
   // Deactivate plan mode
   const deactivatePlanMode = useCallback((reason: string = 'user_requested') => {
     if (!state.active) {
       return;
+    }
+
+    // Clean up agent integration
+    if (agent) {
+      agent.setPlanModeState(null);
+      agent.setReadonlyOverlay(null);
     }
 
     setState(INITIAL_STATE);
@@ -115,7 +150,7 @@ export function usePlanMode(settings: Partial<PlanModeSettings> = {}, agent?: Gr
       to: 'inactive', 
       timestamp: new Date() 
     });
-  }, [state.active, state.phase, emitEvent]);
+  }, [state.active, state.phase, emitEvent, agent]);
 
   // Change phase within plan mode
   const changePhase = useCallback((newPhase: PlanModePhase) => {

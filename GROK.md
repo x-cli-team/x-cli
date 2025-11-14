@@ -42,6 +42,8 @@ grok-one-shot -p "list all TODO comments"
 - **Hooks System** (`src/hooks/`): React hooks for state management
 - **MCP Integration** (`src/mcp/`): Model Context Protocol client
 - **Context System**: On-demand documentation loading (GROK.md + docs-index.md)
+- **Codebase Intelligence** (`src/services/`): Advanced indexing and semantic search
+- **Plan Mode** (`src/services/`): Read-only exploration with comprehensive tooling
 
 ### Context Loading Strategy
 
@@ -110,7 +112,7 @@ src/
 ├── commands/           # CLI subcommands (mcp, set-name, etc.)
 ├── hooks/              # React hooks for state management
 ├── mcp/                # Model Context Protocol integration
-├── services/           # Business logic (workflow, research)
+├── services/           # Business logic (codebase intelligence, Plan Mode, workflows)
 ├── ui/                 # Terminal UI components (React/Ink)
 ├── utils/              # Utilities (settings, confirmation, etc.)
 └── index.ts            # Entry point
@@ -128,13 +130,28 @@ src/
 
 ## Key Features
 
-### 1. Intelligent Code Editing
+### 1. Advanced Codebase Intelligence ⭐ **NEW**
+
+- **Deep Code Understanding**: Million-line codebase indexing with symbol extraction
+- **Semantic Search**: Natural language code discovery ("find authentication logic")
+- **Architectural Analysis**: Feature mapping and cross-cutting concern detection
+- **Flow Tracing**: Execution path analysis with complexity metrics
+- **Symbol Intelligence**: Complete relationship mapping and usage tracking
+
+### 2. Plan Mode - Claude Code Parity ⭐ **COMPLETE**
+
+- **Read-Only Exploration**: Safe codebase analysis with tool simulation
+- **Strategy Formulation**: AI-powered planning with approval workflows
+- **Phased Activation**: Rich visual feedback (3800+ lines of architecture)
+- **Keyboard Activation**: Shift+Tab twice for instant Plan Mode
+
+### 3. Intelligent Code Editing
 
 - Multi-file edits with context awareness
 - Refactoring with impact analysis
 - Syntax-aware modifications
 
-### 2. Research Workflows
+### 4. Research Workflows
 
 - Automated research with approval gates
 - Codebase exploration and analysis
