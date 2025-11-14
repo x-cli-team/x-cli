@@ -13,7 +13,9 @@ try {
   TypeScript = require("tree-sitter-typescript");
   Python = require("tree-sitter-python");
 } catch (error) {
-  console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
+  if (!process.env.GROK_QUIET_MODE) {
+    console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
+  }
 }
 import * as ops from "fs";
 

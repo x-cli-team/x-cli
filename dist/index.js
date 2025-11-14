@@ -69,11 +69,11 @@ var GrokClient;
 var init_client = __esm({
   "src/grok/client.ts"() {
     GrokClient = class {
-      constructor(apiKey2, model, baseURL) {
+      constructor(apiKey, model, baseURL) {
         this.currentModel = "grok-4-fast-non-reasoning";
-        apiKey2 = apiKey2 || process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY;
+        apiKey = apiKey || process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY;
         this.client = new OpenAI({
-          apiKey: apiKey2,
+          apiKey,
           baseURL: baseURL || process.env.GROK_BASE_URL || "https://api.x.ai/v1",
           timeout: 36e4
         });
@@ -2453,10 +2453,10 @@ var init_morph_editor = __esm({
       }
     };
     MorphEditorTool = class {
-      constructor(apiKey2) {
+      constructor(apiKey) {
         this.confirmationService = ConfirmationService.getInstance();
         this.morphBaseUrl = "https://api.morphllm.com/v1";
-        this.morphApiKey = apiKey2 || process.env.MORPH_API_KEY || "";
+        this.morphApiKey = apiKey || process.env.MORPH_API_KEY || "";
         if (!this.morphApiKey) {
           console.warn("MORPH_API_KEY not found. Morph editor functionality will be limited.");
         }
@@ -2740,8 +2740,8 @@ ${numberedLines}${additionalLinesMessage}`
           };
         }
       }
-      setApiKey(apiKey2) {
-        this.morphApiKey = apiKey2;
+      setApiKey(apiKey) {
+        this.morphApiKey = apiKey;
       }
       getApiKey() {
         return this.morphApiKey;
@@ -6404,7 +6404,9 @@ var init_ast_parser = __esm({
       TypeScript = __require("tree-sitter-typescript");
       Python = __require("tree-sitter-python");
     } catch (error) {
-      console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
+      if (!process.env.GROK_QUIET_MODE) {
+        console.warn("Tree-sitter modules not available, falling back to TypeScript-only parsing");
+      }
     }
     pathExists8 = async (filePath) => {
       try {
@@ -18370,7 +18372,7 @@ var init_grok_agent = __esm({
     init_research_recommend();
     init_execution_orchestrator();
     GrokAgent = class extends EventEmitter {
-      constructor(apiKey2, baseURL, model, maxToolRounds, contextPack, verbosityLevel, explainLevel) {
+      constructor(apiKey, baseURL, model, maxToolRounds, contextPack, verbosityLevel, explainLevel) {
         super();
         this.chatHistory = [];
         this.messages = [];
@@ -18398,7 +18400,7 @@ var init_grok_agent = __esm({
         this.maxToolRounds = maxToolRounds || 400;
         this.contextPack = contextPack;
         this.sessionLogPath = process.env.GROK_SESSION_LOG || `${process.env.HOME}/.grok/session.log`;
-        this.grokClient = new GrokClient(apiKey2, modelToUse, baseURL);
+        this.grokClient = new GrokClient(apiKey, modelToUse, baseURL);
         this.textEditor = new TextEditorTool();
         this.morphEditor = process.env.MORPH_API_KEY ? new MorphEditorTool() : null;
         this.bash = new BashTool();
@@ -29444,12 +29446,12 @@ function ApiKeyInput({ onApiKeySet }) {
     }
     setIsSubmitting(true);
     try {
-      const apiKey2 = input.trim();
-      const agent = new GrokAgent(apiKey2);
-      process.env.GROK_API_KEY = apiKey2;
+      const apiKey = input.trim();
+      const agent = new GrokAgent(apiKey);
+      process.env.GROK_API_KEY = apiKey;
       try {
         const manager = getSettingsManager();
-        manager.updateUserSetting("apiKey", apiKey2);
+        manager.updateUserSetting("apiKey", apiKey);
         console.log(`
 \u2705 API key saved to ~/.xcli/config.json`);
       } catch {
@@ -32419,11 +32421,17 @@ var require_package = __commonJS({
 });
 dotenv.config();
 var logStream = fs7__default.createWriteStream(path8__default.join(process.cwd(), "xcli-startup.log"), { flags: "a" });
+var isQuietCommand = process.argv.includes("--version") || process.argv.includes("-V") || process.argv.includes("--help") || process.argv.includes("-h");
+if (isQuietCommand) {
+  process.env.GROK_QUIET_MODE = "true";
+}
 var log = (...args) => {
   const timestamp = (/* @__PURE__ */ new Date()).toISOString();
   const msg = `[${timestamp}] ${args.join(" ")}
 `;
-  console.log(msg.trim());
+  if (!isQuietCommand) {
+    console.log(msg.trim());
+  }
   try {
     logStream.write(msg);
   } catch {
@@ -32432,13 +32440,6 @@ var log = (...args) => {
 log("\u{1F680} grok-one-shotStarting Up...");
 log(`\u{1F4C2} Working directory: ${process.cwd()}`);
 log(`\u{1F5A5}\uFE0F  Node version: ${process.version}`);
-var apiKey = process.env.GROK_API_KEY;
-log(`\u{1F511} API Key: ${apiKey ? "\u2705 Found" : "\u274C Missing"}`);
-if (!apiKey) {
-  console.error("\u274C No API key found. Set GROK_API_KEY environment variable.");
-  log("\u274C Missing API key - exiting");
-  process.exit(1);
-}
 log("\u{1F4E6} Loading core modules...");
 try {
   let loadModel = function() {
@@ -32479,11 +32480,11 @@ try {
     console.error("\u{1F4A5} Unhandled rejection:", reason);
     process.exit(1);
   });
-  async function saveCommandLineSettings(apiKey2, baseURL) {
+  async function saveCommandLineSettings(apiKey, baseURL) {
     try {
       const manager = getSettingsManager2();
-      if (apiKey2) {
-        manager.updateUserSetting("apiKey", apiKey2);
+      if (apiKey) {
+        manager.updateUserSetting("apiKey", apiKey);
         log("\u2705 API key saved to settings");
       }
       if (baseURL) {
@@ -32496,17 +32497,16 @@ try {
   }
   log("\u{1F3AF} Initializing CLI...");
   try {
-    const baseURL = process.env.GROK_BASE_URL;
-    const model = loadModel();
-    const maxToolRounds = parseInt(process.env.MAX_TOOL_ROUNDS || "400");
-    log("\u{1F916} Creating GrokAgent instance...");
-    const manager = getSettingsManager2();
-    const verbosityLevel = manager.getUserSetting("verbosityLevel") || "quiet";
-    const explainLevel = manager.getUserSetting("explainLevel") || "brief";
-    const agent = new GrokAgent2(apiKey, baseURL, model, maxToolRounds, void 0, verbosityLevel, explainLevel);
     log("\u{1F4CB} Setting up Commander CLI...");
     program.name("grok one shot").description("AI-powered CLI assistant").version(pkg.default.version).argument("[message...]", "Initial message to send to Grok").option("-d, --directory <dir>", "set working directory", process.cwd()).option("-k, --api-key <key>", "X API key").option("-u, --base-url <url>", "Grok API base URL").option("-m, --model <model>", "AI model to use").option("-p, --prompt <prompt>", "process a single prompt and exit (headless mode)").option("--max-tool-rounds <rounds>", "maximum tool rounds", "400").option("-q, --quiet", "suppress startup banner and messages").action(async (message, options) => {
       log("\u{1F3AF} Starting main execution...");
+      const apiKey = options.apiKey || process.env.GROK_API_KEY;
+      log(`\u{1F511} API Key: ${apiKey ? "\u2705 Found" : "\u274C Missing"}`);
+      if (!apiKey) {
+        console.error("\u274C No API key found. Use -k flag or set GROK_API_KEY environment variable.");
+        log("\u274C Missing API key - exiting");
+        process.exit(1);
+      }
       if (options.directory) {
         try {
           process.chdir(options.directory);
@@ -32519,6 +32519,14 @@ try {
       if (options.apiKey || options.baseUrl) {
         await saveCommandLineSettings(options.apiKey, options.baseUrl);
       }
+      log("\u{1F916} Creating GrokAgent instance...");
+      const manager = getSettingsManager2();
+      const verbosityLevel = manager.getUserSetting("verbosityLevel") || "quiet";
+      const explainLevel = manager.getUserSetting("explainLevel") || "brief";
+      const baseURL = options.baseUrl || process.env.GROK_BASE_URL;
+      const model = options.model || loadModel();
+      const maxToolRounds = parseInt(options.maxToolRounds || process.env.MAX_TOOL_ROUNDS || "400");
+      const agent = new GrokAgent2(apiKey, baseURL, model, maxToolRounds, void 0, verbosityLevel, explainLevel);
       if (options.prompt) {
         log("\u{1F916} Processing headless prompt...");
         try {

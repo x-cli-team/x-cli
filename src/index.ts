@@ -12,10 +12,22 @@ dotenv.config();
 // Simple logging to both console and file
 import fs from 'fs';
 const logStream = fs.createWriteStream(path.join(process.cwd(), 'xcli-startup.log'), { flags: 'a' });
+
+// Check if this is a --version or --help call
+const isQuietCommand = process.argv.includes('--version') || process.argv.includes('-V') || 
+                      process.argv.includes('--help') || process.argv.includes('-h');
+
+// Set environment variable for other modules to check
+if (isQuietCommand) {
+  process.env.GROK_QUIET_MODE = 'true';
+}
+
 const log = (...args: string[]) => {
   const timestamp = new Date().toISOString();
   const msg = `[${timestamp}] ${args.join(' ')}\n`;
-  console.log(msg.trim());  // Terminal output
+  if (!isQuietCommand) {
+    console.log(msg.trim());  // Terminal output only if not quiet command
+  }
   try {
     logStream.write(msg);
   } catch {
@@ -27,15 +39,7 @@ log("🚀 grok-one-shotStarting Up...");
 log(`📂 Working directory: ${process.cwd()}`);
 log(`🖥️  Node version: ${process.version}`);
 
-// Check API key early
-const apiKey = process.env.GROK_API_KEY;
-log(`🔑 API Key: ${apiKey ? "✅ Found" : "❌ Missing"}`);
-
-if (!apiKey) {
-  console.error("❌ No API key found. Set GROK_API_KEY environment variable.");
-  log("❌ Missing API key - exiting");
-  process.exit(1);
-}
+// API key will be checked later when actually needed
 
 // Import core modules with error handling
 log("📦 Loading core modules...");
@@ -104,17 +108,6 @@ try {
   // Main CLI setup
   log("🎯 Initializing CLI...");
   try {
-    const baseURL = process.env.GROK_BASE_URL;
-    const model = loadModel();
-    const maxToolRounds = parseInt(process.env.MAX_TOOL_ROUNDS || "400");
-    
-    log("🤖 Creating GrokAgent instance...");
-    // Load user verbosity settings
-    const manager = getSettingsManager();
-    const verbosityLevel = manager.getUserSetting('verbosityLevel') || 'quiet';
-    const explainLevel = manager.getUserSetting('explainLevel') || 'brief';
-    
-    const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds, undefined, verbosityLevel, explainLevel);
 
     log("📋 Setting up Commander CLI...");
     program
@@ -132,6 +125,16 @@ try {
       .action(async (message, options) => {
         log("🎯 Starting main execution...");
         
+        // Check for API key when actually needed
+        const apiKey = options.apiKey || process.env.GROK_API_KEY;
+        log(`🔑 API Key: ${apiKey ? "✅ Found" : "❌ Missing"}`);
+
+        if (!apiKey) {
+          console.error("❌ No API key found. Use -k flag or set GROK_API_KEY environment variable.");
+          log("❌ Missing API key - exiting");
+          process.exit(1);
+        }
+        
         if (options.directory) {
           try {
             process.chdir(options.directory);
@@ -145,6 +148,17 @@ try {
         if (options.apiKey || options.baseUrl) {
           await saveCommandLineSettings(options.apiKey, options.baseUrl);
         }
+
+        // Create GrokAgent with validated API key
+        log("🤖 Creating GrokAgent instance...");
+        const manager = getSettingsManager();
+        const verbosityLevel = manager.getUserSetting('verbosityLevel') || 'quiet';
+        const explainLevel = manager.getUserSetting('explainLevel') || 'brief';
+        const baseURL = options.baseUrl || process.env.GROK_BASE_URL;
+        const model = options.model || loadModel();
+        const maxToolRounds = parseInt(options.maxToolRounds || process.env.MAX_TOOL_ROUNDS || "400");
+        
+        const agent = new GrokAgent(apiKey, baseURL, model, maxToolRounds, undefined, verbosityLevel, explainLevel);
 
         // Headless mode: process prompt and exit
         if (options.prompt) {
