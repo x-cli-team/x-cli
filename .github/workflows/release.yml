@@ -51,6 +51,9 @@ jobs:
       - name: Link CLI for testing
         run: npm link
 
+      - name: Set test API key for validation
+        run: echo "X_API_KEY=test-key-for-validation-only" >> $GITHUB_ENV
+
       # Prevent loops if last commit was an automated bump, but allow GitHub releases for release PR merges
       - name: Check if should release
         id: should-release
