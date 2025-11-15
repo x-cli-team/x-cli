@@ -39,6 +39,14 @@ test_silent "Documentation files exist" "[ -f GROK.md ] && [ -f docs-index.md ]"
 test_silent "Core source files exist" "[ -f src/index.ts ] && [ -f src/agent/grok-agent.ts ] && [ -f src/utils/settings-manager.ts ]"
 test_silent "ESLint passes" "npm run lint"
 
+# In CI environments, also test CLI basic functionality with test API key
+if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+    # Set test API key for CI validation
+    export GROK_API_KEY="${X_API_KEY:-test-key-for-validation-only}"
+    test_silent "CLI version display (CI)" "node dist/index.js --version"
+    test_silent "CLI help display (CI)" "node dist/index.js --help"
+fi
+
 # Results
 if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
     if [ "$SILENT" != "true" ]; then

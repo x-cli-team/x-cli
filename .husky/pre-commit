@@ -64,17 +64,21 @@ npx lint-staged --config package.json .agent/**/*.{md,mdx} && npx lint-staged --
 echo "📝 Checking for .agent documentation updates..."
 npm run update-agent-docs-auto 2>/dev/null || echo "📝 Documentation update skipped (not required)"
 
-# Auto-update roadmap with AI agent
-echo "🗓️ Auto-updating roadmap..."
-if command -v grok &> /dev/null && [ -f "apps/site/docs/roadmap.md" ]; then
-  CURRENT_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
-  if timeout 30 grok -p "Review apps/site/docs/roadmap.md and update current version to ${CURRENT_VERSION}. Check if dates need updating to be realistic for future releases. Make minimal necessary changes only." 2>/dev/null; then
-    echo "✅ Roadmap updated successfully"
+# Auto-update roadmap with AI agent (skip in CI)
+if [ -z "$CI" ] && [ -z "$GITHUB_ACTIONS" ]; then
+  echo "🗓️ Auto-updating roadmap..."
+  if command -v grok &> /dev/null && [ -f "apps/site/docs/roadmap.md" ]; then
+    CURRENT_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
+    if timeout 30 grok -p "Review apps/site/docs/roadmap.md and update current version to ${CURRENT_VERSION}. Check if dates need updating to be realistic for future releases. Make minimal necessary changes only." 2>/dev/null; then
+      echo "✅ Roadmap updated successfully"
+    else
+      echo "⚠️ Roadmap auto-update failed - continuing with commit"
+    fi
   else
-    echo "⚠️ Roadmap auto-update failed - continuing with commit"
+    echo "⚠️ Grok not available - skipping roadmap update"
   fi
 else
-  echo "⚠️ Grok not available - skipping roadmap update"
+  echo "⏭️ Skipping roadmap update in CI environment"
 fi
 
 # Run core features test suite
