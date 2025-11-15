@@ -43,6 +43,13 @@ test_silent "ESLint passes" "npm run lint"
 if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
     # Set test API key for CI validation
     export GROK_API_KEY="${X_API_KEY:-test-key-for-validation-only}"
+    
+    # Extra check: ensure dist files exist in CI
+    if [ ! -f "dist/index.js" ]; then
+        [ "$SILENT" != "true" ] && echo "❌ dist/index.js missing in CI environment"
+        FAILED_TESTS+=("dist/index.js missing in CI environment")
+    fi
+    
     test_silent "CLI version display (CI)" "node dist/index.js --version"
     test_silent "CLI help display (CI)" "node dist/index.js --help"
 fi

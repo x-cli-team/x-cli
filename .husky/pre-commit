@@ -81,12 +81,12 @@ else
   echo "⏭️ Skipping roadmap update in CI environment"
 fi
 
-# Run core features test suite
+# Run core features test suite (ensure build exists first)
 if ! ./scripts/test-core-features-husky.sh true 2>/dev/null; then
   echo "❌ Core features validation failed! Essential functionality is broken."
   echo "💡 Common issues:"
   echo "   - TypeScript compilation errors"
-  echo "   - Missing dependencies"
+  echo "   - Missing dependencies" 
   echo "   - Build configuration problems"
   echo "   - Core source files missing"
   echo ""
