@@ -101,6 +101,8 @@ export class GrokAgent extends EventEmitter {
   private readonly minRequestInterval: number = 500; // ms
   private lastRequestTime: number = 0;
   private sessionLogPath: string;
+  private recentToolCalls: Map<string, number> = new Map(); // Track recent tool calls to prevent duplicates
+  private readonly duplicateWindowMs: number = 2000; // 2 second window for duplicate detection
   
   // Plan Mode integration
   private planModeState: PlanModeState | null = null;
@@ -164,6 +166,13 @@ export class GrokAgent extends EventEmitter {
     this.messages.push({
       role: "system",
       content: `You are Grok One-Shot, an AI-powered CLI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}${verbosityInstructions}
+
+🚨 CRITICAL TOOL CALLING RULES:
+- NEVER use multiple tool calls in a single response
+- NEVER concatenate tool calls like "view_fileview_file" or "str_replace_editorstr_replace_editor"
+- ALWAYS use ONE tool call per message with proper XML structure
+- WAIT for tool results before making additional tool calls
+- Each tool call must have valid JSON arguments only
 
 You have access to these tools:
 
@@ -863,6 +872,32 @@ Current working directory: ${process.cwd()}`,
 
   private async executeTool(toolCall: GrokToolCall): Promise<ToolResult> {
     try {
+      const toolName = toolCall.function?.name;
+      const now = Date.now();
+
+      // Check for duplicate tool calls within the window
+      const callSignature = `${toolName}:${toolCall.function?.arguments || ''}`;
+      const lastCallTime = this.recentToolCalls.get(callSignature);
+      
+      if (lastCallTime && (now - lastCallTime) < this.duplicateWindowMs) {
+        console.log(`[GrokAgent] Skipping duplicate tool call: ${toolName}`);
+        return {
+          success: true,
+          output: "Skipped duplicate tool call",
+          details: `This tool call was already executed ${Math.round((now - lastCallTime) / 1000)}s ago`
+        };
+      }
+
+      // Record this tool call
+      this.recentToolCalls.set(callSignature, now);
+      
+      // Clean up old entries to prevent memory bloat
+      for (const [key, time] of this.recentToolCalls.entries()) {
+        if (now - time > this.duplicateWindowMs) {
+          this.recentToolCalls.delete(key);
+        }
+      }
+
       // Check for Plan Mode and intercept destructive operations
       const planModeState = this.getPlanModeState();
       if (planModeState?.active) {
@@ -870,6 +905,34 @@ Current working directory: ${process.cwd()}`,
         if (readonlyOverlay && this.isDestructiveOperation(toolCall.function.name)) {
           return await readonlyOverlay.interceptToolCall(toolCall);
         }
+      }
+
+      // Validate tool call structure before JSON parsing
+      if (!toolCall.function?.arguments) {
+        console.error(`[GrokAgent] Tool call missing function arguments:`, toolCall);
+        return {
+          success: false,
+          error: `Tool call ${toolCall.function?.name || 'unknown'} missing required arguments`,
+          details: `This appears to be a malformed tool call. The AI model may have generated invalid XML or concatenated multiple tool calls.`
+        };
+      }
+
+      // Check for common XML malformation patterns that cause tool call failures
+      if (typeof toolCall.function.arguments === 'string' && 
+          (toolCall.function.arguments.includes('str_replace_editorstr_replace_editor') ||
+           toolCall.function.arguments.includes('view_fileview_file') ||
+           toolCall.function.arguments.includes('create_filecreate_file') ||
+           toolCall.function.arguments.includes('}{') ||
+           toolCall.function.name?.includes('view_file') && toolCall.function.name !== 'view_file')) {
+        console.error(`[GrokAgent] Detected malformed XML in tool call - appears to be concatenated:`, {
+          toolName: toolCall.function.name,
+          arguments: toolCall.function.arguments
+        });
+        return {
+          success: false,
+          error: `Malformed tool call detected - appears to be concatenated XML without proper structure`,
+          details: `The AI model generated invalid XML by concatenating multiple tool calls. This is a model generation issue that requires single, properly formatted tool calls.`
+        };
       }
 
       // Robust JSON parsing with detailed error handling
@@ -890,6 +953,8 @@ Current working directory: ${process.cwd()}`,
           const cleanedArgs = toolCall.function.arguments
             .replace(/,\s*}/g, '}')
             .replace(/,\s*]/g, ']')
+            .replace(/^\s*{?\s*/, '{')  // Ensure starts with {
+            .replace(/\s*}?\s*$/, '}')  // Ensure ends with }
             .trim();
           args = JSON.parse(cleanedArgs);
           console.log(`[GrokAgent] JSON parsing recovered after cleanup`);
@@ -897,7 +962,7 @@ Current working directory: ${process.cwd()}`,
           return {
             success: false,
             error: `Invalid JSON arguments for ${toolCall.function.name}: ${parseError.message}. Arguments: ${toolCall.function.arguments}`,
-            details: `Tool call failed due to malformed JSON. This is likely a model generation issue.`
+            details: `Tool call failed due to malformed JSON. This is likely a model generation issue. Try using single tool calls with proper XML structure.`
           };
         }
       }
@@ -1208,6 +1273,31 @@ Current working directory: ${process.cwd()}`,
 
   private async executeMCPTool(toolCall: GrokToolCall): Promise<ToolResult> {
     try {
+      // Validate tool call structure before JSON parsing
+      if (!toolCall.function?.arguments) {
+        console.error(`[GrokAgent] MCP tool call missing function arguments:`, toolCall);
+        return {
+          success: false,
+          error: `MCP tool call ${toolCall.function?.name || 'unknown'} missing required arguments`,
+          details: `This appears to be a malformed MCP tool call. The AI model may have generated invalid XML or concatenated multiple tool calls.`
+        };
+      }
+
+      // Check for malformed XML patterns in MCP tool calls
+      if (typeof toolCall.function.arguments === 'string' && 
+          (toolCall.function.arguments.includes('mcp__') && toolCall.function.arguments.match(/mcp__\w+mcp__/) ||
+           toolCall.function.name?.startsWith('mcp__') && toolCall.function.name.split('__').length > 3)) {
+        console.error(`[GrokAgent] Detected malformed XML in MCP tool call:`, {
+          toolName: toolCall.function.name,
+          arguments: toolCall.function.arguments
+        });
+        return {
+          success: false,
+          error: `Malformed MCP tool call detected - appears to be concatenated XML`,
+          details: `The AI model generated invalid XML by concatenating multiple MCP tool calls. Use single, properly formatted tool calls only.`
+        };
+      }
+
       // Robust JSON parsing with detailed error handling
       let args: any;
       try {
@@ -1226,6 +1316,8 @@ Current working directory: ${process.cwd()}`,
           const cleanedArgs = toolCall.function.arguments
             .replace(/,\s*}/g, '}')
             .replace(/,\s*]/g, ']')
+            .replace(/^\s*{?\s*/, '{')  // Ensure starts with {
+            .replace(/\s*}?\s*$/, '}')  // Ensure ends with }
             .trim();
           args = JSON.parse(cleanedArgs);
           console.log(`[GrokAgent] MCP JSON parsing recovered after cleanup`);

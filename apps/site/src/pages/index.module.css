@@ -794,6 +794,37 @@
 }
 
 .featureCard h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.featureCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.completionBadge {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-left: auto;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.featureCard h3 {
   font-size: 1.25rem;
   font-weight: 600;
   color: white;

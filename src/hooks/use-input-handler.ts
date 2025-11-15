@@ -6,10 +6,9 @@ import { ConfirmationService } from "../utils/confirmation-service.js";
 import { useEnhancedInput, Key } from "./use-enhanced-input.js";
 import { GrokToolCall } from "../grok/client.js";
 import { ToolResult } from "../types/index.js";
-import { PasteEvent, getPasteDetectionService } from "../services/paste-detection.js";
+// Paste detection now handled inline with pre-capture strategy
 import { usePlanMode } from "./use-plan-mode.js";
 import { detectComplexity } from "../services/complexity-detector.js";
-// TODO: Implement ResearchRecommendService and executionOrchestrator when needed
 
 import { filterCommandSuggestions } from "../ui/components/command-suggestions.js";
 import { loadModelConfig, updateCurrentModel } from "../utils/model-config.js";
@@ -25,6 +24,15 @@ import { SelfHealingSystem } from "../tools/documentation/self-healing-system.js
 import { checkForUpdates, autoUpgrade } from "../utils/version-checker.js";
 import { getSettingsManager } from "../utils/settings-manager.js";
 import pkg from "../../package.json" with { type: "json" };
+
+// Global paste state - declare at module level
+declare global {
+  var grokPasteCache: Map<string, string> | undefined;
+  var grokPasteCounter: number | undefined;
+  var grokStreamingPasteBuffer: string | undefined;
+  var grokExistingInputBeforePaste: string | undefined;
+  var grokCursorPositionBeforePaste: number | undefined;
+}
 
 interface UseInputHandlerProps {
   agent: GrokAgent;
@@ -290,28 +298,7 @@ export function useInputHandler({
     }
   };
 
-  const handlePasteDetected = (pasteEvent: PasteEvent) => {
-    // Show paste summary immediately as visual feedback
-    const userEntry: ChatEntry = {
-      type: "user",
-      content: pasteEvent.content,           // Full content for AI (when submitted)
-      displayContent: pasteEvent.summary,    // Summary for UI display
-      timestamp: new Date(),
-      isPasteSummary: true,
-      pasteMetadata: {
-        pasteNumber: pasteEvent.pasteNumber,
-        lineCount: pasteEvent.lineCount,
-        charCount: pasteEvent.charCount,
-      },
-    };
-
-    // Add the paste summary to chat history for immediate visual feedback
-    setChatHistory((prev) => [...prev, userEntry]);
-
-    // DON'T process the content - just show the summary
-    // The pasted content remains in the input field for user review
-    // When user presses Enter, it will be processed normally
-  };
+  // Paste detection is now handled directly in enhanced input
 
   const handleInputChange = (newInput: string) => {
     // Update command suggestions based on input
@@ -330,23 +317,111 @@ export function useInputHandler({
     setInput,
     setCursorPosition,
     clearInput,
+    insertAtCursor,
     resetHistory,
     handleInput,
   } = useEnhancedInput({
     onSubmit: handleInputSubmit,
     onSpecialKey: handleSpecialKey,
-    onPasteDetected: handlePasteDetected,
+    // Paste detection handled inline
     disabled: isConfirmationActive,
     multiline: true, // Enable multiline mode to handle pasted content properly
   });
 
-  // Hook up the actual input handling
+  // Initialize global paste state
+
+  // Initialize globals
+  if (typeof globalThis.grokPasteCache === 'undefined') {
+    globalThis.grokPasteCache = new Map();
+  }
+  if (typeof globalThis.grokPasteCounter === 'undefined') {
+    globalThis.grokPasteCounter = 0;
+  }
+
+  // Hook up the actual input handling with paste detection
   useInput((inputChar: string, key: Key) => {
     // Check global shortcuts before normal input handling
     if (onGlobalShortcut && onGlobalShortcut(inputChar, key)) {
       return; // Handled by global shortcut
     }
+
+    // ⭐ PASTE DETECTION: Check if this is a paste operation
+    if (inputChar.length > 1) {
+      // 🔑 CRITICAL: Pre-capture existing input and cursor position BEFORE paste processing begins
+      const existingInputBeforePaste = input;
+      const cursorPositionBeforePaste = cursorPosition;
+      if (!globalThis.grokStreamingPasteBuffer) {
+        globalThis.grokExistingInputBeforePaste = existingInputBeforePaste;
+        globalThis.grokCursorPositionBeforePaste = cursorPositionBeforePaste;
+      }
+
+      // Accumulate paste content via streaming buffer
+      if (!globalThis.grokStreamingPasteBuffer) {
+        globalThis.grokStreamingPasteBuffer = '';
+      }
+      globalThis.grokStreamingPasteBuffer += inputChar;
+
+      // Start timeout for paste completion (100ms)
+      setTimeout(() => {
+        const pastedContent = globalThis.grokStreamingPasteBuffer;
+        const existingInput = globalThis.grokExistingInputBeforePaste || '';
+
+        if (pastedContent && (pastedContent.length > 100 || pastedContent.split(/\r\n|\r|\n/).length > 10)) {
+          // Generate paste summary for large content
+          const lines = pastedContent.split(/\r\n|\r|\n/);
+          globalThis.grokPasteCounter! += 1;
+          const summary = `[Pasted text #${globalThis.grokPasteCounter} +${lines.length} lines]`;
+
+          // Cache full content for later expansion
+          globalThis.grokPasteCache!.set(summary, pastedContent);
+
+          // Restore original input state and insert summary at correct position
+          const existingInput = globalThis.grokExistingInputBeforePaste || '';
+          const cursorPos = globalThis.grokCursorPositionBeforePaste || 0;
+          
+          // First restore the original input state
+          setInput(existingInput);
+          setCursorPosition(cursorPos);
+          
+          // Then insert the summary - insertAtCursor will handle cursor positioning
+          setTimeout(() => {
+            insertAtCursor(summary);
+          }, 10);
+
+          // Add paste confirmation to chat history
+          const pasteConfirmationEntry: ChatEntry = {
+            type: "assistant",
+            content: `📄 Large paste detected: ${lines.length} lines, showing summary`,
+            timestamp: new Date(),
+          };
+          setChatHistory((prev) => [...prev, pasteConfirmationEntry]);
+        } else if (pastedContent) {
+          // Handle small pastes - insert at cursor position  
+          const existingInput = globalThis.grokExistingInputBeforePaste || '';
+          const cursorPos = globalThis.grokCursorPositionBeforePaste || 0;
+          
+          const beforeCursor = existingInput.slice(0, cursorPos);
+          const afterCursor = existingInput.slice(cursorPos);
+          const combinedContent = beforeCursor + pastedContent + afterCursor;
+
+          // Update input state with the actual pasted content
+          setInput(combinedContent);
+          // Ensure cursor is positioned after the pasted content with immediate timeout
+          setTimeout(() => {
+            setCursorPosition(beforeCursor.length + pastedContent.length);
+          }, 0);
+        }
+
+        // Clear paste state
+        globalThis.grokStreamingPasteBuffer = undefined;
+        globalThis.grokExistingInputBeforePaste = undefined;
+        globalThis.grokCursorPositionBeforePaste = undefined;
+      }, 100);
+
+      return; // CRITICAL: Don't call handleInput for paste chunks - this prevents cursor interference
+    }
     
+    // Only process as regular input if it's not a paste chunk
     handleInput(inputChar, key);
   });
 
@@ -2173,34 +2248,43 @@ ${pushResult.error || 'Git push failed'}
     return false;
   };
 
-  const processUserMessage = async (userInput: string) => {
-    // Check if this input should be displayed as a paste summary
-    const pasteService = getPasteDetectionService();
-    const shouldSummarize = pasteService.shouldSummarize(userInput);
+  // Paste expansion function - converts summaries back to full content
+  const expandPasteSummaryToFullContent = async (userInput: string): Promise<string> => {
+    if (!globalThis.grokPasteCache) return userInput;
     
-    // Check if we already have a paste summary for this content in recent history
-    const recentEntry = chatHistory[chatHistory.length - 1];
-    const isAlreadyShowingPasteSummary = recentEntry && 
-      recentEntry.isPasteSummary && 
-      recentEntry.content === userInput;
+    let expandedInput = userInput;
+    const cache = globalThis.grokPasteCache;
     
-    // Only add new chat entry if we haven't already shown the paste summary
-    if (!isAlreadyShowingPasteSummary) {
-      const userEntry: ChatEntry = {
-        type: "user",
-        content: userInput,
-        displayContent: shouldSummarize ? pasteService.createPasteSummary(userInput, pasteService.getCurrentCounter() + 1) : userInput,
-        timestamp: new Date(),
-        isPasteSummary: shouldSummarize,
-      };
+    // Replace all paste summaries in the input with full content
+    for (const [summary, fullContent] of cache.entries()) {
+      // Clean up the content: normalize line endings and format for AI processing
+      const cleanContent = fullContent
+        .replace(/\r\n/g, '\n')  // Convert Windows line endings
+        .replace(/\r/g, '\n')    // Convert Mac line endings
+        .trim()                  // Remove leading/trailing whitespace
+        .split('\n')
+        .map(line => line.trim()) // Clean each line
+        .join('\n');
       
-      // Increment paste counter if this was a paste
-      if (shouldSummarize) {
-        pasteService.detectPaste("", userInput); // This will increment the counter
-      }
-      
-      setChatHistory((prev) => [...prev, userEntry]);
+      expandedInput = expandedInput.replace(summary, cleanContent);
     }
+    
+    return expandedInput;
+  };
+
+  const processUserMessage = async (userInput: string) => {
+    // Handle paste summary expansion - if user submits a paste summary, expand to full content
+    const expandedInput = await expandPasteSummaryToFullContent(userInput);
+
+    // Content expansion working - debug logging removed
+
+    const userEntry: ChatEntry = {
+      type: "user",
+      content: expandedInput, // AI receives expanded content
+      displayContent: userInput, // UI shows what user typed (may be summary)
+      timestamp: new Date(),
+    };
+    setChatHistory((prev) => [...prev, userEntry]);
 
     setIsProcessing(true);
     clearInput();
@@ -2313,7 +2397,7 @@ ${pushResult.error || 'Git push failed'}
         lastUpdateTime = now;
       };
 
-      for await (const chunk of agent.processUserMessageStream(userInput)) {
+      for await (const chunk of agent.processUserMessageStream(expandedInput)) {
         switch (chunk.type) {
           case "content":
             if (chunk.content) {

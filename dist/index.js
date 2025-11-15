@@ -20,7 +20,7 @@ import { glob } from 'glob';
 import crypto2 from 'crypto';
 import { encoding_for_model, get_encoding } from 'tiktoken';
 import * as readline from 'readline';
-import React4, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import React5, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { render, Box, Text, useApp, useInput } from 'ink';
 import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
 import { program, Command } from 'commander';
@@ -7562,10 +7562,10 @@ var init_dependency_analyzer = __esm({
         const circularDeps = [];
         const visited = /* @__PURE__ */ new Set();
         const visiting = /* @__PURE__ */ new Set();
-        const dfs = (filePath, path38) => {
+        const dfs = (filePath, path39) => {
           if (visiting.has(filePath)) {
-            const cycleStart = path38.indexOf(filePath);
-            const cycle = path38.slice(cycleStart).concat([filePath]);
+            const cycleStart = path39.indexOf(filePath);
+            const cycle = path39.slice(cycleStart).concat([filePath]);
             circularDeps.push({
               cycle: cycle.map((fp) => graph.nodes.get(fp)?.filePath || fp),
               severity: cycle.length <= 2 ? "error" : "warning",
@@ -7581,7 +7581,7 @@ var init_dependency_analyzer = __esm({
           if (node) {
             for (const dependency of node.dependencies) {
               if (graph.nodes.has(dependency)) {
-                dfs(dependency, [...path38, filePath]);
+                dfs(dependency, [...path39, filePath]);
               }
             }
           }
@@ -12740,8 +12740,8 @@ var init_parseUtil = __esm({
     init_errors();
     init_en();
     makeIssue = (params) => {
-      const { data, path: path38, errorMaps, issueData } = params;
-      const fullPath = [...path38, ...issueData.path || []];
+      const { data, path: path39, errorMaps, issueData } = params;
+      const fullPath = [...path39, ...issueData.path || []];
       const fullIssue = {
         ...issueData,
         path: fullPath
@@ -13049,11 +13049,11 @@ var init_types = __esm({
     init_parseUtil();
     init_util();
     ParseInputLazyPath = class {
-      constructor(parent, value, path38, key) {
+      constructor(parent, value, path39, key) {
         this._cachedPath = [];
         this.parent = parent;
         this.data = value;
-        this._path = path38;
+        this._path = path39;
         this._key = key;
       }
       get path() {
@@ -18384,6 +18384,10 @@ var init_grok_agent = __esm({
         this.minRequestInterval = 500;
         // ms
         this.lastRequestTime = 0;
+        this.recentToolCalls = /* @__PURE__ */ new Map();
+        // Track recent tool calls to prevent duplicates
+        this.duplicateWindowMs = 2e3;
+        // 2 second window for duplicate detection
         // Plan Mode integration
         this.planModeState = null;
         this.readonlyOverlay = null;
@@ -18444,6 +18448,13 @@ The above project context should inform your responses and decision making.` : "
         this.messages.push({
           role: "system",
           content: `You are Grok One-Shot, an AI-powered CLI assistant that helps with file editing, coding tasks, and system operations.${customInstructionsSection}${contextSection}${verbosityInstructions}
+
+\u{1F6A8} CRITICAL TOOL CALLING RULES:
+- NEVER use multiple tool calls in a single response
+- NEVER concatenate tool calls like "view_fileview_file" or "str_replace_editorstr_replace_editor"
+- ALWAYS use ONE tool call per message with proper XML structure
+- WAIT for tool results before making additional tool calls
+- Each tool call must have valid JSON arguments only
 
 You have access to these tools:
 
@@ -18979,12 +18990,49 @@ Current working directory: ${process.cwd()}`
       }
       async executeTool(toolCall) {
         try {
+          const toolName = toolCall.function?.name;
+          const now = Date.now();
+          const callSignature = `${toolName}:${toolCall.function?.arguments || ""}`;
+          const lastCallTime = this.recentToolCalls.get(callSignature);
+          if (lastCallTime && now - lastCallTime < this.duplicateWindowMs) {
+            console.log(`[GrokAgent] Skipping duplicate tool call: ${toolName}`);
+            return {
+              success: true,
+              output: "Skipped duplicate tool call",
+              details: `This tool call was already executed ${Math.round((now - lastCallTime) / 1e3)}s ago`
+            };
+          }
+          this.recentToolCalls.set(callSignature, now);
+          for (const [key, time] of this.recentToolCalls.entries()) {
+            if (now - time > this.duplicateWindowMs) {
+              this.recentToolCalls.delete(key);
+            }
+          }
           const planModeState = this.getPlanModeState();
           if (planModeState?.active) {
             const readonlyOverlay = this.getReadonlyOverlay();
             if (readonlyOverlay && this.isDestructiveOperation(toolCall.function.name)) {
               return await readonlyOverlay.interceptToolCall(toolCall);
             }
+          }
+          if (!toolCall.function?.arguments) {
+            console.error(`[GrokAgent] Tool call missing function arguments:`, toolCall);
+            return {
+              success: false,
+              error: `Tool call ${toolCall.function?.name || "unknown"} missing required arguments`,
+              details: `This appears to be a malformed tool call. The AI model may have generated invalid XML or concatenated multiple tool calls.`
+            };
+          }
+          if (typeof toolCall.function.arguments === "string" && (toolCall.function.arguments.includes("str_replace_editorstr_replace_editor") || toolCall.function.arguments.includes("view_fileview_file") || toolCall.function.arguments.includes("create_filecreate_file") || toolCall.function.arguments.includes("}{") || toolCall.function.name?.includes("view_file") && toolCall.function.name !== "view_file")) {
+            console.error(`[GrokAgent] Detected malformed XML in tool call - appears to be concatenated:`, {
+              toolName: toolCall.function.name,
+              arguments: toolCall.function.arguments
+            });
+            return {
+              success: false,
+              error: `Malformed tool call detected - appears to be concatenated XML without proper structure`,
+              details: `The AI model generated invalid XML by concatenating multiple tool calls. This is a model generation issue that requires single, properly formatted tool calls.`
+            };
           }
           let args;
           try {
@@ -18997,14 +19045,14 @@ Current working directory: ${process.cwd()}`
               toolCall
             });
             try {
-              const cleanedArgs = toolCall.function.arguments.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]").trim();
+              const cleanedArgs = toolCall.function.arguments.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]").replace(/^\s*{?\s*/, "{").replace(/\s*}?\s*$/, "}").trim();
               args = JSON.parse(cleanedArgs);
               console.log(`[GrokAgent] JSON parsing recovered after cleanup`);
             } catch (retryError) {
               return {
                 success: false,
                 error: `Invalid JSON arguments for ${toolCall.function.name}: ${parseError.message}. Arguments: ${toolCall.function.arguments}`,
-                details: `Tool call failed due to malformed JSON. This is likely a model generation issue.`
+                details: `Tool call failed due to malformed JSON. This is likely a model generation issue. Try using single tool calls with proper XML structure.`
               };
             }
           }
@@ -19050,10 +19098,10 @@ Current working directory: ${process.cwd()}`
                 return await this.textEditor.view(args.path, range);
               } catch (error) {
                 console.warn(`view_file tool failed, falling back to bash: ${error.message}`);
-                const path38 = args.path;
-                let command = `cat "${path38}"`;
+                const path39 = args.path;
+                let command = `cat "${path39}"`;
                 if (args.start_line && args.end_line) {
-                  command = `sed -n '${args.start_line},${args.end_line}p' "${path38}"`;
+                  command = `sed -n '${args.start_line},${args.end_line}p' "${path39}"`;
                 }
                 return await this.bash.execute(command);
               }
@@ -19264,6 +19312,25 @@ EOF`;
       }
       async executeMCPTool(toolCall) {
         try {
+          if (!toolCall.function?.arguments) {
+            console.error(`[GrokAgent] MCP tool call missing function arguments:`, toolCall);
+            return {
+              success: false,
+              error: `MCP tool call ${toolCall.function?.name || "unknown"} missing required arguments`,
+              details: `This appears to be a malformed MCP tool call. The AI model may have generated invalid XML or concatenated multiple tool calls.`
+            };
+          }
+          if (typeof toolCall.function.arguments === "string" && (toolCall.function.arguments.includes("mcp__") && toolCall.function.arguments.match(/mcp__\w+mcp__/) || toolCall.function.name?.startsWith("mcp__") && toolCall.function.name.split("__").length > 3)) {
+            console.error(`[GrokAgent] Detected malformed XML in MCP tool call:`, {
+              toolName: toolCall.function.name,
+              arguments: toolCall.function.arguments
+            });
+            return {
+              success: false,
+              error: `Malformed MCP tool call detected - appears to be concatenated XML`,
+              details: `The AI model generated invalid XML by concatenating multiple MCP tool calls. Use single, properly formatted tool calls only.`
+            };
+          }
           let args;
           try {
             args = JSON.parse(toolCall.function.arguments);
@@ -19275,7 +19342,7 @@ EOF`;
               toolCall
             });
             try {
-              const cleanedArgs = toolCall.function.arguments.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]").trim();
+              const cleanedArgs = toolCall.function.arguments.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]").replace(/^\s*{?\s*/, "{").replace(/\s*}?\s*$/, "}").trim();
               args = JSON.parse(cleanedArgs);
               console.log(`[GrokAgent] MCP JSON parsing recovered after cleanup`);
             } catch (retryError) {
@@ -19863,150 +19930,21 @@ var init_use_input_history = __esm({
   "src/hooks/use-input-history.ts"() {
   }
 });
-
-// src/services/paste-detection.ts
-function getPasteDetectionService() {
-  if (!globalPasteService) {
-    globalPasteService = new PasteDetectionService();
-  }
-  return globalPasteService;
-}
-var PasteDetectionService, globalPasteService;
-var init_paste_detection = __esm({
-  "src/services/paste-detection.ts"() {
-    PasteDetectionService = class {
-      constructor(thresholds) {
-        this.pasteCounter = 0;
-        this.debug = process.env.GROK_PASTE_DEBUG === "true";
-        this.thresholds = {
-          lineThreshold: thresholds?.lineThreshold ?? this.getDefaultLineThreshold(),
-          charThreshold: thresholds?.charThreshold ?? this.getDefaultCharThreshold()
-        };
-      }
-      /**
-       * Detects if new content represents a paste operation that should be summarized
-       */
-      detectPaste(oldValue, newValue) {
-        const added = this.getAddedContent(oldValue, newValue);
-        if (this.debug) {
-          console.log("\u{1F50D} Paste Detection Debug:", {
-            addedLength: added?.length || 0,
-            lineCount: added ? this.countLines(added) : 0,
-            thresholds: this.thresholds,
-            shouldSummarize: added ? this.shouldSummarize(added) : false
-          });
-        }
-        if (!added || !this.shouldSummarize(added)) {
-          return null;
-        }
-        this.pasteCounter++;
-        return {
-          content: added,
-          lineCount: this.countLines(added),
-          charCount: added.length,
-          pasteNumber: this.pasteCounter,
-          summary: this.createPasteSummary(added, this.pasteCounter)
-        };
-      }
-      /**
-       * Determines if content should be summarized based on thresholds
-       */
-      shouldSummarize(content) {
-        const lineCount = this.countLines(content);
-        return lineCount > this.thresholds.lineThreshold || content.length > this.thresholds.charThreshold;
-      }
-      /**
-       * Creates a paste summary in the format: [Pasted text #N +X lines]
-       */
-      createPasteSummary(content, pasteNumber) {
-        const lineCount = this.countLines(content);
-        const pluralLines = lineCount === 1 ? "line" : "lines";
-        return `[Pasted text #${pasteNumber} +${lineCount} ${pluralLines}]`;
-      }
-      /**
-       * Resets the paste counter (useful for new sessions)
-       */
-      resetCounter() {
-        this.pasteCounter = 0;
-      }
-      /**
-       * Updates thresholds for paste detection
-       */
-      updateThresholds(thresholds) {
-        this.thresholds = {
-          ...this.thresholds,
-          ...thresholds
-        };
-      }
-      /**
-       * Gets current paste counter value
-       */
-      getCurrentCounter() {
-        return this.pasteCounter;
-      }
-      /**
-       * Gets current thresholds
-       */
-      getThresholds() {
-        return { ...this.thresholds };
-      }
-      /**
-       * Extracts the content that was added between old and new values
-       */
-      getAddedContent(oldValue, newValue) {
-        if (newValue.startsWith(oldValue)) {
-          return newValue.slice(oldValue.length);
-        }
-        return "";
-      }
-      /**
-       * Counts the number of lines in content
-       */
-      countLines(content) {
-        if (!content) return 0;
-        const lines = content.split(/\r\n|\r|\n/);
-        return lines[lines.length - 1] === "" ? lines.length - 1 : lines.length;
-      }
-      /**
-       * Gets default line threshold from environment or config
-       */
-      getDefaultLineThreshold() {
-        const envValue = process.env.GROK_PASTE_LINE_THRESHOLD;
-        if (envValue) {
-          const parsed = parseInt(envValue, 10);
-          if (!isNaN(parsed) && parsed > 0) {
-            return parsed;
-          }
-        }
-        return 2;
-      }
-      /**
-       * Gets default character threshold from environment or config
-       */
-      getDefaultCharThreshold() {
-        const envValue = process.env.GROK_PASTE_CHAR_THRESHOLD;
-        if (envValue) {
-          const parsed = parseInt(envValue, 10);
-          if (!isNaN(parsed) && parsed > 0) {
-            return parsed;
-          }
-        }
-        return 50;
-      }
-    };
-    globalPasteService = null;
-  }
-});
 function useEnhancedInput({
   onSubmit,
   onEscape,
   onSpecialKey,
-  onPasteDetected,
   disabled = false,
   multiline = false
 } = {}) {
   const [input, setInputState] = useState("");
   const [cursorPosition, setCursorPositionState] = useState(0);
+  const debugSetInputState = useCallback((newInput) => {
+    setInputState(newInput);
+  }, []);
+  const debugSetCursorPositionState = useCallback((newPos) => {
+    setCursorPositionState(newPos);
+  }, []);
   const isMultilineRef = useRef(multiline);
   const {
     addToHistory,
@@ -20016,32 +19954,34 @@ function useEnhancedInput({
     isNavigatingHistory
   } = useInputHistory();
   const setInput = useCallback((text) => {
-    const previousInput = input;
-    setInputState(text);
-    setCursorPositionState(Math.min(text.length, cursorPosition));
+    enhancedLog("\u{1F504} setInput called");
+    enhancedLog("setInput details:", {
+      previousInput: input.slice(0, 100) + (input.length > 100 ? "..." : ""),
+      newText: text.slice(0, 100) + (text.length > 100 ? "..." : ""),
+      previousLength: input.length,
+      newLength: text.length,
+      cursorPosition,
+      isNavigatingHistory: isNavigatingHistory()
+    });
+    debugSetInputState(text);
+    debugSetCursorPositionState(Math.min(text.length, cursorPosition));
     if (!isNavigatingHistory()) {
       setOriginalInput(text);
     }
-    if (onPasteDetected && text !== previousInput) {
-      const pasteService = getPasteDetectionService();
-      const pasteEvent = pasteService.detectPaste(previousInput, text);
-      if (pasteEvent) {
-        onPasteDetected(pasteEvent);
-      }
-    }
-  }, [input, cursorPosition, isNavigatingHistory, setOriginalInput, onPasteDetected]);
+    enhancedLog("\u2705 setInput completed");
+  }, [input, cursorPosition, isNavigatingHistory, setOriginalInput]);
   const setCursorPosition = useCallback((position) => {
-    setCursorPositionState(Math.max(0, Math.min(input.length, position)));
-  }, [input.length]);
+    debugSetCursorPositionState(Math.max(0, Math.min(input.length, position)));
+  }, [input.length, debugSetCursorPositionState]);
   const clearInput = useCallback(() => {
-    setInputState("");
-    setCursorPositionState(0);
+    debugSetInputState("");
+    debugSetCursorPositionState(0);
     setOriginalInput("");
-  }, [setOriginalInput]);
+  }, [setOriginalInput, debugSetInputState, debugSetCursorPositionState]);
   const insertAtCursor = useCallback((text) => {
     const result = insertText(input, cursorPosition, text);
-    setInputState(result.text);
-    setCursorPositionState(result.position);
+    debugSetInputState(result.text);
+    debugSetCursorPositionState(result.position);
     setOriginalInput(result.text);
   }, [input, cursorPosition, setOriginalInput]);
   const handleSubmit = useCallback(() => {
@@ -20052,10 +19992,31 @@ function useEnhancedInput({
     }
   }, [input, addToHistory, onSubmit, clearInput]);
   const handleInput = useCallback((inputChar, key) => {
-    if (disabled) return;
+    enhancedLog("\u2328\uFE0F handleInput called");
+    enhancedLog("Input event:", {
+      inputChar: inputChar === "" ? "(empty)" : inputChar,
+      charCode: inputChar.charCodeAt(0) || "N/A",
+      key: {
+        name: key.name || "undefined",
+        ctrl: !!key.ctrl,
+        meta: !!key.meta,
+        shift: !!key.shift,
+        paste: !!key.paste,
+        return: !!key.return,
+        backspace: !!key.backspace,
+        delete: !!key.delete
+      },
+      currentInput: input.slice(0, 50) + (input.length > 50 ? "..." : ""),
+      currentInputLength: input.length,
+      disabled
+    });
+    if (disabled) {
+      enhancedLog("\u274C Input disabled, returning early");
+      return;
+    }
     if (key.ctrl && inputChar === "c" || inputChar === "") {
-      setInputState("");
-      setCursorPositionState(0);
+      debugSetInputState("");
+      debugSetCursorPositionState(0);
       setOriginalInput("");
       return;
     }
@@ -20069,8 +20030,8 @@ function useEnhancedInput({
     if (key.return) {
       if (multiline && key.shift) {
         const result = insertText(input, cursorPosition, "\n");
-        setInputState(result.text);
-        setCursorPositionState(result.position);
+        debugSetInputState(result.text);
+        debugSetCursorPositionState(result.position);
         setOriginalInput(result.text);
       } else {
         handleSubmit();
@@ -20080,58 +20041,58 @@ function useEnhancedInput({
     if ((key.upArrow || key.name === "up") && !key.ctrl && !key.meta) {
       const historyInput = navigateHistory("up");
       if (historyInput !== null) {
-        setInputState(historyInput);
-        setCursorPositionState(historyInput.length);
+        debugSetInputState(historyInput);
+        debugSetCursorPositionState(historyInput.length);
       }
       return;
     }
     if ((key.downArrow || key.name === "down") && !key.ctrl && !key.meta) {
       const historyInput = navigateHistory("down");
       if (historyInput !== null) {
-        setInputState(historyInput);
-        setCursorPositionState(historyInput.length);
+        debugSetInputState(historyInput);
+        debugSetCursorPositionState(historyInput.length);
       }
       return;
     }
     if ((key.leftArrow || key.name === "left") && key.ctrl && !inputChar.includes("[")) {
       const newPos = moveToPreviousWord(input, cursorPosition);
-      setCursorPositionState(newPos);
+      debugSetCursorPositionState(newPos);
       return;
     }
     if ((key.rightArrow || key.name === "right") && key.ctrl && !inputChar.includes("[")) {
       const newPos = moveToNextWord(input, cursorPosition);
-      setCursorPositionState(newPos);
+      debugSetCursorPositionState(newPos);
       return;
     }
     if (key.leftArrow || key.name === "left") {
       const newPos = Math.max(0, cursorPosition - 1);
-      setCursorPositionState(newPos);
+      debugSetCursorPositionState(newPos);
       return;
     }
     if (key.rightArrow || key.name === "right") {
       const newPos = Math.min(input.length, cursorPosition + 1);
-      setCursorPositionState(newPos);
+      debugSetCursorPositionState(newPos);
       return;
     }
     if (key.ctrl && inputChar === "a" || key.name === "home") {
-      setCursorPositionState(0);
+      debugSetCursorPositionState(0);
       return;
     }
     if (key.ctrl && inputChar === "e" || key.name === "end") {
-      setCursorPositionState(input.length);
+      debugSetCursorPositionState(input.length);
       return;
     }
     const isBackspace = key.backspace || key.name === "backspace" || inputChar === "\b" || inputChar === "\x7F" || key.delete && inputChar === "" && !key.shift;
     if (isBackspace) {
       if (key.ctrl || key.meta) {
         const result = deleteWordBefore(input, cursorPosition);
-        setInputState(result.text);
-        setCursorPositionState(result.position);
+        debugSetInputState(result.text);
+        debugSetCursorPositionState(result.position);
         setOriginalInput(result.text);
       } else {
         const result = deleteCharBefore(input, cursorPosition);
-        setInputState(result.text);
-        setCursorPositionState(result.position);
+        debugSetInputState(result.text);
+        debugSetCursorPositionState(result.position);
         setOriginalInput(result.text);
       }
       return;
@@ -20139,13 +20100,13 @@ function useEnhancedInput({
     if (key.delete && inputChar !== "" || key.ctrl && inputChar === "d") {
       if (key.ctrl || key.meta) {
         const result = deleteWordAfter(input, cursorPosition);
-        setInputState(result.text);
-        setCursorPositionState(result.position);
+        debugSetInputState(result.text);
+        debugSetCursorPositionState(result.position);
         setOriginalInput(result.text);
       } else {
         const result = deleteCharAfter(input, cursorPosition);
-        setInputState(result.text);
-        setCursorPositionState(result.position);
+        debugSetInputState(result.text);
+        debugSetCursorPositionState(result.position);
         setOriginalInput(result.text);
       }
       return;
@@ -20153,36 +20114,57 @@ function useEnhancedInput({
     if (key.ctrl && inputChar === "k") {
       const lineEnd = moveToLineEnd(input, cursorPosition);
       const newText = input.slice(0, cursorPosition) + input.slice(lineEnd);
-      setInputState(newText);
+      debugSetInputState(newText);
       setOriginalInput(newText);
       return;
     }
     if (key.ctrl && inputChar === "u") {
       const lineStart = moveToLineStart(input, cursorPosition);
       const newText = input.slice(0, lineStart) + input.slice(cursorPosition);
-      setInputState(newText);
-      setCursorPositionState(lineStart);
+      debugSetInputState(newText);
+      debugSetCursorPositionState(lineStart);
       setOriginalInput(newText);
       return;
     }
     if (key.ctrl && inputChar === "w") {
       const result = deleteWordBefore(input, cursorPosition);
-      setInputState(result.text);
-      setCursorPositionState(result.position);
+      debugSetInputState(result.text);
+      debugSetCursorPositionState(result.position);
       setOriginalInput(result.text);
       return;
     }
     if (key.ctrl && inputChar === "x") {
-      setInputState("");
-      setCursorPositionState(0);
+      debugSetInputState("");
+      debugSetCursorPositionState(0);
       setOriginalInput("");
       return;
     }
     if (inputChar && !key.ctrl && !key.meta) {
+      enhancedLog("\u{1F4DD} Regular character input detected");
+      enhancedLog("Character details:", {
+        character: inputChar,
+        currentPosition: cursorPosition,
+        currentInputLength: input.length,
+        willInsertAt: cursorPosition
+      });
       const result = insertText(input, cursorPosition, inputChar);
-      setInputState(result.text);
-      setCursorPositionState(result.position);
+      enhancedLog("\u{1F4DD} Text insertion result:", {
+        oldLength: input.length,
+        newLength: result.text.length,
+        newPosition: result.position,
+        insertedChar: inputChar
+      });
+      debugSetInputState(result.text);
+      debugSetCursorPositionState(result.position);
       setOriginalInput(result.text);
+      enhancedLog("\u2705 Regular character input completed");
+    } else {
+      enhancedLog("\u274C Character input skipped:", {
+        hasInputChar: !!inputChar,
+        isCtrl: !!key.ctrl,
+        isMeta: !!key.meta,
+        reason: !inputChar ? "No input char" : key.ctrl ? "Ctrl pressed" : "Meta pressed"
+      });
     }
   }, [disabled, onSpecialKey, input, cursorPosition, multiline, handleSubmit, navigateHistory, setOriginalInput]);
   return {
@@ -20197,11 +20179,13 @@ function useEnhancedInput({
     handleInput
   };
 }
+var enhancedLog;
 var init_use_enhanced_input = __esm({
   "src/hooks/use-enhanced-input.ts"() {
     init_text_utils();
     init_use_input_history();
-    init_paste_detection();
+    enhancedLog = (..._args) => {
+    };
   }
 });
 
@@ -27518,23 +27502,6 @@ function useInputHandler({
       }
     }
   };
-  const handlePasteDetected = (pasteEvent) => {
-    const userEntry = {
-      type: "user",
-      content: pasteEvent.content,
-      // Full content for AI (when submitted)
-      displayContent: pasteEvent.summary,
-      // Summary for UI display
-      timestamp: /* @__PURE__ */ new Date(),
-      isPasteSummary: true,
-      pasteMetadata: {
-        pasteNumber: pasteEvent.pasteNumber,
-        lineCount: pasteEvent.lineCount,
-        charCount: pasteEvent.charCount
-      }
-    };
-    setChatHistory((prev) => [...prev, userEntry]);
-  };
   const handleInputChange = (newInput) => {
     if (newInput.startsWith("/")) {
       setShowCommandSuggestions(true);
@@ -27550,18 +27517,73 @@ function useInputHandler({
     setInput,
     setCursorPosition,
     clearInput,
+    insertAtCursor,
     resetHistory,
     handleInput
   } = useEnhancedInput({
     onSubmit: handleInputSubmit,
     onSpecialKey: handleSpecialKey,
-    onPasteDetected: handlePasteDetected,
+    // Paste detection handled inline
     disabled: isConfirmationActive,
     multiline: true
     // Enable multiline mode to handle pasted content properly
   });
+  if (typeof globalThis.grokPasteCache === "undefined") {
+    globalThis.grokPasteCache = /* @__PURE__ */ new Map();
+  }
+  if (typeof globalThis.grokPasteCounter === "undefined") {
+    globalThis.grokPasteCounter = 0;
+  }
   useInput((inputChar, key) => {
     if (onGlobalShortcut && onGlobalShortcut(inputChar, key)) {
+      return;
+    }
+    if (inputChar.length > 1) {
+      const existingInputBeforePaste = input;
+      const cursorPositionBeforePaste = cursorPosition;
+      if (!globalThis.grokStreamingPasteBuffer) {
+        globalThis.grokExistingInputBeforePaste = existingInputBeforePaste;
+        globalThis.grokCursorPositionBeforePaste = cursorPositionBeforePaste;
+      }
+      if (!globalThis.grokStreamingPasteBuffer) {
+        globalThis.grokStreamingPasteBuffer = "";
+      }
+      globalThis.grokStreamingPasteBuffer += inputChar;
+      setTimeout(() => {
+        const pastedContent = globalThis.grokStreamingPasteBuffer;
+        if (pastedContent && (pastedContent.length > 100 || pastedContent.split(/\r\n|\r|\n/).length > 10)) {
+          const lines = pastedContent.split(/\r\n|\r|\n/);
+          globalThis.grokPasteCounter += 1;
+          const summary = `[Pasted text #${globalThis.grokPasteCounter} +${lines.length} lines]`;
+          globalThis.grokPasteCache.set(summary, pastedContent);
+          const existingInput2 = globalThis.grokExistingInputBeforePaste || "";
+          const cursorPos = globalThis.grokCursorPositionBeforePaste || 0;
+          setInput(existingInput2);
+          setCursorPosition(cursorPos);
+          setTimeout(() => {
+            insertAtCursor(summary);
+          }, 10);
+          const pasteConfirmationEntry = {
+            type: "assistant",
+            content: `\u{1F4C4} Large paste detected: ${lines.length} lines, showing summary`,
+            timestamp: /* @__PURE__ */ new Date()
+          };
+          setChatHistory((prev) => [...prev, pasteConfirmationEntry]);
+        } else if (pastedContent) {
+          const existingInput2 = globalThis.grokExistingInputBeforePaste || "";
+          const cursorPos = globalThis.grokCursorPositionBeforePaste || 0;
+          const beforeCursor = existingInput2.slice(0, cursorPos);
+          const afterCursor = existingInput2.slice(cursorPos);
+          const combinedContent = beforeCursor + pastedContent + afterCursor;
+          setInput(combinedContent);
+          setTimeout(() => {
+            setCursorPosition(beforeCursor.length + pastedContent.length);
+          }, 0);
+        }
+        globalThis.grokStreamingPasteBuffer = void 0;
+        globalThis.grokExistingInputBeforePaste = void 0;
+        globalThis.grokCursorPositionBeforePaste = void 0;
+      }, 100);
       return;
     }
     handleInput(inputChar, key);
@@ -29220,24 +29242,27 @@ ${pushResult.error || "Git push failed"}
     }
     return false;
   };
-  const processUserMessage = async (userInput) => {
-    const pasteService = getPasteDetectionService();
-    const shouldSummarize = pasteService.shouldSummarize(userInput);
-    const recentEntry = chatHistory[chatHistory.length - 1];
-    const isAlreadyShowingPasteSummary = recentEntry && recentEntry.isPasteSummary && recentEntry.content === userInput;
-    if (!isAlreadyShowingPasteSummary) {
-      const userEntry = {
-        type: "user",
-        content: userInput,
-        displayContent: shouldSummarize ? pasteService.createPasteSummary(userInput, pasteService.getCurrentCounter() + 1) : userInput,
-        timestamp: /* @__PURE__ */ new Date(),
-        isPasteSummary: shouldSummarize
-      };
-      if (shouldSummarize) {
-        pasteService.detectPaste("", userInput);
-      }
-      setChatHistory((prev) => [...prev, userEntry]);
+  const expandPasteSummaryToFullContent = async (userInput) => {
+    if (!globalThis.grokPasteCache) return userInput;
+    let expandedInput = userInput;
+    const cache = globalThis.grokPasteCache;
+    for (const [summary, fullContent] of cache.entries()) {
+      const cleanContent = fullContent.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim().split("\n").map((line) => line.trim()).join("\n");
+      expandedInput = expandedInput.replace(summary, cleanContent);
     }
+    return expandedInput;
+  };
+  const processUserMessage = async (userInput) => {
+    const expandedInput = await expandPasteSummaryToFullContent(userInput);
+    const userEntry = {
+      type: "user",
+      content: expandedInput,
+      // AI receives expanded content
+      displayContent: userInput,
+      // UI shows what user typed (may be summary)
+      timestamp: /* @__PURE__ */ new Date()
+    };
+    setChatHistory((prev) => [...prev, userEntry]);
     setIsProcessing(true);
     clearInput();
     try {
@@ -29326,7 +29351,7 @@ ${pushResult.error || "Git push failed"}
         }
         lastUpdateTime = now;
       };
-      for await (const chunk of agent.processUserMessageStream(userInput)) {
+      for await (const chunk of agent.processUserMessageStream(expandedInput)) {
         switch (chunk.type) {
           case "content":
             if (chunk.content) {
@@ -29396,7 +29421,6 @@ var init_use_input_handler = __esm({
   "src/hooks/use-input-handler.ts"() {
     init_confirmation_service();
     init_use_enhanced_input();
-    init_paste_detection();
     init_use_plan_mode();
     init_command_suggestions();
     init_model_config();
@@ -30720,6 +30744,7 @@ var init_file_content_renderer = __esm({
   }
 });
 function ToolCallEntry({ entry, verbosityLevel, explainLevel }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const getExplanation = (toolName2, filePath2, _isExecuting) => {
     if (explainLevel === "off") return null;
     const explanations = {
@@ -30747,6 +30772,19 @@ function ToolCallEntry({ entry, verbosityLevel, explainLevel }) {
     const explanation2 = explanations[toolName2];
     if (!explanation2) return null;
     return explainLevel === "detailed" ? explanation2.detailed : explanation2.brief;
+  };
+  const truncateToClaudeStyle = (content) => {
+    const lines = content.split("\n");
+    const maxLines = 3;
+    if (lines.length <= maxLines) {
+      return { preview: content, hasMore: false, totalLines: lines.length };
+    }
+    const preview2 = lines.slice(0, maxLines).join("\n");
+    return {
+      preview: preview2,
+      hasMore: true,
+      totalLines: lines.length
+    };
   };
   const getToolActionName = (toolName2) => {
     if (toolName2.startsWith("mcp__")) {
@@ -30815,6 +30853,7 @@ function ToolCallEntry({ entry, verbosityLevel, explainLevel }) {
   const shouldShowToolContent = verbosityLevel !== "quiet";
   const shouldShowFullContent = verbosityLevel === "normal" || verbosityLevel === "verbose";
   const explanation = getExplanation(toolName, filePath);
+  const { preview, hasMore, totalLines } = truncateToClaudeStyle(entry.content || "");
   return /* @__PURE__ */ jsxs(Box, { flexDirection: "column", marginTop: 1, children: [
     /* @__PURE__ */ jsxs(Box, { children: [
       /* @__PURE__ */ jsx(Text, { color: "magenta", children: "\u23FA" }),
@@ -30827,16 +30866,39 @@ function ToolCallEntry({ entry, verbosityLevel, explainLevel }) {
       "\u{1F4A1} ",
       explanation
     ] }) }),
-    shouldShowToolContent && /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: isExecuting ? /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u23BF Executing..." }) : shouldShowFileContent && shouldShowFullContent ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+    shouldShowToolContent && /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: isExecuting ? /* @__PURE__ */ jsx(Text, { color: "cyan", children: "\u23BF Executing..." }) : shouldShowFileContent && shouldShowFullContent ? /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: !isExpanded ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+      /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+        "\u23BF ",
+        preview
+      ] }),
+      hasMore && /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+        "\u2026 +",
+        totalLines - 3,
+        " lines (ctrl+r to expand)"
+      ] })
+    ] }) : /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
       /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF File contents:" }),
       /* @__PURE__ */ jsx(Box, { marginLeft: 2, flexDirection: "column", children: /* @__PURE__ */ jsx(FileContentRenderer, { content: entry.content }) })
-    ] }) : shouldShowDiff && shouldShowFullContent ? (
+    ] }) }) : shouldShowDiff && shouldShowFullContent ? (
       // For diff results, show only the summary line, not the raw content
       /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
         "\u23BF ",
         entry.content.split("\n")[0]
       ] })
-    ) : !shouldShowFullContent ? /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Completed" }) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+    ) : !shouldShowFullContent ? /* @__PURE__ */ jsx(Text, { color: "gray", children: "\u23BF Completed" }) : !isExpanded && hasMore ? /* @__PURE__ */ jsxs(Box, { flexDirection: "column", children: [
+      /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+        "\u23BF ",
+        preview
+      ] }),
+      /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+        "\u2026 +",
+        totalLines - 3,
+        " lines (ctrl+r to expand)"
+      ] })
+    ] }) : !isExpanded ? /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
+      "\u23BF ",
+      preview
+    ] }) : /* @__PURE__ */ jsxs(Text, { color: "gray", children: [
       "\u23BF ",
       formatToolContent(entry.content, toolName)
     ] }) }),
@@ -30905,7 +30967,7 @@ var MemoizedChatEntry;
 var init_chat_history = __esm({
   "src/ui/components/chat-history.tsx"() {
     init_chat_entry_router();
-    MemoizedChatEntry = React4.memo(
+    MemoizedChatEntry = React5.memo(
       ({ entry, verbosityLevel, explainLevel }) => {
         return /* @__PURE__ */ jsx(ChatEntryRouter, { entry, verbosityLevel, explainLevel });
       }
@@ -31154,31 +31216,64 @@ function ChatInput({
   isProcessing,
   isStreaming
 }) {
-  const beforeCursor = input.slice(0, cursorPosition);
-  const lines = input.split(/\r\n|\r|\n/);
-  const isMultiline = lines.length > 1;
-  const MAX_DISPLAY_LINES = 10;
-  const shouldTruncateDisplay = lines.length > MAX_DISPLAY_LINES;
-  if (shouldTruncateDisplay) {
-    console.log(`\u{1F4C4} Large paste detected: ${lines.length} lines, showing truncated view`);
-  }
-  let currentLineIndex = 0;
-  let currentCharIndex = 0;
-  let totalChars = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (totalChars + lines[i].length >= cursorPosition) {
-      currentLineIndex = i;
-      currentCharIndex = cursorPosition - totalChars;
-      break;
+  try {
+    let displayInput = input;
+    const beforeCursor = displayInput.slice(0, Math.min(cursorPosition, displayInput.length));
+    const lines = displayInput.split(/\r\n|\r|\n/);
+    const isMultiline = lines.length > 1;
+    const MAX_DISPLAY_LINES = 10;
+    const shouldTruncateDisplay = lines.length > MAX_DISPLAY_LINES;
+    if (shouldTruncateDisplay) {
+      console.log(`\u{1F4C4} Large content: ${lines.length} lines, showing truncated view`);
     }
-    totalChars += lines[i].length + 1;
-  }
-  const showCursor = !isProcessing && !isStreaming;
-  const borderColor = isProcessing || isStreaming ? "yellow" : "blue";
-  const promptColor = "cyan";
-  const placeholderText = "Ask me anything...";
-  const isPlaceholder = !input;
-  if (isMultiline) {
+    let currentLineIndex = 0;
+    let currentCharIndex = 0;
+    let totalChars = 0;
+    for (let i = 0; i < lines.length; i++) {
+      if (totalChars + lines[i].length >= cursorPosition) {
+        currentLineIndex = i;
+        currentCharIndex = cursorPosition - totalChars;
+        break;
+      }
+      totalChars += lines[i].length + 1;
+    }
+    const showCursor = !isProcessing && !isStreaming;
+    const borderColor = isProcessing || isStreaming ? "yellow" : "blue";
+    const promptColor = "cyan";
+    const placeholderText = "Ask me anything...";
+    const isPlaceholder = !input;
+    if (isMultiline) {
+      return /* @__PURE__ */ jsx(
+        Box,
+        {
+          borderStyle: "round",
+          borderColor,
+          paddingX: 1,
+          paddingY: 0,
+          marginTop: 1,
+          flexDirection: "column",
+          children: /* @__PURE__ */ jsx(Text, { children: shouldTruncateDisplay ? (
+            // Show Claude Code style paste summary but don't replace input
+            `\u276F [Pasted text #${globalThis.grokPasteCounter || 1} +${lines.length} lines]`
+          ) : (
+            // Normal multiline display for reasonable sizes
+            lines.map((line, index) => {
+              const isCurrentLine = index === currentLineIndex;
+              const promptChar = index === 0 ? "\u276F " : "  ";
+              let lineText = promptChar + line;
+              if (isCurrentLine && showCursor) {
+                const cursorPos = promptChar.length + currentCharIndex;
+                lineText = lineText.slice(0, cursorPos) + "\u2588" + lineText.slice(cursorPos + 1);
+              }
+              return index === lines.length - 1 ? lineText : lineText + "\n";
+            }).join("")
+          ) })
+        }
+      );
+    }
+    const adjustedCursorPos = Math.min(cursorPosition, displayInput.length);
+    const cursorChar = displayInput.slice(adjustedCursorPos, adjustedCursorPos + 1) || " ";
+    const afterCursorText = displayInput.slice(adjustedCursorPos + 1);
     return /* @__PURE__ */ jsx(
       Box,
       {
@@ -31187,57 +31282,36 @@ function ChatInput({
         paddingX: 1,
         paddingY: 0,
         marginTop: 1,
-        flexDirection: "column",
-        children: /* @__PURE__ */ jsx(Text, { children: shouldTruncateDisplay ? (
-          // Show truncated view for very large pastes
-          `\u276F [Large paste: ${lines.length} lines, ${input.length} chars]
-  First few lines:
-  ${lines.slice(0, 3).map((line) => `  ${line}`).join("\n")}
-  ...
-  Last few lines:
-  ${lines.slice(-2).map((line) => `  ${line}`).join("\n")}
-  
-  Press Enter to submit or edit to modify.`
-        ) : (
-          // Normal multiline display for reasonable sizes
-          lines.map((line, index) => {
-            const isCurrentLine = index === currentLineIndex;
-            const promptChar = index === 0 ? "\u276F " : "  ";
-            let lineText = promptChar + line;
-            if (isCurrentLine && showCursor) {
-              const cursorPos = promptChar.length + currentCharIndex;
-              lineText = lineText.slice(0, cursorPos) + "\u2588" + lineText.slice(cursorPos + 1);
-            }
-            return index === lines.length - 1 ? lineText : lineText + "\n";
-          }).join("")
-        ) })
+        children: /* @__PURE__ */ jsxs(Box, { children: [
+          /* @__PURE__ */ jsx(Text, { color: promptColor, children: "\u276F " }),
+          isPlaceholder ? /* @__PURE__ */ jsxs(Fragment, { children: [
+            /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: placeholderText }),
+            showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: " " })
+          ] }) : /* @__PURE__ */ jsxs(Text, { children: [
+            beforeCursor,
+            showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar }),
+            !showCursor && cursorChar !== " " && cursorChar,
+            afterCursorText
+          ] })
+        ] })
+      }
+    );
+  } catch (error) {
+    console.error("[ERROR] ChatInput component crashed:", error);
+    console.error("[ERROR] Stack:", error instanceof Error ? error.stack : "No stack");
+    console.error("[ERROR] Input data:", { input: input?.slice(0, 100), cursorPosition, isProcessing, isStreaming });
+    return /* @__PURE__ */ jsx(
+      Box,
+      {
+        borderStyle: "round",
+        borderColor: "red",
+        paddingX: 1,
+        paddingY: 0,
+        marginTop: 1,
+        children: /* @__PURE__ */ jsx(Text, { color: "red", children: "\u276F [Input error - check console]" })
       }
     );
   }
-  const cursorChar = input.slice(cursorPosition, cursorPosition + 1) || " ";
-  const afterCursorText = input.slice(cursorPosition + 1);
-  return /* @__PURE__ */ jsx(
-    Box,
-    {
-      borderStyle: "round",
-      borderColor,
-      paddingX: 1,
-      paddingY: 0,
-      marginTop: 1,
-      children: /* @__PURE__ */ jsxs(Box, { children: [
-        /* @__PURE__ */ jsx(Text, { color: promptColor, children: "\u276F " }),
-        isPlaceholder ? /* @__PURE__ */ jsxs(Fragment, { children: [
-          /* @__PURE__ */ jsx(Text, { color: "gray", dimColor: true, children: placeholderText }),
-          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: " " })
-        ] }) : /* @__PURE__ */ jsxs(Text, { children: [
-          beforeCursor,
-          showCursor && /* @__PURE__ */ jsx(Text, { backgroundColor: "white", color: "black", children: cursorChar }),
-          !showCursor && cursorChar !== " " && cursorChar,
-          afterCursorText
-        ] })
-      ] })
-    }
-  );
 }
 var init_chat_input = __esm({
   "src/ui/components/chat-input.tsx"() {
@@ -31864,6 +31938,85 @@ var init_chat_interface_renderer = __esm({
     init_confirmation_dialog();
   }
 });
+function getSessionLogger() {
+  if (!sessionLogger) {
+    sessionLogger = new SessionLogger();
+  }
+  return sessionLogger;
+}
+function logTerminalState(state) {
+  getSessionLogger().logTerminalState(state);
+}
+var SessionLogger, sessionLogger;
+var init_session_logger = __esm({
+  "src/utils/session-logger.ts"() {
+    SessionLogger = class {
+      constructor() {
+        this.sessionId = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+        this.logPath = path8__default.join(process.cwd(), `session-${this.sessionId}.log`);
+        this.init();
+      }
+      init() {
+        const header = `
+=================================================================
+\u{1F9EA} GROK ONE-SHOT TESTING SESSION
+Session ID: ${this.sessionId}
+Started: ${(/* @__PURE__ */ new Date()).toISOString()}
+=================================================================
+
+`;
+        fs7__default.writeFileSync(this.logPath, header);
+      }
+      logTerminalState(state) {
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+        const entry = `
+[${timestamp}] \u{1F4FA} TERMINAL STATE - ${state.action}
+=====================================
+INPUT FIELD: "${state.input}"
+CURSOR POS: ${state.cursorPosition}
+PROCESSING: ${state.isProcessing}
+STREAMING: ${state.isStreaming}
+CHAT ENTRIES: ${state.chatHistory.length}
+LAST ENTRY: ${state.chatHistory.length > 0 ? JSON.stringify(state.chatHistory[state.chatHistory.length - 1], null, 2) : "None"}
+=====================================
+
+`;
+        fs7__default.appendFileSync(this.logPath, entry);
+      }
+      logUserAction(action, details = {}) {
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+        const entry = `[${timestamp}] \u{1F464} USER ACTION: ${action}
+Details: ${JSON.stringify(details, null, 2)}
+
+`;
+        fs7__default.appendFileSync(this.logPath, entry);
+      }
+      logPasteEvent(event) {
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+        const entry = `[${timestamp}] \u{1F4CB} PASTE EVENT: ${event.phase}
+Data: ${JSON.stringify(event.data, null, 2)}
+
+`;
+        fs7__default.appendFileSync(this.logPath, entry);
+      }
+      logTestResult(testName, result, details) {
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+        const entry = `
+[${timestamp}] \u2705 TEST RESULT: ${testName}
+Result: ${result}
+Details: ${details}
+=================================================================
+
+`;
+        fs7__default.appendFileSync(this.logPath, entry);
+      }
+      getLogPath() {
+        return this.logPath;
+      }
+    };
+    sessionLogger = null;
+  }
+});
 
 // src/ui/components/chat-interface.tsx
 var chat_interface_exports = {};
@@ -31928,6 +32081,16 @@ function ChatInterfaceWithAgent({
     explainLevel,
     planMode
   } = useInputHandler(inputHandlerProps);
+  useEffect(() => {
+    logTerminalState({
+      input,
+      cursorPosition,
+      chatHistory,
+      isProcessing,
+      isStreaming,
+      action: "STATE_CHANGE"
+    });
+  }, [input, cursorPosition, chatHistory.length, isProcessing, isStreaming]);
   useStreaming(agent, initialMessage, setChatHistory, {
     setIsProcessing,
     setIsStreaming,
@@ -32014,6 +32177,7 @@ var init_chat_interface = __esm({
     init_use_session_logging();
     init_use_processing_timer();
     init_chat_interface_renderer();
+    init_session_logger();
   }
 });
 
@@ -32554,7 +32718,7 @@ try {
         printWelcomeBanner2(options.quiet);
       }
       const initialMessage = Array.isArray(message) ? message.join(" ") : message || "";
-      const app = render(React4.createElement(ChatInterface2, {
+      const app = render(React5.createElement(ChatInterface2, {
         agent,
         initialMessage,
         quiet: options.quiet

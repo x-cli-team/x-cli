@@ -15,6 +15,7 @@ import { useConsoleSetup } from "../../hooks/use-console-setup.js";
 import { useSessionLogging } from "../../hooks/use-session-logging.js";
 import { useProcessingTimer } from "../../hooks/use-processing-timer.js";
 import { ChatInterfaceRenderer, ContextInfo, PlanMode } from "../../ui/components/chat-interface-renderer.js";
+import { logTerminalState, logUserAction } from "../../utils/session-logger.js";
 
 interface ChatInterfaceProps {
   agent?: GrokAgent;
@@ -104,6 +105,18 @@ function ChatInterfaceWithAgent({
     explainLevel,
     planMode,
   } = useInputHandler(inputHandlerProps);
+
+  // 🧪 SESSION LOGGING: Track terminal state for testing
+  useEffect(() => {
+    logTerminalState({
+      input,
+      cursorPosition,
+      chatHistory,
+      isProcessing,
+      isStreaming,
+      action: 'STATE_CHANGE'
+    });
+  }, [input, cursorPosition, chatHistory.length, isProcessing, isStreaming]);
 
   // Use streaming hook for processing initial messages
   useStreaming(agent, initialMessage, setChatHistory, {

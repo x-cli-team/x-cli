@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Text } from "ink";
 import { ChatEntry } from "../../../agent/grok-agent.js";
 import { DiffRenderer } from "../diff-renderer.js";
@@ -17,6 +17,8 @@ const truncateContent = (content: string, maxLength: number = 100): string => {
 };
 
 export function ToolCallEntry({ entry, verbosityLevel, explainLevel }: ToolCallEntryProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Generate explanations for operations
   const getExplanation = (toolName: string, filePath: string, _isExecuting: boolean) => {
     if (explainLevel === 'off') return null;
@@ -48,6 +50,23 @@ export function ToolCallEntry({ entry, verbosityLevel, explainLevel }: ToolCallE
     if (!explanation) return null;
 
     return explainLevel === 'detailed' ? explanation.detailed : explanation.brief;
+  };
+
+  // Truncate content to Claude Code style (3 lines max)
+  const truncateToClaudeStyle = (content: string): { preview: string; hasMore: boolean; totalLines: number } => {
+    const lines = content.split('\n');
+    const maxLines = 3;
+    
+    if (lines.length <= maxLines) {
+      return { preview: content, hasMore: false, totalLines: lines.length };
+    }
+
+    const preview = lines.slice(0, maxLines).join('\n');
+    return { 
+      preview, 
+      hasMore: true, 
+      totalLines: lines.length 
+    };
   };
 
 
@@ -144,6 +163,7 @@ export function ToolCallEntry({ entry, verbosityLevel, explainLevel }: ToolCallE
   const shouldShowFullContent = verbosityLevel === 'normal' || verbosityLevel === 'verbose';
 
   const explanation = getExplanation(toolName, filePath, isExecuting);
+  const { preview, hasMore, totalLines } = truncateToClaudeStyle(entry.content || '');
 
   return (
     <Box flexDirection="column" marginTop={1}>
@@ -167,16 +187,38 @@ export function ToolCallEntry({ entry, verbosityLevel, explainLevel }: ToolCallE
             <Text color="cyan">⎿ Executing...</Text>
           ) : shouldShowFileContent && shouldShowFullContent ? (
             <Box flexDirection="column">
-              <Text color="gray">⎿ File contents:</Text>
-              <Box marginLeft={2} flexDirection="column">
-                <FileContentRenderer content={entry.content} />
-              </Box>
+              {!isExpanded ? (
+                <Box flexDirection="column">
+                  <Text color="gray">⎿ {preview}</Text>
+                  {hasMore && (
+                    <Text color="gray">
+                      … +{totalLines - 3} lines (ctrl+r to expand)
+                    </Text>
+                  )}
+                </Box>
+              ) : (
+                <Box flexDirection="column">
+                  <Text color="gray">⎿ File contents:</Text>
+                  <Box marginLeft={2} flexDirection="column">
+                    <FileContentRenderer content={entry.content} />
+                  </Box>
+                </Box>
+              )}
             </Box>
           ) : shouldShowDiff && shouldShowFullContent ? (
             // For diff results, show only the summary line, not the raw content
             <Text color="gray">⎿ {entry.content.split("\n")[0]}</Text>
           ) : !shouldShowFullContent ? (
             <Text color="gray">⎿ Completed</Text>
+          ) : !isExpanded && hasMore ? (
+            <Box flexDirection="column">
+              <Text color="gray">⎿ {preview}</Text>
+              <Text color="gray">
+                … +{totalLines - 3} lines (ctrl+r to expand)
+              </Text>
+            </Box>
+          ) : !isExpanded ? (
+            <Text color="gray">⎿ {preview}</Text>
           ) : (
             <Text color="gray">⎿ {formatToolContent(entry.content, toolName)}</Text>
           )}

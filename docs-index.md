@@ -66,6 +66,7 @@ Complete map of Grok One-Shot documentation. All files are in `.agent/` director
 - `features/research-mode.md` - Codebase exploration
 - `features/codebase-intelligence.md` - Advanced indexing and semantic search ⭐ **NEW**
 - `features/plan-mode.md` - Claude Code Plan Mode implementation ⭐ **COMPLETE**
+- `features/paste-detection-parity.md` - Paste detection Claude Code parity tracker 🔄 **IN PROGRESS**
 - `features/error-handling.md` - Error handling and recovery
 - `features/plan-mode.md` - Plan mode (TBD)
 - `features/ide-integration.md` - IDE extensions (TBD)

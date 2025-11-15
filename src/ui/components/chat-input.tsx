@@ -8,26 +8,41 @@ interface ChatInputProps {
   isStreaming: boolean;
 }
 
+// Global paste cache (now managed at input handler level)
+declare global {
+  var grokPasteCache: Map<string, string> | undefined;
+  var grokPasteCounter: number | undefined;
+}
+
 export function ChatInput({
   input,
   cursorPosition,
   isProcessing,
   isStreaming,
 }: ChatInputProps) {
-  const beforeCursor = input.slice(0, cursorPosition);
-  // afterCursor removed - not used in single line mode
+  try {
+    // Debug logging disabled
+    // pasteLog('=== ChatInput render ===');
 
-  // Handle multiline input display - support different line endings
-  const lines = input.split(/\r\n|\r|\n/);
-  const isMultiline = lines.length > 1;
+    // Use the input as provided - input handler now manages summary display properly
+    let displayInput = input;
+
+    const beforeCursor = displayInput.slice(0, Math.min(cursorPosition, displayInput.length));
+    // afterCursor removed - not used in single line mode
+
+    // Handle multiline input display - support different line endings  
+    const lines = displayInput.split(/\r\n|\r|\n/);
+    const isMultiline = lines.length > 1;
+    
+    // Debug logging disabled
   
   // Limit display to reasonable number of lines to prevent terminal overflow
   const MAX_DISPLAY_LINES = 10;
   const shouldTruncateDisplay = lines.length > MAX_DISPLAY_LINES;
   
-  // Optional debug logging
+  // Display handling for large content (paste summaries are now handled at input level)
   if (shouldTruncateDisplay) {
-    console.log(`📄 Large paste detected: ${lines.length} lines, showing truncated view`);
+    console.log(`📄 Large content: ${lines.length} lines, showing truncated view`);
   }
 
   // Calculate cursor position across lines
@@ -64,15 +79,8 @@ export function ChatInput({
       >
         <Text>
           {shouldTruncateDisplay ? (
-            // Show truncated view for very large pastes
-            `❯ [Large paste: ${lines.length} lines, ${input.length} chars]
-  First few lines:
-  ${lines.slice(0, 3).map(line => `  ${line}`).join('\n')}
-  ...
-  Last few lines:
-  ${lines.slice(-2).map(line => `  ${line}`).join('\n')}
-  
-  Press Enter to submit or edit to modify.`
+            // Show Claude Code style paste summary but don't replace input
+            `❯ [Pasted text #${globalThis.grokPasteCounter || 1} +${lines.length} lines]`
           ) : (
             // Normal multiline display for reasonable sizes
             lines.map((line, index) => {
@@ -98,8 +106,9 @@ export function ChatInput({
   }
 
   // Single line input box
-  const cursorChar = input.slice(cursorPosition, cursorPosition + 1) || " ";
-  const afterCursorText = input.slice(cursorPosition + 1);
+  const adjustedCursorPos = Math.min(cursorPosition, displayInput.length);
+  const cursorChar = displayInput.slice(adjustedCursorPos, adjustedCursorPos + 1) || " ";
+  const afterCursorText = displayInput.slice(adjustedCursorPos + 1);
 
   return (
     <Box
@@ -137,4 +146,22 @@ export function ChatInput({
       </Box>
     </Box>
   );
+  } catch (error) {
+    console.error('[ERROR] ChatInput component crashed:', error);
+    console.error('[ERROR] Stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('[ERROR] Input data:', { input: input?.slice(0, 100), cursorPosition, isProcessing, isStreaming });
+    
+    // Return a safe fallback UI
+    return (
+      <Box
+        borderStyle="round"
+        borderColor="red"
+        paddingX={1}
+        paddingY={0}
+        marginTop={1}
+      >
+        <Text color="red">❯ [Input error - check console]</Text>
+      </Box>
+    );
+  }
 }
