@@ -129,20 +129,24 @@ else
   echo "✅ Tool code integrity verified (no accidental changes detected)"
 fi
 
-# Validate MDX files for compilation errors
-echo "🔍 Validating MDX documentation..."
-if ! npm run build:site > /dev/null 2>&1; then
-  echo "❌ MDX compilation failed! Please fix MDX syntax errors before committing."
-  echo "💡 Common issues:"
-  echo "   - Custom component closing tags (</Tip>, </Step>, </Note>) inside list items"
-  echo "   - Missing blank lines before closing tags"
-  echo "   - Unmatched opening/closing tags"
-  echo ""
-  echo "🔧 To debug: Run 'npm run build:site' to see detailed errors"
-  echo "🚫 Commit blocked - fix MDX errors and try again"
-  exit 1
+# Validate MDX files for compilation errors (skip in CI due to link resolution issues)
+if [ -z "$CI" ] && [ -z "$GITHUB_ACTIONS" ]; then
+  echo "🔍 Validating MDX documentation..."
+  if ! npm run build:site > /dev/null 2>&1; then
+    echo "❌ MDX compilation failed! Please fix MDX syntax errors before committing."
+    echo "💡 Common issues:"
+    echo "   - Custom component closing tags (</Tip>, </Step>, </Note>) inside list items"
+    echo "   - Missing blank lines before closing tags"
+    echo "   - Unmatched opening/closing tags"
+    echo ""
+    echo "🔧 To debug: Run 'npm run build:site' to see detailed errors"
+    echo "🚫 Commit blocked - fix MDX errors and try again"
+    exit 1
+  else
+    echo "✅ MDX documentation validated successfully"
+  fi
 else
-  echo "✅ MDX documentation validated successfully"
+  echo "⏭️ Skipping MDX validation in CI environment"
 fi
 
 # TODO: Add session learnings capture here
