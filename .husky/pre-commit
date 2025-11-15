@@ -82,7 +82,7 @@ else
 fi
 
 # Run core features test suite (ensure build exists first)
-if ! ./scripts/test-core-features-husky.sh false; then
+if ! ./scripts/test-core-features-husky.sh true 2>/dev/null; then
   echo "❌ Core features validation failed! Essential functionality is broken."
   echo "💡 Common issues:"
   echo "   - TypeScript compilation errors"

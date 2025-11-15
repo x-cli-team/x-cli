@@ -53,7 +53,7 @@ export class MCPManager extends EventEmitter {
         },
         {
           capabilities: {
-            tools: {}
+            // Client capabilities - not tools (tools are for servers)
           }
         }
       );
