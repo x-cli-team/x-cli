@@ -48,6 +48,9 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
+      - name: Link CLI for testing
+        run: npm link
+
       # Prevent loops if last commit was an automated bump, but allow GitHub releases for release PR merges
       - name: Check if should release
         id: should-release
